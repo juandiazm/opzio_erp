@@ -3,9 +3,9 @@
 <script>
     var unique_id = '{{ $unique_id }}';
 </script>
-<script src="{{ asset('js/erp/approve_linkedin_post/approve_linkedin_post.js') }}" defer></script>
+@vite('resources/js/erp/approve_linkedin_post/approve_linkedin_post.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/approve_linkedin_post/approve_linkedin_post.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/approve_linkedin_post/approve_linkedin_post.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')

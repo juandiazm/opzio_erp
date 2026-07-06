@@ -141,7 +141,7 @@ trait clients_trait
                 ,$user_client_permissions
                 ,$send_client_email
             );
-            $MailResponse = $this->Client_SendNewClientEmailToRidder($client);
+            $MailResponse = $this->Client_SendNewClientEmailToOpzio($client);
             return [
                 'status' => 1,
                 'message' => 'cliente agregado',
@@ -205,7 +205,7 @@ trait clients_trait
                 ,'#0153FF'
                 ,$user_client_permissions
             );
-            $MailResponse = $this->Client_SendNewClientEmailToRidder($client);
+            $MailResponse = $this->Client_SendNewClientEmailToOpzio($client);
             $Response = [
                 'status' => 1,
                 'message' => 'Cliente registrado',
@@ -217,7 +217,7 @@ trait clients_trait
         }
         return $Response;
     }
-    public function Client_SendNewClientEmailToRidder($client){
+    public function Client_SendNewClientEmailToOpzio($client){
         try{
             if($client->active == 0){
                 return [
@@ -225,11 +225,11 @@ trait clients_trait
                     'message' => 'El cliente no está activo'
                 ];
             }
-            //Send mail to ridder
+            //Send mail to opzio
             $Mails = [];
             $Mails[] = [
-                'address' => 'comunicaciones@ridder.com.co',
-                'name' => 'RIDDER S.A.S.'
+                'address' => 'comunicaciones@opzio.com.co',
+                'name' => 'Opzio S.A.S.'
             ];
             $MailData = 
             [

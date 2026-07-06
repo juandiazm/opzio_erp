@@ -556,9 +556,9 @@ trait nini_integration_trait
     {
         return [
             'status' => 1,
-            'message' => 'Ridder ERP - Nini Integration Active',
+            'message' => 'Opzio ERP - Nini Integration Active',
             'data' => [
-                'app' => 'ridder_erp',
+                'app' => 'opzio_erp',
                 'integration' => 'nini',
                 'timestamp' => Carbon::now()->toIso8601String(),
                 'version' => '1.0.0',

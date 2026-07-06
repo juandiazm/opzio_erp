@@ -1,7 +1,7 @@
 @extends('erp.layouts.app')
 @section('erp-app-header')
-<script src="{{ asset('js/erp/ia_assistant/ia_marketing_report.js') }}" defer></script>
-<link href="{{ asset('css/erp/ia_assistant/ia_marketing_report.css') }}" rel="stylesheet">
+@vite('resources/js/erp/ia_assistant/ia_marketing_report.js')
+@vite('resources/sass/erp/ia_assistant/ia_marketing_report.scss')
 @endsection
 @section('component_title', 'Reportes de Marketing')
 @section('erp-app-content')

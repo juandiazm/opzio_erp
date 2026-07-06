@@ -170,11 +170,11 @@ trait income_payments_trait
                     );
                     //Update license if is reccurrent
                     $LicensesResponse = $this->License_UpdateBillingDataByIds($income_licenses);
-                    //Send Mail to Ridder
+                    //Send Mail to Opzio
                     $Mails = [];
                     $Mails[] = [
-                        'address' => 'comunicaciones@ridder.com.co',
-                        'name' => 'Ridder S.A.S'
+                        'address' => 'comunicaciones@opzio.com.co',
+                        'name' => 'Opzio S.A.S'
                     ];
                     $MailData = 
                     [
@@ -188,7 +188,7 @@ trait income_payments_trait
                         "client" => $client,
                     ]
                     );
-                    $RidderEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
+                    $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                     //Send SMS to client
                     $message = 'Hola '.$client->name.', tu orden de compra #'.substr($income_payment->unique_id, -10).' ha sido procesada exitosamente.';
                     foreach ($licenses_notifications as $notification) {
@@ -223,7 +223,7 @@ trait income_payments_trait
                     "client" => $client,
                 ]
                 );
-                $RidderEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
+                $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                 /////////////////////
                 $Response['status'] = 1;
                 $Response['message'] = 'Wompi payment finished';
@@ -406,11 +406,11 @@ trait income_payments_trait
                     );
                     // Update license if is recurrent
                     $LicensesResponse = $this->License_UpdateBillingDataByIds($income_licenses);
-                    // Send Mail to Ridder
+                    // Send Mail to Opzio
                     $Mails = [];
                     $Mails[] = [
-                        'address' => 'comunicaciones@ridder.com.co',
-                        'name' => 'Ridder S.A.S'
+                        'address' => 'comunicaciones@opzio.com.co',
+                        'name' => 'Opzio S.A.S'
                     ];
                     $MailData = [
                         'subject' => 'Nuevo pago '.$payment_state_label.' (Bold) #'.substr($income_payment->unique_id, -10)
@@ -421,7 +421,7 @@ trait income_payments_trait
                         "income" => $income,
                         "client" => $client,
                     ]);
-                    $RidderEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
+                    $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                     // Send SMS to client
                     $message = 'Hola '.$client->name.', tu orden de compra #'.substr($income_payment->unique_id, -10).' ha sido procesada exitosamente.';
                     foreach ($licenses_notifications as $notification) {
@@ -452,7 +452,7 @@ trait income_payments_trait
                     "income" => $income,
                     "client" => $client,
                 ]);
-                $RidderEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
+                $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                 
                 $Response['status'] = 1;
                 $Response['message'] = 'Bold payment finished';

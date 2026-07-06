@@ -1,9 +1,9 @@
 @extends('client.layouts.app')
 @section('component_title', 'Inicio')
 @section('client-app-header')
-<script src="{{ asset('js/client/dashboard/dashboard.js') }}" defer></script>
+@vite('resources/js/client/dashboard/dashboard.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/dashboard/dashboard.css') }}" rel="stylesheet">
+@vite('resources/sass/client/dashboard/dashboard.scss')
 @endsection
 @section('client-app-content')
 <div id="dashboard-container" class="d-flex justify-content-center">

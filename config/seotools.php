@@ -9,7 +9,7 @@ return [
          * The default configurations to be used by the meta generator.
          */
         'defaults'       => [
-            'title'        => "RIDDER", // set false to total remove
+            'title'        => "Opzio", // set false to total remove
             'titleBefore'  => false, // Put defaults.title before page title, like 'It's Over 9000! - Dashboard'
             'description'  => 'No esperes más para alcanzar tus metas digitales. Explora nuestras soluciones y comienza a construir el futuro de tu empresa.', // set false to total remove
             'separator'    => ' - ',
@@ -36,7 +36,7 @@ return [
          * The default configurations to be used by the opengraph generator.
          */
         'defaults' => [
-            'title'       => 'RIDDER', // set false to total remove
+            'title'       => 'Opzio', // set false to total remove
             'description'  => 'No esperes más para alcanzar tus metas digitales. Explora nuestras soluciones y comienza a construir el futuro de tu empresa.', // set false to total remove
             'url'         => null, // Set null for using Url::current(), set false to total remove
             'type'        => false,
@@ -58,7 +58,7 @@ return [
          * The default configurations to be used by the json-ld generator.
          */
         'defaults' => [
-            'title'       => 'RIDDER', // set false to total remove
+            'title'       => 'Opzio', // set false to total remove
             'description'  => 'No esperes más para alcanzar tus metas digitales. Explora nuestras soluciones y comienza a construir el futuro de tu empresa.', // set false to total remove
             'url'         => false, // Set null for using Url::current(), set false to total remove
             'type'        => 'WebPage',

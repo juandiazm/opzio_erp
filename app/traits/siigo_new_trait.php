@@ -873,7 +873,7 @@ trait siigo_new_trait
 				"branch_office" =>  $branch_office,
 			];
 			$SendData["seller"] = $this->SiggoUserID;
-			$SendData["observations"]= $observations.' Registro automático API ridder.com.co';
+			$SendData["observations"]= $observations.' Registro automático API opzio.com.co';
 			if($purchase_order != null && $purchase_order != ''){
 				//get last 20 characters
 				$purchase_order = substr($purchase_order, -20);

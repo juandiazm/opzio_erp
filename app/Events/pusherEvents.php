@@ -17,8 +17,8 @@ class pusherEvents implements ShouldBroadcast
     
     public function __construct($SERVICE_CHANNEL, $SERVICE_EVENT, $message)
     {
-        $this->SERVICE_CHANNEL = 'ridder-channel-'.$SERVICE_CHANNEL;
-        $this->SERVICE_EVENT = 'ridder-event-'.$SERVICE_EVENT;
+        $this->SERVICE_CHANNEL = 'opzio-channel-'.$SERVICE_CHANNEL;
+        $this->SERVICE_EVENT = 'opzio-event-'.$SERVICE_EVENT;
         $this->message = $message;
     }
 

@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 
-use App\traits\old_ridder_trait;
+use App\traits\old_opzio_trait;
 use App\traits\clients_trait;
 use App\traits\licenses_trait;
 use App\traits\incomes_trait;
@@ -32,10 +32,10 @@ use App\Models\service;
 use App\Models\tax;
 
 
-class old_ridder_controller extends Controller
+class old_opzio_controller extends Controller
 {
     use
-        old_ridder_trait
+        old_opzio_trait
         , clients_trait
         , licenses_trait
         , incomes_trait
@@ -53,7 +53,7 @@ class old_ridder_controller extends Controller
                 //////////////////////////////////////////////////
                 $url = 'companies/get-all';
                 $send_data = [];
-                $Response = $this->Ridder_syh_PostRequest($url, $send_data);
+                $Response = $this->Opzio_syh_PostRequest($url, $send_data);
                 info($Response);
                 if ($Response['status'] == 1) {
                     $Clients = $Response['data'];
@@ -74,7 +74,7 @@ class old_ridder_controller extends Controller
                 return \Response::json($Response, 400);
             } catch (\Exception $e) {
                 set_time_limit(60);
-                info('ridder_syh_trait ' . $e->getMessage());
+                info('opzio_syh_trait ' . $e->getMessage());
                 return ['status' => 0, 'message' => $e->getMessage()];
             }
         } else {
@@ -93,7 +93,7 @@ class old_ridder_controller extends Controller
                 //////////////////////////////////////////////////
                 $url = 'bills/get-all';
                 $send_data = [];
-                $Response = $this->Ridder_syh_PostRequest($url, $send_data);
+                $Response = $this->Opzio_syh_PostRequest($url, $send_data);
                 if ($Response['status'] == 1) {
                     $Bills = $Response['data'];
                     $clientsDB = client::with('licenses')->get();
@@ -192,7 +192,7 @@ class old_ridder_controller extends Controller
                 return \Response::json($Response, 400);
             } catch (\Exception $e) {
                 set_time_limit(60);
-                info('ridder_syh_trait ' . $e->getMessage());
+                info('opzio_syh_trait ' . $e->getMessage());
                 return ['status' => 0, 'message' => $e->getMessage()];
             }
         } else {
@@ -211,7 +211,7 @@ class old_ridder_controller extends Controller
                 //////////////////////////////////////////////////
                 $url = 'expenses/get-all';
                 $send_data = [];
-                $Response = $this->Ridder_syh_PostRequest($url, $send_data);
+                $Response = $this->Opzio_syh_PostRequest($url, $send_data);
                 if ($Response['status'] == 1) {
                     $Expenses = $Response['data'];
                     $ExpensesResult=[];
@@ -235,7 +235,7 @@ class old_ridder_controller extends Controller
             }
             catch (\Exception $e) {
                 set_time_limit(60);
-                info('ridder_syh_trait ' . $e->getMessage());
+                info('opzio_syh_trait ' . $e->getMessage());
                 return ['status' => 0, 'message' => $e->getMessage()];
             }
         }else{
@@ -246,7 +246,7 @@ class old_ridder_controller extends Controller
     {
         $url = 'companies/get-all';
         $send_data = [];
-        $Response = $this->Ridder_syh_PostRequest($url, $send_data);
+        $Response = $this->Opzio_syh_PostRequest($url, $send_data);
 
         if ($Response['status'] == 1) {
 

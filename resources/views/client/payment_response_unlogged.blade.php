@@ -1,12 +1,12 @@
 @extends('layouts.app')
 @section('app-header')
-<title>RIDDER - Respuesta de Pago</title>
+<title>Opzio - Respuesta de Pago</title>
 <script>
     var unique_id = "{{ $unique_id }}";
 </script>
-<script src="{{ asset('js/client/payment_response_unlogged/payment_response_unlogged.js') }}" defer></script>
+@vite('resources/js/client/payment_response_unlogged/payment_response_unlogged.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/payment_response_unlogged/payment_response_unlogged.css') }}" rel="stylesheet">
+@vite('resources/sass/client/payment_response_unlogged/payment_response_unlogged.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')

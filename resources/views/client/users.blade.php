@@ -4,11 +4,11 @@
 <script>
     var current_logged_user = @json(session('client_user'));
 </script>
-<script src="{{ asset('js/client/users/users.js') }}" defer></script>
-<script src="{{ asset('js/client/traceability.js') }}" defer></script>
+@vite('resources/js/client/users/users.js')
+@vite('resources/js/client/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/users/users.css') }}" rel="stylesheet">
-<link href="{{ asset('css/client/traceability.css') }}" rel="stylesheet">
+@vite('resources/sass/client/users/users.scss')
+@vite('resources/sass/client/traceability.scss')
 @endsection
 @section('client-app-content')
 <nav>

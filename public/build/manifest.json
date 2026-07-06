@@ -1,0 +1,532 @@
+{
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf": {
+    "file": "assets/fa-brands-400-CCY5neTf.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.woff2": {
+    "file": "assets/fa-brands-400-Cmgzmso_.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-duotone-900.ttf": {
+    "file": "assets/fa-duotone-900-D3z9DPdH.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-duotone-900.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-duotone-900.woff2": {
+    "file": "assets/fa-duotone-900-DDBVeZhv.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-duotone-900.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-light-300.ttf": {
+    "file": "assets/fa-light-300-MxS50Jsy.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-light-300.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-light-300.woff2": {
+    "file": "assets/fa-light-300-BIIPDt7z.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-light-300.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-regular-400.ttf": {
+    "file": "assets/fa-regular-400-BlbHWFQL.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-regular-400.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-regular-400.woff2": {
+    "file": "assets/fa-regular-400-DcyeaIpN.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-regular-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-solid-900.ttf": {
+    "file": "assets/fa-solid-900-Dn5Ag2DJ.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-solid-900.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-solid-900.woff2": {
+    "file": "assets/fa-solid-900-DjKv4PhZ.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-solid-900.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-thin-100.ttf": {
+    "file": "assets/fa-thin-100-BOecG6-3.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-thin-100.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-thin-100.woff2": {
+    "file": "assets/fa-thin-100-COluDTpR.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-thin-100.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.ttf": {
+    "file": "assets/fa-v4compatibility-BFA6bNw1.ttf",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.ttf"
+  },
+  "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.woff2": {
+    "file": "assets/fa-v4compatibility-DT4DjF5T.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.woff2"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-ot6wlB1M.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/client/blog/email/unsubscribe.js": {
+    "file": "assets/unsubscribe-DPlgKbK_.js",
+    "name": "unsubscribe",
+    "src": "resources/js/client/blog/email/unsubscribe.js",
+    "isEntry": true
+  },
+  "resources/js/client/companies/companies.js": {
+    "file": "assets/companies-BtKjpOnW.js",
+    "name": "companies",
+    "src": "resources/js/client/companies/companies.js",
+    "isEntry": true
+  },
+  "resources/js/client/dashboard/dashboard.js": {
+    "file": "assets/dashboard-BBpola57.js",
+    "name": "dashboard",
+    "src": "resources/js/client/dashboard/dashboard.js",
+    "isEntry": true
+  },
+  "resources/js/client/incomes/incomes.js": {
+    "file": "assets/incomes-DC8hnhjl.js",
+    "name": "incomes",
+    "src": "resources/js/client/incomes/incomes.js",
+    "isEntry": true
+  },
+  "resources/js/client/layouts/app.js": {
+    "file": "assets/app-BdQOAXGV.js",
+    "name": "app",
+    "src": "resources/js/client/layouts/app.js",
+    "isEntry": true
+  },
+  "resources/js/client/layouts/menu.js": {
+    "file": "assets/menu-D8Ku0itU.js",
+    "name": "menu",
+    "src": "resources/js/client/layouts/menu.js",
+    "isEntry": true
+  },
+  "resources/js/client/licenses/licenses.js": {
+    "file": "assets/licenses-r3ss3ms1.js",
+    "name": "licenses",
+    "src": "resources/js/client/licenses/licenses.js",
+    "isEntry": true
+  },
+  "resources/js/client/login/login.js": {
+    "file": "assets/login-0PPs372M.js",
+    "name": "login",
+    "src": "resources/js/client/login/login.js",
+    "isEntry": true
+  },
+  "resources/js/client/pay_unlogged/pay_unlogged.js": {
+    "file": "assets/pay_unlogged-HbxQ6OGs.js",
+    "name": "pay_unlogged",
+    "src": "resources/js/client/pay_unlogged/pay_unlogged.js",
+    "isEntry": true
+  },
+  "resources/js/client/payment_response_unlogged/payment_response_unlogged.js": {
+    "file": "assets/payment_response_unlogged-B_p5Tun6.js",
+    "name": "payment_response_unlogged",
+    "src": "resources/js/client/payment_response_unlogged/payment_response_unlogged.js",
+    "isEntry": true
+  },
+  "resources/js/client/profile/profile.js": {
+    "file": "assets/profile-DJ5O0ciy.js",
+    "name": "profile",
+    "src": "resources/js/client/profile/profile.js",
+    "isEntry": true
+  },
+  "resources/js/client/register/register.js": {
+    "file": "assets/register-hWaTRAjG.js",
+    "name": "register",
+    "src": "resources/js/client/register/register.js",
+    "isEntry": true
+  },
+  "resources/js/client/set_password/set_password.js": {
+    "file": "assets/set_password-DgEf1Mjo.js",
+    "name": "set_password",
+    "src": "resources/js/client/set_password/set_password.js",
+    "isEntry": true
+  },
+  "resources/js/client/traceability.js": {
+    "file": "assets/traceability-62omIa6t.js",
+    "name": "traceability",
+    "src": "resources/js/client/traceability.js",
+    "isEntry": true
+  },
+  "resources/js/client/users/users.js": {
+    "file": "assets/users-WTmZja3k.js",
+    "name": "users",
+    "src": "resources/js/client/users/users.js",
+    "isEntry": true
+  },
+  "resources/js/crud-input.js": {
+    "file": "assets/crud-input-AzBPKbA1.js",
+    "name": "crud-input",
+    "src": "resources/js/crud-input.js",
+    "isEntry": true
+  },
+  "resources/js/erp/approve_blog/approve_blog.js": {
+    "file": "assets/approve_blog-BV-MuVEG.js",
+    "name": "approve_blog",
+    "src": "resources/js/erp/approve_blog/approve_blog.js",
+    "isEntry": true
+  },
+  "resources/js/erp/approve_facebook_post/approve_facebook_post.js": {
+    "file": "assets/approve_facebook_post-BkJsu_ge.js",
+    "name": "approve_facebook_post",
+    "src": "resources/js/erp/approve_facebook_post/approve_facebook_post.js",
+    "isEntry": true
+  },
+  "resources/js/erp/approve_instagram_post/approve_instagram_post.js": {
+    "file": "assets/approve_instagram_post-rHFe2vcK.js",
+    "name": "approve_instagram_post",
+    "src": "resources/js/erp/approve_instagram_post/approve_instagram_post.js",
+    "isEntry": true
+  },
+  "resources/js/erp/approve_linkedin_post/approve_linkedin_post.js": {
+    "file": "assets/approve_linkedin_post-B4jYnAeI.js",
+    "name": "approve_linkedin_post",
+    "src": "resources/js/erp/approve_linkedin_post/approve_linkedin_post.js",
+    "isEntry": true
+  },
+  "resources/js/erp/approve_twitter_post/approve_twitter_post.js": {
+    "file": "assets/approve_twitter_post-CbeOELik.js",
+    "name": "approve_twitter_post",
+    "src": "resources/js/erp/approve_twitter_post/approve_twitter_post.js",
+    "isEntry": true
+  },
+  "resources/js/erp/chat/chat.js": {
+    "file": "assets/chat-BZTKqdZ4.js",
+    "name": "chat",
+    "src": "resources/js/erp/chat/chat.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/clients.js": {
+    "file": "assets/clients-B7KfBaGj.js",
+    "name": "clients",
+    "src": "resources/js/erp/clients/clients.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/traceability.js": {
+    "file": "assets/traceability-CjdZgNg-.js",
+    "name": "traceability",
+    "src": "resources/js/erp/clients/traceability.js",
+    "isEntry": true
+  },
+  "resources/js/erp/dashboard/dashboard.js": {
+    "file": "assets/dashboard-Mtx79akO.js",
+    "name": "dashboard",
+    "src": "resources/js/erp/dashboard/dashboard.js",
+    "isEntry": true
+  },
+  "resources/js/erp/departments/departments.js": {
+    "file": "assets/departments-Csu9lvzR.js",
+    "name": "departments",
+    "src": "resources/js/erp/departments/departments.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/employees.js": {
+    "file": "assets/employees-Rk67SxK2.js",
+    "name": "employees",
+    "src": "resources/js/erp/employees/employees.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/ia_assistant.js": {
+    "file": "assets/ia_assistant-l0sNRNKZ.js",
+    "name": "ia_assistant",
+    "src": "resources/js/erp/ia_assistant/ia_assistant.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/ia_marketing_report.js": {
+    "file": "assets/ia_marketing_report-CedPAHdv.js",
+    "name": "ia_marketing_report",
+    "src": "resources/js/erp/ia_assistant/ia_marketing_report.js",
+    "isEntry": true
+  },
+  "resources/js/erp/incomes/incomes.js": {
+    "file": "assets/incomes-ClDlSMJl.js",
+    "name": "incomes",
+    "src": "resources/js/erp/incomes/incomes.js",
+    "isEntry": true
+  },
+  "resources/js/erp/layouts/app.js": {
+    "file": "assets/app-Ckpp0atQ.js",
+    "name": "app",
+    "src": "resources/js/erp/layouts/app.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/licenses.js": {
+    "file": "assets/licenses-JB94mmga.js",
+    "name": "licenses",
+    "src": "resources/js/erp/licenses/licenses.js",
+    "isEntry": true
+  },
+  "resources/js/erp/login/login.js": {
+    "file": "assets/login-Bnv3nxWd.js",
+    "name": "login",
+    "src": "resources/js/erp/login/login.js",
+    "isEntry": true
+  },
+  "resources/js/erp/my_profile/my_profile.js": {
+    "file": "assets/my_profile-DyWDfAcE.js",
+    "name": "my_profile",
+    "src": "resources/js/erp/my_profile/my_profile.js",
+    "isEntry": true
+  },
+  "resources/js/erp/outcomes/outcomes.js": {
+    "file": "assets/outcomes-BFWvFPcl.js",
+    "name": "outcomes",
+    "src": "resources/js/erp/outcomes/outcomes.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/providers.js": {
+    "file": "assets/providers-BT2rDrXk.js",
+    "name": "providers",
+    "src": "resources/js/erp/providers/providers.js",
+    "isEntry": true
+  },
+  "resources/js/erp/pusher/pusher.js": {
+    "file": "assets/pusher-CjriEOBy.js",
+    "name": "pusher",
+    "src": "resources/js/erp/pusher/pusher.js",
+    "isEntry": true
+  },
+  "resources/js/erp/pusher/pusher_channels_chat.js": {
+    "file": "assets/pusher_channels_chat-eWS6it1O.js",
+    "name": "pusher_channels_chat",
+    "src": "resources/js/erp/pusher/pusher_channels_chat.js",
+    "isEntry": true
+  },
+  "resources/js/erp/reports/reports.js": {
+    "file": "assets/reports-gy426ym8.js",
+    "name": "reports",
+    "src": "resources/js/erp/reports/reports.js",
+    "isEntry": true
+  },
+  "resources/js/erp/reset_password/reset_password.js": {
+    "file": "assets/reset_password-gwgJiBuv.js",
+    "name": "reset_password",
+    "src": "resources/js/erp/reset_password/reset_password.js",
+    "isEntry": true
+  },
+  "resources/js/erp/traceability.js": {
+    "file": "assets/traceability-C39MmUBf.js",
+    "name": "traceability",
+    "src": "resources/js/erp/traceability.js",
+    "isEntry": true
+  },
+  "resources/js/erp/users/users.js": {
+    "file": "assets/users-KCeyedjN.js",
+    "name": "users",
+    "src": "resources/js/erp/users/users.js",
+    "isEntry": true
+  },
+  "resources/js/erp/web-pages/web-pages.js": {
+    "file": "assets/web-pages-BBpola57.js",
+    "name": "web-pages",
+    "src": "resources/js/erp/web-pages/web-pages.js",
+    "isEntry": true
+  },
+  "resources/sass/app.scss": {
+    "file": "assets/app-Dq10j8el.css",
+    "src": "resources/sass/app.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/blog/email/unsubscribe.scss": {
+    "file": "assets/unsubscribe-Ctrk9NpA.css",
+    "src": "resources/sass/client/blog/email/unsubscribe.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/companies/companies.scss": {
+    "file": "assets/companies-RhocbuE5.css",
+    "src": "resources/sass/client/companies/companies.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/dashboard/dashboard.scss": {
+    "file": "assets/dashboard-DfipKDXq.css",
+    "src": "resources/sass/client/dashboard/dashboard.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/incomes/incomes.scss": {
+    "file": "assets/incomes-rizVur7_.css",
+    "src": "resources/sass/client/incomes/incomes.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/layouts/app.scss": {
+    "file": "assets/app-CVMNjb7c.css",
+    "src": "resources/sass/client/layouts/app.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/layouts/menu.scss": {
+    "file": "assets/menu-DtJw7nUU.css",
+    "src": "resources/sass/client/layouts/menu.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/licenses/licenses.scss": {
+    "file": "assets/licenses-CyLBVSHB.css",
+    "src": "resources/sass/client/licenses/licenses.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/login/login.scss": {
+    "file": "assets/login-DrZHUuww.css",
+    "src": "resources/sass/client/login/login.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/pay_unlogged/pay_unlogged.scss": {
+    "file": "assets/pay_unlogged-D_O3an5p.css",
+    "src": "resources/sass/client/pay_unlogged/pay_unlogged.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/payment_response_unlogged/payment_response_unlogged.scss": {
+    "file": "assets/payment_response_unlogged-u-kKfO9m.css",
+    "src": "resources/sass/client/payment_response_unlogged/payment_response_unlogged.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/profile/profile.scss": {
+    "file": "assets/profile-Dg8SV_Aj.css",
+    "src": "resources/sass/client/profile/profile.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/register/register.scss": {
+    "file": "assets/register-j7Cm7Ghm.css",
+    "src": "resources/sass/client/register/register.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/set_password/set_password.scss": {
+    "file": "assets/set_password-DXYpXSH1.css",
+    "src": "resources/sass/client/set_password/set_password.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/traceability.scss": {
+    "file": "assets/traceability-DJwzdBom.css",
+    "src": "resources/sass/client/traceability.scss",
+    "isEntry": true
+  },
+  "resources/sass/client/users/users.scss": {
+    "file": "assets/users-e7WM33L8.css",
+    "src": "resources/sass/client/users/users.scss",
+    "isEntry": true
+  },
+  "resources/sass/crud-input.scss": {
+    "file": "assets/crud-input-D586heb_.css",
+    "src": "resources/sass/crud-input.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/approve_blog/approve_blog.scss": {
+    "file": "assets/approve_blog-BhDLcWTi.css",
+    "src": "resources/sass/erp/approve_blog/approve_blog.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss": {
+    "file": "assets/approve_facebook_post-DTfTPY15.css",
+    "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/approve_instagram_post/approve_instagram_post.scss": {
+    "file": "assets/approve_facebook_post-DTfTPY15.css",
+    "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/approve_linkedin_post/approve_linkedin_post.scss": {
+    "file": "assets/approve_facebook_post-DTfTPY15.css",
+    "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/approve_twitter_post/approve_twitter_post.scss": {
+    "file": "assets/approve_facebook_post-DTfTPY15.css",
+    "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/chat/chat.scss": {
+    "file": "assets/chat-Bg7MUoyz.css",
+    "src": "resources/sass/erp/chat/chat.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/clients/clients.scss": {
+    "file": "assets/clients-CGCmbWzB.css",
+    "src": "resources/sass/erp/clients/clients.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/clients/traceability.scss": {
+    "file": "assets/traceability-DJwzdBom.css",
+    "src": "resources/sass/client/traceability.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/dashboard/dashboard.scss": {
+    "file": "assets/dashboard-DEne--QU.css",
+    "src": "resources/sass/erp/dashboard/dashboard.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/departments/departments.scss": {
+    "file": "assets/departments-BFbeF9X-.css",
+    "src": "resources/sass/erp/departments/departments.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/employees/employees.scss": {
+    "file": "assets/employees-DpOF_i-E.css",
+    "src": "resources/sass/erp/employees/employees.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/ia_assistant/ia_assistant.scss": {
+    "file": "assets/ia_assistant-DvcG_JEW.css",
+    "src": "resources/sass/erp/ia_assistant/ia_assistant.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/ia_assistant/ia_marketing_report.scss": {
+    "file": "assets/ia_marketing_report-YRFpeLoX.css",
+    "src": "resources/sass/erp/ia_assistant/ia_marketing_report.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/incomes/incomes.scss": {
+    "file": "assets/incomes-C95IQM1z.css",
+    "src": "resources/sass/erp/incomes/incomes.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/layouts/app.scss": {
+    "file": "assets/app-C50xlnJx.css",
+    "src": "resources/sass/erp/layouts/app.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/licenses/licenses.scss": {
+    "file": "assets/licenses-DOexU4AS.css",
+    "src": "resources/sass/erp/licenses/licenses.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/login/login.scss": {
+    "file": "assets/login-BnXt1fK9.css",
+    "src": "resources/sass/erp/login/login.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/my_profile/my_profile.scss": {
+    "file": "assets/my_profile-DLX0hqUQ.css",
+    "src": "resources/sass/erp/my_profile/my_profile.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/outcomes/outcomes.scss": {
+    "file": "assets/outcomes-BmTvBwTC.css",
+    "src": "resources/sass/erp/outcomes/outcomes.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/providers/providers.scss": {
+    "file": "assets/providers-DW_AA7Za.css",
+    "src": "resources/sass/erp/providers/providers.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/reports/reports.scss": {
+    "file": "assets/reports-C5AClP1A.css",
+    "src": "resources/sass/erp/reports/reports.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/reset_password/reset_password.scss": {
+    "file": "assets/reset_password-CzqB7vQM.css",
+    "src": "resources/sass/erp/reset_password/reset_password.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/traceability.scss": {
+    "file": "assets/traceability-DL7nlVO5.css",
+    "src": "resources/sass/erp/traceability.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/users/users.scss": {
+    "file": "assets/users-HoMLZXHS.css",
+    "src": "resources/sass/erp/users/users.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/web-pages/web-pages.scss": {
+    "file": "assets/web-pages-a4hYdoI3.css",
+    "src": "resources/sass/erp/web-pages/web-pages.scss",
+    "isEntry": true
+  }
+}

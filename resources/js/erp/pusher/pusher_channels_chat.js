@@ -15,8 +15,8 @@ function Service_usePusherData(data){
     cluster: 'us2'
   });
   //Canal de servicios
-  var service_channel = pusher.subscribe('ridder-channel-chat');
-  service_channel.bind('ridder-event-chat', function(data) {
+  var service_channel = pusher.subscribe('opzio-channel-chat');
+  service_channel.bind('opzio-event-chat', function(data) {
     audio.play();
     appendChatMesssages([data.message]);
   });

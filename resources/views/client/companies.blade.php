@@ -4,9 +4,9 @@
 <script>
     var current_client = @json(session('client_user')['active_client']);
 </script>
-<script src="{{ asset('js/client/companies/companies.js') }}" defer></script>
+@vite('resources/js/client/companies/companies.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/companies/companies.css') }}" rel="stylesheet">
+@vite('resources/sass/client/companies/companies.scss')
 @endsection
 @section('client-app-content')
 <div id="companies-container">

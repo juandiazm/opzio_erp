@@ -4,9 +4,9 @@
     var unique_id = "{{ $unique_id }}";
     var home_url = "{{ config('app.APP_HOME_PAGE_URL') }}";
 </script>
-<script src="{{ asset('js/client/blog/email/unsubscribe.js') }}" defer></script>
+@vite('resources/js/client/blog/email/unsubscribe.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/blog/email/unsubscribe.css') }}" rel="stylesheet">
+@vite('resources/sass/client/blog/email/unsubscribe.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')

@@ -1,9 +1,9 @@
 @extends('erp.layouts.app')
 @section('component_title', 'PÁGINA WEB')
 @section('erp-app-header')
-<script src="{{ asset('js/erp/web-pages/web-pages.js') }}" defer></script>
+@vite('resources/js/erp/web-pages/web-pages.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/web-pages/web-pages.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/web-pages/web-pages.scss')
 @endsection
 @section('erp-app-content')
 <nav>

@@ -1,3 +1,244 @@
-.text-white{color:#fff}.bg-success{background-color:#1bcc5a}.bg-secondary{background-color:#0153ff}.bg-primary{background-color:#00057b}.text-gray-primary{color:#fff}.text-success{color:#1bcc5a}.text-gray-secondary{color:#f2f2f2}@media screen and (min-width:768px){#register-container{background:#242574;background:linear-gradient(90deg,#242574,#162ea4 74%,#0932bb);background-image:url(/images/bg-white.webp);background-position:50%;background-repeat:no-repeat;background-size:cover;height:87vh;margin:0;padding:0}#register-container #register-centered{width:90vw}#register-container #register-centered #register-data-container{background-color:#fff;border-radius:50px;box-shadow:0 3px 6px rgba(0,0,0,.161);padding:4vh 2vw;width:450px}#register-container #register-centered #register-data-container #avatar-img{display:block;margin:auto;width:150px}#register-container #register-centered #register-data-container #register-title{color:#272727;display:block;font-size:1.8em;font-weight:600;margin:0;padding:0;text-align:center}#register-container #register-centered #register-data-container #register-message{color:#707070;display:block;font-size:1.2em;font-weight:600;margin:0;padding:0;text-align:center}#register-container #register-centered #register-data-container #inputs-container{display:block;margin:20px 0;padding:0}#register-container #register-centered #register-data-container #inputs-container .input-container{margin:0;padding:5px 0}#register-container #register-centered #register-data-container #inputs-container .input-container .label{color:#707070;font-size:1em;font-weight:600;margin:0;padding:0}#register-container #register-centered #register-data-container #inputs-container .input-container .input{background-color:transparent;border:none;border-bottom:1px solid #d7d7d7;color:#272727;font-size:1em;font-weight:600;margin:0;padding:0}#register-container #register-centered #register-data-container #inputs-container .input-container .input:focus{outline:none}#register-container #register-centered #register-data-container #inputs-container .input-container .input::-moz-placeholder{color:#c4c4c4}#register-container #register-centered #register-data-container #inputs-container .input-container .input::placeholder{color:#c4c4c4}#register-container #register-centered #register-data-container #register-btn{background-color:#0153ff;color:#fff;display:block;margin:0 auto;width:50%}#register-container #register-centered #register-data-container #login-container{cursor:pointer;margin:20px 0 0;padding:0}#register-container #register-centered #register-data-container #login-container p{font-size:1.1em;margin:0 10px;padding:0}#register-container #register-centered #register-data-container #login-container #login-message{color:#707070}#register-container #register-centered #register-data-container #login-container #login-link{color:#0153ff;font-weight:500;text-decoration:underline}}@media screen and (max-width:768px){#register-container{background:#242574;background:linear-gradient(90deg,#242574,#162ea4 74%,#0932bb);background-image:url(/images/bg-white.webp);background-position:50%;background-repeat:no-repeat;background-size:cover;height:100vh;margin:0;padding:0}#register-container #register-centered{width:100vw}#register-container #register-centered #register-data-container{background-color:#fff;border-radius:50px;box-shadow:0 3px 6px rgba(0,0,0,.161);padding:4vh 2vw;width:450px}#register-container #register-centered #register-data-container #avatar-img{display:block;margin:auto;width:30%}#register-container #register-centered #register-data-container #register-title{color:#272727;display:block;font-size:1.8em;font-weight:600;margin:0;padding:0;text-align:center}#register-container #register-centered #register-data-container #register-message{color:#707070;display:block;font-size:1.2em;font-weight:600;margin:0;padding:0;text-align:center}#register-container #register-centered #register-data-container #inputs-container{display:block;margin:20px 0;padding:0}#register-container #register-centered #register-data-container #inputs-container .input-container{margin:0;padding:5px 0}#register-container #register-centered #register-data-container #inputs-container .input-container .label{color:#707070;font-size:1em;font-weight:600;margin:0;padding:0}#register-container #register-centered #register-data-container #inputs-container .input-container .input{background-color:transparent;border:none;border-bottom:1px solid #d7d7d7;color:#272727;font-size:1em;font-weight:600;margin:0;padding:0}#register-container #register-centered #register-data-container #inputs-container .input-container .input:focus{outline:none}#register-container #register-centered #register-data-container #inputs-container .input-container .input::-moz-placeholder{color:#c4c4c4}#register-container #register-centered #register-data-container #inputs-container .input-container .input::placeholder{color:#c4c4c4}#register-container #register-centered #register-data-container #register-btn{background-color:#0153ff;color:#fff;display:block;margin:0 auto;width:50%}#register-container #register-centered #register-data-container #login-container{cursor:pointer;margin:20px 0 0;padding:0}#register-container #register-centered #register-data-container #login-container p{font-size:1.1em;margin:0 10px;padding:0}#register-container #register-centered #register-data-container #login-container #login-message{color:#707070}#register-container #register-centered #register-data-container #login-container #login-link{color:#0153ff;font-weight:500;text-decoration:underline}}
+.text-white {
+  color: #ffffff;
+}
 
-/*# sourceMappingURL=register.css.map*/
+.bg-success {
+  background-color: #1bcc5a;
+}
+
+.bg-secondary {
+  background-color: #0153FF;
+}
+
+.bg-primary {
+  background-color: #00057B;
+}
+
+.text-gray-primary {
+  color: #FFFFFF;
+}
+
+.text-success {
+  color: #1bcc5a;
+}
+
+.text-gray-secondary {
+  color: #F2F2F2;
+}
+
+@media screen and (min-width: 768px) {
+  #register-container {
+    height: 87vh;
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 37, 116);
+    background: linear-gradient(90deg, rgb(36, 37, 116) 0%, rgb(22, 46, 164) 74%, rgb(9, 50, 187) 100%);
+    background-image: url("/images/bg-white.webp");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  #register-container #register-centered {
+    width: 90vw;
+  }
+  #register-container #register-centered #register-data-container {
+    /* UI Properties */
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border-radius: 50px;
+    width: 450px;
+    background-color: rgb(255, 255, 255);
+    padding: 4vh 2vw;
+  }
+  #register-container #register-centered #register-data-container #avatar-img {
+    margin: auto;
+    display: block;
+    width: 150px;
+  }
+  #register-container #register-centered #register-data-container #register-title {
+    margin: 0;
+    padding: 0;
+    display: block;
+    color: #272727;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.8em;
+  }
+  #register-container #register-centered #register-data-container #register-message {
+    margin: 0;
+    padding: 0;
+    display: block;
+    color: #707070;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.2em;
+  }
+  #register-container #register-centered #register-data-container #inputs-container {
+    margin: 20px 0;
+    padding: 0;
+    display: block;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container {
+    margin: 0;
+    padding: 5px 0;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .label {
+    margin: 0;
+    padding: 0;
+    color: #707070;
+    font-weight: 600;
+    font-size: 1em;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input {
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-bottom: 1px solid #D7D7D7;
+    background-color: transparent;
+    color: #272727;
+    font-size: 1em;
+    font-weight: 600;
+    /*placeholder color*/
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input:focus {
+    outline: none;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input::-moz-placeholder {
+    color: #C4C4C4;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input::placeholder {
+    color: #C4C4C4;
+  }
+  #register-container #register-centered #register-data-container #register-btn {
+    margin: 0 auto;
+    display: block;
+    background-color: #0153FF;
+    color: #ffffff;
+    width: 50%;
+  }
+  #register-container #register-centered #register-data-container #login-container {
+    margin: 20px 0 0 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  #register-container #register-centered #register-data-container #login-container p {
+    margin: 0 10px;
+    padding: 0;
+    font-size: 1.1em;
+  }
+  #register-container #register-centered #register-data-container #login-container #login-message {
+    color: #707070;
+  }
+  #register-container #register-centered #register-data-container #login-container #login-link {
+    color: #0153FF;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+}
+@media screen and (max-width: 768px) {
+  #register-container {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 37, 116);
+    background: linear-gradient(90deg, rgb(36, 37, 116) 0%, rgb(22, 46, 164) 74%, rgb(9, 50, 187) 100%);
+    background-image: url("/images/bg-white.webp");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  #register-container #register-centered {
+    width: 100vw;
+  }
+  #register-container #register-centered #register-data-container {
+    /* UI Properties */
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border-radius: 50px;
+    width: 450px;
+    background-color: rgb(255, 255, 255);
+    padding: 4vh 2vw;
+  }
+  #register-container #register-centered #register-data-container #avatar-img {
+    margin: auto;
+    display: block;
+    width: 30%;
+  }
+  #register-container #register-centered #register-data-container #register-title {
+    margin: 0;
+    padding: 0;
+    display: block;
+    color: #272727;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.8em;
+  }
+  #register-container #register-centered #register-data-container #register-message {
+    margin: 0;
+    padding: 0;
+    display: block;
+    color: #707070;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.2em;
+  }
+  #register-container #register-centered #register-data-container #inputs-container {
+    margin: 20px 0;
+    padding: 0;
+    display: block;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container {
+    margin: 0;
+    padding: 5px 0;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .label {
+    margin: 0;
+    padding: 0;
+    color: #707070;
+    font-weight: 600;
+    font-size: 1em;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input {
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-bottom: 1px solid #D7D7D7;
+    background-color: transparent;
+    color: #272727;
+    font-size: 1em;
+    font-weight: 600;
+    /*placeholder color*/
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input:focus {
+    outline: none;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input::-moz-placeholder {
+    color: #C4C4C4;
+  }
+  #register-container #register-centered #register-data-container #inputs-container .input-container .input::placeholder {
+    color: #C4C4C4;
+  }
+  #register-container #register-centered #register-data-container #register-btn {
+    margin: 0 auto;
+    display: block;
+    background-color: #0153FF;
+    color: #ffffff;
+    width: 50%;
+  }
+  #register-container #register-centered #register-data-container #login-container {
+    margin: 20px 0 0 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  #register-container #register-centered #register-data-container #login-container p {
+    margin: 0 10px;
+    padding: 0;
+    font-size: 1.1em;
+  }
+  #register-container #register-centered #register-data-container #login-container #login-message {
+    color: #707070;
+  }
+  #register-container #register-centered #register-data-container #login-container #login-link {
+    color: #0153FF;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+}

@@ -22,7 +22,7 @@ class AddDefaultUser extends Migration
             $user->name = 'Juan Carlos';
             $user->lastname = 'Diaz Mosquera';
             $user->username = 'juandiazm';
-            $user->email = 'juandiazm@ridder.com.co';
+            $user->email = 'juandiazm@opzio.com.co';
             $user->identification = '1018468726';
             $user->password = '$2y$10$aWsQTXMqpIloPvQmS5CNhOt6BwhmvW2yRSgCG.vCayn336TVohtfG';
             $user->photo = '';

@@ -6,9 +6,9 @@
     var permissions_flag = {{ collect(session('permissions'))->firstWhere('client_user_permission_id', 1)!=null?1:0 }}
     var permissions = {!! json_encode(session('permissions')) !!};
 </script>
-<script src="{{ asset('js/client/profile/profile.js') }}" defer></script>
+@vite('resources/js/client/profile/profile.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/profile/profile.css') }}" rel="stylesheet">
+@vite('resources/sass/client/profile/profile.scss')
 @endsection
 @section('client-app-content')
 <div id="my-profile-container">

@@ -1,11 +1,11 @@
 @extends('erp.layouts.app')
 @section('component_title', 'USUARIOS')
 @section('erp-app-header')
-<script src="{{ asset('js/erp/users/users.js') }}" defer></script>
-<script src="{{ asset('js/erp/traceability.js') }}" defer></script>
+@vite('resources/js/erp/users/users.js')
+@vite('resources/js/erp/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/users/users.css') }}" rel="stylesheet">
-<link href="{{ asset('css/erp/traceability.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/users/users.scss')
+@vite('resources/sass/erp/traceability.scss')
 @endsection
 @section('erp-app-content')
 <nav>
@@ -78,7 +78,7 @@
                     </div>
                     <div class="input-container col-12 d-flex" title="Correo del usuario">
                         <label for="username" class="input-title align-self-center">Correo</label>
-                        <input type="text" id="create-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@ridder.com.co">
+                        <input type="text" id="create-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@opzio.com.co">
                     </div>
                     <div class="input-container col-12 d-flex" title="Contraseña del usuario">
                         <label for="username" class="input-title align-self-center">Contraseña</label>
@@ -153,7 +153,7 @@
                     </div>
                     <div class="input-container col-12 d-flex" title="Correo del usuario">
                         <label for="username" class="input-title align-self-center">Correo</label>
-                        <input type="text" id="update-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@ridder.com.co">
+                        <input type="text" id="update-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@opzio.com.co">
                     </div>
                 </div>
                 

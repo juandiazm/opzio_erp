@@ -4,21 +4,21 @@ use GuzzleHttp\Client;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Illuminate\Support\Facades\App;
 
-trait old_ridder_trait
+trait old_opzio_trait
 {
 	private $Client = null;
-	public function Ridder_syh_GetConnection(){
+	public function Opzio_syh_GetConnection(){
 		$this->Client = new Client([
-			'base_uri' => 'https://old.ridder.com.co/API/',
+			'base_uri' => 'https://old.opzio.com.co/API/',
 			'timeout'  => 10.0,
 			'verify' => false,
 		]);
 		return '1';
 	}
-	public function Ridder_syh_PostRequest($url, $SendData){
+	public function Opzio_syh_PostRequest($url, $SendData){
 		try{
 			if($this->Client == null){
-				$this->Ridder_syh_GetConnection();
+				$this->Opzio_syh_GetConnection();
 			}
 			$myBody['AaBbCcDdEeFfGgHhIi'] = 'APIInterfaceApplication';
 			if($SendData != null){
@@ -32,7 +32,7 @@ trait old_ridder_trait
 			}
 			return json_decode($response, true);
 		}catch(\Exception $e){
-			info('ridder_syh_trait '.$e->getMessage());
+			info('opzio_syh_trait '.$e->getMessage());
 			return $e->getMessage();
 		}
 	}

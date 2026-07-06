@@ -1,3 +1,95 @@
-@media screen and (min-width:768px){.traceability-filter-container{background:#f8f8f8 0 0 no-repeat padding-box;border-radius:42px;box-shadow:0 3px 6px rgba(0,0,0,.161);display:flex;justify-content:space-between;margin-bottom:2vh;padding:2vh 4%}.traceability-filter-container .input-container .input-title{margin-right:5px}.traceability-filter-container .input-container .input-value{background-color:transparent;overflow-x:hidden;width:11vw}.traceability-table-container{height:66vh;margin-bottom:1vh}.traceability-table-container .traceability-table .traceability-usr-img{background-position:50%;background-repeat:no-repeat;background-size:cover;border-radius:50%;border-style:solid;border-width:2px;height:40px;width:40px}.traceability-table-container .traceability-table .traceability-usr-username{margin:0;padding:0;width:-moz-min-content;width:min-content}.traceability-table-container .traceability-table .traceability-col-data{width:15vw}.traceability-table-container .traceability-table .traceability-col-data p{height:10vh;margin:0;overflow-x:hidden;padding:0;white-space:nowrap;width:15vw}}@media screen and (max-width:768px){.traceability-filter-container{background:#f8f8f8 0 0 no-repeat padding-box;border-radius:42px;box-shadow:0 3px 6px rgba(0,0,0,.161);display:block;margin-bottom:2vh;padding:2vh 4%}.traceability-filter-container .input-container{display:inline-flex!important;padding:5px 1vw;vertical-align:top;width:50%}.traceability-filter-container .input-container .input-title{margin-right:5px;width:30%}.traceability-filter-container .input-container .input-value{background-color:transparent;overflow-x:hidden;width:11vw;width:70%}.traceability-table-container{height:60vh;margin-bottom:1vh}.traceability-table-container .traceability-table .traceability-usr-img{display:none}.traceability-table-container .traceability-table .traceability-usr-username{margin:0;padding:0;width:-moz-min-content;width:min-content}.traceability-table-container .traceability-table .traceability-col-data,.traceability-table-container .traceability-table .traceability-col-id{display:none}}
-
-/*# sourceMappingURL=traceability.css.map*/
+@media screen and (min-width: 768px) {
+  .traceability-filter-container {
+    background: #F8F8F8 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border-radius: 42px;
+    padding: 2vh 4%;
+    margin-bottom: 2vh;
+    display: flex;
+    justify-content: space-between;
+  }
+  .traceability-filter-container .input-container .input-title {
+    margin-right: 5px;
+  }
+  .traceability-filter-container .input-container .input-value {
+    width: 11vw;
+    background-color: transparent;
+    overflow-x: hidden;
+  }
+  .traceability-table-container {
+    height: 66vh;
+    margin-bottom: 1vh;
+  }
+  .traceability-table-container .traceability-table .traceability-usr-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-width: 2px;
+    border-style: solid;
+  }
+  .traceability-table-container .traceability-table .traceability-usr-username {
+    margin: 0;
+    padding: 0;
+    width: -moz-min-content;
+    width: min-content;
+  }
+  .traceability-table-container .traceability-table .traceability-col-data {
+    width: 15vw;
+  }
+  .traceability-table-container .traceability-table .traceability-col-data p {
+    width: 15vw;
+    height: 10vh;
+    white-space: nowrap;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+}
+@media screen and (max-width: 768px) {
+  .traceability-filter-container {
+    background: #F8F8F8 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border-radius: 42px;
+    padding: 2vh 4%;
+    margin-bottom: 2vh;
+    display: block;
+  }
+  .traceability-filter-container .input-container {
+    display: inline-flex !important;
+    vertical-align: top;
+    width: 50%;
+    padding: 5px 1vw;
+  }
+  .traceability-filter-container .input-container .input-title {
+    margin-right: 5px;
+    width: 30%;
+  }
+  .traceability-filter-container .input-container .input-value {
+    width: 11vw;
+    background-color: transparent;
+    overflow-x: hidden;
+    width: 70%;
+  }
+  .traceability-table-container {
+    height: 60vh;
+    margin-bottom: 1vh;
+  }
+  .traceability-table-container .traceability-table .traceability-usr-img {
+    display: none;
+  }
+  .traceability-table-container .traceability-table .traceability-usr-username {
+    margin: 0;
+    padding: 0;
+    width: -moz-min-content;
+    width: min-content;
+  }
+  .traceability-table-container .traceability-table .traceability-col-id {
+    display: none;
+  }
+  .traceability-table-container .traceability-table .traceability-col-data {
+    display: none;
+  }
+}

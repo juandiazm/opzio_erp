@@ -29,19 +29,19 @@ class client_chat_controller extends Controller
                 $Mails = [];
                 $Mails[] = 
                 [
-                    'address' => 'comunicaciones@ridder.com.co',
-                    'name' => 'Ridder Comunicación',
+                    'address' => 'comunicaciones@opzio.com.co',
+                    'name' => 'Opzio Comunicación',
                 ];
                 $Mails[] = [
-                    'address' => 'analista.tech@ridder.com.co',
+                    'address' => 'analista.tech@opzio.com.co',
                     'name' => 'Yuli Garzón'
                 ];
                 $Mails[] = [
-                    'address' => 'mariaf.franco@ridder.com.co',
+                    'address' => 'mariaf.franco@opzio.com.co',
                     'name' => 'Maria Franco'
                 ];
                 $Mails[] = [
-                    'address' => 'juandiazm@ridder.com.co',
+                    'address' => 'juandiazm@opzio.com.co',
                     'name' => 'Juan Diaz'
                 ];
                 $MailData = 

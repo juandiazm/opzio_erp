@@ -32,13 +32,13 @@ class db_backup extends Command
                 $this->Bill_SendMissingBillsNotification(2);
             }*/
             /////////////////////
-            $filename = 'ridder_erp_'.Carbon::now()->format('d').'.sql';
+            $filename = 'opzio_erp_'.Carbon::now()->format('d').'.sql';
             $command = "mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . "  > " . storage_path() . "/backups/" . $filename;
             $returnVar = NULL;
             $output = NULL;
             exec($command, $output, $returnVar);
             //if(Carbon::now()->format('H') == '00'){
-                $filename_google = 'ridder_erp_'.Carbon::now()->format('d');
+                $filename_google = 'opzio_erp_'.Carbon::now()->format('d');
                 //Remove files with the same name
                 $files = collect(Storage::disk('google')->listContents());
                 foreach($files as $file){

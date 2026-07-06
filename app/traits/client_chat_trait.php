@@ -65,7 +65,7 @@ trait client_chat_trait
                     $message = new client_chat_message();
                     $message->client_chat_id = $chat->id;
                     $message->is_admin = 1;
-                    $message->message = 'Hola, soy Maya, el asistente virtual de RIDDER, en que te puedo ayudar?';
+                    $message->message = 'Hola, soy Maya, el asistente virtual de Opzio, en que te puedo ayudar?';
                     $message->save();
                 }
                 $messages = client_chat_message::where('client_chat_id', $chat->id)->orderBy('id')->get();

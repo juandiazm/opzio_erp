@@ -24,17 +24,17 @@ class instagram_controller extends Controller
             /*send approve mail*/
             $Mails = [];
             $Mails[] = [
-                'address' => 'mariaf.franco@ridder.com.co',
-                'name' => 'mariaf.franco@ridder.com.co'
+                'address' => 'mariaf.franco@opzio.com.co',
+                'name' => 'mariaf.franco@opzio.com.co'
             ];
             $Mails[] = [
-                'address' => 'comunicaciones@ridder.com.co',
-                'name' => 'comunicaciones@ridder.com.co'
+                'address' => 'comunicaciones@opzio.com.co',
+                'name' => 'comunicaciones@opzio.com.co'
             ];
             /*
             $Mails[] = [
-                'address' => 'daniel.mr@ridder.com.co',
-                'name' => 'daniel.mr@ridder.com.co'
+                'address' => 'daniel.mr@opzio.com.co',
+                'name' => 'daniel.mr@opzio.com.co'
             ];
             
             $Mails[] = [

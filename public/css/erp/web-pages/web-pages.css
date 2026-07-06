@@ -1,3 +1,27 @@
-.text-white{color:#fff}.bg-success{background-color:#1bcc5a}.bg-secondary{background-color:#0153ff}.bg-primary{background-color:#00057b}.text-gray-primary{color:#fff}.text-success{color:#1bcc5a}.text-gray-secondary{color:#f2f2f2}
+.text-white {
+  color: #ffffff;
+}
 
-/*# sourceMappingURL=web-pages.css.map*/
+.bg-success {
+  background-color: #1bcc5a;
+}
+
+.bg-secondary {
+  background-color: #0153FF;
+}
+
+.bg-primary {
+  background-color: #00057B;
+}
+
+.text-gray-primary {
+  color: #FFFFFF;
+}
+
+.text-success {
+  color: #1bcc5a;
+}
+
+.text-gray-secondary {
+  color: #F2F2F2;
+}

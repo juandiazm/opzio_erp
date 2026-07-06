@@ -1,7 +1,9 @@
-require('./bootstrap');
+import './bootstrap';
 import 'chart.js';
-window.Swal = require('sweetalert2');
-window.Toastify = require('toastify-js');
+import Swal from 'sweetalert2';
+import Toastify from 'toastify-js';
+window.Swal = Swal;
+window.Toastify = Toastify;
 
 $(document).on('click', ".image-container", change_image_action);
 $(document).on('click', ".image-plus-icon", function(){

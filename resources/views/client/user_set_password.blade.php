@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('app-header')
-<script src="{{ asset('js/client/set_password/set_password.js') }}" defer></script>
+@vite('resources/js/client/set_password/set_password.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/set_password/set_password.css') }}" rel="stylesheet">
+@vite('resources/sass/client/set_password/set_password.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')

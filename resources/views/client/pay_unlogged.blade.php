@@ -1,15 +1,15 @@
 @extends('layouts.app')
 @section('app-header')
-<title>RIDDER - Realiza tu pago</title>
+<title>Opzio - Realiza tu pago</title>
 <!-- Scripts de pasarelas de pago -->
 <script type="text/javascript" src="https://checkout.wompi.co/widget.js"></script>
 <script type="text/javascript" src="https://checkout.bold.co/library/boldPaymentButton.js"></script>
 <script>
     var income_unique_id = "{{ $income_unique_id }}";
 </script>
-<script src="{{ asset('js/client/pay_unlogged/pay_unlogged.js') }}" defer></script>
+@vite('resources/js/client/pay_unlogged/pay_unlogged.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/pay_unlogged/pay_unlogged.css') }}" rel="stylesheet">
+@vite('resources/sass/client/pay_unlogged/pay_unlogged.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')

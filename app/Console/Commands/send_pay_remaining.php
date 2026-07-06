@@ -263,7 +263,7 @@ class send_pay_remaining extends Command
         if(count($report_message) > 0){
             $Mails = [
                 [
-                    'address' => 'juandiazm@ridder.com.co',
+                    'address' => 'juandiazm@opzio.com.co',
                     'name' => 'Juan Diaz',
                 ]
             ];

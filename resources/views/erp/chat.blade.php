@@ -3,7 +3,7 @@
 @section('erp-app-header')
 
 <!-- Styles -->
-<link href="{{ asset('css/erp/chat/chat.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/chat/chat.scss')
 @endsection
 @section('erp-app-content')
 <div class="chat-container">
@@ -30,5 +30,5 @@
 
     </ul>
 </div>
-<script src="{{ asset('js/erp/chat/chat.js') }}" defer></script>
+@vite('resources/js/erp/chat/chat.js')
 @endsection

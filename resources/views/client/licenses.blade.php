@@ -1,11 +1,11 @@
 @extends('client.layouts.app')
 @section('component_title', 'LICENCIAS')
 @section('client-app-header')
-<script src="{{ asset('js/client/licenses/licenses.js') }}" defer></script>
-<script src="{{ asset('js/client/traceability.js') }}" defer></script>
+@vite('resources/js/client/licenses/licenses.js')
+@vite('resources/js/client/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/licenses/licenses.css') }}" rel="stylesheet">
-<link href="{{ asset('css/client/traceability.css') }}" rel="stylesheet">
+@vite('resources/sass/client/licenses/licenses.scss')
+@vite('resources/sass/client/traceability.scss')
 @endsection
 @section('client-app-content')
 <nav>

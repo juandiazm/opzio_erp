@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('app-header')
-<script src="{{ asset('js/erp/pusher/pusher.js') }}" defer></script>
-<script src="{{ asset('js/erp/pusher/pusher_channels_chat.js') }}" defer></script>
-<script src="{{ asset('js/erp/layouts/app.js') }}" defer></script>
+@vite('resources/js/erp/pusher/pusher.js')
+@vite('resources/js/erp/pusher/pusher_channels_chat.js')
+@vite('resources/js/erp/layouts/app.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/layouts/app.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/layouts/app.scss')
 @yield('erp-app-header')
 @endsection
 @section('app-content')
@@ -13,7 +13,6 @@
         <button id="sidebar-toggle-btn" class="sidebar-toggle-btn d-none d-md-flex" aria-label="Toggle menu">
             <i class="fa-light fa-chevron-left"></i>
         </button>
-        <img src="/images/business_logo_simple_blue.webp" alt="Ridder" id="sidebar-ridder-logo" onclick="location.href='/admin/dashboard'">
         <div id="my-profile-container" class="d-flex justify-content-start">
             <div id="my-profile-image-container">
                 <img src="/images/erp/users/{{ session('user')['photo'] }}" alt="My Profile" id="my-profile-image" style="border-color:{{ session('user')['color'] }};" onclick="location.href='/admin/my-profile'">
@@ -159,6 +158,6 @@
         </div>
         @yield('erp-app-content')
     </div>
-    <img src="/images/business_blues.webp" id="principal-logo-ridder" alt="ridder" onclick="location.href='/admin'">
+    <img src="/images/business_blues.webp" id="principal-logo-opzio" alt="opzio" onclick="location.href='/admin'">
 </div>
 @endsection

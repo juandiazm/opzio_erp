@@ -5,9 +5,9 @@
     var current_user = {!! json_encode(session('user')) !!};
     var permissions = {!! json_encode(session('permissions')) !!};
 </script>
-<script src="{{ asset('js/erp/my_profile/my_profile.js') }}" defer></script>
+@vite('resources/js/erp/my_profile/my_profile.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/my_profile/my_profile.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/my_profile/my_profile.scss')
 @endsection
 @section('erp-app-content')
 <nav>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="input-container col-12 d-flex" title="Correo del usuario">
                         <label for="username" class="input-title align-self-center">Correo</label>
-                        <input type="text" id="update-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@ridder.com.co">
+                        <input type="text" id="update-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@opzio.com.co">
                     </div>
                 </div>
                 

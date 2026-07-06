@@ -51,7 +51,7 @@ trait instagram_trait
             $Response = $this->OpenIA_MakeQuestionToAssistant(
                 $this->ES_INSTAGRAM_ASSISTANT_ID
                 , $content['thread_id']
-                , 'Genera un caption para una publicación en Instagram en español, enfocado en el tema: "'.$subject.'". La publicación debe ser creada desde la perspectiva de una empresa de desarrollo de software llamada "Ridder Software Developers". El tono debe ser innovador y persuasivo, buscando captar la atención y generar interés. El objetivo es provocar una necesidad en los lectores, incentivando la interacción y los clics en la publicación.'
+                , 'Genera un caption para una publicación en Instagram en español, enfocado en el tema: "'.$subject.'". La publicación debe ser creada desde la perspectiva de una empresa de desarrollo de software llamada "Opzio Software Developers". El tono debe ser innovador y persuasivo, buscando captar la atención y generar interés. El objetivo es provocar una necesidad en los lectores, incentivando la interacción y los clics en la publicación.'
                 , 5
                 , 5
             );
@@ -129,7 +129,7 @@ trait instagram_trait
             $post = new instagram_post();
             $post->unique_id = Str::uuid()->toString();
             $post->user_id = null;
-            $post->user_name = 'Ridder Software Developers';
+            $post->user_name = 'Opzio Software Developers';
             $post->subject = $subject;
             $post->caption = $content['caption'];
             $post->image_url = $content['image_url'];
@@ -199,7 +199,7 @@ trait instagram_trait
             $url = env('INSTAGRAM_API_USER_ID').'/media';
             $params = [
                 'access_token' => env('INSTAGRAM_API_ACCESS_TOKEN')
-                ,'image_url' => $post->image_url/*'https://erp.ridder.com.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
+                ,'image_url' => $post->image_url/*'https://erp.opzio.com.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
                 ,'caption' => $post->caption
             ];
             $instagramResponse = $this->InstagramAPI_PostRequest($url, $params, []);

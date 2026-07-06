@@ -16,7 +16,7 @@
     <!-- iOS PWA Configuration -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="RIDDER ERP">
+    <meta name="apple-mobile-web-app-title" content="Opzio ERP">
     <link rel="apple-touch-icon" href="/images/pwa/icon-192x192.png">
     <link rel="apple-touch-startup-image" href="/images/pwa/icon-512x512.png">
     
@@ -28,17 +28,17 @@
     <script src="{{ asset('js/jquery.js') }}"></script>
     <script src="{{ asset('js/popper.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    @vite('resources/js/app.js')
     <script src="{{ asset('js/general.js')}}" defer></script>
-    <script src="{{ asset('js/crud-input.js')}}" defer></script>
+    @vite('resources/js/crud-input.js')
     <script src="{{ asset('js/pwa.js')}}" defer></script>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" async>
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/crud-input.css') }}" rel="stylesheet">
+    @vite('resources/sass/app.scss')
+    @vite('resources/sass/crud-input.scss')
     @yield('app-header')
 </head>
 <body>
@@ -46,7 +46,7 @@
     <div id="layout-app" class="mx-0 px-0 w-100">
         @yield('app-content')
     </div>
-    <a class="d-block w-100 px-0 mx-0 text-center" href="https://ridder.com.co" id="ridder-feet" target="_blank">® Powered by RIDDER - {{ \Carbon\Carbon::now()->format('Y') }}</a>
+    <a class="d-block w-100 px-0 mx-0 text-center" href="https://opzio.com.co" id="opzio-feet" target="_blank">® Powered by Opzio - {{ \Carbon\Carbon::now()->format('Y') }}</a>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAF9AFSoPJMHWh_8EmeOGTFLVRTQcFCm-M">
     </script>

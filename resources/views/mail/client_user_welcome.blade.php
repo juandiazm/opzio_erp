@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIDDER S.A.S</title>
+    <title>Opzio S.A.S</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #555555; background-color: #FFFFFF; }
@@ -40,11 +40,11 @@
 <div class="email-wrapper">
     <div class="email-container">
         <div class="email-header">
-            <img src="{{ asset('images/business_blues.png') }}" alt="RIDDER S.A.S" class="email-logo-img">
+            <img src="{{ asset('images/business_blues.png') }}" alt="Opzio S.A.S" class="email-logo-img">
             
         </div>
         <div class="email-content">
-            <h1 class="email-greeting">¡Bienvenido a RIDDER!</h1>
+            <h1 class="email-greeting">¡Bienvenido a Opzio!</h1>
             <p class="email-text">Hola <strong>{{ $Data['name'] }}</strong>, tu cuenta ha sido creada exitosamente. Usa el código temporal a continuación para acceder:</p>
             <div class="info-box primary">
                 <p class="info-label">Tu código temporal de acceso</p>
@@ -55,11 +55,11 @@
             </div>
         </div>
         <div class="email-footer">
-            <p class="footer-text">&copy; {{ date('Y') }} RIDDER S.A.S &mdash; <a href="https://www.ridder.com.co" class="footer-link">www.ridder.com.co</a></p>
+            <p class="footer-text">&copy; {{ date('Y') }} Opzio S.A.S &mdash; <a href="https://www.opzio.com.co" class="footer-link">www.opzio.com.co</a></p>
             <div class="social-icons">
-                <a href="mailto:contabilidad@ridder.com.co" class="social-icon" target="_blank"><img src="{{ asset('images/social-media/mail.png') }}" alt="Email"></a>
-                <a href="https://www.facebook.com/riddersyh/" class="social-icon" target="_blank"><img src="{{ asset('images/social-media/facebook.png') }}" alt="Facebook"></a>
-                <a href="https://www.instagram.com/riddersyh/" class="social-icon" target="_blank"><img src="{{ asset('images/social-media/instagram.png') }}" alt="Instagram"></a>
+                <a href="mailto:contabilidad@opzio.com.co" class="social-icon" target="_blank"><img src="{{ asset('images/social-media/mail.png') }}" alt="Email"></a>
+                <a href="https://www.facebook.com/opziosyh/" class="social-icon" target="_blank"><img src="{{ asset('images/social-media/facebook.png') }}" alt="Facebook"></a>
+                <a href="https://www.instagram.com/opziosyh/" class="social-icon" target="_blank"><img src="{{ asset('images/social-media/instagram.png') }}" alt="Instagram"></a>
                 <a href="https://wa.me/573197536472" class="social-icon" target="_blank"><img src="{{ asset('images/social-media/whatsapp.png') }}" alt="WhatsApp"></a>
             </div>
         </div>

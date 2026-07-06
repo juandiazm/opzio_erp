@@ -69,7 +69,7 @@ trait payment_gateway_bold_trait
                 'integrity_signature' => $integrity_signature,
                 'redirection_url' => $redirection_url,
                 'environment' => $environment_value,
-                'description' => 'Pago de licencias RIDDER'
+                'description' => 'Pago de licencias Opzio'
             );
             $Response['status'] = 1;
         }catch(\Exception $e){

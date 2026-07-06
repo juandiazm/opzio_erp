@@ -1,11 +1,11 @@
 @extends('erp.layouts.app')
 @section('component_title', 'EMPLEADOS')
 @section('erp-app-header')
-<script src="{{ asset('js/erp/employees/employees.js') }}" defer></script>
-<script src="{{ asset('js/erp/traceability.js') }}" defer></script>
+@vite('resources/js/erp/employees/employees.js')
+@vite('resources/js/erp/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/traceability.css') }}" rel="stylesheet">
-<link href="{{ asset('css/erp/employees/employees.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/traceability.scss')
+@vite('resources/sass/erp/employees/employees.scss')
 @endsection
 @section('erp-app-content')
 <nav>
@@ -133,7 +133,7 @@
                     </div>
                     <div class="input-container col-12 d-flex">
                         <label for="employeename" class="input-title align-self-center">Correo E.</label>
-                        <input type="email" id="create-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@ridder.com.co">
+                        <input type="email" id="create-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@opzio.com.co">
                     </div>
                 </div>
             </div>
@@ -241,7 +241,7 @@
                     </div>
                     <div class="input-container col-12 d-flex">
                         <label for="employeename" class="input-title align-self-center">Correo E.</label>
-                        <input type="email" id="update-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@ridder.com.co">
+                        <input type="email" id="update-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@opzio.com.co">
                     </div>
                 </div>
             </div>

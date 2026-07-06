@@ -165,7 +165,7 @@ trait client_users_trait
                 ];
                 $MailData = 
                 [
-                    'subject' => 'Bienvenido a RIDDER S.A.S - Contraseña temporal'
+                    'subject' => 'Bienvenido a Opzio S.A.S - Contraseña temporal'
                 ];
                 $View = 'mail.client_user_welcome';
                 $ViewData = collect(

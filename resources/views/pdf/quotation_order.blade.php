@@ -53,22 +53,22 @@
                 justify-content: space-between;
                 align-items: center;
             }
-            #header-container #ridder-logo,
-            #header-container #ridder-data-container,
+            #header-container #opzio-logo,
+            #header-container #opzio-data-container,
             #header-container #order-main-information{
                 display: inline-block;
                 vertical-align: middle;
             }
-            #header-container #ridder-logo{
+            #header-container #opzio-logo{
                 width: 25%;
                 position: relative;
                 left: -2.3vw;
             }
-            #header-container #ridder-data-container{
+            #header-container #opzio-data-container{
                 width: 35%;
             }
-            #header-container #ridder-data-container p,
-            #header-container #ridder-data-container a{
+            #header-container #opzio-data-container p,
+            #header-container #opzio-data-container a{
                 margin: 0%;
                 padding: 0%;
                 display: block;
@@ -202,12 +202,12 @@
             .feed-sub-contianer span{
                 font-weight: bold;
             }
-            #feed-container #ridder-logo-feed,
+            #feed-container #opzio-logo-feed,
             #feed-container #feed-text-container{
                 display: inline-block;
                 vertical-align: middle;
             }
-            #feed-container #ridder-logo-feed{
+            #feed-container #opzio-logo-feed{
                 width: 100px;
                 align-self: center;
                 box-shadow: 0px 3px 6px #00000029;
@@ -359,15 +359,15 @@
             @endif
             <div id="general-container">
                 <div id="header-container" class="container border-botton">
-                    <img src="{{ $Data['public_path'].'images/business_blues.webp' }}" alt="RIDDER S.A.S" id="ridder-logo"/>
-                    <div id="ridder-data-container">
-                        <p class="title">RIDDER S.A.S</p>
+                    <img src="{{ $Data['public_path'].'images/business_blues.webp' }}" alt="Opzio S.A.S" id="opzio-logo"/>
+                    <div id="opzio-data-container">
+                        <p class="title">Opzio S.A.S</p>
                         <br>
                         <p>NIT: 901.721.687-1</p>
                         <p>Dir: CARRERA 76 80 20 P 4</p>
                         <p>Tel: (601) 4051307</p>
                         <p>Bogotá D.C., Colombia</p>
-                        <a href="https://ridder.com.co/" target="_blank">www.ridder.com.co</a>
+                        <a href="https://opzio.com.co/" target="_blank">www.opzio.com.co</a>
                     </div>
                     <div id="order-main-information">
                         <p class="title">COTIZACIÓN</p>
@@ -463,11 +463,11 @@
                 @endif
                 <div id="feed-container">
                     <div class="feed-sub-contianer">
-                    <img src="{{ $Data['public_path'].'images/bussines-logo-rounded.webp'}}" alt="RIDDER S.A.S" id="ridder-logo-feed"/>
+                    <img src="{{ $Data['public_path'].'images/bussines-logo-rounded.webp'}}" alt="Opzio S.A.S" id="opzio-logo-feed"/>
                         <div id="feed-text-container">
                             <p id="feed-department"><strong>Departamento Comercial</strong></p>
                             <p id="feed-email">{{  session('user')==null?'':session('user')['email'] }}</p>
-                            <a id="feed-link" href="https://ridder.com.co/" target="_blank">Ridder S.A.S</a>
+                            <a id="feed-link" href="https://opzio.com.co/" target="_blank">Opzio S.A.S</a>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 @extends('erp.layouts.app')
 @section('erp-app-header')
-<link href="{{ asset('css/erp/ia_assistant/ia_assistant.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/ia_assistant/ia_assistant.scss')
 @endsection
 @section('component_title', 'IA Assistant')
 @section('erp-app-content')

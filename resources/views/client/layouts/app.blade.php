@@ -5,9 +5,9 @@
         window.location.href = '/client/profile/set-password';
     }
 </script>
-<script src="{{ asset('js/client/layouts/app.js') }}" defer></script>
+@vite('resources/js/client/layouts/app.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/layouts/app.css') }}" rel="stylesheet">
+@vite('resources/sass/client/layouts/app.scss')
 @yield('client-app-header')
 @endsection
 @section('app-content')
@@ -16,9 +16,9 @@
     {!! $header_menu_view !!}
     <div id="client-app-sidebar" class="col-1 col-md-2 d-flex flex-column">
         @if(collect(session('permissions'))->firstWhere('client_user_permission_id', 1)!=null)
-        <img src="/images/erp/clients/{{ session('client_user')['active_client']['photo'] }}"  onerror="this.src='/images/no-image.jpg'" alt="Ridder" id="sidebar-client-logo" onclick="location.href='/client/my-companies'">
+        <img src="/images/erp/clients/{{ session('client_user')['active_client']['photo'] }}"  onerror="this.src='/images/no-image.jpg'" alt="Opzio" id="sidebar-client-logo" onclick="location.href='/client/my-companies'">
         @else
-        <img src="/images/erp/clients/{{ session('client_user')['active_client']['photo'] }}"  onerror="this.src='/images/no-image.jpg'" alt="Ridder" id="sidebar-client-logo" onclick="location.href='/client/dashboard'">
+        <img src="/images/erp/clients/{{ session('client_user')['active_client']['photo'] }}"  onerror="this.src='/images/no-image.jpg'" alt="Opzio" id="sidebar-client-logo" onclick="location.href='/client/dashboard'">
         @endif
         <div id="company-container">
             <div id="company-name-container">

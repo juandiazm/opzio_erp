@@ -1,7 +1,7 @@
 // Service Worker para PWA
 // Este es un service worker básico que permite la instalación PWA
 
-const CACHE_NAME = 'ridder-erp-v1';
+const CACHE_NAME = 'opzio-erp-v1';
 const urlsToCache = [
   '/',
   '/css/app.css',

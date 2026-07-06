@@ -1,11 +1,11 @@
 @extends('erp.layouts.app')
 @section('component_title', 'INGRESOS')
 @section('erp-app-header')
-<script src="{{ asset('js/erp/incomes/incomes.js') }}" defer></script>
-<script src="{{ asset('js/erp/traceability.js') }}" defer></script>
+@vite('resources/js/erp/incomes/incomes.js')
+@vite('resources/js/erp/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/incomes/incomes.css') }}" rel="stylesheet">
-<link href="{{ asset('css/erp/traceability.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/incomes/incomes.scss')
+@vite('resources/sass/erp/traceability.scss')
 @endsection
 @section('erp-app-content')
 <nav>

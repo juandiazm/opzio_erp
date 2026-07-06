@@ -1,11 +1,11 @@
 @extends('erp.layouts.app')
 @section('component_title', 'DEPARTAMENTOS')
 @section('erp-app-header')
-<script src="{{ asset('js/erp/departments/departments.js') }}" defer></script>
-<script src="{{ asset('js/erp/traceability.js') }}" defer></script>
+@vite('resources/js/erp/departments/departments.js')
+@vite('resources/js/erp/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/departments/departments.css') }}" rel="stylesheet">
-<link href="{{ asset('css/erp/traceability.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/departments/departments.scss')
+@vite('resources/sass/erp/traceability.scss')
 @endsection
 @section('erp-app-content')
 <nav>

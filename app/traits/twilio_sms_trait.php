@@ -43,7 +43,7 @@ trait twilio_sms_trait
                 $phone = $prefix.substr($phone, 1);
             }
             $receiverNumber = $phone;
-            $message = 'RIDDER S.A.S: '.$messages;
+            $message = 'Opzio S.A.S: '.$messages;
     
             $sid = env('TWILIO_SID');
             $token = env('TWILIO_TOKEN');

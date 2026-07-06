@@ -50,7 +50,7 @@ trait facebook_trait
             $Response = $this->OpenIA_MakeQuestionToAssistant(
                 $this->ES_FACEBOOK_ASSISTANT_ID
                 , $content['thread_id']
-                ,'Redacta un párrafo en español (máximo 300 caracteres) sobre "'.$subject.'", escrito desde la perspectiva de una empresa de desarrollo de software llamada "Ridder Software Developers". El texto debe ser innovador, persuasivo y diseñado para despertar una necesidad en el lector, incentivando los clics hacia su página [Enlace]. Evita repetir temas y mantén el contenido fresco y atractivo.'
+                ,'Redacta un párrafo en español (máximo 300 caracteres) sobre "'.$subject.'", escrito desde la perspectiva de una empresa de desarrollo de software llamada "Opzio Software Developers". El texto debe ser innovador, persuasivo y diseñado para despertar una necesidad en el lector, incentivando los clics hacia su página [Enlace]. Evita repetir temas y mantén el contenido fresco y atractivo.'
                 , 5
                 , 5
             );
@@ -86,7 +86,7 @@ trait facebook_trait
             $post = new facebook_post();
             $post->unique_id = Str::uuid()->toString();
             $post->user_id = null;
-            $post->user_name = 'Ridder Software Developers';
+            $post->user_name = 'Opzio Software Developers';
             $post->subject = $content['subject'];
             $post->message = $content['message'];
             $post->link = null;
@@ -200,7 +200,7 @@ trait facebook_trait
             $url = env('FACEBOOK_API_USER_ID').'/feed';
             $params = [
                 'access_token' => env('FACEBOOK_API_ACCESS_TOKEN')
-                ,'message' => $post->message/*'https://erp.ridder.com.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
+                ,'message' => $post->message/*'https://erp.opzio.com.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
                 ,'link' => $post->link
             ];
             $facebookResponse = $this->FacebookAPI_PostRequest($url, $params, []);

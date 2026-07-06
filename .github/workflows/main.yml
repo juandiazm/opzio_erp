@@ -76,50 +76,50 @@ jobs:
 
     - name: Add server to known_hosts
       run: |
-        ssh-keyscan -H 34.82.192.32 >> ~/.ssh/known_hosts
+        ssh-keyscan -H 35.239.181.103 >> ~/.ssh/known_hosts
 
     - name: Ensure deployment directory exists
       run: |
-        ssh -o StrictHostKeyChecking=no git@34.82.192.32 'sudo mkdir -p /var/www/html/ridder_erp && sudo chmod -R 777 /var/www/html/ridder_erp'
+        ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo mkdir -p /var/www/html/opzio_erp && sudo chmod -R 777 /var/www/html/opzio_erp'
     
     - name: Deploy storage directory
       run: |
-        if ssh -o StrictHostKeyChecking=no git@34.82.192.32 '[ ! -d "/var/www/html/ridder_erp/storage" ]'; then
+        if ssh -o StrictHostKeyChecking=no git@35.239.181.103 '[ ! -d "/var/www/html/opzio_erp/storage" ]'; then
           echo "Storage directory not found. Copying from repository..."
-          scp -r ./storage git@34.82.192.32:/var/www/html/ridder_erp/
-          ssh -o StrictHostKeyChecking=no git@34.82.192.32 'sudo chmod -R 777 /var/www/html/ridder_erp/storage'
+          scp -r ./storage git@35.239.181.103:/var/www/html/opzio_erp/
+          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo chmod -R 777 /var/www/html/opzio_erp/storage'
         else
           echo "Storage directory exists. Nothing to do."
         fi
 
     - name: Deploy public directory
       run: |
-        if ssh -o StrictHostKeyChecking=no git@34.82.192.32 '[ ! -d "/var/www/html/ridder_erp/public" ]'; then
+        if ssh -o StrictHostKeyChecking=no git@35.239.181.103 '[ ! -d "/var/www/html/opzio_erp/public" ]'; then
           echo "Public directory not found. Copying from repository..."
-          scp -r ./public git@34.82.192.32:/var/www/html/ridder_erp/
+          scp -r ./public git@35.239.181.103:/var/www/html/opzio_erp/
         else
-          ssh -o StrictHostKeyChecking=no git@34.82.192.32 'sudo rm -rf /var/www/html/ridder_erp/public/css /var/www/html/ridder_erp/public/js /var/www/html/ridder_erp/public/fonts /var/www/html/ridder_erp/public/images/payment-gateways'
-          scp -r ./public/css git@34.82.192.32:/var/www/html/ridder_erp/public
-          scp -r ./public/js git@34.82.192.32:/var/www/html/ridder_erp/public
-          scp -r ./public/fonts git@34.82.192.32:/var/www/html/ridder_erp/public
-          ssh -o StrictHostKeyChecking=no git@34.82.192.32 'sudo mkdir -p /var/www/html/ridder_erp/public/images'
-          scp -r ./public/images/payment-gateways git@34.82.192.32:/var/www/html/ridder_erp/public/images/
+          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo rm -rf /var/www/html/opzio_erp/public/css /var/www/html/opzio_erp/public/js /var/www/html/opzio_erp/public/fonts /var/www/html/opzio_erp/public/images/payment-gateways'
+          scp -r ./public/css git@35.239.181.103:/var/www/html/opzio_erp/public
+          scp -r ./public/js git@35.239.181.103:/var/www/html/opzio_erp/public
+          scp -r ./public/fonts git@35.239.181.103:/var/www/html/opzio_erp/public
+          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo mkdir -p /var/www/html/opzio_erp/public/images'
+          scp -r ./public/images/payment-gateways git@35.239.181.103:/var/www/html/opzio_erp/public/images/
         fi
-        ssh -o StrictHostKeyChecking=no git@34.82.192.32 'sudo chmod -R 777 /var/www/html/ridder_erp/public'
+        ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo chmod -R 777 /var/www/html/opzio_erp/public'
         
 
     - name: Deploy .env file
       run: |
-        if ssh -o StrictHostKeyChecking=no git@34.82.192.32 '[ ! -f "/var/www/html/ridder_erp/.env" ]'; then
+        if ssh -o StrictHostKeyChecking=no git@35.239.181.103 '[ ! -f "/var/www/html/opzio_erp/.env" ]'; then
           echo ".env file not found. Copying from repository..."
-          scp .env_temp git@34.82.192.32:/var/www/html/ridder_erp/.env
+          scp .env_temp git@35.239.181.103:/var/www/html/opzio_erp/.env
         fi
 
     - name: Deploy to server
       run: |
-        scp build.tar.gz git@34.82.192.32:/var/www/html/ridder_erp
-        ssh git@34.82.192.32 << 'EOF'
-        cd /var/www/html/ridder_erp
+        scp build.tar.gz git@35.239.181.103:/var/www/html/opzio_erp
+        ssh git@35.239.181.103 << 'EOF'
+        cd /var/www/html/opzio_erp
         tar -xzf build.tar.gz
         sudo update-alternatives --set php /usr/bin/php8.1
         curl -sS https://getcomposer.org/installer | php
@@ -136,6 +136,6 @@ jobs:
 
     - name: Setting ownership
       run: |
-        ssh -o StrictHostKeyChecking=no git@34.82.192.32 'sudo chown -R www-data:www-data /var/www/html/ridder_erp'
+        ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo chown -R www-data:www-data /var/www/html/opzio_erp'
 
     

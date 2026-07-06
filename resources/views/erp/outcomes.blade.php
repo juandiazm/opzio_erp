@@ -1,9 +1,9 @@
 @extends('erp.layouts.app')
 @section('component_title', 'EGRESOS')
 @section('erp-app-header')
-<script src="{{ asset('js/erp/outcomes/outcomes.js') }}" defer></script>
+@vite('resources/js/erp/outcomes/outcomes.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/outcomes/outcomes.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/outcomes/outcomes.scss')
 @endsection
 @section('erp-app-content')
 <nav>

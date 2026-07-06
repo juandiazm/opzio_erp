@@ -1,3 +1,212 @@
-.text-white{color:#fff}.bg-success{background-color:#1bcc5a}.bg-secondary{background-color:#0153ff}.bg-primary{background-color:#00057b}.text-gray-primary{color:#fff}.text-success{color:#1bcc5a}.text-gray-secondary{color:#f2f2f2}@media screen and (min-width:768px){.unsubscribe-container{align-items:center;background:#242574;background:linear-gradient(90deg,#242574,#162ea4 74%,#0932bb);background-image:url(/images/login/bg.webp);background-position:50%;background-repeat:no-repeat;background-size:cover;display:flex;height:87vh;justify-content:center;margin:0;padding:0}.unsubscribe-container .unsubscribe-sub-container{background:hsla(0,0%,100%,.9);border-radius:10px;margin:0;min-width:500px;padding:5vh 3vw;width:70%}.unsubscribe-container .unsubscribe-sub-container .icon{color:#00057b;display:block;font-size:100px;margin:0 auto;text-align:center}.unsubscribe-container .unsubscribe-sub-container .title{color:#00057b;font-size:2rem;font-weight:600;margin:0 0 20px;padding:0;text-align:center}.unsubscribe-container .unsubscribe-sub-container .description{color:#707070;font-size:1.2rem;margin:0 0 20px;padding:0;text-align:center}.unsubscribe-container .unsubscribe-sub-container .reason{background-color:hsla(0,0%,100%,.4);border:none;color:#707070;display:block;font-size:1.2rem;height:15vh;margin:0 0 20px;padding:15px 10px;resize:none;text-align:center;width:100%}.unsubscribe-container .unsubscribe-sub-container .reason:focus{outline:none}.unsubscribe-container .unsubscribe-sub-container .buttons-container{align-items:center;display:flex;justify-content:space-between}.unsubscribe-container .unsubscribe-sub-container .buttons-container .btn{align-self:center;border:none;border-radius:5px!important;cursor:pointer;font-weight:600;margin:0;padding:5px 20px}.unsubscribe-container .unsubscribe-sub-container .buttons-container .btn:focus{outline:none}.unsubscribe-container .unsubscribe-sub-container .buttons-container .unsubscribe{background-color:#707070;color:#fff;font-size:1rem}.unsubscribe-container .unsubscribe-sub-container .buttons-container .cancel{background-color:#00057b;color:#fff;font-size:1.2rem}}@media screen and (max-width:768px){.unsubscribe-container{align-items:center;background:#242574;background:linear-gradient(90deg,#242574,#162ea4 74%,#0932bb);background-image:url(/images/login/bg.webp);background-position:50%;background-repeat:no-repeat;background-size:cover;display:flex;height:95vh;justify-content:center;margin:0;padding:0}.unsubscribe-container .unsubscribe-sub-container{background:hsla(0,0%,100%,.9);border-radius:10px;margin:0;padding:5vh 3vw;width:95%}.unsubscribe-container .unsubscribe-sub-container .icon{color:#00057b;display:block;font-size:50px;margin:0 auto;text-align:center}.unsubscribe-container .unsubscribe-sub-container .title{color:#00057b;font-size:2rem;font-weight:600;margin:0 0 20px;padding:0;text-align:center}.unsubscribe-container .unsubscribe-sub-container .description{color:#707070;font-size:.9rem;margin:0 0 20px;padding:0;text-align:center}.unsubscribe-container .unsubscribe-sub-container .reason{background-color:hsla(0,0%,100%,.4);border:none;color:#707070;display:block;font-size:1.2rem;height:15vh;margin:0 0 20px;padding:15px 10px;resize:none;text-align:center;width:100%}.unsubscribe-container .unsubscribe-sub-container .reason:focus{outline:none}.unsubscribe-container .unsubscribe-sub-container .buttons-container{align-items:center;display:flex;justify-content:space-between}.unsubscribe-container .unsubscribe-sub-container .buttons-container .btn{align-self:center;border:none;border-radius:5px!important;cursor:pointer;font-weight:600;margin:0;max-width:49%;padding:5px 10px}.unsubscribe-container .unsubscribe-sub-container .buttons-container .btn:focus{outline:none}.unsubscribe-container .unsubscribe-sub-container .buttons-container .unsubscribe{background-color:#707070;color:#fff;font-size:.9rem}.unsubscribe-container .unsubscribe-sub-container .buttons-container .cancel{background-color:#00057b;color:#fff;font-size:1rem}}
+.text-white {
+  color: #ffffff;
+}
 
-/*# sourceMappingURL=unsubscribe.css.map*/
+.bg-success {
+  background-color: #1bcc5a;
+}
+
+.bg-secondary {
+  background-color: #0153FF;
+}
+
+.bg-primary {
+  background-color: #00057B;
+}
+
+.text-gray-primary {
+  color: #FFFFFF;
+}
+
+.text-success {
+  color: #1bcc5a;
+}
+
+.text-gray-secondary {
+  color: #F2F2F2;
+}
+
+@media screen and (min-width: 768px) {
+  .unsubscribe-container {
+    height: 87vh;
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 37, 116);
+    background: linear-gradient(90deg, rgb(36, 37, 116) 0%, rgb(22, 46, 164) 74%, rgb(9, 50, 187) 100%);
+    background-image: url("/images/login/bg.webp");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .unsubscribe-container .unsubscribe-sub-container {
+    margin: 0;
+    padding: 5vh 3vw;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    width: 70%;
+    min-width: 500px;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .icon {
+    text-align: center;
+    font-size: 100px;
+    color: #00057B;
+    margin-bottom: 20px;
+    margin: 0 auto;
+    display: block;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #00057B;
+    margin: 0 0 20px 0;
+    padding: 0;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .description {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #707070;
+    margin-bottom: 20px;
+    margin: 0 0 20px 0;
+    padding: 0;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .reason {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #707070;
+    margin-bottom: 20px;
+    margin: 0 0 20px 0;
+    padding: 15px 10px;
+    display: block;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: none;
+    resize: none;
+    height: 15vh;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .reason:focus {
+    outline: none;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .btn {
+    margin: 0;
+    padding: 5px 20px;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px !important;
+    align-self: center;
+    cursor: pointer;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .btn:focus {
+    outline: none;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .unsubscribe {
+    background-color: #707070;
+    color: #ffffff;
+    font-size: 1rem;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .cancel {
+    background-color: #00057B;
+    color: #ffffff;
+    font-size: 1.2rem;
+  }
+}
+@media screen and (max-width: 768px) {
+  .unsubscribe-container {
+    height: 95vh;
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 37, 116);
+    background: linear-gradient(90deg, rgb(36, 37, 116) 0%, rgb(22, 46, 164) 74%, rgb(9, 50, 187) 100%);
+    background-image: url("/images/login/bg.webp");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .unsubscribe-container .unsubscribe-sub-container {
+    margin: 0;
+    padding: 5vh 3vw;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    width: 95%;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .icon {
+    text-align: center;
+    font-size: 50px;
+    color: #00057B;
+    margin-bottom: 20px;
+    margin: 0 auto;
+    display: block;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #00057B;
+    margin: 0 0 20px 0;
+    padding: 0;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .description {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #707070;
+    margin-bottom: 20px;
+    margin: 0 0 20px 0;
+    padding: 0;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .reason {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #707070;
+    margin-bottom: 20px;
+    margin: 0 0 20px 0;
+    padding: 15px 10px;
+    display: block;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: none;
+    resize: none;
+    height: 15vh;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .reason:focus {
+    outline: none;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .btn {
+    margin: 0;
+    padding: 5px 10px;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px !important;
+    align-self: center;
+    max-width: 49%;
+    cursor: pointer;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .btn:focus {
+    outline: none;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .unsubscribe {
+    background-color: #707070;
+    color: #ffffff;
+    font-size: 0.9rem;
+  }
+  .unsubscribe-container .unsubscribe-sub-container .buttons-container .cancel {
+    background-color: #00057B;
+    color: #ffffff;
+    font-size: 1rem;
+  }
+}

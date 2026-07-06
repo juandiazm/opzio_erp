@@ -32,7 +32,7 @@ trait amazon_sns_trait
 
                 // Publish a message to the SNS topic
                 $result = $sns->publish([
-                    'Message' => 'RIDDER S.A.S: '.$message,
+                    'Message' => 'Opzio S.A.S: '.$message,
                     'PhoneNumber' => $phone_number,
                     'MessageAttributes' => [
                         'AWS.SNS.SMS.SMSType'  => [

@@ -1,3 +1,106 @@
-.text-white{color:#fff}.bg-success{background-color:#1bcc5a}.bg-secondary{background-color:#0153ff}.bg-primary{background-color:#00057b}.text-gray-primary{color:#fff}.text-success{color:#1bcc5a}.text-gray-secondary{color:#f2f2f2}#ia-assistant-container{padding:10px 0}#ia-assistant-container .ia-assistant-subtitle{color:#707070;font-size:15px;margin:0 0 24px}#ia-assistant-container #ia-assistant-cards{display:flex;flex-wrap:wrap;gap:20px}#ia-assistant-container #ia-assistant-cards .ia-assistant-card{background-color:#fff;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.08);color:#272727;display:flex;flex-direction:column;padding:24px;text-decoration:none;transition:box-shadow .25s,transform .25s;width:260px}#ia-assistant-container #ia-assistant-cards .ia-assistant-card--active{cursor:pointer}#ia-assistant-container #ia-assistant-cards .ia-assistant-card--active:hover{box-shadow:0 6px 20px rgba(1,83,255,.2);transform:translateY(-2px)}#ia-assistant-container #ia-assistant-cards .ia-assistant-card--soon{cursor:default;opacity:.55}#ia-assistant-container #ia-assistant-cards .ia-assistant-card__icon-wrapper{align-items:center;background-color:#f0f4ff;border-radius:10px;display:flex;height:48px;justify-content:center;margin-bottom:14px;width:48px}#ia-assistant-container #ia-assistant-cards .ia-assistant-card__icon{color:#0153ff;font-size:22px}#ia-assistant-container #ia-assistant-cards .ia-assistant-card__title{color:#272727;font-size:15px;font-weight:700;margin:0 0 8px}#ia-assistant-container #ia-assistant-cards .ia-assistant-card__description{color:#707070;flex:1;font-size:12px;line-height:1.6;margin:0 0 16px}#ia-assistant-container #ia-assistant-cards .ia-assistant-card__badge{align-self:flex-start;border-radius:20px;font-size:11px;font-weight:600;padding:3px 10px}#ia-assistant-container #ia-assistant-cards .ia-assistant-card__badge--active{background-color:#e6f4ea;color:#1b7a35}#ia-assistant-container #ia-assistant-cards .ia-assistant-card__badge--soon{background-color:#f5f5f5;color:#707070}
+.text-white {
+  color: #ffffff;
+}
 
-/*# sourceMappingURL=ia_assistant.css.map*/
+.bg-success {
+  background-color: #1bcc5a;
+}
+
+.bg-secondary {
+  background-color: #0153FF;
+}
+
+.bg-primary {
+  background-color: #00057B;
+}
+
+.text-gray-primary {
+  color: #FFFFFF;
+}
+
+.text-success {
+  color: #1bcc5a;
+}
+
+.text-gray-secondary {
+  color: #F2F2F2;
+}
+
+#ia-assistant-container {
+  padding: 10px 0;
+}
+#ia-assistant-container .ia-assistant-subtitle {
+  font-size: 15px;
+  color: #707070;
+  margin: 0 0 24px 0;
+}
+#ia-assistant-container #ia-assistant-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card {
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  color: #272727;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card--active {
+  cursor: pointer;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card--active:hover {
+  box-shadow: 0px 6px 20px rgba(1, 83, 255, 0.2);
+  transform: translateY(-2px);
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card--soon {
+  opacity: 0.55;
+  cursor: default;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card__icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: #f0f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card__icon {
+  font-size: 22px;
+  color: #0153FF;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #272727;
+  margin: 0 0 8px 0;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card__description {
+  font-size: 12px;
+  color: #707070;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  flex: 1;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card__badge {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card__badge--active {
+  background-color: #e6f4ea;
+  color: #1b7a35;
+}
+#ia-assistant-container #ia-assistant-cards .ia-assistant-card__badge--soon {
+  background-color: #f5f5f5;
+  color: #707070;
+}

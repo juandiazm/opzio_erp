@@ -7,9 +7,9 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-<script src="{{ asset('js/erp/reports/reports.js') }}" defer></script>
+@vite('resources/js/erp/reports/reports.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/reports/reports.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/reports/reports.scss')
 @endsection
 @section('component-title-options')
     <div id="export-report-excel-container">

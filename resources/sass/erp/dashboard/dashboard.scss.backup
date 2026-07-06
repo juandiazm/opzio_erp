@@ -10,7 +10,7 @@
     width: 100%;
     margin: 1vh 0;
 }
-#principal-logo-ridder{
+#principal-logo-opzio{
     background-color: transparent !important;
 }
 @media screen and (min-width: 768px) {

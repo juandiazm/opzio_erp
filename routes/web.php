@@ -36,8 +36,8 @@ use App\Http\Controllers\client_users_controller;
 use App\Http\Controllers\income_payment_controller;
 use App\Http\Controllers\payment_gateway_wompi_controller;
 use App\Http\Controllers\payment_gateway_bold_controller;
-//Ridder
-use App\Http\Controllers\old_ridder_controller;
+//Opzio
+use App\Http\Controllers\old_opzio_controller;
 use App\Http\Controllers\client_chat_controller;
 use App\Http\Controllers\open_ia_controller;
 use App\Http\Controllers\ia_assistant_controller;
@@ -52,15 +52,15 @@ use App\Http\Controllers\ia_assistant_controller;
 |
 */
 Route::get('', function () {
-    return redirect('/client');
+    return redirect('/admin');
 });
 
 // PWA - Serve manifest.json and service-worker.js inline to avoid redirect issues
 Route::get('manifest.json', function () {
     return response()->json([
-        'name' => 'RIDDER ERP',
-        'short_name' => 'RIDDER',
-        'description' => 'Sistema de gestión empresarial RIDDER ERP',
+        'name' => 'Opzio ERP',
+        'short_name' => 'Opzio',
+        'description' => 'Sistema de gestión empresarial Opzio ERP',
         'start_url' => '/',
         'display' => 'standalone',
         'background_color' => '#ffffff',
@@ -607,11 +607,11 @@ Route::prefix('api')->group(function () {
         Route::get('approve/{unique_id}', [admin_pages_controller::class, 'approve_twitter_post_page']);
         Route::post('approve', [twitter_controller::class, 'approve_twitter_post']);
     });
-    /*Route::prefix('old-ridder')->group(function () {
-        Route::post('get-and-set-clients-licenses', [old_ridder_controller::class, 'get_and_set_client_and_licenses']);
-        Route::post('set-last-payed-date-on-licenses', [old_ridder_controller::class, 'last_payed_date_on_licenses']);
-        Route::post('set-incomes', [old_ridder_controller::class, 'set_incomes']);
-        Route::post('set-outcomes', [old_ridder_controller::class, 'set_outcomes']);
+    /*Route::prefix('old-opzio')->group(function () {
+        Route::post('get-and-set-clients-licenses', [old_opzio_controller::class, 'get_and_set_client_and_licenses']);
+        Route::post('set-last-payed-date-on-licenses', [old_opzio_controller::class, 'last_payed_date_on_licenses']);
+        Route::post('set-incomes', [old_opzio_controller::class, 'set_incomes']);
+        Route::post('set-outcomes', [old_opzio_controller::class, 'set_outcomes']);
     });*/
 });
 //CSRF Token
@@ -627,7 +627,7 @@ Route::prefix('test')->group(function () {
             "state"=> "0",
             "client_id"=> "1",
             "client_identification"=> "56465465465",
-            "client_name"=> "RIDDER",
+            "client_name"=> "Opzio",
             "timely_payment"=> "2024-03-05",
             "cutoff_date"=> "2024-03-20",
             "description"=> null,
@@ -635,7 +635,7 @@ Route::prefix('test')->group(function () {
             "updated_at"=> "2024-03-06T02:37:32.000000Z",
             "created_at"=> "2024-03-06T02:37:32.000000Z",
             "id"=> 39,
-            "url" => "https://erp.ridder.com.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
+            "url" => "https://erp.opzio.com.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
             "licenses"=> collect([
                 [
                 "income_id"=> 39,
@@ -663,7 +663,7 @@ Route::prefix('test')->group(function () {
             "client"=> [
             "id"=> 1,
             "unique_id"=> "509fe981-125a-4cd7-b041-e716e555de8f",
-            "name"=> "RIDDER",
+            "name"=> "Opzio",
             "lastname"=> null,
             "email"=> "465465@gmail.com",
             "identification_type"=> 0,
@@ -689,7 +689,7 @@ Route::prefix('test')->group(function () {
             "created_at"=> "2024-01-13T17:58:44.000000Z",
             "updated_at"=> "2024-01-19T01:46:29.000000Z"
             ],
-            "public_path"=> "https://erp.ridder.com.co/"
+            "public_path"=> "https://erp.opzio.com.co/"
         ];
         return view('pdf.purchase_order',compact('Data'));
     });
@@ -701,7 +701,7 @@ Route::prefix('test')->group(function () {
                 "state"=> "0",
                 "client_id"=> "1",
                 "client_identification"=> "56465465465",
-                "client_name"=> "RIDDER",
+                "client_name"=> "Opzio",
                 "timely_payment"=> "2024-03-05",
                 "cutoff_date"=> "2024-03-20",
                 "description"=> null,
@@ -709,7 +709,7 @@ Route::prefix('test')->group(function () {
                 "updated_at"=> "2024-03-06T02:37:32.000000Z",
                 "created_at"=> "2024-03-06T02:37:32.000000Z",
                 "id"=> 39,
-                "url" => "https://erp.ridder.com.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
+                "url" => "https://erp.opzio.com.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
                 "licenses"=> [
                     [
                     "income_id"=> 39,
@@ -736,7 +736,7 @@ Route::prefix('test')->group(function () {
                 "client"=> [
                 "id"=> 1,
                 "unique_id"=> "509fe981-125a-4cd7-b041-e716e555de8f",
-                "name"=> "RIDDER",
+                "name"=> "Opzio",
                 "lastname"=> null,
                 "email"=> "465465@gmail.com",
                 "identification_type"=> 0,
@@ -762,15 +762,15 @@ Route::prefix('test')->group(function () {
                 "created_at"=> "2024-01-13T17:58:44.000000Z",
                 "updated_at"=> "2024-01-19T01:46:29.000000Z"
                 ],
-                "public_path"=> "https://erp.ridder.com.co/",
+                "public_path"=> "https://erp.opzio.com.co/",
                 "ia_message" => "Tu tienda virtual está lista para triunfar en la web. ¿Quieres más? Descubre nuestros servicios adicionales y destaca en línea como nunca antes.",
             ];
             return view('mail.purchase_order', compact('Data'));
         });
         Route::get('client_user_restore_password', function(){
             $Data = [
-                "name"=> "RIDDER",
-                "email"=> "juand@ridder.com.co",
+                "name"=> "Opzio",
+                "email"=> "juand@opzio.com.co",
                 "restore-code" => "123456",
                 "reset_password_date" => "2024-01-13T17:58:44.000000Z",
             ];
@@ -779,7 +779,7 @@ Route::prefix('test')->group(function () {
         Route::get('income_payment_finished', function(){
             $Data = [
                 'client' => [
-                    'name' => 'RIDDER',
+                    'name' => 'Opzio',
                     'identification' => '56465465465',
                 ],
                 'income' => [
@@ -795,7 +795,7 @@ Route::prefix('test')->group(function () {
         Route::get('client_income_payment_finished', function(){
             $Data = [
                 'client' => [
-                    'name' => 'RIDDER',
+                    'name' => 'Opzio',
                     'identification' => '56465465465',
                 ],
                 'income' => [
@@ -822,7 +822,7 @@ Route::prefix('test')->group(function () {
                     "url" => "disen-futuro-marca",
                     "brief" => "Descubre cómo el diseño UX/UI puede transformar la experiencia de tus usuarios y el éxito de tu marca en la era digital. ¡Optimiza tu presencia en línea y diferénciate con un diseño innovador!",
                     "img" => "b2b6805b_d5a3_4a61_9661_4c3a94a5ea0e.webp",
-                    "author" => "RIDDER I.A.",
+                    "author" => "Opzio I.A.",
                     "type" => 0,
                     "language" => "es",
                     "keywords" => "Diseño UX/UI, Experiencia del Usuario, Marca, Tecnología, Innovación.",
@@ -862,7 +862,7 @@ Route::prefix('test')->group(function () {
                     "url" => "disen-futuro-marca",
                     "brief" => "Descubre cómo el diseño UX/UI puede transformar la experiencia de tus usuarios y el éxito de tu marca en la era digital. ¡Optimiza tu presencia en línea y diferénciate con un diseño innovador!",
                     "img" => "b2b6805b_d5a3_4a61_9661_4c3a94a5ea0e.webp",
-                    "author" => "RIDDER I.A.",
+                    "author" => "Opzio I.A.",
                     "type" => 0,
                     "language" => "es",
                     "keywords" => "Diseño UX/UI, Experiencia del Usuario, Marca, Tecnología, Innovación.",
@@ -883,7 +883,7 @@ Route::prefix('test')->group(function () {
                     "state"=> "0",
                     "client_id"=> "1",
                     "client_identification"=> "56465465465",
-                    "client_name"=> "RIDDER",
+                    "client_name"=> "Opzio",
                     "timely_payment"=> "2024-03-05",
                     "cutoff_date"=> "2024-03-20",
                     "description"=> null,
@@ -896,7 +896,7 @@ Route::prefix('test')->group(function () {
                 "client"=> [
                 "id"=> 1,
                 "unique_id"=> "509fe981-125a-4cd7-b041-e716e555de8f",
-                "name"=> "RIDDER",
+                "name"=> "Opzio",
                 "lastname"=> null,
                 "email"=> "465465@gmail.com",
                 "identification_type"=> 0,

@@ -1,3 +1,206 @@
-.text-white{color:#fff}.bg-success{background-color:#1bcc5a}.bg-secondary{background-color:#0153ff}.bg-primary{background-color:#00057b}.text-gray-primary{color:#fff}.text-success{color:#1bcc5a}.text-gray-secondary{color:#f2f2f2}@media screen and (min-width:768px){#nav-update #update-inputs-container{margin:0;padding:0;width:100%}#nav-update #update-inputs-container .input-container{margin:5px 0;padding:0}#nav-update #update-inputs-container .input-container .input-title{font-size:1.1em;width:30%}#nav-update #update-inputs-container .input-container .input-value{margin:0;width:70%}#nav-update #update-inputs-container .multimedia-input-container{cursor:pointer;margin:0 5%;position:relative}#nav-update #update-inputs-container .multimedia-input-container:hover .image-icon,#nav-update #update-inputs-container .multimedia-input-container:hover .image-plus-icon{transform:scale(1.05)}#nav-update #update-inputs-container .multimedia-input-container #update-user-color-container,#nav-update #update-inputs-container .multimedia-input-container #update-user-img-container{border:4px solid #707070;border-radius:50%;height:70px;margin:0 auto;transition:.3s;width:70px}#nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .color-icon,#nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .image-icon,#nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .color-icon,#nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .image-icon{color:#707070;font-size:25px;transition:.3s}#nav-update #update-inputs-container .multimedia-input-container .image-plus-icon{background-color:#0153ff;border-radius:50%;bottom:0;color:#fff;font-size:10px;padding:5px;position:absolute;right:0;transition:.3s;z-index:10}#nav-update #permissions-container{border-radius:20px;box-shadow:0 3px 6px rgba(0,0,0,.161);display:block;margin:4vh auto 0;padding:2vh 2%;width:95%}#nav-update #permissions-container #permissions-title{color:#707070}#nav-update .permissions-list{margin:0;padding:0}#nav-update .permissions-list .permission-input-container{margin:0 0 5px;padding:0}#nav-update .permissions-list .permission-input-container .form-check-input{cursor:pointer;margin:0 5px 0 0}#nav-update .permissions-list .permission-input-container .permission-label{color:#707070;cursor:pointer;font-size:1.1em}#nav-update #update-button{display:block;margin:3vh 2% 0 auto;width:200px}}@media screen and (max-width:768px){#nav-update #update-inputs-container{margin:0;padding:0;width:100%}#nav-update #update-inputs-container .input-container{margin:5px 0;padding:0}#nav-update #update-inputs-container .input-container .input-title{font-size:1.1em;width:30%}#nav-update #update-inputs-container .input-container .input-value{margin:0;width:70%}#nav-update #update-inputs-container .multimedia-input-container{cursor:pointer;margin:0 5%;position:relative}#nav-update #update-inputs-container .multimedia-input-container:hover .image-icon,#nav-update #update-inputs-container .multimedia-input-container:hover .image-plus-icon{transform:scale(1.05)}#nav-update #update-inputs-container .multimedia-input-container #update-user-color-container,#nav-update #update-inputs-container .multimedia-input-container #update-user-img-container{border:4px solid #707070;border-radius:50%;height:70px;margin:0 auto;transition:.3s;width:70px}#nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .color-icon,#nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .image-icon,#nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .color-icon,#nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .image-icon{color:#707070;font-size:25px;transition:.3s}#nav-update #update-inputs-container .multimedia-input-container .image-plus-icon{background-color:#0153ff;border-radius:50%;bottom:0;color:#fff;font-size:10px;padding:5px;position:absolute;right:0;transition:.3s;z-index:10}#nav-update #permissions-container{border-radius:20px;box-shadow:0 3px 6px rgba(0,0,0,.161);display:block;margin:4vh auto 0;padding:2vh 2%;width:95%}#nav-update #permissions-container #permissions-title{color:#707070}#nav-update .permissions-list{margin:0;padding:0}#nav-update .permissions-list .permission-input-container{margin:0 0 5px;padding:0}#nav-update .permissions-list .permission-input-container .form-check-input{cursor:pointer;margin:0 5px 0 0}#nav-update .permissions-list .permission-input-container .permission-label{color:#707070;cursor:pointer;font-size:1.1em}#nav-update #update-button{display:block;margin:3vh 2% 3vh auto;width:200px}}
+.text-white {
+  color: #ffffff;
+}
 
-/*# sourceMappingURL=my_profile.css.map*/
+.bg-success {
+  background-color: #1bcc5a;
+}
+
+.bg-secondary {
+  background-color: #0153FF;
+}
+
+.bg-primary {
+  background-color: #00057B;
+}
+
+.text-gray-primary {
+  color: #FFFFFF;
+}
+
+.text-success {
+  color: #1bcc5a;
+}
+
+.text-gray-secondary {
+  color: #F2F2F2;
+}
+
+@media screen and (min-width: 768px) {
+  #nav-update #update-inputs-container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  #nav-update #update-inputs-container .input-container {
+    margin: 5px 0;
+    padding: 0;
+  }
+  #nav-update #update-inputs-container .input-container .input-title {
+    width: 30%;
+    font-size: 1.1em;
+  }
+  #nav-update #update-inputs-container .input-container .input-value {
+    width: 70%;
+    margin: 0;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container {
+    position: relative;
+    cursor: pointer;
+    margin: 0 5%;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container:hover .image-icon,
+  #nav-update #update-inputs-container .multimedia-input-container:hover .image-plus-icon {
+    transform: scale(1.05);
+  }
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-img-container,
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-color-container {
+    border: 4px solid #707070;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    margin: 0 auto;
+    transition: 0.3s;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .image-icon, #nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .color-icon,
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .image-icon,
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .color-icon {
+    font-size: 25px;
+    color: #707070;
+    transition: 0.3s;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container .image-plus-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #0153FF;
+    padding: 5px;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 10px;
+    transition: 0.3s;
+  }
+  #nav-update #permissions-container {
+    margin: 4vh auto 0 auto;
+    padding: 2vh 2%;
+    display: block;
+    width: 95%;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border-radius: 20px;
+  }
+  #nav-update #permissions-container #permissions-title {
+    color: #707070;
+  }
+  #nav-update .permissions-list {
+    margin: 0;
+    padding: 0;
+  }
+  #nav-update .permissions-list .permission-input-container {
+    margin: 0 0 5px 0;
+    padding: 0;
+  }
+  #nav-update .permissions-list .permission-input-container .form-check-input {
+    margin: 0 5px 0 0;
+    cursor: pointer;
+  }
+  #nav-update .permissions-list .permission-input-container .permission-label {
+    color: #707070;
+    font-size: 1.1em;
+    cursor: pointer;
+  }
+  #nav-update #update-button {
+    margin: 3vh 2% 0 auto;
+    width: 200px;
+    display: block;
+  }
+}
+@media screen and (max-width: 768px) {
+  #nav-update #update-inputs-container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  #nav-update #update-inputs-container .input-container {
+    margin: 5px 0;
+    padding: 0;
+  }
+  #nav-update #update-inputs-container .input-container .input-title {
+    width: 30%;
+    font-size: 1.1em;
+  }
+  #nav-update #update-inputs-container .input-container .input-value {
+    width: 70%;
+    margin: 0;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container {
+    position: relative;
+    cursor: pointer;
+    margin: 0 5%;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container:hover .image-icon,
+  #nav-update #update-inputs-container .multimedia-input-container:hover .image-plus-icon {
+    transform: scale(1.05);
+  }
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-img-container,
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-color-container {
+    border: 4px solid #707070;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    margin: 0 auto;
+    transition: 0.3s;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .image-icon, #nav-update #update-inputs-container .multimedia-input-container #update-user-img-container .color-icon,
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .image-icon,
+  #nav-update #update-inputs-container .multimedia-input-container #update-user-color-container .color-icon {
+    font-size: 25px;
+    color: #707070;
+    transition: 0.3s;
+  }
+  #nav-update #update-inputs-container .multimedia-input-container .image-plus-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #0153FF;
+    padding: 5px;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 10px;
+    transition: 0.3s;
+  }
+  #nav-update #permissions-container {
+    margin: 4vh auto 0 auto;
+    padding: 2vh 2%;
+    display: block;
+    width: 95%;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border-radius: 20px;
+  }
+  #nav-update #permissions-container #permissions-title {
+    color: #707070;
+  }
+  #nav-update .permissions-list {
+    margin: 0;
+    padding: 0;
+  }
+  #nav-update .permissions-list .permission-input-container {
+    margin: 0 0 5px 0;
+    padding: 0;
+  }
+  #nav-update .permissions-list .permission-input-container .form-check-input {
+    margin: 0 5px 0 0;
+    cursor: pointer;
+  }
+  #nav-update .permissions-list .permission-input-container .permission-label {
+    color: #707070;
+    font-size: 1.1em;
+    cursor: pointer;
+  }
+  #nav-update #update-button {
+    margin: 3vh 2% 3vh auto;
+    width: 200px;
+    display: block;
+  }
+}

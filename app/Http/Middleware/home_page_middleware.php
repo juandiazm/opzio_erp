@@ -18,7 +18,7 @@ class home_page_middleware
     {
         //check if base url is .env APP_HOME_PAGE_URL url
         $url = $request->header('origin');
-        if(strpos($url, '//ridder.com.co') !== false || strpos($url, '//www.ridder.com.co') !== false || strpos($url, 'localhost') !== false )
+        if(strpos($url, '//opzio.com.co') !== false || strpos($url, '//www.opzio.com.co') !== false || strpos($url, 'localhost') !== false )
         {
             return $next($request);
         }

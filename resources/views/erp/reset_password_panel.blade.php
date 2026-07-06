@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('app-header')
-<script src="{{ asset('js/erp/reset_password/reset_password.js') }}" defer></script>
+@vite('resources/js/erp/reset_password/reset_password.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/reset_password/reset_password.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/reset_password/reset_password.scss')
 @yield('admin-app-header')
 @endsection
 @section('app-content')

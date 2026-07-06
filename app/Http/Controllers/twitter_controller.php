@@ -24,16 +24,16 @@ class twitter_controller extends Controller
             /*send approve mail*/
             $Mails = [];
             $Mails[] = [
-                'address' => 'mariaf.franco@ridder.com.co',
-                'name' => 'mariaf.franco@ridder.com.co'
+                'address' => 'mariaf.franco@opzio.com.co',
+                'name' => 'mariaf.franco@opzio.com.co'
             ];
             $Mails[] = [
-                'address' => 'comunicaciones@ridder.com.co',
-                'name' => 'comunicaciones@ridder.com.co'
+                'address' => 'comunicaciones@opzio.com.co',
+                'name' => 'comunicaciones@opzio.com.co'
             ];
             /*$Mails[] = [
-                'address' => 'juandiazm@ridder.com.co',
-                'name' => 'juandiazm@ridder.com.co'
+                'address' => 'juandiazm@opzio.com.co',
+                'name' => 'juandiazm@opzio.com.co'
             ];*/
             $MailData = 
             [

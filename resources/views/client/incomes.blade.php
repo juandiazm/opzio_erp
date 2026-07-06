@@ -1,11 +1,11 @@
 @extends('client.layouts.app')
 @section('component_title', 'Pagos')
 @section('client-app-header')
-<script src="{{ asset('js/client/incomes/incomes.js') }}" defer></script>
-<script src="{{ asset('js/client/traceability.js') }}" defer></script>
+@vite('resources/js/client/incomes/incomes.js')
+@vite('resources/js/client/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/incomes/incomes.css') }}" rel="stylesheet">
-<link href="{{ asset('css/client/traceability.css') }}" rel="stylesheet">
+@vite('resources/sass/client/incomes/incomes.scss')
+@vite('resources/sass/client/traceability.scss')
 @endsection
 @section('client-app-content')
 <nav>

@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('app-header')
-<script src="{{ asset('js/client/register/register.js') }}" defer></script>
+@vite('resources/js/client/register/register.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/register/register.css') }}" rel="stylesheet">
+@vite('resources/sass/client/register/register.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')

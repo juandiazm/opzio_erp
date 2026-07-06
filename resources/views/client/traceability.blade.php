@@ -1,9 +1,9 @@
 @extends('client.layouts.app')
 @section('component_title', 'Trazabilidad')
 @section('client-app-header')
-<script src="{{ asset('js/client/traceability.js') }}" defer></script>
+@vite('resources/js/client/traceability.js')
 <!-- Styles -->
-<link href="{{ asset('css/client/traceability.css') }}" rel="stylesheet">
+@vite('resources/sass/client/traceability.scss')
 <script>
     $(document).ready(function() {
         setTimeout(() => {

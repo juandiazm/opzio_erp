@@ -1,12 +1,12 @@
 @import "/node_modules/toastify-js/src/toastify.css";
-@import "~@fortawesome/fontawesome-pro/css/all";
+@import "@fortawesome/fontawesome-pro/css/all";
 
 
 // Variables
 @import 'variables';
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@import 'bootstrap/scss/bootstrap';
 body, html{
     background-color: #fff;
     overflow-x: hidden;
@@ -104,7 +104,7 @@ input[type=number] {
 #layout-app{
     min-height: 100vh;
 }
-#ridder-feet{
+#opzio-feet{
     background-color: #E6E6E6;
     color: #000;
     padding: 3px 0;

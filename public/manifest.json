@@ -1,7 +1,7 @@
 {
-  "name": "RIDDER ERP",
-  "short_name": "RIDDER",
-  "description": "Sistema de gestión empresarial RIDDER ERP",
+  "name": "Opzio ERP",
+  "short_name": "Opzio",
+  "description": "Sistema de gestión empresarial Opzio ERP",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

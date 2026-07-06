@@ -1,41 +1,27 @@
-// Body
-$primary: #00057B;
-$secondary: #0153FF;
-$bg-primary: #FFFFFF ;
-$bg-secondary: #F2F2F2;
-$bg-cancel-btn: #c4c4c4;
-$text-white: #ffffff;
-$text-black: #272727;
-$text-gray: #707070;
-$text-link: #0153FF;
-$background-add-row: #F2F6FF;
-$success: #1bcc5a;
-$yellow: #F6AA1C;
-$danger: #C90D0D;
-$border-gray: #D7D7D7;
-$excel-color: #10BE16;
+// Palette – sober, neutral, professional
+$primary:             #1E293B; // Slate-800  — principal
+$secondary:           #475569; // Slate-600  — secundario
+$bg-primary:          #FFFFFF; // Blanco puro
+$bg-secondary:        #F8FAFC; // Slate-50   — fondo suave
+$bg-cancel-btn:       #E2E8F0; // Slate-200  — botón cancelar
+$text-white:          #FFFFFF;
+$text-black:          #0F172A; // Slate-900  — texto principal
+$text-gray:           #64748B; // Slate-500  — texto secundario
+$text-link:           #3B82F6; // Blue-500   — enlaces
+$background-add-row:  #F1F5F9; // Slate-100
+$success:             #16A34A; // Green-600
+$yellow:              #D97706; // Amber-600
+$danger:              #DC2626; // Red-600
+$border-gray:         #CBD5E1; // Slate-300
+$excel-color:         #16A34A; // Green-600
 // Typography
 $font-family-sans-serif: 'Rajdhani', sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
-.text-white{
-    color: #ffffff;
-}
-.bg-success{
-    background-color: $success;
-}
-.bg-secondary{
-    background-color: $secondary;
-}
-.bg-primary{
-    background-color: $primary;
-}
-.text-gray-primary {
-    color: $bg-primary;
-}
-.text-success {
-    color: $success;
-}
-.text-gray-secondary {
-    color: $bg-secondary;
-}
+.text-white        { color: #FFFFFF; }
+.bg-success        { background-color: $success; }
+.bg-secondary      { background-color: $secondary; }
+.bg-primary        { background-color: $primary; }
+.text-gray-primary { color: $bg-primary; }
+.text-success      { color: $success; }
+.text-gray-secondary { color: $bg-secondary; }

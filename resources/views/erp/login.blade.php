@@ -1,18 +1,15 @@
 @extends('layouts.app')
 @section('app-header')
-<script src="{{ asset('js/erp/login/login.js') }}" defer></script>
+@vite('resources/js/erp/login/login.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/login/login.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/login/login.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')
 <section id="login-container" class="d-flex justify-content-center">
     <div id="login-centered" class="align-self-center d-flex justify-content-around">
-        <div id="ridder-logo-container" class="align-self-center">
-            <img src="/images/business_logo_white_light.webp" alt="Ridder" id="ridder-logo">
-        </div>
         <div id="login-data-container">
-            <img src="/images/login/avatar.svg" alt="Avatar" id="avatar-img">
+            <i class="fa-regular fa-circle-user" id="avatar-img"></i>
             <h1 id="login-title">Iniciar Sesión</h1>
             <p id="login-message">¡Bienvenido de nuevo!</p>
             <input type="text" id="login-identification" class="form-control" placeholder="Identificación / Correo / Username" autofocus>

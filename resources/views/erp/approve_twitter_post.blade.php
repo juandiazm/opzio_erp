@@ -3,9 +3,9 @@
 <script>
     var unique_id = '{{ $unique_id }}';
 </script>
-<script src="{{ asset('js/erp/approve_twitter_post/approve_twitter_post.js') }}" defer></script>
+@vite('resources/js/erp/approve_twitter_post/approve_twitter_post.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/approve_twitter_post/approve_twitter_post.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/approve_twitter_post/approve_twitter_post.scss')
 @yield('home-app-header')
 @endsection
 @section('app-content')

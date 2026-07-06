@@ -1,178 +1,114 @@
 @import '../../variables';
 
-@media screen and (min-width: 768px) {
-    #login-container{
-        height: 87vh;
-        margin: 0;
-        padding: 0;
-        background: rgb(36,37,116);
-        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
-        background-image: url('/images/login/bg.webp');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        #login-centered{
-            width: 90vw;
-            #login-data-container{
-                /* UI Properties */
-                box-shadow: 0px 3px 6px #00000029;
-                border: 1px solid #707070;
-                border-radius: 22px;
-                width: 450px;
-                background-color: rgba(255, 255,255, .6);
-                padding: 4vh 2vw;
-                #avatar-img{
-                    margin: auto;
-                    display: block;
-                    width: 200px;
+#login-container {
+    min-height: 100vh;
+    background-color: $bg-secondary;
+
+    #login-centered {
+        padding: 2rem;
+
+        #login-data-container {
+            background-color: $bg-primary;
+            border: 1px solid $border-gray;
+            border-radius: 10px;
+            width: 380px;
+            min-width: 300px;
+            padding: 2.5rem 2rem;
+
+            #avatar-img {
+                display: block;
+                text-align: center;
+                font-size: 3.5rem;
+                color: $border-gray;
+                margin: 0 auto 1.25rem;
+            }
+
+            #login-title {
+                color: $text-black;
+                text-align: center;
+                font-size: 1.375rem;
+                font-weight: 600;
+                margin: 0 0 0.25rem;
+                padding: 0;
+            }
+
+            #login-message {
+                color: $text-gray;
+                text-align: center;
+                font-size: 0.875rem;
+                margin: 0 0 1.75rem;
+                padding: 0;
+            }
+
+            .form-control {
+                text-align: center;
+                margin-bottom: 0.75rem;
+                color: $text-black;
+                border-color: $border-gray;
+
+                &:focus {
+                    border-color: $primary;
+                    box-shadow: none;
                 }
-                #login-title{
-                    margin: 30px 0 5px 0;
+            }
+
+            #login-btn {
+                display: block;
+                width: 100%;
+                border-radius: 6px;
+                margin-top: 0.5rem;
+                font-size: 0.9rem;
+                letter-spacing: 0.04em;
+            }
+
+            #forgot-password {
+                display: block;
+                text-align: center;
+                color: $text-gray;
+                font-size: 0.875rem;
+                font-weight: 400;
+                margin: 1.25rem 0 0;
+                padding: 0;
+                text-decoration: underline;
+                cursor: pointer;
+
+                &:hover { color: $text-link; }
+            }
+
+            #register-container {
+                display: flex;
+                justify-content: center;
+                margin: 0.75rem 0 0;
+                cursor: pointer;
+
+                p {
+                    margin: 0 0.25rem;
                     padding: 0;
-                    display: block;
-                    color: $text-white;
-                    text-align: center;
+                    font-size: 0.875rem;
+                    font-weight: 400;
                 }
-                #login-message{
-                    margin: 0;
-                    padding: 0;
-                    display: block;
-                    color: $text-white;
-                    text-align: center;
-                    font-weight: 500;
-                }
-                .form-control{
-                    text-align: center;
-                    margin: 20px 0;
-                    font-size: 1.3em;
-                    color: $text-gray;
-                }
-                #login-btn{
-                    border-radius: 8px !important;
-                    display: block;
-                    margin: 0 auto;
-                    font-size: 1.3em;
-                    width: 300px;
-                }
-                #forgot-password{
-                    margin: 40px 0 0 0;
-                    padding: 0;
-                    display: block;
-                    color: $text-white;
-                    text-align: center;
-                    font-weight: 500;
-                    font-size: 1.1em;
+
+                #register-message { color: $text-gray; }
+
+                #register-link {
+                    color: $text-link;
                     text-decoration: underline;
-                    cursor: pointer;
-                }
-                #register-container{
-                    margin: 10px 0 0 0;
-                    padding: 0;
-                    cursor: pointer;
-                    p{
-                        margin: 0 10px;
-                        padding: 0;
-                        font-size: 1.1em;
-                        font-weight: 500;
-                    }
-                    #register-message{
-                        color: $text-white;
-                    }
-                    #register-link{
-                        color: $text-link;
-                        text-decoration: underline;
-                    }
                 }
             }
         }
-        
     }
-}
-@media screen and (max-width: 768px) {
-    #login-container{
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-        background: rgb(36,37,116);
-        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
-        background-image: url('/images/login/bg.webp');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        #login-centered{
-            width: 100vw;
-            #login-data-container{
-                /* UI Properties */
-                box-shadow: 0px 3px 6px #00000029;
-                border: 1px solid #707070;
-                border-radius: 22px;
-                width: 450px;
-                background-color: rgba(255, 255,255, .6);
-                padding: 4vh 2vw;
-                #avatar-img{
-                    margin: auto;
-                    display: block;
-                    width: 30%;
-                }
-                #login-title{
-                    margin: 30px 0 5px 0;
-                    padding: 0;
-                    display: block;
-                    color: $text-white;
-                    text-align: center;
-                }
-                #login-message{
-                    margin: 0;
-                    padding: 0;
-                    display: block;
-                    color: $text-white;
-                    text-align: center;
-                    font-weight: 500;
-                }
-                .form-control{
-                    text-align: center;
-                    margin: 20px 0;
-                    font-size: 1.3em;
-                    color: $text-gray;
-                }
-                #login-btn{
-                    border-radius: 8px !important;
-                    display: block;
-                    margin: 0 auto;
-                    font-size: 1.3em;
-                    width: 300px;
-                }
-                #forgot-password{
-                    margin: 40px 0 0 0;
-                    padding: 0;
-                    display: block;
-                    color: $text-white;
-                    text-align: center;
-                    font-weight: 500;
-                    font-size: 1.1em;
-                    text-decoration: underline;
-                    cursor: pointer;
-                }
-                #register-container{
-                    margin: 10px 0 0 0;
-                    padding: 0;
-                    cursor: pointer;
-                    p{
-                        margin: 0 10px;
-                        padding: 0;
-                        font-size: 1.1em;
-                        font-weight: 500;
-                    }
-                    #register-message{
-                        color: $text-white;
-                    }
-                    #register-link{
-                        color: $text-link;
-                        text-decoration: underline;
-                    }
-                }
+
+    @media (max-width: 768px) {
+        #login-centered {
+            padding: 0;
+
+            #login-data-container {
+                width: 100%;
+                min-height: 100vh;
+                border: none;
+                border-radius: 0;
+                padding: 4rem 1.5rem;
             }
         }
-        
     }
 }

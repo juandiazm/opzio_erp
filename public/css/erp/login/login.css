@@ -1,3 +1,176 @@
-.text-white{color:#fff}.bg-success{background-color:#1bcc5a}.bg-secondary{background-color:#0153ff}.bg-primary{background-color:#00057b}.text-gray-primary{color:#fff}.text-success{color:#1bcc5a}.text-gray-secondary{color:#f2f2f2}@media screen and (min-width:768px){#login-container{background:#242574;background:linear-gradient(90deg,#242574,#162ea4 74%,#0932bb);background-image:url(/images/login/bg.webp);background-position:50%;background-repeat:no-repeat;background-size:cover;height:100vh;margin:0;padding:0}#login-container #login-centered{width:90vw}#login-container #login-centered #ridder-logo-container{width:35vw}#login-container #login-centered #ridder-logo-container #ridder-logo{width:100%}#login-container #login-centered #login-data-container{background-color:hsla(0,0%,100%,.4);border:1px solid #707070;border-radius:22px;box-shadow:0 3px 6px rgba(0,0,0,.161);min-width:400px;padding:4vh 2vw;width:30vw}#login-container #login-centered #login-data-container #avatar-img{display:block;margin:auto;width:200px}#login-container #login-centered #login-data-container #login-title{color:#fff;display:block;margin:30px 0 5px;padding:0;text-align:center}#login-container #login-centered #login-data-container #login-message{color:#fff;display:block;font-weight:500;margin:0;padding:0;text-align:center}#login-container #login-centered #login-data-container .form-control{color:#707070;font-size:1.3em;margin:20px 0;text-align:center}#login-container #login-centered #login-data-container #login-btn{border-radius:8px!important;display:block;font-size:1.3em;margin:0 auto;width:300px}#login-container #login-centered #login-data-container #forgot-password{color:#fff;cursor:pointer;display:block;font-size:1.1em;font-weight:500;margin:40px 0 0;padding:0;text-align:center;text-decoration:underline}}@media screen and (max-width:768px){#login-container{background:#242574;background:linear-gradient(90deg,#242574,#162ea4 74%,#0932bb);background-image:url(/images/login/bg.webp);background-position:50%;background-repeat:no-repeat;background-size:cover;height:100vh;margin:0;padding:0}#login-container #login-centered{width:100vw}#login-container #login-centered #ridder-logo-container{display:none}#login-container #login-centered #login-data-container{background-color:hsla(0,0%,100%,.4);border:1px solid #707070;border-radius:22px;box-shadow:0 3px 6px rgba(0,0,0,.161);padding:4vh 2vw;width:100%}#login-container #login-centered #login-data-container #avatar-img{display:block;margin:auto;width:30%}#login-container #login-centered #login-data-container #login-title{color:#fff;display:block;margin:30px 0 5px;padding:0;text-align:center}#login-container #login-centered #login-data-container #login-message{color:#fff;display:block;font-weight:500;margin:0;padding:0;text-align:center}#login-container #login-centered #login-data-container .form-control{color:#707070;font-size:1.3em;margin:20px 0;text-align:center}#login-container #login-centered #login-data-container #login-btn{border-radius:8px!important;display:block;font-size:1.3em;margin:0 auto;width:300px}#login-container #login-centered #login-data-container #forgot-password{color:#fff;cursor:pointer;display:block;font-size:1.1em;font-weight:500;margin:40px 0 0;padding:0;text-align:center;text-decoration:underline}}
+.text-white {
+  color: #ffffff;
+}
 
-/*# sourceMappingURL=login.css.map*/
+.bg-success {
+  background-color: #1bcc5a;
+}
+
+.bg-secondary {
+  background-color: #0153FF;
+}
+
+.bg-primary {
+  background-color: #00057B;
+}
+
+.text-gray-primary {
+  color: #FFFFFF;
+}
+
+.text-success {
+  color: #1bcc5a;
+}
+
+.text-gray-secondary {
+  color: #F2F2F2;
+}
+
+@media screen and (min-width: 768px) {
+  #login-container {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 37, 116);
+    background: linear-gradient(90deg, rgb(36, 37, 116) 0%, rgb(22, 46, 164) 74%, rgb(9, 50, 187) 100%);
+    background-image: url("/images/login/bg.webp");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  #login-container #login-centered {
+    width: 90vw;
+  }
+  #login-container #login-centered #opzio-logo-container {
+    width: 35vw;
+  }
+  #login-container #login-centered #opzio-logo-container #opzio-logo {
+    width: 100%;
+  }
+  #login-container #login-centered #login-data-container {
+    /* UI Properties */
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border: 1px solid #707070;
+    border-radius: 22px;
+    width: 30vw;
+    min-width: 400px;
+    background-color: rgba(255, 255, 255, 0.4);
+    padding: 4vh 2vw;
+  }
+  #login-container #login-centered #login-data-container #avatar-img {
+    margin: auto;
+    display: block;
+    width: 200px;
+  }
+  #login-container #login-centered #login-data-container #login-title {
+    margin: 30px 0 5px 0;
+    padding: 0;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+  }
+  #login-container #login-centered #login-data-container #login-message {
+    margin: 0;
+    padding: 0;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 500;
+  }
+  #login-container #login-centered #login-data-container .form-control {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.3em;
+    color: #707070;
+  }
+  #login-container #login-centered #login-data-container #login-btn {
+    border-radius: 8px !important;
+    display: block;
+    margin: 0 auto;
+    font-size: 1.3em;
+    width: 300px;
+  }
+  #login-container #login-centered #login-data-container #forgot-password {
+    margin: 40px 0 0 0;
+    padding: 0;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.1em;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+@media screen and (max-width: 768px) {
+  #login-container {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 37, 116);
+    background: linear-gradient(90deg, rgb(36, 37, 116) 0%, rgb(22, 46, 164) 74%, rgb(9, 50, 187) 100%);
+    background-image: url("/images/login/bg.webp");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  #login-container #login-centered {
+    width: 100vw;
+  }
+  #login-container #login-centered #opzio-logo-container {
+    display: none;
+  }
+  #login-container #login-centered #login-data-container {
+    /* UI Properties */
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
+    border: 1px solid #707070;
+    border-radius: 22px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.4);
+    padding: 4vh 2vw;
+  }
+  #login-container #login-centered #login-data-container #avatar-img {
+    margin: auto;
+    display: block;
+    width: 30%;
+  }
+  #login-container #login-centered #login-data-container #login-title {
+    margin: 30px 0 5px 0;
+    padding: 0;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+  }
+  #login-container #login-centered #login-data-container #login-message {
+    margin: 0;
+    padding: 0;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 500;
+  }
+  #login-container #login-centered #login-data-container .form-control {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.3em;
+    color: #707070;
+  }
+  #login-container #login-centered #login-data-container #login-btn {
+    border-radius: 8px !important;
+    display: block;
+    margin: 0 auto;
+    font-size: 1.3em;
+    width: 300px;
+  }
+  #login-container #login-centered #login-data-container #forgot-password {
+    margin: 40px 0 0 0;
+    padding: 0;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.1em;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}

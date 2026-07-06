@@ -3,10 +3,10 @@
 @section('erp-app-header')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-<script src="{{ asset('js/erp/dashboard/dashboard.js') }}" defer></script>
+@vite('resources/js/erp/dashboard/dashboard.js')
 <!-- Styles -->
-<link href="{{ asset('css/erp/dashboard/dashboard.css') }}" rel="stylesheet">
-<link href="{{ asset('css/erp/dashboard/dashboard-overdue.css') }}" rel="stylesheet">
+@vite('resources/sass/erp/dashboard/dashboard.scss')
+@vite('resources/sass/erp/dashboard/dashboard-overdue.scss')
 @endsection
 @section('erp-app-content')
 <div id="dashboard-container" class="scrollable">

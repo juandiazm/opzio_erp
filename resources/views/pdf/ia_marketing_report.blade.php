@@ -47,17 +47,17 @@
                 font-size: 12px;
                 color: #555;
             }
-            #cover-section .cover-top-meta .ridder-brand {
+            #cover-section .cover-top-meta .opzio-brand {
                 float: right;
                 text-align: center;
             }
-            #cover-section .cover-top-meta .ridder-brand img {
+            #cover-section .cover-top-meta .opzio-brand img {
                 max-height: 36px;
                 display: block;
                 margin-left: auto;
                 margin-bottom: 2px;
             }
-            #cover-section .cover-top-meta .ridder-brand .ridder-name {
+            #cover-section .cover-top-meta .opzio-brand .opzio-name {
                 font-size: 11px;
                 font-weight: bold;
                 color: #00057B;
@@ -65,7 +65,7 @@
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
-            #cover-section .cover-top-meta .ridder-brand .ridder-sub {
+            #cover-section .cover-top-meta .opzio-brand .opzio-sub {
                 font-size: 9px;
                 color: #999;
                 margin: 0;
@@ -343,10 +343,10 @@
         <div id="cover-section">
             {{-- Top meta bar --}}
             <div class="cover-top-meta">
-                <div class="ridder-brand">
-                    <img src="data:image/webp;base64,{{ base64_encode(file_get_contents(public_path('images/bussines-logo-rounded.webp'))) }}" alt="RIDDER S.A.S">
-                    <p class="ridder-name">RIDDER S.A.S</p>
-                    <p class="ridder-sub">Equipo de Marketing</p>
+                <div class="opzio-brand">
+                    <img src="data:image/webp;base64,{{ base64_encode(file_get_contents(public_path('images/bussines-logo-rounded.webp'))) }}" alt="Opzio S.A.S">
+                    <p class="opzio-name">Opzio S.A.S</p>
+                    <p class="opzio-sub">Equipo de Marketing</p>
                 </div>
                 <p class="report-label">Informe de Marketing Digital</p>
                 <p class="report-title-sm">{{ $reportTitle }}</p>
@@ -373,7 +373,7 @@
                     <p class="intent-text">{{ $sec2['business_intent'] }}</p>
                 </div>
             @endif
-            <p class="cover-brand">Informe elaborado por el Equipo de Marketing &mdash; RIDDER S.A.S</p>
+            <p class="cover-brand">Informe elaborado por el Equipo de Marketing &mdash; Opzio S.A.S</p>
         </div>
 
         {{-- ── Métricas Globales ── --}}
@@ -577,7 +577,7 @@
         @endif
 
         <hr class="footer-divider">
-        <p class="footer-closing">{{ now()->translatedFormat('j \de F \de Y') }} &mdash; &copy; RIDDER S.A.S - Equipo de Marketing</p>
+        <p class="footer-closing">{{ now()->translatedFormat('j \de F \de Y') }} &mdash; &copy; Opzio S.A.S - Equipo de Marketing</p>
 
     </div>
     </body>

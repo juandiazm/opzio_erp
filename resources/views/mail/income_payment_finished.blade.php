@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIDDER S.A.S</title>
+    <title>Opzio S.A.S</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #555555; background-color: #FFFFFF; }
@@ -37,7 +37,7 @@
 <div class="email-wrapper">
     <div class="email-container">
         <div class="email-header">
-            <img src="{{ asset('images/business_blues.png') }}" alt="RIDDER S.A.S" class="email-logo-img">
+            <img src="{{ asset('images/business_blues.png') }}" alt="Opzio S.A.S" class="email-logo-img">
             
         </div>
         <div class="email-content">
@@ -74,8 +74,8 @@
             </div>
         </div>
         <div class="email-footer">
-            <p class="footer-text">&copy; {{ date('Y') }} RIDDER S.A.S &mdash; Sistema Interno</p>
-            <p class="footer-text"><a href="https://www.ridder.com.co" class="footer-link">www.ridder.com.co</a></p>
+            <p class="footer-text">&copy; {{ date('Y') }} Opzio S.A.S &mdash; Sistema Interno</p>
+            <p class="footer-text"><a href="https://www.opzio.com.co" class="footer-link">www.opzio.com.co</a></p>
         </div>
     </div>
 </div>
