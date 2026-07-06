@@ -1,0 +1,117 @@
+@import '../../variables';
+
+@media screen and (min-width: 768px) {
+    #approve_blog-container{
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: rgb(36,37,116);
+        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
+        background-image: url('/images/approve/bg.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        #approve_blog-centered{
+            margin: 0;
+            padding: 20px;
+            background-color: $bg-primary;
+            border-radius: 20px;
+            width: 70%;
+            min-width: 500px;
+            max-width: 800px;
+            text-align: center;
+            #approve_blog-title{
+                font-size: 2rem;
+                font-weight: 700;
+                color: $primary;
+                margin-bottom: 20px;
+            }
+            #approve_blog-message{
+                font-size: 1.2rem;
+                font-weight: 500;
+                color: $text-gray;
+                margin-bottom: 20px;
+            }
+            .propagation-opt-container{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 15px;
+                .status-spinner{
+                    margin: 0 10px 0 0;
+                    padding: 0;
+                    align-self: center;
+                    font-size: 1.5em;
+                    visibility: hidden;
+                    color: $primary;
+                }
+                .form-check-input{
+                    width: 20px;
+                    height: 20px;
+                    margin: 0 10px 0 0;
+                    padding: 0;
+                    align-self: center;
+                }
+                .form-check-label{
+                    font-size: 1.2rem;
+                    font-weight: 500;
+                    color: $text-gray;
+                    text-align: left;
+                    width:50%;
+                    align-self: center;
+                }
+            }
+            #approve_blog-loading-icon{
+                font-size: 3rem;
+                color: $primary;
+                margin-bottom: 20px;
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    #approve_blog-container{
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: rgb(36,37,116);
+        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
+        background-image: url('/images/approve/bg.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        #approve_blog-centered{
+            margin: 0;
+            padding: 20px;
+            background-color: $bg-primary;
+            border-radius: 20px;
+            width: 95%;
+            text-align: center;
+            #approve_blog-title{
+                font-size: 2rem;
+                font-weight: 700;
+                color: $primary;
+                margin-bottom: 20px;
+            }
+            #approve_blog-message{
+                font-size: 1.2rem;
+                font-weight: 500;
+                color: $text-gray;
+                margin-bottom: 20px;
+            }
+            #approve_blog-loading-icon{
+                font-size: 3rem;
+                color: $primary;
+                margin-bottom: 20px;
+            }
+        }
+    }
+}

@@ -1,0 +1,645 @@
+@import '../../variables';
+
+@media screen and (min-width: 768px) {
+    #nav-list{
+        #user-list-container{
+            max-height: 75vh;
+            margin: 0 0 2vh 0;
+            #search-list-container{
+                background: #F8F8F8 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                padding: 2vh 0;
+                width: 90%;
+                display: block;
+                margin: 1vh auto;
+                #search-list-title{
+                    margin: 0 15px 0 0;
+                    padding: 0;
+                    color: $primary;
+                    font-weight: bold;
+                }
+                #search-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 25vw;
+                }
+            }
+            #user-list-table{
+                margin: 0;
+                padding: 0;
+                #user-list-table-header{
+                    position: sticky;
+                    top: 0;
+                }
+                #user-list-table-body{
+                    .image-column-container{
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-width: 2px;
+                        border-style: solid;
+                    }
+                }
+                .columns-actions{
+                    white-space: nowrap;
+                    i{
+                        display: inline-block;
+                        vertical-align: middle;
+                    }
+                }
+            }
+        }
+    }
+    #nav-create{
+        #create-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{
+                    width: 30%;
+                    font-size: 1.1em;
+                }
+                .input-value{
+                    width: 70%;
+                    margin: 0;
+                }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{
+                        transform: scale(1.05);
+                    }
+                }
+                #create-user-img-container,
+                #create-user-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 70px;
+                    height: 70px;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{
+                        font-size: 25px;
+                        color: $text-gray;
+                        transition: .3s;
+                    }
+                }
+                
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 10;
+                    background-color: $secondary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 10px;
+                    transition: .3s;
+                    
+                }
+            }
+            
+        }
+        #permissions-container{
+            margin: 4vh auto 0 auto;
+            padding: 2vh 2%;
+            display: block;
+            width: 95%;
+            box-shadow: 0px 3px 6px #00000029;
+            border-radius: 20px;
+            #permissions-title{
+                color: $text-gray;
+            }
+            .permissions-list{
+                margin: 0;
+                padding: 0;
+                .permission-input-container{
+                    margin: 0 0 5px 0;
+                    padding: 0;
+                    .form-check-input{
+                        margin: 0 5px 0 0;
+                        cursor: pointer;
+                    }
+                    .permission-label{
+                        color: $text-gray;
+                        font-size: 1.1em;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+        #add-button{
+            margin: 3vh 2% 0 auto;
+            width: 200px;
+            display: block;
+        }
+    }
+    #nav-update{
+        #user-sub-opt-container{
+            margin-top: 20px;
+            width: 170px;
+            margin: 10px auto 0 auto;
+            #update-user-go-traceability{
+                padding: 5px 35px;
+                margin: 0 3px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                cursor: pointer;
+                transition: .3s;
+                border-radius: 40px;
+                &:hover{
+                    background-color: $secondary;
+                    i{
+                        color: $text-white;
+                    }
+                }
+                i{
+                    font-size: 1.5em;
+                    transition: .3s;
+                    color: $secondary;
+                
+                }
+            }
+            #update-user-delete{
+                padding: 7px 15px;
+                margin: 0 3px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                cursor: pointer;
+                transition: .3s;
+                border-radius: 40px;
+                i{
+                    font-size: 1.5em;
+                    transition: .3s;
+                    color: $text-gray;
+                    &:hover{
+                        color: $text-white !important;
+                    }
+                
+                    
+                }
+                &:hover{
+                    background-color: $danger;
+                    i{
+                        color: $text-white;
+                    
+                    }
+                }
+            }
+            #update-user-restore{
+                padding: 5px 10px;
+                margin: 0 3px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                cursor: pointer;
+                transition: .3s;
+                border-radius: 40px;
+                &:hover{
+                    background-color: $yellow;
+                    i{
+                        color: $text-white;
+                    }
+                }
+                i{
+                    font-size: 1.5em;
+                    transition: .3s;
+                    color: $text-gray;
+                
+                }
+            }
+        }
+        #update-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{
+                    width: 30%;
+                    font-size: 1.1em;
+                }
+                .input-value{
+                    width: 70%;
+                    margin: 0;
+                }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{
+                        transform: scale(1.05);
+                    }
+                }
+                #update-user-img-container,
+                #update-user-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 70px;
+                    height: 70px;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{
+                        font-size: 25px;
+                        color: $text-gray;
+                        transition: .3s;
+                    }
+                }
+                
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 10;
+                    background-color: $secondary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 10px;
+                    transition: .3s;
+                    
+                }
+            }
+            
+            }
+            #permissions-container{
+            margin: 4vh auto 0 auto;
+            padding: 2vh 2%;
+            display: block;
+            width: 95%;
+            box-shadow: 0px 3px 6px #00000029;
+            border-radius: 20px;
+            #permissions-title{
+                color: $text-gray;
+            }
+        }
+        .permissions-list{
+            margin: 0;
+            padding: 0;
+            .permission-input-container{
+                margin: 0 0 5px 0;
+                padding: 0;
+                .form-check-input{
+                    margin: 0 5px 0 0;
+                    cursor: pointer;
+                }
+                .permission-label{
+                    color: $text-gray;
+                    font-size: 1.1em;
+                    cursor: pointer;
+                }
+            }
+        }
+        #update-button{
+            margin: 3vh 2% 0 auto;
+            width: 200px;
+            display: block;
+        }
+    }
+       
+}
+@media screen and (max-width: 768px) {
+    #nav-list{
+        #user-list-container{
+            max-height: 75vh;
+            margin: 0 0 2vh 0;
+            #search-list-container{
+                background: #F8F8F8 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                padding: 2vh 0;
+                width: 90%;
+                display: block;
+                margin: 1vh auto;
+                #search-list-title{
+                    display: none;
+                }
+                #search-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 90%;
+                    text-align: center;
+                }
+            }
+            #user-list-table{
+                .fa-bars-progress{
+                    display: none;
+                }
+                p, a{
+                    font-size: 14px !important;
+                }
+                margin: 0;
+                padding: 0;
+                #user-list-table-header{
+                    position: sticky;
+                    top: 0;
+                }
+                .column-id,
+                .column-photo,
+                .column-email{
+                    display: none;
+                }
+                .column-name{
+                    max-width: 25vw;
+                }
+                #user-list-table-body{
+                    .image-column-container{
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-width: 2px;
+                        border-style: solid;
+                    }
+                }
+                
+            }
+        }
+    }
+    #nav-create{
+        #create-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            #multimedia-container{
+                order: 0;
+                padding: 2vh 0;
+            }
+            .inputs-cols{
+                order: 1;
+                
+            }
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{
+                    width: 30%;
+                    font-size: 1.1em;
+                }
+                .input-value{
+                    width: 70%;
+                    margin: 0;
+                }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{
+                        transform: scale(1.05);
+                    }
+                }
+                #create-user-img-container,
+                #create-user-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 70px;
+                    height: 70px;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{
+                        font-size: 25px;
+                        color: $text-gray;
+                        transition: .3s;
+                    }
+                }
+                
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 10;
+                    background-color: $secondary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 10px;
+                    transition: .3s;
+                    
+                }
+            }
+            
+        }
+        #permissions-container{
+            margin: 4vh auto 0 auto;
+            padding: 2vh 2%;
+            display: block;
+            width: 95%;
+            box-shadow: 0px 3px 6px #00000029;
+            border-radius: 20px;
+            #permissions-title{
+                color: $text-gray;
+            }
+            .permissions-list{
+                margin: 0;
+                padding: 0;
+                .permission-input-container{
+                    margin: 0 0 5px 0;
+                    padding: 0;
+                    .form-check-input{
+                        margin: 0 5px 0 0;
+                        cursor: pointer;
+                    }
+                    .permission-label{
+                        color: $text-gray;
+                        font-size: 1.1em;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+        #add-button{
+            margin: 3vh 2% 3vh auto;
+            width: 200px;
+            display: block;
+        }
+    }
+    #nav-update{
+        #user-sub-opt-container{
+            margin-top: 20px;
+            width: 170px;
+            margin: 10px auto 0 auto;
+            #update-user-go-traceability{
+                padding: 5px 35px;
+                margin: 0 3px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                cursor: pointer;
+                transition: .3s;
+                border-radius: 40px;
+                &:hover{
+                    background-color: $secondary;
+                    i{
+                        color: $text-white;
+                    }
+                }
+                i{
+                    font-size: 1.5em;
+                    transition: .3s;
+                    color: $secondary;
+                
+                }
+            }
+            #update-user-delete{
+                padding: 7px 15px;
+                margin: 0 3px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                cursor: pointer;
+                transition: .3s;
+                border-radius: 40px;
+                i{
+                    font-size: 1.5em;
+                    transition: .3s;
+                    color: $text-gray;
+                    &:hover{
+                        color: $text-white !important;
+                    }
+                
+                    
+                }
+                &:hover{
+                    background-color: $danger;
+                    i{
+                        color: $text-white;
+                    
+                    }
+                }
+            }
+            #update-user-restore{
+                padding: 5px 10px;
+                margin: 0 3px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                cursor: pointer;
+                transition: .3s;
+                border-radius: 40px;
+                &:hover{
+                    background-color: $yellow;
+                    i{
+                        color: $text-white;
+                    }
+                }
+                i{
+                    font-size: 1.5em;
+                    transition: .3s;
+                    color: $text-gray;
+                
+                }
+            }
+        }
+        #update-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{
+                    width: 30%;
+                    font-size: 1.1em;
+                }
+                .input-value{
+                    width: 70%;
+                    margin: 0;
+                }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{
+                        transform: scale(1.05);
+                    }
+                }
+                #update-user-img-container,
+                #update-user-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 70px;
+                    height: 70px;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{
+                        font-size: 25px;
+                        color: $text-gray;
+                        transition: .3s;
+                    }
+                }
+                
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 10;
+                    background-color: $secondary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 10px;
+                    transition: .3s;
+                    
+                }
+            }
+            
+            }
+            #permissions-container{
+            margin: 4vh auto 0 auto;
+            padding: 2vh 2%;
+            display: block;
+            width: 95%;
+            box-shadow: 0px 3px 6px #00000029;
+            border-radius: 20px;
+            #permissions-title{
+                color: $text-gray;
+            }
+        }
+        .permissions-list{
+            margin: 0;
+            padding: 0;
+            .permission-input-container{
+                margin: 0 0 5px 0;
+                padding: 0;
+                .form-check-input{
+                    margin: 0 5px 0 0;
+                    cursor: pointer;
+                }
+                .permission-label{
+                    color: $text-gray;
+                    font-size: 1.1em;
+                    cursor: pointer;
+                }
+            }
+        }
+        #update-button{
+            margin: 3vh 2% 0 auto;
+            width: 200px;
+            display: block;
+        }
+    }
+}

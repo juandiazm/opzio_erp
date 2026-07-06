@@ -1,0 +1,186 @@
+@import '../../../variables';
+
+@media screen and (min-width: 768px) {
+    .unsubscribe-container{
+        height: 87vh;
+        margin: 0;
+        padding: 0;
+        background: rgb(36,37,116);
+        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
+        background-image: url('/images/login/bg.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .unsubscribe-sub-container{
+            margin: 0;
+            padding: 5vh 3vw;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            width: 70%;
+            min-width: 500px;
+            .icon{
+                text-align: center;
+                font-size: 100px;
+                color: $primary;
+                margin-bottom: 20px;
+                margin: 0 auto;
+                display: block;
+            }
+            .title{
+                text-align: center;
+                font-size: 2rem;
+                font-weight: 600;
+                color: $primary;
+                margin: 0 0 20px 0;
+                padding: 0;
+            }
+            .description{
+                text-align: center;
+                font-size: 1.2rem;
+                color: $text-gray;
+                margin-bottom: 20px;
+                margin: 0 0 20px 0;
+                padding: 0;
+            }
+            .reason{
+                text-align: center;
+                font-size: 1.2rem;
+                color: $text-gray;
+                margin-bottom: 20px;
+                margin: 0 0 20px 0;
+                padding: 15px 10px;
+                display: block;
+                width: 100%;
+                background-color: rgba(255, 255, 255, .4);
+                border: none;
+                resize: none;
+                height: 15vh;
+                &:focus{
+                    outline: none;
+                }
+            }
+            .buttons-container{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .btn{
+                    margin: 0;
+                    padding: 5px 20px;
+                    font-weight: 600;
+                    border: none;
+                    border-radius: 5px !important;
+                    align-self: center;
+                    cursor: pointer;
+                    &:focus{
+                        outline: none;
+                    }
+                }
+                .unsubscribe{
+                    background-color: $text-gray;
+                    color: $text-white;
+                    font-size: 1rem;
+                }
+                .cancel{
+                    background-color: $primary;
+                    color: $text-white;
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    .unsubscribe-container{
+        height: 95vh;
+        margin: 0;
+        padding: 0;
+        background: rgb(36,37,116);
+        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
+        background-image: url('/images/login/bg.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .unsubscribe-sub-container{
+            margin: 0;
+            padding: 5vh 3vw;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            width: 95%;
+            .icon{
+                text-align: center;
+                font-size: 50px;
+                color: $primary;
+                margin-bottom: 20px;
+                margin: 0 auto;
+                display: block;
+            }
+            .title{
+                text-align: center;
+                font-size: 2rem;
+                font-weight: 600;
+                color: $primary;
+                margin: 0 0 20px 0;
+                padding: 0;
+            }
+            .description{
+                text-align: center;
+                font-size: .9rem;
+                color: $text-gray;
+                margin-bottom: 20px;
+                margin: 0 0 20px 0;
+                padding: 0;
+            }
+            .reason{
+                text-align: center;
+                font-size: 1.2rem;
+                color: $text-gray;
+                margin-bottom: 20px;
+                margin: 0 0 20px 0;
+                padding: 15px 10px;
+                display: block;
+                width: 100%;
+                background-color: rgba(255, 255, 255, .4);
+                border: none;
+                resize: none;
+                height: 15vh;
+                &:focus{
+                    outline: none;
+                }
+            }
+            .buttons-container{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .btn{
+                    margin: 0;
+                    padding: 5px 10px;
+                    font-weight: 600;
+                    border: none;
+                    border-radius: 5px !important;
+                    align-self: center;
+                    max-width: 49%;
+                    cursor: pointer;
+                    &:focus{
+                        outline: none;
+                    }
+                }
+                .unsubscribe{
+                    background-color: $text-gray;
+                    color: $text-white;
+                    font-size: .9rem;
+                }
+                .cancel{
+                    background-color: $primary;
+                    color: $text-white;
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
+}

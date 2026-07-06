@@ -1,0 +1,487 @@
+@import '../../variables';
+
+@media screen and (min-width: 768px) {
+    #companies-container{
+        #header-container{
+            margin: 2vh 0 3vh 0;
+            padding: 0;
+            width: 100%;
+            #update-client-verification{
+                i{
+                    transition: .3s;
+                    margin: 0 5px;
+                    font-size: 18px;
+                    &.disabled{
+                        color: $text-gray;
+                    }
+                    &.enabled{
+                        color: $secondary;
+                        transform: scale(1.3);
+                    }
+                    &:hover{
+                        transform: scale(1.1);
+                    }
+                }
+            }
+        }
+        #update-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            #update-client-description{
+                border: 1px solid #707070;
+                border-radius: 20px;
+                width: 100%;
+                padding: 10px;
+            }
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{
+                    width: 30%;
+                    font-size: 1.1em;
+                }
+                .input-value{
+                    width: 70%;
+                    margin: 0;
+                }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{
+                        transform: scale(1.05);
+                    }
+                }
+                #update-client-img-container,
+                #update-client-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 7vw;
+                    height: 7vw;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{
+                        font-size: 4vw;
+                        color: $text-gray;
+                        transition: .3s;
+                    }
+                }
+                
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0vw;
+                    right: 0vw;
+                    z-index: 10;
+                    background-color: $secondary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 20px;
+                    transition: .3s;
+                    
+                }
+            }
+            
+        }
+        
+        #update-client-button{
+            margin: 2vh 2% 0 auto;
+            width: 200px;
+            display: block;
+        }
+        
+        #sub-nav-users{
+            #create-client-inputs-container{
+                margin: 1vh 0;
+                padding: 2vh 1vw;
+                width: 100%;
+                background: #F7F7F7 0% 0% no-repeat padding-box;
+                border-radius: 20px;
+                .input-container{
+                    margin: 5px 0;
+                    padding: 0;
+                    .input-title{
+                        width: 30%;
+                        font-size: 1.1em;
+                    }
+                    .input-value{
+                        width: 70%;
+                        margin: 0;
+                        background-color: transparent;
+                    }
+                }
+                .multimedia-input-container{
+                    position: relative;
+                    cursor: pointer;
+                    margin: 0 5%;
+                    &:hover{
+                        .image-icon,
+                        .image-plus-icon{
+                            transform: scale(1.05);
+                        }
+                    }
+                    #create-client-user-img-container,
+                    #create-client-user-color-container{
+                        border: 4px solid $text-gray;
+                        border-radius: 50%;
+                        width: 70px;
+                        height: 70px;
+                        margin: 0 auto;
+                        transition: .3s;
+                        .image-icon, .color-icon{
+                            font-size: 25px;
+                            color: $text-gray;
+                            transition: .3s;
+                        }
+                    }
+                    
+                    .image-plus-icon{
+                        position: absolute;
+                        bottom: 0;
+                        right: 0;
+                        z-index: 10;
+                        background-color: $secondary;
+                        padding: 5px;
+                        border-radius: 50%;
+                        color: $text-white;
+                        font-size: 10px;
+                        transition: .3s;
+                        
+                    }
+                }
+                #add-client-user-button{
+                    width:120px;
+                }
+            }
+            #client-users-table{
+                #client-users-table-body{
+                    .color-column{
+                        div{
+                            margin: 0;
+                            padding: 0;
+                            text-align: center;
+                            border-radius: 50%;
+                            width: 30px;
+                            height: 30px;
+                            p{
+                                font-size: .9em;
+                                color: #FFF;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #sub-nav-documents{
+            #client-documents-add-container{
+                background: #F7F7F7 0% 0% no-repeat padding-box;
+                border-radius: 20px;
+                padding: 3vh 5%;
+                .client-document-input-title{
+                    margin: 0;
+                    padding: 0;
+                    display: block;
+                    height: min-content;
+                    color: $text-gray;
+                    font-weight: 600;
+                }
+                .client-document-input-name{
+                    background-color: transparent;
+                }
+                .client-document-input-file{
+                    border: 1px solid $text-gray;
+                    border-radius: 20px;
+                }
+            }
+            #client-documents-table{
+                #client-documents-table-body{
+                    .client-document-input-name{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        border: none;
+                        color: $text-gray;
+                        font-weight: 500;
+                        font-size: 1.1em;
+                    }
+                    .client-document-input-link{
+                        color: $secondary;
+                        font-weight: 600;
+                        font-size: 1.1em;
+                    }
+                }
+            }
+            #client-licenses-table{
+                #client-licenses-table-body{
+                    .client-license-input-name{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        border: none;
+                        color: $text-gray;
+                        font-weight: 500;
+                        font-size: 1.1em;
+                    }
+                    .client-license-input-link{
+                        color: $secondary;
+                        font-weight: 600;
+                        font-size: 1.1em;
+                    }
+                    .client-license-input-comission{
+                        width: 80px;
+                    }
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    #companies-container{
+        #header-container{
+            margin: 2vh 0 3vh 0;
+            padding: 0;
+            width: 100%;
+            .input-title{
+                display: none;
+            }
+            #update-client-verification{
+                i{
+                    transition: .3s;
+                    margin: 0 5px;
+                    font-size: 18px;
+                    &.disabled{
+                        color: $text-gray;
+                    }
+                    &.enabled{
+                        color: $secondary;
+                        transform: scale(1.3);
+                    }
+                    &:hover{
+                        transform: scale(1.1);
+                    }
+                }
+            }
+        }
+        #update-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            #update-client-description{
+                border: 1px solid #707070;
+                border-radius: 20px;
+                width: 100%;
+                padding: 10px;
+            }
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{
+                    width: 30%;
+                    font-size: 1.1em;
+                }
+                .input-value{
+                    width: 70%;
+                    margin: 0;
+                }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{
+                        transform: scale(1.05);
+                    }
+                }
+                #update-client-img-container,
+                #update-client-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 17vw;
+                    height: 17vw;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{
+                        font-size: 4vw;
+                        color: $text-gray;
+                        transition: .3s;
+                    }
+                }
+                
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0vw;
+                    right: 0vw;
+                    z-index: 10;
+                    background-color: $secondary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 20px;
+                    transition: .3s;
+                    
+                }
+            }
+            
+        }
+        
+        #update-client-button{
+            margin: 2vh 2% 0 auto;
+            width: 200px;
+            display: block;
+        }
+        
+        #sub-nav-users{
+            #create-client-inputs-container{
+                margin: 1vh 0;
+                padding: 2vh 1vw;
+                width: 100%;
+                background: #F7F7F7 0% 0% no-repeat padding-box;
+                border-radius: 20px;
+                .input-container{
+                    margin: 5px 0;
+                    padding: 0;
+                    .input-title{
+                        width: 30%;
+                        font-size: 1.1em;
+                    }
+                    .input-value{
+                        width: 70%;
+                        margin: 0;
+                        background-color: transparent;
+                    }
+                }
+                .multimedia-input-container{
+                    position: relative;
+                    cursor: pointer;
+                    margin: 0 5%;
+                    &:hover{
+                        .image-icon,
+                        .image-plus-icon{
+                            transform: scale(1.05);
+                        }
+                    }
+                    #create-client-user-img-container,
+                    #create-client-user-color-container{
+                        border: 4px solid $text-gray;
+                        border-radius: 50%;
+                        width: 70px;
+                        height: 70px;
+                        margin: 0 auto;
+                        transition: .3s;
+                        .image-icon, .color-icon{
+                            font-size: 25px;
+                            color: $text-gray;
+                            transition: .3s;
+                        }
+                    }
+                    
+                    .image-plus-icon{
+                        position: absolute;
+                        bottom: 0;
+                        right: 0;
+                        z-index: 10;
+                        background-color: $secondary;
+                        padding: 5px;
+                        border-radius: 50%;
+                        color: $text-white;
+                        font-size: 10px;
+                        transition: .3s;
+                        
+                    }
+                }
+                #add-client-user-button{
+                    width:120px;
+                }
+            }
+            #client-users-table{
+                #client-users-table-body{
+                    .color-column{
+                        div{
+                            margin: 0;
+                            padding: 0;
+                            text-align: center;
+                            border-radius: 50%;
+                            width: 30px;
+                            height: 30px;
+                            p{
+                                font-size: .9em;
+                                color: #FFF;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #sub-nav-documents{
+            #client-documents-add-container{
+                background: #F7F7F7 0% 0% no-repeat padding-box;
+                border-radius: 20px;
+                padding: 3vh 5%;
+                .client-document-input-title{
+                    margin: 0;
+                    padding: 0;
+                    display: block;
+                    height: min-content;
+                    color: $text-gray;
+                    font-weight: 600;
+                }
+                .client-document-input-name{
+                    background-color: transparent;
+                }
+                .client-document-input-file{
+                    border: 1px solid $text-gray;
+                    border-radius: 20px;
+                }
+            }
+            #client-documents-table{
+                #client-documents-table-body{
+                    .client-document-input-name{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        border: none;
+                        color: $text-gray;
+                        font-weight: 500;
+                        font-size: 1.1em;
+                    }
+                    .client-document-input-link{
+                        color: $secondary;
+                        font-weight: 600;
+                        font-size: 1.1em;
+                    }
+                }
+            }
+            #client-licenses-table{
+                #client-licenses-table-body{
+                    .client-license-input-name{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        border: none;
+                        color: $text-gray;
+                        font-weight: 500;
+                        font-size: 1.1em;
+                    }
+                    .client-license-input-link{
+                        color: $secondary;
+                        font-weight: 600;
+                        font-size: 1.1em;
+                    }
+                    .client-license-input-comission{
+                        width: 80px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,100 @@
+@media screen and (min-width: 768px) {
+    .traceability-filter-container{
+        background: #F8F8F8 0% 0% no-repeat padding-box;
+        box-shadow: 0px 3px 6px #00000029;
+        border-radius: 42px;
+        padding: 2vh 4%;
+        margin-bottom: 2vh;
+        display: flex;
+        justify-content: space-between;
+        .input-container{
+            .input-title{
+                margin-right: 5px;
+            }
+            .input-value{
+                width: 11vw;
+                background-color: transparent;
+                overflow-x: hidden;
+            }
+        }
+    }
+    .traceability-table-container{
+        height: 66vh;
+        margin-bottom: 1vh;
+        .traceability-table{
+            .traceability-usr-img{
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-position: center;
+                background-size: cover;
+                background-repeat: no-repeat;
+                border-width: 2px;
+                border-style: solid;
+            }
+            .traceability-usr-username{
+                margin: 0;
+                padding: 0;
+                width: min-content;
+            }
+            .traceability-col-data{
+                width: 15vw;
+                p{
+                    width: 15vw;
+                    height: 10vh;
+                    white-space: nowrap;
+                    overflow-x: hidden;
+                    margin: 0;
+                    padding: 0;
+                    
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    .traceability-filter-container{
+        background: #F8F8F8 0% 0% no-repeat padding-box;
+        box-shadow: 0px 3px 6px #00000029;
+        border-radius: 42px;
+        padding: 2vh 4%;
+        margin-bottom: 2vh;
+        display: block;
+        .input-container{
+            display: inline-flex !important;
+            vertical-align: top;
+            width: 50%;
+            padding: 5px 1vw;
+            .input-title{
+                margin-right: 5px;
+                width: 30%;
+            }
+            .input-value{
+                width: 11vw;
+                background-color: transparent;
+                overflow-x: hidden;
+                width: 70%;
+            }
+        }
+    }
+    .traceability-table-container{
+        height: 60vh;
+        margin-bottom: 1vh;
+        .traceability-table{
+            .traceability-usr-img{
+                display: none;
+            }
+            .traceability-usr-username{
+                margin: 0;
+                padding: 0;
+                width: min-content;
+            }
+            .traceability-col-id{
+                display: none;
+            }
+            .traceability-col-data{
+                display: none;
+            }
+        }
+    }
+}

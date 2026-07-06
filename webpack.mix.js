@@ -1,0 +1,107 @@
+const mix = require('laravel-mix');
+
+/*
+ |--------------------------------------------------------------------------
+ | Mix Asset Management
+ |--------------------------------------------------------------------------
+ |
+ | Mix provides a clean, fluent API for defining some Webpack build steps
+ | for your Laravel application. By default, we are compiling the Sass
+ | file for the application as well as bundling up all the JS files.
+ |
+ */
+
+ mix.js('resources/js/app.js', 'public/js')
+ .js('resources/js/crud-input.js', 'public/js')
+//Admin
+.js('resources/js/erp/pusher/pusher.js', 'public/js/erp/pusher')
+.js('resources/js/erp/pusher/pusher_channels_chat.js', 'public/js/erp/pusher')
+.js('resources/js/erp/login/login.js', 'public/js/erp/login')
+.js('resources/js/erp/traceability.js', 'public/js/erp')
+.js('resources/js/erp/layouts/app.js', 'public/js/erp/layouts')
+.js('resources/js/erp/users/users.js', 'public/js/erp/users')
+.js('resources/js/erp/clients/clients.js', 'public/js/erp/clients')
+.js('resources/js/erp/clients/traceability.js', 'public/js/erp/clients')
+.js('resources/js/erp/employees/employees.js', 'public/js/erp/employees')
+.js('resources/js/erp/providers/providers.js', 'public/js/erp/providers')
+.js('resources/js/erp/departments/departments.js', 'public/js/erp/departments')
+.js('resources/js/erp/licenses/licenses.js', 'public/js/erp/licenses')
+.js('resources/js/erp/incomes/incomes.js', 'public/js/erp/incomes')
+.js('resources/js/erp/outcomes/outcomes.js', 'public/js/erp/outcomes')
+.js('resources/js/erp/reports/reports.js', 'public/js/erp/reports')
+.js('resources/js/erp/web-pages/web-pages.js', 'public/js/erp/web-pages')
+.js('resources/js/erp/my_profile/my_profile.js', 'public/js/erp/my_profile')
+.js('resources/js/erp/dashboard/dashboard.js', 'public/js/erp/dashboard')
+.js('resources/js/erp/chat/chat.js', 'public/js/erp/chat')
+.js('resources/js/erp/ia_assistant/ia_assistant.js', 'public/js/erp/ia_assistant')
+.js('resources/js/erp/ia_assistant/ia_marketing_report.js', 'public/js/erp/ia_assistant')
+.js('resources/js/erp/approve_blog/approve_blog.js', 'public/js/erp/approve_blog')
+.js('resources/js/erp/approve_instagram_post/approve_instagram_post.js', 'public/js/erp/approve_instagram_post')
+.js('resources/js/erp/approve_facebook_post/approve_facebook_post.js', 'public/js/erp/approve_facebook_post')
+.js('resources/js/erp/approve_linkedin_post/approve_linkedin_post.js', 'public/js/erp/approve_linkedin_post')
+.js('resources/js/erp/approve_twitter_post/approve_twitter_post.js', 'public/js/erp/approve_twitter_post')
+.js('resources/js/erp/reset_password/reset_password.js', 'public/js/erp/reset_password')
+//Client
+.js('resources/js/client/layouts/app.js', 'public/js/client/layouts')
+.js('resources/js/client/traceability.js', 'public/js/client')
+.js('resources/js/client/layouts/menu.js', 'public/js/client/layouts')
+.js('resources/js/client/login/login.js', 'public/js/client/login')
+.js('resources/js/client/register/register.js', 'public/js/client/register')
+.js('resources/js/client/dashboard/dashboard.js', 'public/js/client/dashboard')
+.js('resources/js/client/profile/profile.js', 'public/js/client/profile')
+.js('resources/js/client/set_password/set_password.js', 'public/js/client/set_password')
+.js('resources/js/client/companies/companies.js', 'public/js/client/companies')
+.js('resources/js/client/users/users.js', 'public/js/client/users')
+.js('resources/js/client/pay_unlogged/pay_unlogged.js', 'public/js/client/pay_unlogged')
+.js('resources/js/client/payment_response_unlogged/payment_response_unlogged.js', 'public/js/client/payment_response_unlogged')
+.js('resources/js/client/licenses/licenses.js', 'public/js/client/licenses')
+.js('resources/js/client/incomes/incomes.js', 'public/js/client/incomes')
+.js('resources/js/client/blog/email/unsubscribe.js', 'public/js/client/blog/email')
+//////////////////////////////////////////////
+.sass('resources/sass/app.scss', 'public/css')
+.sass('resources/sass/crud-input.scss', 'public/css')
+//Admin
+.sass('resources/sass/erp/login/login.scss', 'public/css/erp/login')
+.sass('resources/sass/erp/traceability.scss', 'public/css/erp')
+.sass('resources/sass/erp/layouts/app.scss', 'public/css/erp/layouts')
+.sass('resources/sass/erp/users/users.scss', 'public/css/erp/users')
+.sass('resources/sass/erp/clients/clients.scss', 'public/css/erp/clients')
+.sass('resources/sass/erp/clients/traceability.scss', 'public/css/erp/clients')
+.sass('resources/sass/erp/employees/employees.scss', 'public/css/erp/employees')
+.sass('resources/sass/erp/providers/providers.scss', 'public/css/erp/providers')
+.sass('resources/sass/erp/departments/departments.scss', 'public/css/erp/departments')
+.sass('resources/sass/erp/licenses/licenses.scss', 'public/css/erp/licenses')
+.sass('resources/sass/erp/incomes/incomes.scss', 'public/css/erp/incomes')
+.sass('resources/sass/erp/outcomes/outcomes.scss', 'public/css/erp/outcomes')
+.sass('resources/sass/erp/reports/reports.scss', 'public/css/erp/reports')
+.sass('resources/sass/erp/web-pages/web-pages.scss', 'public/css/erp/web-pages')
+.sass('resources/sass/erp/my_profile/my_profile.scss', 'public/css/erp/my_profile')
+.sass('resources/sass/erp/dashboard/dashboard.scss', 'public/css/erp/dashboard')
+.sass('resources/sass/erp/chat/chat.scss', 'public/css/erp/chat')
+.sass('resources/sass/erp/ia_assistant/ia_assistant.scss', 'public/css/erp/ia_assistant')
+.sass('resources/sass/erp/ia_assistant/ia_marketing_report.scss', 'public/css/erp/ia_assistant')
+.sass('resources/sass/erp/approve_blog/approve_blog.scss', 'public/css/erp/approve_blog')
+.sass('resources/sass/erp/approve_instagram_post/approve_instagram_post.scss', 'public/css/erp/approve_instagram_post')
+.sass('resources/sass/erp/approve_facebook_post/approve_facebook_post.scss', 'public/css/erp/approve_facebook_post')
+.sass('resources/sass/erp/approve_linkedin_post/approve_linkedin_post.scss', 'public/css/erp/approve_linkedin_post')
+.sass('resources/sass/erp/approve_twitter_post/approve_twitter_post.scss', 'public/css/erp/approve_twitter_post')
+.sass('resources/sass/erp/reset_password/reset_password.scss', 'public/css/erp/reset_password')
+//Client
+.sass('resources/sass/client/layouts/app.scss', 'public/css/client/layouts')
+.sass('resources/sass/client/traceability.scss', 'public/css/client')
+.sass('resources/sass/client/layouts/menu.scss', 'public/css/client/layouts')
+.sass('resources/sass/client/login/login.scss', 'public/css/client/login')
+.sass('resources/sass/client/register/register.scss', 'public/css/client/register')
+.sass('resources/sass/client/dashboard/dashboard.scss', 'public/css/client/dashboard')
+.sass('resources/sass/client/profile/profile.scss', 'public/css/client/profile')
+.sass('resources/sass/client/set_password/set_password.scss', 'public/css/client/set_password')
+.sass('resources/sass/client/companies/companies.scss', 'public/css/client/companies')
+.sass('resources/sass/client/users/users.scss', 'public/css/client/users')
+.sass('resources/sass/client/pay_unlogged/pay_unlogged.scss', 'public/css/client/pay_unlogged')
+.sass('resources/sass/client/payment_response_unlogged/payment_response_unlogged.scss', 'public/css/client/payment_response_unlogged')
+.sass('resources/sass/client/licenses/licenses.scss', 'public/css/client/licenses')
+.sass('resources/sass/client/incomes/incomes.scss', 'public/css/client/incomes')
+.sass('resources/sass/client/blog/email/unsubscribe.scss', 'public/css/client/blog/email')
+ //////////////////////////////////////////////
+ .sourceMaps()
+ .browserSync('127.0.0.1:8000');

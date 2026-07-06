@@ -1,0 +1,475 @@
+@import "/node_modules/toastify-js/src/toastify.css";
+@import "~@fortawesome/fontawesome-pro/css/all";
+
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+body, html{
+    background-color: #fff;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    //enable toch actions
+    -webkit-overflow-scrolling: touch;
+    touch-action: auto;
+    //prevent overflow x
+    overflow-x: hidden;
+    //prevent scroll bar
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    //prevent scroll bar
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+textarea:focus, 
+textarea.form-control:focus, 
+input.form-control:focus, 
+input[type=text]:focus, 
+input[type=password]:focus, 
+input[type=email]:focus, 
+input[type=number]:focus, 
+[type=text].form-control:focus, 
+[type=password].form-control:focus, 
+[type=email].form-control:focus, 
+[type=tel].form-control:focus, 
+[contenteditable].form-control:focus {
+  box-shadow: inset 0 -1px 0 #ddd;
+}
+input:hover {
+    border-color: none !important;
+    box-shadow: none !important;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.table-row-add{
+    td{
+        background-color: $background-add-row !important;
+        .crud-current-selected-input, .form-control, .form-select{
+            background-color: $background-add-row !important;
+        }
+    }
+    
+}
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+.scrollable-transparent::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0);
+    background-color: #ffffff;
+  }
+  
+  .scrollable-transparent::-webkit-scrollbar {
+    width: 1px;
+    height: 0px;
+    background-color: #ffffff;
+  }
+  
+  .scrollable-transparent::-webkit-scrollbar-thumb {
+    background-color: #ffffff;
+}
+/* scroll-bar width */
+::-webkit-scrollbar,
+.scrollable::-webkit-scrollbar {
+    width: 4px;
+}
+.scrollable, .scrollable-transparent{
+    overflow-y: scroll;
+}
+/* scroll-bar Track */
+::-webkit-scrollbar-track,
+.scrollable::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* scroll-bar Handle */
+::-webkit-scrollbar-thumb,
+.scrollable::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* scroll-bar Handle on hover */
+::-webkit-scrollbar-thumb:hover,
+.scrollable::-webkit-scrollbar-thumb:hover {
+    background: #c0c0c0;
+}
+#layout-app{
+    min-height: 100vh;
+}
+#ridder-feet{
+    background-color: #E6E6E6;
+    color: #000;
+    padding: 3px 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .3s;
+    font-size: 12px;
+    font-weight: bold;
+    &:hover,
+    &:focus{
+        background-color: #CCC;
+    }
+}
+.btn{
+    border-radius: 28px !important;
+}
+.btn-primary{
+    color: $white;
+    &:hover,
+    &:focus{
+        background-color: $secondary;
+        border: 1px solid $secondary;
+    }
+}
+.btn-success{
+    color: $white;
+}
+.input-group{
+    border-radius: 2px;
+    &.password-input{
+        input{
+            border-right: none;
+        }
+        .input-group-append{
+            border-radius: 2px;
+            border: 1px solid #ced4da;
+            font-size: 1.2em;
+            color: #444;
+    
+        }
+    }
+    
+}
+i{
+    cursor: pointer;
+    &:hover,
+    &:focus{
+        color: $secondary;
+    }
+}
+.general-padding {
+    width: 100%;
+    padding: 0 3vw;
+}
+.general-body-padding{
+    width: 100%;
+    padding: 0 10vw;
+}
+.custom-space {
+    letter-spacing: 1.68px;
+}
+.image-input-list{
+    margin: 1vh 0 0 0;
+    padding: 0;
+    list-style: none;
+    .image-input-list-item{
+        margin: 1vh 5px;
+        display: inline-block;
+        vertical-align: middle;
+        width: min-content;
+        
+    }
+}
+
+.image-container{
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border: 1px dotted $primary;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: .3s;
+    &:hover,
+    &:focus,
+    &:hover .image-title,
+    &:focus .image-title{
+        color: $secondary;
+    }
+}
+
+.image-title{
+    font-size: .9em;
+    text-align: center;
+    transition: .3s;
+}
+.image-input{
+    display: none;
+}
+.scrollable-transparent::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 1px rgba(0,0,0,0);
+    background-color: #ffffff;
+}
+
+.scrollable-transparent::-webkit-scrollbar
+{
+    width: 1px;
+    height: 0px;
+    background-color: #ffffff;
+}
+
+.scrollable-transparent::-webkit-scrollbar-thumb
+{
+    background-color: #ffffff;
+}
+.Scrollable, .Scrollable2, .scrollable-transparent{
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+  .fa{
+    transition: .3s;
+    &:hover{
+        transform: scale(1.05);
+    }
+  }
+  .pagination{
+    li{
+        cursor: pointer;
+    }
+  }
+//center div
+.centered{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.gm-style .gmnoprint {
+    display: none;
+}
+.input-container{
+    margin: 0;
+    padding: 0;
+    .input-title{
+        color: $text-gray;
+        font-weight: 700;
+    }
+    
+}
+.form-control, .form-select,.crud-current-selected-input,.crud-item-add-input{
+    border: none;
+    border-bottom: 1px solid $text-gray;
+    border-radius: 0;
+    padding: 0 0 1px 3px;
+    color: $text-gray;
+    //placeholder color
+    &::placeholder{
+        color: $text-gray;
+        opacity: 0.5;
+    }
+}
+.input-color{
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+.input-password {
+    cursor: pointer;
+}
+
+.toastify {
+    font-weight: 600;
+}
+.is-invalid{
+    box-shadow: none !important;
+    border-color: $danger !important;
+}
+.form-check-input{
+    width: 19px;
+    height: 19px;
+    border-color: $text-gray;
+    border-width: 2px;
+}
+.pagination{
+    .page-item{
+        cursor: pointer;
+    }
+}
+table{
+    thead{
+        tr{
+            th{
+                vertical-align: middle;
+                font-weight: bold;
+                color: $primary !important;
+                font-size: 1.1em;
+            }
+        }
+    }
+    tbody{
+        tr{
+            td{
+                p{
+                    margin: 0;
+                    padding: 0;
+                    display: block;
+                    width: 100%;
+                    font-size: 1.1em;
+                    font-weight: 600;
+                    color: $text-gray;
+                }
+            }
+        }
+    }
+    .action-cell{
+        i{
+            margin: 0 5px;
+            font-size: 21px;
+            color: $text-gray;
+            &:hover{
+                color: $secondary;
+            }
+        }
+    }
+}
+.form-switch{
+    
+    .form-check-input{
+        width: 50px !important;
+        cursor: pointer;
+        &:checked{
+            background-color: $secondary !important;
+            border-color: $secondary !important;
+        }
+    }
+}
+.toggle-container{
+    width: 140px;
+    background: #F2F2F2 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 13px;
+    text-align: center;
+    padding: 0;
+    .toggle-value{
+        font-size: 0.9em;
+        align-self: center;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        transition: .3s;
+        border-radius: 13px;
+        height: 100%;
+        p{
+            margin: 0;
+            padding: 0;
+            display: block;
+            width: 100%;
+            align-self: center;
+        }
+        &.inactive{
+            color: $text-gray;
+            P{
+                font-weight: 500;
+            }
+        }
+        &.active{
+            p{
+                font-weight: 600;
+            }
+        }
+        &.active[value="0"]{
+            background-color: #FFF;
+            color: $text-black;
+            -webkit-box-shadow: inset 2px 4px 20px 0px rgba(0,0,0,0.17);
+            -moz-box-shadow: inset 2px 4px 20px 0px rgba(0,0,0,0.17);
+            box-shadow: inset 2px 4px 20px 0px rgba(0,0,0,0.17);
+        }
+        &.active[value="1"]{
+            background-color: #10BE16;
+            color: #FFF;
+            -webkit-box-shadow: inset 2px 4px 20px 0px rgba(0,0,0,0.17);
+            -moz-box-shadow: inset 2px 4px 20px 0px rgba(0,0,0,0.17);
+            box-shadow: inset 2px 4px 20px 0px rgba(0,0,0,0.17);
+            P{
+                color: #fff !important;
+            }
+        }
+    }
+}
+i{
+    cursor: pointer;
+    transition: .3s;
+    &:hover,
+    &:focus{
+        color: $secondary;
+    }
+    &.fa-trash-can{
+        &:hover{
+            color: $danger !important;
+        }
+    
+    }
+    &.fa-ban {
+        color: $danger !important;
+        &:hover{
+            color: $danger !important;
+        }
+    }
+}
+tr.deleted{
+    //set opacity on all td inside the container except the lastone
+    td:not(:last-child){
+        opacity: .3;
+    }
+}
+.page-link{
+    select{
+        border: none;
+        cursor: pointer;
+        //remove border on hover
+        &:hover, &:active, &:focus{
+            border: none;
+        }
+    }
+}
+.selected, :hover{
+    &.state-0{
+        color: $bg-secondary;
+        border: 1px solid $text-gray !important;
+        background-color: $text-gray;
+    }
+    &.state-1{
+        color: $bg-secondary;
+        border: 1px solid $danger !important;
+        background-color: $danger;
+    }
+    &.state-2{
+        color: $bg-secondary;
+        border: 1px solid $secondary !important;
+        background-color: $secondary;
+    }
+    &.state-3{
+        color: $bg-secondary;
+        border: 1px solid $success !important;
+        background-color: $success;
+    }
+}
+input, select, textarea{
+    &[disabled=disabled]{
+        background-color: transparent !important;
+        opacity: 0.5 !important;
+    }
+}
+.loading-icon {
+    margin: 0 5px;
+    align-self: center;
+    vertical-align: middle;
+    
+}
+.daterangepicker{
+    .active{
+        background-color: $primary !important;
+    }
+    .monthselect, .yearselect{
+        border-radius: 30px;
+        padding: 5px 10px;
+    }
+}

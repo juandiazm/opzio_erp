@@ -1,0 +1,2 @@
+(()=>{function n(){$("#responsive-menu").animate({left:"-100%"},500,(function(){$("#responsive-menu").css("display","none")}))}$(document).on("click","#burger-menu",(function(){$("#responsive-menu").css("display","block").css("left","-100%"),$("#responsive-menu").animate({left:"0%"},500)})),$(document).on("click","#responsive-close-opt",n),$(document).on("click","#responsive-menu .nav-list",n),$(document).ready((function(){}))})();
+//# sourceMappingURL=menu.js.map

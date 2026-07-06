@@ -1,0 +1,729 @@
+@import '../../variables';
+
+@media screen and (min-width: 768px) {
+    #nav-list{
+        #search-list-container{
+            background: #F8F8F8 0% 0% no-repeat padding-box;
+            box-shadow: 0px 3px 6px #00000029;
+            padding: 2vh 0;
+            width: 90%;
+            display: flex;
+            justify-content: space-around;
+            margin: 1vh auto;
+            #search-list-input-contaner{
+                margin: 0 5px;
+                #search-list-title{
+                    margin: 0 15px 0 0;
+                    padding: 0;
+                    color: $primary;
+                    font-weight: bold;
+                }
+                #search-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 25vw;
+                }
+            }
+            #state-list-input-contaner{
+                margin: 0 5px;
+                #state-list-title{
+                    margin: 0 15px 0 0;
+                    padding: 0;
+                    color: $primary;
+                    font-weight: bold;
+                }
+                #state-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 15vw;
+                }
+            }
+        }
+        tr.deleted{
+            //set opacity on all td inside the container except the last two one
+            td:nth-last-child(2){
+                opacity: 1 !important;
+            }
+        }
+        .active-state{
+            margin: 0 5px;
+            padding: 0 10px;
+            font-size: .9em;
+            border-radius: 13px;
+            width: 100%;
+        }
+        .list-go-to-pay{
+            background-color: $yellow;
+            color: $text-white;
+            font-size: 1.1em;
+            padding: 8px 7px;
+            border-radius: 50%;
+            box-shadow: 0px 2px 2px #00000029;
+        }
+        .columns-actions{
+            i{
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
+        
+    }
+    #order-viewer-container{
+        margin: 0;
+        padding: 0;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.7); 
+        z-index: 9999 !important;
+        isolation: isolate;
+        #close-order-viewer{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: $primary;
+            cursor: pointer;
+            z-index: 10000 !important;
+            pointer-events: auto;
+            &:hover{
+                transform: scale(1.2);
+                transition: 0.2s;
+            }
+        }
+        #order-viewer-sub-container{
+            margin: auto;
+            padding: 0;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            #order-viewer-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            #order-viewer{
+                width: 60vw;
+                height: 70vh;
+                margin: 0 auto;
+                padding: 0;
+                display: block;
+            }
+            #order-viewer-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                #send-order-button{
+                    background-color: $primary;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+            }
+        }
+        #send-order-container{
+            margin: auto;
+            padding: 20px;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FFF;
+            box-shadow: 0px 3px 6px #00000029;
+            width: 60vw;
+            #send-order-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            input{
+                border: none;
+                background-color: transparent;
+            }
+            #send-order-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                
+                #cancel-send-order-button{
+                    background-color: $danger;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+                #confirm-send-order-button{
+                    background-color: $success;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    
+    #nav-list{
+        #search-list-container{
+            background: #F8F8F8 0% 0% no-repeat padding-box;
+            box-shadow: 0px 3px 6px #00000029;
+            padding: 2vh 0;
+            width: 90%;
+            display: block;
+            margin: 1vh auto;
+            
+            #search-list-input-contaner{
+                margin: 5px 0;
+                #search-list-title{
+                    display: none;
+                }
+                #search-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 90%;
+                    text-align: center;
+                }
+            }
+            #state-list-input-contaner{
+                margin: 5px 0;
+                #state-list-title{
+                    display: none;
+                }
+                #state-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 90%;
+                    text-align: center;
+                }
+            }
+        }
+        .fa-bars-progress{
+            display: none;
+        }
+        tr{
+            i{
+                font-size: 25px !important;
+            }
+            &.deleted{
+                //set opacity on all td inside the container except the last two one
+                td:nth-last-child(2){
+                    opacity: 1 !important;
+                }
+            }
+        }
+        .active-state{
+            margin: 0 5px;
+            padding: 0 10px;
+            font-size: .9em;
+            border-radius: 13px;
+            width: 100%;
+        }
+        .columns-timely-payment,
+        .columns-cutoff-date,
+        .columns-bill,
+        .columns-client,
+        .columns-created-at{
+            display: none;
+        }
+        
+        .columns-total{
+            text-align: start !important;
+        }
+        .columns-state{
+            width: 10%;
+            label{
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                margin: 0 auto;
+                display: block;
+                /*hide text*/
+                overflow: hidden;
+                text-indent: -9999px;
+                
+            }
+        }
+    }
+    #nav-create{
+        #create-income-container{
+            margin: auto;
+            padding: 0 0 5vh 0;
+            display: block;
+            width: 80%;
+            .header-income-container{
+                margin: 0;
+                padding: 0 2vw 3vh 2vw;
+                width: 100%;
+                border-bottom: 2px solid $border-gray;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: rgba(255, 255, 255, .98);
+                .state-container{
+                    background: #F8F8F8 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 20px;
+                    padding: 10px 0px;
+                    margin: 2vh 0;
+                    .state-title{
+                        display: none;
+                    }
+                    .state-input-container{
+                        margin-left: 5px;
+                        .state-input{
+                            transition: .3s;
+                            cursor: pointer;
+                            label{
+                                cursor: pointer;
+                            }
+                            margin: 0 5px;
+                            padding: 2px 5px;
+                            font-size: .9em;
+                            border: 1px solid $text-gray;
+                            border-radius: 13px;
+                        }
+                    }
+                }
+                .input-container{
+                    margin: 7px 0;
+                    padding: 0;
+                    width: 100%;
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        margin: 0;
+                        padding: 0;
+                        width: 80%;
+                    }
+                }
+                .input-cutoff-date{
+                    color: $danger;
+                }
+                .description-container{
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        border: 1px solid $border-gray;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: 12vh;
+                        padding: 10px;
+                    }
+                }
+            }
+            .income-licenses-list{
+                margin: 2vh 0 0 0;
+                padding: 0 2vw;
+                width: 100%;
+                .order-licenses-list-item{
+                    padding: 2vh 2vw;
+                    box-shadow: 0px 3px 6px #00000029;
+                    &.order-licenses-list-item-create{
+                        background-color: $bg-secondary;
+                    }
+                    border-radius: 20px;
+                    margin-bottom: 2vh;
+                    .input-container{
+                        margin: 7px 0;
+                        padding: 0;
+                        width: 100%;
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            margin: 0;
+                            padding: 0;
+                            width: 80%;
+                            background-color: transparent;
+                        }
+                    }
+                    .description-container{
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            border: 1px solid $border-gray;
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 16vh;
+                            padding: 10px;
+                        }
+                    }
+                    .add-license-button{
+                        margin: 0 0 0 auto;
+                        padding: 10px;
+                        display: block;
+                        color: $secondary;
+                        font-size: 30px !important;
+                        margin-top: 1vh;
+                        width: min-content;
+                    }
+                    &.update-income-licenses-list-item{
+                        i{
+                            font-size: 18px;
+                        }
+                        .update-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $secondary;
+                            padding: 10px 35px;
+                            margin-right: 10px;
+                            background-color: #FAFAFA;
+                        }
+                        .delete-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $text-gray;
+                            padding: 10px;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+            #create-income-button{
+                margin: 0 0 0 auto;
+                display: block;
+                background-color: $secondary;
+                color: $bg-primary;
+                font-size: 1em;
+            }
+        }
+    }
+    #nav-update{
+        #update-income-container{
+            margin: auto;
+            padding: 0 0 5vh 0;
+            display: block;
+            width: 80%;
+            .header-income-container{
+                margin: 0;
+                padding: 0 2vw 3vh 2vw;
+                width: 100%;
+                border-bottom: 2px solid $border-gray;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: rgba(255, 255, 255, .98);
+                box-shadow: 0px 3px 6px #00000029;
+                .state-container{
+                    background: #F8F8F8 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 20px;
+                    padding: 10px 0px;
+                    margin: 2vh 0;
+                    .state-title{
+                        display: none;
+                    }
+                    .state-input-container{
+                        margin-left: 5px;
+                        .state-input{
+                            transition: .3s;
+                            cursor: pointer;
+                            label{
+                                cursor: pointer;
+                            }
+                            margin: 0 5px;
+                            padding: 2px 5px;
+                            font-size: .9em;
+                            border: 1px solid $text-gray;
+                            border-radius: 13px;
+                        }
+                    }
+                }
+                .input-container{
+                    margin: 7px 0;
+                    padding: 0;
+                    width: 100%;
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        margin: 0;
+                        padding: 0;
+                        width: 80%;
+                    }
+                }
+                .input-cutoff-date{
+                    color: $danger;
+                }
+                .description-container{
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        border: 1px solid $border-gray;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: 3vh;
+                        padding: 10px;
+                    }
+                }
+            }
+            .income-licenses-list{
+                margin: 2vh 0 0 0;
+                padding: 0 2vw;
+                width: 100%;
+                .order-licenses-list-item{
+                    padding: 2vh 2vw;
+                    box-shadow: 0px 3px 6px #00000029;
+                    &.order-licenses-list-item-update{
+                        background-color: $bg-secondary;
+                    }
+                    border-radius: 20px;
+                    margin-bottom: 2vh;
+                    .input-container{
+                        margin: 7px 0;
+                        padding: 0;
+                        width: 100%;
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            margin: 0;
+                            padding: 0;
+                            width: 80%;
+                            background-color: transparent;
+                        }
+                    }
+                    .description-container{
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            border: 1px solid $border-gray;
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 8vh;
+                            padding: 10px;
+                        }
+                    }
+                    .add-license-button{
+                        margin: 0 0 0 auto;
+                        padding: 10px;
+                        display: block;
+                        color: $secondary;
+                        font-size: 30px;
+                        margin-top: 1vh;
+                        width: min-content;
+                    }
+                    &.update-income-licenses-list-item{
+                        i{
+                            font-size: 18px;
+                        }
+                        .update-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $secondary;
+                            padding: 10px 35px;
+                            margin-right: 10px;
+                            background-color: #FAFAFA;
+                        }
+                        .delete-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $text-gray;
+                            padding: 10px;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+            #update-income-button{
+                margin: 0;
+                background-color: $secondary;
+                color: $bg-primary;
+                font-size: 1em;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+            #print-income-button{
+                background-color: $primary;
+                padding: 12px 15px;
+                color: $text-white;
+                font-size: 1em;
+                margin-right: 10px;
+                box-shadow: 0px 3px 6px #00000029;
+                border-radius: 40px;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+            #view-income-document{
+                background-color: $secondary;
+                padding: 12px 35px;
+                color: $text-white;
+                font-size: 1em;
+                margin-right: 10px;
+                box-shadow: 0px 3px 6px #00000029;
+                border-radius: 40px;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+        }
+    }
+    #order-viewer-container{
+        margin: 0;
+        padding: 0;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.7); 
+        z-index: 9999 !important;
+        isolation: isolate;
+        #close-order-viewer{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px !important;
+            color: $primary;
+            cursor: pointer;
+            z-index: 10000 !important;
+            pointer-events: auto;
+        }
+        #order-viewer-sub-container{
+            margin: auto;
+            padding: 0;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            #order-viewer-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            #order-viewer{
+                width: 95vw;
+                height: 60vh;
+                margin: 0 auto;
+                padding: 0;
+                display: block;
+                box-shadow: 0px 3px 6px #00000029;
+            }
+            #order-viewer-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                #send-order-button{
+                    background-color: $primary;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+            }
+        }
+        #send-order-container{
+            margin: auto;
+            padding: 20px;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FFF;
+            box-shadow: 0px 3px 6px #00000029;
+            width: 90vw;
+            #send-order-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            input{
+                border: none;
+                background-color: transparent;
+            }
+            #send-order-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                
+                #cancel-send-order-button{
+                    background-color: $danger;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+                #confirm-send-order-button{
+                    background-color: $success;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+                
+            }
+            .columns-send-phone{
+                display: none;
+            }
+            .columns-send-email {
+                width: 55vw;
+                input, p{
+                    width: 55vw;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+}

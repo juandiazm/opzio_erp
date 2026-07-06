@@ -1,0 +1,664 @@
+@import '../../variables';
+#erp-app-content{
+    max-height: 100%;
+}
+@media screen and (min-width: 768px) {
+    #erp-app-container{
+        height: 100vh;
+        
+        #erp-app-sidebar{
+            background: #F8F8F8 0% 0% no-repeat padding-box;
+            box-shadow: 0px 3px 6px #00000029;
+            padding: 3vh 0;
+            max-height: 100%;
+            z-index: 999;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                       flex 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                       max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                       padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: visible;
+            
+            .sidebar-toggle-btn{
+                position: absolute;
+                top: 15px;
+                right: -15px;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background-color: $secondary;
+                color: #FFF;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1000;
+                box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+                
+                &:hover{
+                    transform: scale(1.15);
+                    box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
+                    background-color: darken($secondary, 5%);
+                }
+                
+                &:active{
+                    transform: scale(1.05);
+                }
+                
+                i{
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+            }
+            
+            &.collapsed{
+                flex: 0 0 80px !important;
+                max-width: 80px !important;
+                padding: 3vh 10px;
+                
+                .sidebar-toggle-btn{
+                    right: -12px;
+                    
+                    i{
+                        transform: rotate(180deg);
+                    }
+                }
+                
+                #sidebar-ridder-logo{
+                    max-width: 50px;
+                    margin: 0 auto 2vh;
+                }
+                
+                #my-profile-name-container{
+                    display: none !important;
+                }
+                
+                #close-session-text{
+                    position: absolute;
+                    transform: translateX(-200%);
+                    opacity: 0;
+                    pointer-events: none;
+                }
+                
+                .sidebar-menu-item-text{
+                    display: none !important;
+                }
+                
+                #my-profile-container{
+                    justify-content: center !important;
+                    padding: 0;
+                    
+                    #my-profile-image-container{
+                        #my-profile-image{
+                            max-width: 45px;
+                            border-width: 2px;
+                        }
+                    }
+                }
+                
+                #sidebar-menu{
+                    margin: 3vh 0 2vh 0;
+                    
+                    .sidebar-menu-item{
+                        padding: 1.2vh 0;
+                        margin: 0.3vh 0;
+                        
+                        .sidebar-menu-item-link{
+                            justify-content: center;
+                            padding: 8px;
+                            
+                            .sidebar-menu-item-img{
+                                margin: 0 !important;
+                                width: 26px;
+                                height: 26px;
+                            }
+                            
+                            .sidebar-menu-item-icon{
+                                margin: 0 !important;
+                                font-size: 26px;
+                            }
+                        }
+                        
+                        &:hover{
+                            background-color: rgba($secondary, 0.1);
+                            border-radius: 10px;
+                            
+                            .sidebar-menu-item-link{
+                                .sidebar-menu-item-img path{
+                                    fill: $secondary;
+                                }
+                                .sidebar-menu-item-icon{
+                                    color: $secondary;
+                                }
+                            }
+                        }
+                        
+                        &.selected{
+                            background-color: $secondary;
+                            border-radius: 10px;
+                            
+                            .sidebar-menu-item-link{
+                                .sidebar-menu-item-img path{
+                                    fill: #fff;
+                                }
+                                .sidebar-menu-item-icon{
+                                    color: #fff;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                #close-session{
+                    width: 55px !important;
+                    height: 55px !important;
+                    border-radius: 50% !important;
+                    padding: 0 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    margin: 0 auto !important;
+                    
+                    #close-session-img{
+                        width: 24px !important;
+                        height: 24px !important;
+                        flex-shrink: 0 !important;
+                    }
+                    #close-session-text{
+                        display: none !important;
+                    }
+                }
+            }
+            
+            #sidebar-ridder-logo{
+                margin: 0 auto 2vh;
+                padding: 0;
+                display: block;
+                width: 100%;
+                max-width: 104px;
+                cursor: pointer;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                           opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                           height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                           margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            #my-profile-container{
+                margin: 2vh 0 0 0;
+                padding: 0 5%;
+                display: flex;
+                width: 100%;
+                transition: padding 0.3s ease;
+                
+                #my-profile-image-container{
+                    margin: 0;
+                    padding: 0;
+                    flex-shrink: 0;
+                    
+                    #my-profile-image{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        max-width: 80px;
+                        border-radius: 50%;
+                        border-width: 3px;
+                        border-style: solid;
+                        transition: max-width 0.3s ease, border-width 0.3s ease;
+                        cursor: pointer;
+                        
+                        &:hover{
+                            opacity: 0.9;
+                        }
+                    }
+                }
+                
+                #my-profile-name-container{
+                    margin: 0;
+                    padding: 0 0 0 15px;
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                               opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                    position: relative;
+                    
+                    #my-profile-name{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        color: $primary;
+                        font-weight: bold;
+                        font-size: 1.2em;
+                        white-space: nowrap;
+                    }
+                    #my-profile-role{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        color: $text-black;
+                        font-weight: 400;
+                        white-space: nowrap;
+                    }
+                    #my-profile-link{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        color: $secondary;
+                        font-weight: 500;
+                        white-space: nowrap;
+                        
+                        &:hover{
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+            #sidebar-menu{
+                margin: 4vh 0 2vh 0;
+                padding: 0;
+                display: block;
+                width: 100%;
+                scrollbar-width: none;
+                scrollbar-color: transparent transparent;
+                overflow-y: auto;
+                flex: 1;
+                
+                .sidebar-menu-item{
+                    margin: 0;
+                    padding: 1vh 0;
+                    display: block;
+                    width: 100%;
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+                    
+                    .sidebar-menu-item-link{
+                        margin: 0;
+                        padding: 0 5%;
+                        display: flex;
+                        justify-content: flex-start;
+                        align-items: center;
+                        width: 100%;
+                        text-decoration: none;
+                        transition: padding 0.3s ease;
+                        
+                        .sidebar-menu-item-img{
+                            margin: 0;
+                            padding: 0;
+                            display: block;
+                            width: 20px;
+                            height: 20px;
+                            flex-shrink: 0;
+                            transition: all 0.3s ease;
+                            
+                            path{
+                                fill: #454545;
+                                transition: fill 0.3s;
+                            }
+                        }
+                        
+                        .sidebar-menu-item-icon{
+                            font-size: 20px;
+                            color: #454545;
+                            flex-shrink: 0;
+                            transition: all 0.3s ease;
+                        }
+                        
+                        .sidebar-menu-item-text{
+                            margin: 0 0 0 12px;
+                            padding: 0;
+                            display: block;
+                            font-size: 1em;
+                            color: $text-black;
+                            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                                       opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            font-weight: 500;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            position: relative;
+                        }
+                    }
+                    
+                    &:hover,
+                    &.selected{
+                        background-color: $secondary;
+                        
+                        .sidebar-menu-item-link{
+                            .sidebar-menu-item-img{
+                                path{
+                                    fill: #fff;
+                                }
+                            }
+                            .sidebar-menu-item-text{
+                               color: #fff;
+                            }
+                            .sidebar-menu-item-icon{
+                                color: #FFF;
+                            }
+                        }
+                    }
+                }
+            }
+            #close-session{
+                background-color: $secondary;
+                color: #FFF;
+                border: none;
+                border-radius: 12px;
+                padding: 12px 20px;
+                width: 80%;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                margin: 0 auto;
+                
+                &:hover{
+                    transform: scale(.95);
+                    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+                }
+                
+                #close-session-img{
+                    fill: #FFF;
+                    width: 20px;
+                    height: 20px;
+                    flex-shrink: 0;
+                    transition: width 0.3s ease, height 0.3s ease;
+                }
+                
+                #close-session-text{
+                    margin: 0;
+                    padding: 0;
+                    display: block;
+                    font-size: 1.1em;
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                               opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    position: relative;
+                }
+            }
+        }
+        
+        #erp-app-content{
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 100;
+            
+            &.expanded{
+                flex: 0 0 calc(100% - 80px) !important;
+                max-width: calc(100% - 80px) !important;
+            }
+        }
+        #principal-logo-ridder{
+            margin: 0;
+            padding: 0;
+            display: block;
+            width: 100px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 10;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, .9);
+        }
+        #erp-app-content-title-container{
+            padding: 3vh 0 2vh 2%;
+            margin: 0;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+            #erp-app-content-title{
+                color: $primary;
+                font-weight: bold;
+                margin: 0;
+                padding: 0;
+                font-size: 2.5em;
+            }
+            #loader-container{
+                width: 2em;
+                #loader-icon{
+                    color: $primary;
+                    font-weight: bold;
+                    margin: 0;
+                    padding: 0;
+                    font-size: 2em;
+                }
+            }
+        }
+        .nav-tabs{
+            &.principal-nav-tabs{
+                .nav-link{
+                    color: $secondary;
+                    font-weight: bold;
+                    font-size: 1.3em;
+                    border-width: 2px;
+                    padding-left: 4vw;
+                    padding-right: 4vw;
+                    cursor: pointer;
+                    &.active{
+                        color: $text-gray;
+                    }
+                }
+            }
+            &.sub-nav-tabs{
+                .nav-link{
+                    color: $primary;
+                    font-weight: 600;
+                    font-size: 1.1em;
+                    border-width: 2px;
+                    padding-left: 4vw;
+                    padding-right: 4vw;
+                    cursor: pointer;
+                    &.active{
+                        color: $text-gray;
+                    }
+                }
+            }
+        }
+        
+        .tab-content{
+            padding: 2vh 1vw 0 1vw;
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    #erp-app-container{
+        height: 100vh;
+        #erp-app-sidebar{
+            /* Transformar sidebar en bottom nav en mobile */
+            background: #F8F8F8 0% 0% no-repeat padding-box;
+            box-shadow: 0 -3px 12px rgba(0,0,0,0.08);
+            padding: 0;
+            max-height: none;
+            z-index: 1100;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center;
+            justify-content: space-between;
+            overflow: visible;
+            scrollbar-width: thin;
+            scrollbar-color: rgba($secondary, 0.3) transparent;
+
+            &::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: rgba($secondary, 0.3);
+                border-radius: 2px;
+            }
+
+            .sidebar-toggle-btn{
+                display: none; // En móvil ya está colapsado por defecto
+            }
+
+            /* Mostrar logo en el menú inferior como un item más */
+            #sidebar-ridder-logo{
+                display: block !important;
+                margin: 0 !important;
+                padding: 10px 8px !important;
+                width: auto !important;
+                max-width: 40px !important;
+                min-width: 56px !important;
+                height: auto !important;
+                max-height: 40px !important;
+                cursor: pointer;
+                transition: transform 0.12s ease;
+                flex-shrink: 0;
+                align-self: center;
+                object-fit: contain;
+                order: 1; // Colocar después del menú
+                
+                &:active {
+                    transform: scale(0.92);
+                }
+            }
+
+            /* ocultar perfil en barra inferior y usar sólo iconos */
+            #my-profile-container{
+                display: none !important;
+            }
+
+            #sidebar-menu{
+                margin: 0 !important;
+                padding: 0 8px !important;
+                display: flex !important;
+                width: auto !important;
+                flex: 1;
+                list-style: none !important;
+                justify-content: space-evenly;
+                align-items: center;
+                order: 2; // Menú en el centro
+
+                .sidebar-menu-item{
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    display: inline-block !important;
+                    width: auto !important;
+                    transition: all 0.12s ease;
+                    cursor: pointer;
+                    min-width: 56px !important; // touch area
+                    position: relative;
+                    border-radius: 10px;
+                    overflow: visible;
+
+                    .sidebar-menu-item-link{
+                        margin: 0 !important;
+                        padding: 10px 8px !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        gap: 4px;
+                        width: auto !important;
+                        min-height: 48px;
+                        position: relative;
+                        text-decoration: none !important;
+                        z-index: 2;
+
+                        .sidebar-menu-item-img{
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            display: block !important;
+                            width: 22px !important;
+                            height: 22px !important;
+                            flex-shrink: 0;
+                            transition: all 0.12s ease;
+
+                            path{
+                                fill: #454545;
+                                transition: fill 0.12s ease;
+                            }
+                        }
+
+                        .sidebar-menu-item-icon{
+                            font-size: 22px !important;
+                            color: #454545 !important;
+                            margin: 0 !important;
+                            flex-shrink: 0;
+                            transition: all 0.12s ease;
+                        }
+
+                        .sidebar-menu-item-text{
+                            display: none !important; // ocultar texto en bottom nav
+                        }
+                    }
+
+                    &.selected{
+                        background-color: transparent !important;
+
+                        .sidebar-menu-item-link{
+                            .sidebar-menu-item-img{
+                                path{
+                                    fill: $secondary !important;
+                                }
+                            }
+                            .sidebar-menu-item-icon{
+                                color: $secondary !important;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* ocultar botón cerrar sesión desde la barra (mantener accesible en perfil) */
+            #close-session{
+                display: none !important;
+            }
+        }
+        #principal-logo-ridder{
+            display: none;
+        }
+        #erp-app-content-title-container{
+            padding: 2vh 3% 1vh 3%;
+            margin: 0;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+            #erp-app-content-title{
+                color: $primary;
+                font-weight: bold;
+                margin: 0;
+                padding: 0;
+                font-size: 1.75em;
+                line-height: 1.2;
+            }
+            #loader-container{
+                width: 1.5em;
+                #loader-icon{
+                    color: $primary;
+                    font-weight: bold;
+                    margin: 0;
+                    padding: 0;
+                    font-size: 1.5em;
+                }
+            }
+        }
+        /* asegurar que el contenido no quede oculto por la barra inferior */
+        #erp-app-content{
+            padding-bottom: 80px !important;
+            width: 96dvw !important;
+            max-width: 100dvw !important;
+            flex: 0 0 100dvw !important;
+            margin: 0 !important;
+            padding: 0 2dvw !important;
+            height: calc(100dvh - 40px) !important;
+        }
+    }
+}

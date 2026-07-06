@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PWA - RIDDER ERP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #0066cc;
+        }
+        .test-section h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .icon-preview {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .icon-preview img {
+            display: block;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+        .icon-preview span {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Test PWA - RIDDER ERP</h1>
+        <p class="subtitle">Herramienta de verificación de Progressive Web App</p>
+
+        <!-- Test Manifest -->
+        <div class="test-section">
+            <h3>📋 1. Manifest.json</h3>
+            <div id="manifest-status" class="status warning">Verificando...</div>
+            <button onclick="testManifest()">Verificar Manifest</button>
+        </div>
+
+        <!-- Test Service Worker -->
+        <div class="test-section">
+            <h3>⚙️ 2. Service Worker</h3>
+            <div id="sw-status" class="status warning">Verificando...</div>
+            <button onclick="testServiceWorker()">Verificar Service Worker</button>
+            <button onclick="unregisterServiceWorker()">Desregistrar SW</button>
+        </div>
+
+        <!-- Test Icons -->
+        <div class="test-section">
+            <h3>🎨 3. Iconos PWA</h3>
+            <div id="icons-status" class="status warning">Verificando iconos...</div>
+            <div id="icons-preview"></div>
+            <button onclick="testIcons()">Verificar Iconos</button>
+        </div>
+
+        <!-- Test HTTPS -->
+        <div class="test-section">
+            <h3>🔒 4. HTTPS</h3>
+            <div id="https-status" class="status warning">Verificando...</div>
+        </div>
+
+        <!-- Test Installation -->
+        <div class="test-section">
+            <h3>📱 5. Capacidad de Instalación</h3>
+            <div id="install-status" class="status warning">Verificando...</div>
+            <button onclick="triggerInstall()" id="manual-install">Instalar App</button>
+        </div>
+
+        <!-- Test Cache -->
+        <div class="test-section">
+            <h3>💾 6. Cache Storage</h3>
+            <div id="cache-status" class="status warning">Verificando...</div>
+            <button onclick="testCache()">Verificar Cache</button>
+            <button onclick="clearCache()">Limpiar Cache</button>
+        </div>
+
+        <!-- Test Offline -->
+        <div class="test-section">
+            <h3>🌐 7. Estado de Conexión</h3>
+            <div id="connection-status" class="status warning">Verificando...</div>
+        </div>
+
+        <!-- Información -->
+        <div class="test-section">
+            <h3>ℹ️ Información</h3>
+            <div id="info-status"></div>
+        </div>
+    </div>
+
+    <script>
+        let deferredPrompt;
+
+        // Auto-verificar al cargar
+        window.addEventListener('load', () => {
+            testManifest();
+            testServiceWorker();
+            testIcons();
+            testHTTPS();
+            testCache();
+            updateConnectionStatus();
+            showInfo();
+        });
+
+        // Test Manifest
+        async function testManifest() {
+            const statusEl = document.getElementById('manifest-status');
+            try {
+                const response = await fetch('/manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    statusEl.className = 'status success';
+                    statusEl.innerHTML = `✓ Manifest encontrado<br>
+                        <small>Nombre: ${manifest.name}<br>
+                        Short Name: ${manifest.short_name}<br>
+                        Display: ${manifest.display}<br>
+                        Theme Color: ${manifest.theme_color}</small>`;
+                } else {
+                    throw new Error('No encontrado');
+                }
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = '✗ Error: ' + error.message;
+            }
+        }
+
+        // Test Service Worker
+        async function testServiceWorker() {
+            const statusEl = document.getElementById('sw-status');
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        statusEl.className = 'status success';
+                        statusEl.innerHTML = `✓ Service Worker activo<br>
+                            <small>Scope: ${registration.scope}<br>
+                            Estado: ${registration.active ? 'Activated' : 'Registering'}</small>`;
+                    } else {
+                        statusEl.className = 'status warning';
+                        statusEl.textContent = '⚠ Service Worker no registrado';
+                    }
+                } catch (error) {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = '✗ Error: ' + error.message;
+                }
+            } else {
+                statusEl.className = 'status error';
+                statusEl.textContent = '✗ Service Worker no soportado';
+            }
+        }
+
+        // Desregistrar Service Worker
+        async function unregisterServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (registration) {
+                    await registration.unregister();
+                    alert('Service Worker desregistrado. Recarga la página.');
+                    location.reload();
+                }
+            }
+        }
+
+        // Test Icons
+        async function testIcons() {
+            const statusEl = document.getElementById('icons-status');
+            const previewEl = document.getElementById('icons-preview');
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            let allLoaded = true;
+            let loadedCount = 0;
+
+            previewEl.innerHTML = '';
+
+            for (const size of sizes) {
+                const img = new Image();
+                const url = `/images/pwa/icon-${size}x${size}.png`;
+                
+                await new Promise((resolve) => {
+                    img.onload = () => {
+                        loadedCount++;
+                        if ([192, 512].includes(size)) {
+                            const preview = document.createElement('div');
+                            preview.className = 'icon-preview';
+                            const previewImg = img.cloneNode();
+                            previewImg.width = size > 192 ? 100 : 50;
+                            preview.appendChild(previewImg);
+                            preview.innerHTML += `<span>${size}x${size}</span>`;
+                            previewEl.appendChild(preview);
+                        }
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        allLoaded = false;
+                        resolve();
+                    };
+                    img.src = url;
+                });
+            }
+
+            if (allLoaded && loadedCount === sizes.length) {
+                statusEl.className = 'status success';
+                statusEl.textContent = `✓ Todos los iconos cargados (${loadedCount}/${sizes.length})`;
+            } else {
+                statusEl.className = 'status error';
+                statusEl.textContent = `✗ Algunos iconos no se cargaron (${loadedCount}/${sizes.length})`;
+            }
+        }
+
+        // Test HTTPS
+        function testHTTPS() {
+            const statusEl = document.getElementById('https-status');
+            const isHTTPS = window.location.protocol === 'https:';
+            const isLocalhost = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1';
+
+            if (isHTTPS) {
+                statusEl.className = 'status success';
+                statusEl.textContent = '✓ Conexión segura (HTTPS)';
+            } else if (isLocalhost) {
+                statusEl.className = 'status warning';
+                statusEl.textContent = '⚠ HTTP en localhost (OK para desarrollo)';
+            } else {
+                statusEl.className = 'status error';
+                statusEl.textContent = '✗ HTTP detectado. PWA requiere HTTPS en producción';
+            }
+        }
+
+        // Capacidad de instalación
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const statusEl = document.getElementById('install-status');
+            statusEl.className = 'status success';
+            statusEl.textContent = '✓ La app puede ser instalada';
+        });
+
+        async function triggerInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    alert('¡Gracias por instalar RIDDER ERP!');
+                }
+                deferredPrompt = null;
+            } else {
+                alert('La app ya está instalada o no puede ser instalada en este momento');
+            }
+        }
+
+        window.addEventListener('appinstalled', () => {
+            const statusEl = document.getElementById('install-status');
+            statusEl.className = 'status success';
+            statusEl.textContent = '✓ App instalada exitosamente';
+        });
+
+        // Test Cache
+        async function testCache() {
+            const statusEl = document.getElementById('cache-status');
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    if (cacheNames.length > 0) {
+                        let totalSize = 0;
+                        for (const name of cacheNames) {
+                            const cache = await caches.open(name);
+                            const keys = await cache.keys();
+                            totalSize += keys.length;
+                        }
+                        statusEl.className = 'status success';
+                        statusEl.innerHTML = `✓ Cache activo<br>
+                            <small>Caches: ${cacheNames.length}<br>
+                            Archivos cacheados: ${totalSize}</small>`;
+                    } else {
+                        statusEl.className = 'status warning';
+                        statusEl.textContent = '⚠ No hay caches activos';
+                    }
+                } catch (error) {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = '✗ Error al leer cache: ' + error.message;
+                }
+            } else {
+                statusEl.className = 'status error';
+                statusEl.textContent = '✗ Cache Storage no soportado';
+            }
+        }
+
+        async function clearCache() {
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                alert('Cache limpiado. Recarga la página.');
+                location.reload();
+            }
+        }
+
+        // Estado de conexión
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connection-status');
+            if (navigator.onLine) {
+                statusEl.className = 'status success';
+                statusEl.textContent = '✓ Conectado a internet';
+            } else {
+                statusEl.className = 'status error';
+                statusEl.textContent = '✗ Sin conexión a internet';
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        // Información
+        function showInfo() {
+            const infoEl = document.getElementById('info-status');
+            infoEl.innerHTML = `
+                <strong>Navegador:</strong> ${navigator.userAgent}<br>
+                <strong>Platform:</strong> ${navigator.platform}<br>
+                <strong>Idioma:</strong> ${navigator.language}<br>
+                <strong>Cookies habilitadas:</strong> ${navigator.cookieEnabled ? 'Sí' : 'No'}<br>
+                <strong>Service Worker soportado:</strong> ${'serviceWorker' in navigator ? 'Sí' : 'No'}<br>
+                <strong>Cache Storage soportado:</strong> ${'caches' in window ? 'Sí' : 'No'}
+            `;
+        }
+    </script>
+</body>
+</html>

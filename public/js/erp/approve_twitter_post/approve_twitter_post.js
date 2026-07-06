@@ -1,0 +1,2 @@
+$(document).ready((function(){var a;a={unique_id},PostMethodFunction("/api/twitter/approve",a,null,(function(a){$("#approve-post-loading-icon").removeAttr("class").addClass("fa fa-check"),$("#approve-post-status-message").text("Post aprobado exitosamente")}),(function(){$("#approve-post-loading-icon").removeAttr("class").addClass("fa fa-exclamation-triangle"),$("#approve-post-status-message").text("Error al aprobar el post")}))}));
+//# sourceMappingURL=approve_twitter_post.js.map

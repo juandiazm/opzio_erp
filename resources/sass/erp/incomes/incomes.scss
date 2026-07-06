@@ -1,0 +1,1442 @@
+@import '../../variables';
+
+@media screen and (min-width: 768px) {
+    #nav-list{
+        #search-list-container{
+            background: #F8F8F8 0% 0% no-repeat padding-box;
+            box-shadow: 0px 3px 6px #00000029;
+            padding: 2vh 0;
+            width: 90%;
+            display: flex;
+            justify-content: space-around;
+            margin: 1vh auto;
+            #search-list-input-contaner{
+                margin: 0 5px;
+                #search-list-title{
+                    margin: 0 15px 0 0;
+                    padding: 0;
+                    color: $primary;
+                    font-weight: bold;
+                }
+                #search-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 25vw;
+                }
+            }
+            #state-list-input-contaner{
+                margin: 0 5px;
+                #state-list-title{
+                    margin: 0 15px 0 0;
+                    padding: 0;
+                    color: $primary;
+                    font-weight: bold;
+                }
+                #state-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 15vw;
+                }
+            }
+            
+        }
+        tr.deleted{
+            //set opacity on all td inside the container except the last two one
+            td:nth-last-child(2){
+                opacity: 1 !important;
+            }
+        }
+        .columns-actions{
+            white-space: nowrap;
+            i{
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
+        .active-state{
+            margin: 0 5px;
+            padding: 0 10px;
+            font-size: .9em;
+            border-radius: 13px;
+            width: 100%;
+        }
+    }
+    #nav-create{
+        #create-income-container{
+            margin: auto;
+            padding: 0 0 5vh 0;
+            display: block;
+            width: 80%;
+            .header-income-container{
+                margin: 0;
+                padding: 0 2vw 3vh 2vw;
+                width: 100%;
+                border-bottom: 2px solid $border-gray;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: rgba(255, 255, 255, .98);
+                .state-container{
+                    background: #F8F8F8 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 20px;
+                    padding: 10px 0px;
+                    margin: 2vh 0;
+                    .state-title{
+                        font-size: 1em;
+                        color: $primary;
+                        font-weight: bold;
+                        margin-right: 5px;
+                    }
+                    .state-input-container{
+                        margin-left: 5px;
+                        .state-input{
+                            transition: .3s;
+                            cursor: pointer;
+                            label{
+                                cursor: pointer;
+                            }
+                            margin: 0 5px;
+                            padding: 2px 10px;
+                            font-size: .9em;
+                            border: 1px solid $text-gray;
+                            border-radius: 13px;
+                        }
+                    }
+                }
+                .input-container{
+                    margin: 7px 0;
+                    padding: 0;
+                    width: 100%;
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        margin: 0;
+                        padding: 0;
+                        width: 80%;
+                    }
+                }
+                .input-cutoff-date{
+                    color: $danger;
+                }
+                .description-container{
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        border: 1px solid $border-gray;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: 12vh;
+                        padding: 10px;
+                    }
+                }
+            }
+            .income-licenses-list{
+                margin: 2vh 0 0 0;
+                padding: 0 2vw;
+                width: 100%;
+                .order-licenses-list-item{
+                    padding: 2vh 2vw;
+                    box-shadow: 0px 3px 6px #00000029;
+                    &.order-licenses-list-item-create{
+                        background-color: $bg-secondary;
+                    }
+                    border-radius: 20px;
+                    margin-bottom: 2vh;
+                    .input-container{
+                        margin: 7px 0;
+                        padding: 0;
+                        width: 100%;
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            margin: 0;
+                            padding: 0;
+                            width: 80%;
+                            background-color: transparent;
+                        }
+                    }
+                    .description-container{
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            border: 1px solid $border-gray;
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 16vh;
+                            padding: 10px;
+                        }
+                    }
+                    .add-license-button{
+                        margin: 0 0 0 auto;
+                        padding: 10px;
+                        display: block;
+                        color: $secondary;
+                        font-size: 30px;
+                        margin-top: 1vh;
+                        width: min-content;
+                    }
+                    &.update-income-licenses-list-item{
+                        i{
+                            font-size: 18px;
+                        }
+                        .update-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $secondary;
+                            padding: 10px 35px;
+                            margin-right: 10px;
+                            background-color: #FAFAFA;
+                        }
+                        .delete-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $text-gray;
+                            padding: 10px;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+            #create-income-button{
+                margin: 0 0 0 auto;
+                display: block;
+                background-color: $secondary;
+                color: $bg-primary;
+                font-size: 1em;
+            }
+        }
+    }
+    #nav-update{
+        #update-income-container{
+            margin: auto;
+            padding: 0 0 5vh 0;
+            display: block;
+            width: 80%;
+            .header-income-container{
+                margin: 0;
+                padding: 0 2vw 3vh 2vw;
+                width: 100%;
+                border-bottom: 2px solid $border-gray;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: rgba(255, 255, 255, .98);
+                box-shadow: 0px 3px 6px #00000029;
+                .state-container{
+                    background: #F8F8F8 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 20px;
+                    padding: 10px 0px;
+                    margin: 2vh 0;
+                    .state-title{
+                        font-size: 1em;
+                        color: $primary;
+                        font-weight: bold;
+                        margin-right: 5px;
+                    }
+                    .state-input-container{
+                        margin-left: 5px;
+                        .state-input{
+                            transition: .3s;
+                            cursor: pointer;
+                            label{
+                                cursor: pointer;
+                            }
+                            margin: 0 5px;
+                            padding: 2px 10px;
+                            font-size: .9em;
+                            border: 1px solid $text-gray;
+                            border-radius: 13px;
+                        }
+                    }
+                }
+                .input-container{
+                    margin: 7px 0;
+                    padding: 0;
+                    width: 100%;
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        margin: 0;
+                        padding: 0;
+                        width: 80%;
+                    }
+                }
+                .input-cutoff-date{
+                    color: $danger;
+                }
+                .description-container{
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        border: 1px solid $border-gray;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: 12vh;
+                        padding: 10px;
+                    }
+                }
+            }
+            .income-licenses-list{
+                margin: 2vh 0 0 0;
+                padding: 0 2vw;
+                width: 100%;
+                .order-licenses-list-item{
+                    padding: 2vh 2vw;
+                    box-shadow: 0px 3px 6px #00000029;
+                    &.order-licenses-list-item-update{
+                        background-color: $bg-secondary;
+                    }
+                    border-radius: 20px;
+                    margin-bottom: 2vh;
+                    .input-container{
+                        margin: 7px 0;
+                        padding: 0;
+                        width: 100%;
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            margin: 0;
+                            padding: 0;
+                            width: 80%;
+                            background-color: transparent;
+                        }
+                    }
+                    .description-container{
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            border: 1px solid $border-gray;
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 16vh;
+                            padding: 10px;
+                        }
+                    }
+                    .add-license-button{
+                        margin: 0 0 0 auto;
+                        padding: 10px;
+                        display: block;
+                        color: $secondary;
+                        font-size: 30px;
+                        margin-top: 1vh;
+                        width: min-content;
+                    }
+                    &.update-income-licenses-list-item{
+                        i{
+                            font-size: 18px;
+                        }
+                        .update-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $secondary;
+                            padding: 10px 35px;
+                            margin-right: 10px;
+                            background-color: #FAFAFA;
+                        }
+                        .delete-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $text-gray;
+                            padding: 10px;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+            #update-income-button{
+                margin: 0;
+                background-color: $secondary;
+                color: $bg-primary;
+                font-size: 1em;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+            #print-income-button{
+                background-color: $primary;
+                padding: 12px 15px;
+                color: $text-white;
+                font-size: 1em;
+                margin-right: 10px;
+                box-shadow: 0px 3px 6px #00000029;
+                border-radius: 40px;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+            #view-income-document{
+                background-color: $secondary;
+                padding: 12px 35px;
+                color: $text-white;
+                font-size: 1em;
+                margin-right: 10px;
+                box-shadow: 0px 3px 6px #00000029;
+                border-radius: 40px;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+        }
+    }
+    #order-viewer-container{
+        margin: 0;
+        padding: 0;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.7); 
+        z-index: 9999 !important;
+        isolation: isolate;
+        #close-order-viewer{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: $primary;
+            cursor: pointer;
+            z-index: 10000 !important;
+            pointer-events: auto;
+            &:hover{
+                transform: scale(1.2);
+                transition: 0.2s;
+            }
+        }
+        #order-viewer-sub-container{
+            margin: auto;
+            padding: 0;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            #order-viewer-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            #order-viewer{
+                width: 60vw;
+                height: 70vh;
+                margin: 0 auto;
+                padding: 0;
+                display: block;
+            }
+            #order-viewer-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                #send-order-button{
+                    background-color: $primary;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+            }
+        }
+        #send-order-container{
+            margin: auto;
+            padding: 20px;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FFF;
+            box-shadow: 0px 3px 6px #00000029;
+            width: 60vw;
+            #send-order-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            input{
+                border: none;
+                background-color: transparent;
+            }
+            #send-order-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                
+                #cancel-send-order-button{
+                    background-color: $danger;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+                #confirm-send-order-button{
+                    background-color: $success;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    p, a{
+        font-size: 14px !important;
+    }
+    #nav-list{
+        #search-list-container{
+            background: #F8F8F8 0% 0% no-repeat padding-box;
+            box-shadow: 0px 3px 6px #00000029;
+            padding: 2vh 0;
+            width: 90%;
+            display: block;
+            margin: 1vh auto;
+            
+            #search-list-input-contaner{
+                margin: 5px 0;
+                #search-list-title{
+                    display: none;
+                }
+                #search-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 90%;
+                    text-align: center;
+                }
+            }
+            #state-list-input-contaner{
+                margin: 5px 0;
+                #state-list-title{
+                    display: none;
+                }
+                #state-list-input{
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 0;
+                    border-bottom: 1px solid $text-gray;
+                    padding: 0;
+                    width: 90%;
+                    text-align: center;
+                }
+            }
+        }
+        .fa-bars-progress{
+            display: none;
+        }
+        tr.deleted{
+            //set opacity on all td inside the container except the last two one
+            td:nth-last-child(2){
+                opacity: 1 !important;
+            }
+        }
+        .active-state{
+            margin: 0 5px;
+            padding: 0 10px;
+            font-size: .9em;
+            border-radius: 13px;
+            width: 100%;
+        }
+        .columns-timely-payment,
+        .columns-cutoff-date,
+        .columns-bill,
+        .columns-created-at{
+            display: none;
+        }
+        .columns-state{
+            width: 10%;
+            label{
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                margin: 0 auto;
+                display: block;
+                /*hide text*/
+                overflow: hidden;
+                text-indent: -9999px;
+                
+            }
+        }
+        td, th{
+            width: 20%;
+        }
+    }
+    #nav-create{
+        #create-income-container{
+            margin: auto;
+            padding: 0 0 5vh 0;
+            display: block;
+            width: 100%;
+            .header-income-container{
+                margin: 0;
+                padding: 0 2vw 3vh 2vw;
+                width: 100%;
+                border-bottom: 2px solid $border-gray;
+                background-color: rgba(255, 255, 255, .98);
+                .state-container{
+                    background: #F8F8F8 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 20px;
+                    padding: 10px 0px;
+                    margin: 2vh 0;
+                    .state-title{
+                        display: none;
+                    }
+                    .state-input-container{
+                        margin-left: 5px;
+                        .state-input{
+                            transition: .3s;
+                            cursor: pointer;
+                            label{
+                                cursor: pointer;
+                            }
+                            margin: 0 5px;
+                            padding: 2px 5px;
+                            font-size: .9em;
+                            border: 1px solid $text-gray;
+                            border-radius: 13px;
+                        }
+                    }
+                }
+                .input-container{
+                    margin: 7px 0;
+                    padding: 0;
+                    width: 100%;
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        margin: 0;
+                        padding: 0;
+                        width: 80%;
+                    }
+                }
+                .input-cutoff-date{
+                    color: $danger;
+                }
+                .description-container{
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        border: 1px solid $border-gray;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: 12vh;
+                        padding: 10px;
+                    }
+                }
+            }
+            .income-licenses-list{
+                margin: 2vh 0 0 0;
+                padding: 0 2vw;
+                width: 100%;
+                .order-licenses-list-item{
+                    padding: 2vh 2vw;
+                    box-shadow: 0px 3px 6px #00000029;
+                    &.order-licenses-list-item-create{
+                        background-color: $bg-secondary;
+                    }
+                    border-radius: 20px;
+                    margin-bottom: 2vh;
+                    .input-container{
+                        margin: 7px 0;
+                        padding: 0;
+                        width: 100%;
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            margin: 0;
+                            padding: 0;
+                            width: 80%;
+                            background-color: transparent;
+                        }
+                    }
+                    .description-container{
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            border: 1px solid $border-gray;
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 16vh;
+                            padding: 10px;
+                        }
+                    }
+                    .add-license-button{
+                        margin: 0 0 0 auto;
+                        padding: 10px;
+                        display: block;
+                        color: $secondary;
+                        font-size: 30px !important;
+                        margin-top: 1vh;
+                        width: min-content;
+                    }
+                    &.update-income-licenses-list-item{
+                        i{
+                            font-size: 18px;
+                        }
+                        .update-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $secondary;
+                            padding: 10px 35px;
+                            margin-right: 10px;
+                            background-color: #FAFAFA;
+                        }
+                        .delete-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $text-gray;
+                            padding: 10px;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+            #create-income-button{
+                margin: 0 0 0 auto;
+                display: block;
+                background-color: $secondary;
+                color: $bg-primary;
+                font-size: 1em;
+            }
+        }
+    }
+    #nav-update{
+        #update-income-container{
+            margin: auto;
+            padding: 0 0 5vh 0;
+            display: block;
+            width: 100%;
+            .header-income-container{
+                margin: 0;
+                padding: 0 2vw 3vh 2vw;
+                width: 100%;
+                border-bottom: 2px solid $border-gray;
+                background-color: rgba(255, 255, 255, .98);
+                box-shadow: 0px 3px 6px #00000029;
+                .state-container{
+                    background: #F8F8F8 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 20px;
+                    padding: 10px 0px;
+                    margin: 2vh 0;
+                    .state-title{
+                        display: none;
+                    }
+                    .state-input-container{
+                        margin-left: 5px;
+                        .state-input{
+                            transition: .3s;
+                            cursor: pointer;
+                            label{
+                                cursor: pointer;
+                            }
+                            margin: 0 5px;
+                            padding: 2px 5px;
+                            font-size: .9em;
+                            border: 1px solid $text-gray;
+                            border-radius: 13px;
+                        }
+                    }
+                }
+                .input-container{
+                    margin: 7px 0;
+                    padding: 0;
+                    width: 100%;
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        margin: 0;
+                        padding: 0;
+                        width: 80%;
+                    }
+                }
+                .input-cutoff-date{
+                    color: $danger;
+                }
+                .description-container{
+                    .input-title{
+                        margin: 0;
+                        padding: 0;
+                        width: 30%;
+                        text-align: left;
+                    }
+                    .input-value{
+                        border: 1px solid $border-gray;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: 3vh;
+                        padding: 10px;
+                    }
+                }
+            }
+            .income-licenses-list{
+                margin: 2vh 0 0 0;
+                padding: 0 2vw;
+                width: 100%;
+                .order-licenses-list-item{
+                    padding: 2vh 2vw;
+                    box-shadow: 0px 3px 6px #00000029;
+                    &.order-licenses-list-item-update{
+                        background-color: $bg-secondary;
+                    }
+                    border-radius: 20px;
+                    margin-bottom: 2vh;
+                    .input-container{
+                        margin: 7px 0;
+                        padding: 0;
+                        width: 100%;
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            margin: 0;
+                            padding: 0;
+                            width: 80%;
+                            background-color: transparent;
+                        }
+                    }
+                    .description-container{
+                        .input-title{
+                            margin: 0;
+                            padding: 0;
+                            width: 30%;
+                            text-align: left;
+                        }
+                        .input-value{
+                            border: 1px solid $border-gray;
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 8vh;
+                            padding: 10px;
+                        }
+                    }
+                    .add-license-button{
+                        margin: 0 0 0 auto;
+                        padding: 10px;
+                        display: block;
+                        color: $secondary;
+                        font-size: 30px;
+                        margin-top: 1vh;
+                        width: min-content;
+                    }
+                    &.update-income-licenses-list-item{
+                        i{
+                            font-size: 18px;
+                        }
+                        .update-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $secondary;
+                            padding: 10px 35px;
+                            margin-right: 10px;
+                            background-color: #FAFAFA;
+                        }
+                        .delete-license-button{
+                            box-shadow: 0px 3px 6px #00000029;
+                            border-radius: 40px;
+                            color: $text-gray;
+                            padding: 10px;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+            #update-income-button{
+                margin: 0;
+                background-color: $secondary;
+                color: $bg-primary;
+                font-size: 1em;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+            #print-income-button{
+                background-color: $primary;
+                padding: 12px 15px;
+                color: $text-white;
+                font-size: 1em;
+                margin-right: 10px;
+                box-shadow: 0px 3px 6px #00000029;
+                border-radius: 40px;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+            #view-income-document{
+                background-color: $secondary;
+                padding: 12px 35px;
+                color: $text-white;
+                font-size: 1em;
+                margin-right: 10px;
+                box-shadow: 0px 3px 6px #00000029;
+                border-radius: 40px;
+                &:hover{
+                    transform: scale(1.1);
+                }
+            }
+        }
+    }
+    #order-viewer-container{
+        margin: 0;
+        padding: 0;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.7); 
+        z-index: 9999 !important;
+        isolation: isolate;
+        #close-order-viewer{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px !important;
+            color: $primary;
+            cursor: pointer;
+            z-index: 10000 !important;
+            pointer-events: auto;
+        }
+        #order-viewer-sub-container{
+            margin: auto;
+            padding: 0;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            #order-viewer-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            #order-viewer{
+                width: 95vw;
+                height: 60vh;
+                margin: 0 auto;
+                padding: 0;
+                display: block;
+                box-shadow: 0px 3px 6px #00000029;
+            }
+            #order-viewer-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                #send-order-button{
+                    background-color: $primary;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+            }
+        }
+        #send-order-container{
+            margin: auto;
+            padding: 20px;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FFF;
+            box-shadow: 0px 3px 6px #00000029;
+            width: 90vw;
+            #send-order-title{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                font-size: 2em;
+                color: $primary;
+            }
+            input{
+                border: none;
+                background-color: transparent;
+            }
+            #send-order-buttons{
+                margin: 2vh 0 0 0;
+                padding: 0;
+                display: block;
+                text-align: center;
+                
+                #cancel-send-order-button{
+                    background-color: $danger;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+                #confirm-send-order-button{
+                    background-color: $success;
+                    color: $bg-primary;
+                    font-size: 1.2em;
+                }
+                
+            }
+            .columns-send-phone{
+                display: none;
+            }
+            .columns-send-email {
+                width: 55vw;
+                input, p{
+                    width: 55vw;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+#import-report-excel-container {
+    margin: 0;
+    padding: 0;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #0153FF;
+    border-radius: 50px;
+    gap: 5px;
+    cursor: pointer;
+    transition: .3s;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white; 
+    z-index: 999;
+}
+
+#import-report-excel-container #import-report-excel-icon {
+    font-size: 17px;
+    color: #0153FF;
+}
+
+#import-report-excel-container #import-report-excel-icon:hover {
+    color: #0153FF !important;
+}
+
+#import-report-excel-container #import-report-excel-text {
+    display: none;
+    transition: .3s;
+    color: #0153FF;
+}
+
+#import-report-excel-container:hover {
+    padding: 5px 20px;
+    width: fit-content;
+}
+
+#import-report-excel-container:hover #import-report-excel-text {
+    display: block;
+}
+
+#download-assistant-template {
+    margin: 20px 0;
+    padding: 0;
+    display: block;
+    width: 100%;
+    color: #0153FF;
+    text-decoration: underline;
+}
+
+// Advances Modal Styles
+#advances-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 2000;
+    overflow-y: auto;
+    
+    #advances-modal-container {
+        margin: 2vh auto;
+        padding: 0;
+        background-color: #FFF;
+        box-shadow: 0px 3px 20px #00000029;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 1000px;
+        position: relative;
+        
+        #close-advances-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 25px;
+            color: $primary;
+            cursor: pointer;
+            transition: .3s;
+            z-index: 2001;
+            
+            &:hover {
+                color: darken($primary, 10%);
+                transform: rotate(90deg);
+            }
+        }
+        
+        #advances-modal-header {
+            padding: 30px;
+            border-bottom: 2px solid $border-gray;
+            
+            #advances-modal-title {
+                color: $primary;
+                font-size: 1.8em;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+            
+            #advances-modal-income-info {
+                display: flex;
+                gap: 30px;
+                margin-bottom: 20px;
+                
+                p {
+                    margin: 0;
+                    font-size: 1em;
+                    color: #333;
+                    
+                    strong {
+                        color: $primary;
+                    }
+                }
+            }
+            
+            #advances-modal-summary {
+                display: flex;
+                gap: 30px;
+                padding: 15px;
+                background-color: #F8F8F8;
+                border-radius: 8px;
+                flex-wrap: wrap;
+                
+                .summary-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    
+                    .summary-label {
+                        font-size: 0.9em;
+                        color: #666;
+                        font-weight: 500;
+                    }
+                    
+                    .summary-value {
+                        font-size: 1.3em;
+                        font-weight: 600;
+                        color: $primary;
+                        
+                        &.total-advances {
+                            color: #28a745;
+                        }
+                        
+                        &.balance-pending {
+                            color: #ff9800;
+                        }
+                    }
+                }
+            }
+        }
+        
+        #advances-modal-content {
+            padding: 30px;
+            
+            #advance-form-container {
+                margin-bottom: 30px;
+                padding: 20px;
+                background-color: #f9f9f9;
+                border-radius: 8px;
+                border: 1px solid $border-gray;
+                
+                #advance-form-title {
+                    font-size: 1.3em;
+                    font-weight: 600;
+                    color: $primary;
+                    margin-bottom: 20px;
+                }
+                
+                .form-group {
+                    margin-bottom: 15px;
+                    
+                    label {
+                        display: block;
+                        font-size: 0.95em;
+                        font-weight: 500;
+                        color: #333;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .form-control {
+                        width: 100%;
+                        padding: 8px 12px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        font-size: 0.95em;
+                        transition: .3s;
+                        
+                        &:focus {
+                            border-color: $primary;
+                            outline: none;
+                            box-shadow: 0 0 0 0.2rem rgba($primary, 0.25);
+                        }
+                    }
+                    
+                    textarea.form-control {
+                        resize: vertical;
+                    }
+                }
+                
+                .form-buttons {
+                    display: flex;
+                    gap: 10px;
+                    justify-content: flex-end;
+                    margin-top: 20px;
+                    
+                    .btn {
+                        padding: 10px 25px;
+                        border: none;
+                        border-radius: 5px;
+                        font-size: 1em;
+                        cursor: pointer;
+                        transition: .3s;
+                        
+                        &.btn-secondary {
+                            background-color: #6c757d;
+                            color: white;
+                            
+                            &:hover {
+                                background-color: darken(#6c757d, 10%);
+                            }
+                        }
+                        
+                        &.btn-primary {
+                            background-color: $primary;
+                            color: white;
+                            
+                            &:hover {
+                                background-color: darken($primary, 10%);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            #advances-list-container {
+                h2 {
+                    font-size: 1.3em;
+                    font-weight: 600;
+                    color: $primary;
+                }
+                
+                .btn-success {
+                    background-color: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: .3s;
+                    
+                    &:hover {
+                        background-color: darken(#28a745, 10%);
+                    }
+                    
+                    i {
+                        margin-right: 5px;
+                    }
+                }
+                
+                table {
+                    margin-top: 20px;
+                    width: 100%;
+                    
+                    thead {
+                        background-color: $primary;
+                        
+                        th {
+                            color: white;
+                            padding: 12px;
+                            font-size: 0.9em;
+                            font-weight: 600;
+                        }
+                    }
+                    
+                    tbody {
+                        tr {
+                            transition: .3s;
+                            
+                            &:hover {
+                                background-color: #f5f5f5;
+                            }
+                            
+                            td {
+                                padding: 12px;
+                                font-size: 0.95em;
+                                border-bottom: 1px solid $border-gray;
+                                
+                                i {
+                                    cursor: pointer;
+                                    margin: 0 5px;
+                                    transition: .3s;
+                                    
+                                    &.advance-item-edit {
+                                        color: $primary;
+                                        
+                                        &:hover {
+                                            color: darken($primary, 15%);
+                                        }
+                                    }
+                                    
+                                    &.advance-item-delete {
+                                        color: #dc3545;
+                                        
+                                        &:hover {
+                                            color: darken(#dc3545, 15%);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #advances-modal {
+        #advances-modal-container {
+            width: 95%;
+            margin: 1vh auto;
+            
+            #advances-modal-header {
+                padding: 20px;
+                
+                #advances-modal-title {
+                    font-size: 1.4em;
+                }
+                
+                #advances-modal-income-info {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                #advances-modal-summary {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+            }
+            
+            #advances-modal-content {
+                padding: 20px;
+                
+                #advance-form-container {
+                    padding: 15px;
+                }
+                
+                #advances-list-container {
+                    .d-flex {
+                        flex-direction: column;
+                        gap: 15px;
+                        
+                        .btn-success {
+                            width: 100%;
+                        }
+                    }
+                    
+                    table {
+                        font-size: 0.85em;
+                        
+                        thead th,
+                        tbody td {
+                            padding: 8px 5px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

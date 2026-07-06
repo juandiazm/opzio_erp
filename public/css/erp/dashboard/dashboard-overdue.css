@@ -1,0 +1,14 @@
+/* Estilos para columnas de fecha de corte y días vencidos */
+.approve-incomes-cutoff {
+  text-align: center !important;
+  white-space: nowrap;
+}
+
+.approve-incomes-overdue {
+  text-align: center !important;
+}
+
+.approve-incomes-overdue .overdue-text {
+  color: #C90D0D !important;
+  font-weight: 600 !important;
+}

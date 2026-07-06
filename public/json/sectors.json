@@ -1,0 +1,38 @@
+[
+    {
+      "name": "Servicios Financieros",
+      "id": 1	
+    },
+    {
+      "name": "Manufactura",
+      "id": 2
+    },
+    {
+      "name": "Comercio",
+      "id": 3
+    },
+    {
+      "name": "Gobierno",
+      "id": 4
+    },
+    {
+      "name": "Salud",
+      "id": 5
+    },
+    {
+      "name": "Educación",
+      "id": 6
+    },
+    {
+      "name": "Logística y Transporte",
+      "id": 7
+    },
+    {
+      "name": "Telecomunicaciones",
+      "id": 8
+    },
+    {
+      "name": "Minería",
+      "id": 9
+    }
+  ]

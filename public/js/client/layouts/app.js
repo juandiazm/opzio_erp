@@ -1,0 +1,2 @@
+$(document).on("click","#close-session",(function(){PostMethodFunction("/client/profile/close-session",{},null,(function(){window.location.href="/"}),null)})),$(window).resize((function(){var n=$("#menu-nav").height(),e=$(window).height();$("#client-app-sidebar").css("height",e-n).css("max-height",e-n),$("#client-app-content").css("height",e-n).css("max-height",e-n)})),$(document).ready((function(){$(window).resize()}));
+//# sourceMappingURL=app.js.map

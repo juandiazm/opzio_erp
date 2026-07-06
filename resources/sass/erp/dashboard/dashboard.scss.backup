@@ -1,0 +1,1342 @@
+@import '../../variables';
+#erp-app-content{
+    background-color: #F7F7F7;
+}
+#dashboard-container{
+    line-height: 1.1;
+}
+.separate-line{
+    border: 1px solid $border-gray;
+    width: 100%;
+    margin: 1vh 0;
+}
+#principal-logo-ridder{
+    background-color: transparent !important;
+}
+@media screen and (min-width: 768px) {
+    #dashboard-container{
+        margin: 0;
+        padding: 0;
+        display: flex;
+        width: 100%;
+        .column-container{
+            margin: 0;
+            padding: 0 0.5vw;
+            display: block;
+            width: 50%;
+            .row-container{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                width: 100%;
+                display: flex;
+                .segment-header{
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    .segment-title{
+                        font-size: 15px;
+                        font-weight: 600;
+                        margin: 0;
+                        padding: 0;
+                        color: $text-gray;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        .tooltip-icon{
+                            font-size: 14px;
+                            color: $text-gray;
+                            cursor: pointer;
+                            margin-left: 2px;
+                        }
+                    }
+                    .segment-month{
+                        border: 1px solid #707070;
+                        border-radius: 13px;
+                        width: 40%;
+                        text-align: center;
+                        cursor: pointer;
+                        padding: 3px 5px;
+                        font-size: 12px;
+                    }
+                }
+                .income-outcome-segment{
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    width: 50%;
+                    padding: 15px;
+                    .income-number-container{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                       .value-container{
+                            margin: 0;
+                            padding: 1vh 0;
+                            text-align: center;
+                            width: 100%;
+                            display: block;
+                            .income-number{
+                                font-size: 1.7em;
+                                font-weight: 600;
+                                color: $secondary;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                .income-number-icon{
+                                    color: $secondary;
+                                    margin: 0;
+                                    padding: 0 10px 0 0;
+                                    align-self: center;
+                                }
+                            }
+                            .income-title{
+                                font-size: 1em;
+                                font-weight: 600;
+                                color: $secondary;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                display: block;
+                                width: 100%;
+                            
+                            }
+                       }
+                       .last-month-comparison-message{
+                            margin: 0;
+                            padding: 0;
+                            display: block;
+                            color: $text-gray;
+                            font-size: 0.8em;
+                            width: 100%;
+                            text-align: center;
+                            i{
+                                margin-right: 4px;
+                            }
+                       }
+                    }
+                    .outcome-number-container{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        .value-container{
+                            margin: 0;
+                            padding: 1vh 0;
+                            text-align: center;
+                            width: 100%;
+                            display: block;
+                            .outcome-number{
+                                font-size: 1.7em;
+                                font-weight: 600;
+                                color: $danger;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                .outcome-number-icon{
+                                    color: $danger;
+                                    margin: 0;
+                                    padding: 0 10px 0 0;
+                                    align-self: center;
+                                }
+                            }
+                            .outcome-title{
+                                font-size: 1em;
+                                font-weight: 600;
+                                color: $danger;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                display: block;
+                                width: 100%;
+                            }
+                        }
+                        .last-month-comparison-message{
+                            margin: 0;
+                            padding: 0;
+                            display: block;
+                            color: $text-gray;
+                            font-size: 0.8em;
+                            width: 100%;
+                            text-align: center;
+                            i{
+                                margin-right: 4px;
+                            }
+                        }
+                    }
+                }
+                .collect-active-container{
+                    width: 50%;
+                    padding: 0 0 0 15px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    .collect-active-sub-container{
+                        box-shadow: 0px 3px 6px #00000029;
+                        border-radius: 30px;
+                        padding: 15px;
+                        &.collect-container{
+                            background-color: $secondary;
+                            .segment-title{
+                                color: $text-white !important;
+                                i{
+                                    color: $text-white !important;
+                                }
+                            }
+                            .receivable-value{
+                                color: $text-white;
+                                margin: 15px 0 0 0;
+                                padding: 0;
+                                display: block;
+                                width: 100%;
+                                text-align: center;
+                                font-size: 1.7em;
+                            }
+                        }
+                        &.active-clients-container{
+                            background-color: $primary;
+                            .segment-title{
+                                color: $text-white !important;
+                                i{
+                                    color: $text-white !important;
+                                }
+                            }
+                            .active-clients-value{
+                                color: $text-white;
+                                margin: 15px 0 0 0;
+                                padding: 0;
+                                display: block;
+                                width: 100%;
+                                text-align: center;
+                                font-size: 2.5em;
+                            }
+                            .active-clients-value-licenses{
+                                color: $text-white;
+                                margin: 0;
+                                padding: 0;
+                                display: block;
+                                width: 100%;
+                                text-align: center;
+                                font-size: .9em;
+                            }
+                        }
+                    }
+                    
+                }
+                .income-outcome-graph-segment{
+                    margin: 0;
+                    padding: 15px;
+                    display: block;
+                    width: 100%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .input-date-range-container{
+                        margin: 0;
+                        padding: 0;
+                        width: 60%;
+                        text-align: right;
+                        input{
+                            display: inline-block;
+                            vertical-align: middle;
+                            width: 40%;
+                        }
+                        #income-outcome-graph-month-form-input{
+                            margin: 0 5px 0 0;
+                        }
+                        #income-outcome-graph-month-to-input{
+                            margin: 0 0 0 5px;
+                        }
+                    }
+                    #income-outcome-graph{
+                        margin: 0 0 0 0;
+                        padding: 0;
+                        display: block;
+                        width: 100% !important;
+                        height: 18vh !important;
+                    }
+                    .income-outcome-balance-container{
+                        margin: 10px 0 0 0;
+                        padding: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        gap: 20px;
+                        p{
+                            margin: 0;
+                            padding: 0;
+                            font-weight: bold;
+                            font-size: 12px;
+                            cursor: pointer;
+                        }
+                        .income-total{
+                            color: #0153FF;
+                        }
+                        .outcome-total{
+                            color: #ee6f6f;
+                        }
+                        .balance-total{
+                            color: $text-gray;
+                        }
+                    }
+                    .income-outcome-average-container{
+                        margin: 10px 0 0 0;
+                        padding: 10px 0 0 0;
+                        border-top: 1px solid #E0E0E0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        gap: 30px;
+                        .average-item{
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            .average-label{
+                                font-size: 11px;
+                                color: $text-gray;
+                                font-weight: 500;
+                            }
+                            .average-income-value{
+                                font-size: 12px;
+                                color: #0153FF;
+                                font-weight: 600;
+                            }
+                            .average-outcome-value{
+                                font-size: 12px;
+                                color: #ee6f6f;
+                                font-weight: 600;
+                            }
+                        }
+                    }
+                }
+                .due-clients-segment{
+                    margin: 0 7.5px 0 0;
+                    padding: 15px;
+                    display: block;
+                    width: 50%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 5px 0;
+                    }
+                    .due-clients-table-container{
+                        margin: 0;
+                        padding: 0 2px;
+                        display: block;
+                        width: 100%;
+                        overflow-y: auto;
+                        max-height: 200px;
+                        overflow-x: hidden;
+                        .due-clients-table{
+                            thead{
+                                tr{
+                                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                                    box-shadow: 0px 3px 6px #00000029;
+                                    position: sticky;
+                                    top: 0;
+                                    left: 0;
+                                    font-size: .9em;
+                                    th{
+                                        padding: 4px;
+                                    }
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    margin: 0;
+                                    padding: 0;
+                                    cursor: pointer;
+                                    &:hover{
+                                        td{
+                                            background-color: $background-add-row;
+                                        }
+                                    }
+                                    td{
+                                        padding: 4px;
+                                        vertical-align: middle;
+                                        transition: .3s;
+                                        p{
+                                            margin: 0;
+                                            padding: 0;
+                                            display: block;
+                                            width: 100%;
+                                            font-size: .9em;
+                                            color: $text-gray;
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                
+                            }
+                            .client-image{
+                                margin: 0 auto;
+                                padding: 0;   
+                                display: block;
+                                width: 20px; 
+                                align-self: center;
+                                border-radius: 50%;
+                            }
+                            .client-name{
+                                text-align: left;
+                                width: 50%;
+                            }
+                            .client-amount{
+                                text-align: right;
+                                width: 50%;
+                            }
+                            .client-days{
+                                text-align: right;
+                            }
+                        }
+                    }
+                }
+                .new-clients-graphic-segment{
+                    margin: 0 0 0 7.5px;
+                    padding: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    width: 50%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 5px 0;
+                        .input-date-range-container{
+                            display: none;
+                        }
+                        .calendar-icon{
+                            color: $text-gray;
+                        }
+                    }
+                    #new-clients-graph{
+                        padding: 15px 0 0 0;
+                        min-height: 70% !important;
+                    }
+                }
+                .quotation-segment{
+                    margin: 0 7.5px 0 0;
+                    padding: 15px;
+                    display: block;
+                    width: 50%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 10px 0;
+                        p{
+                            margin: 0;
+                            padding: 0;
+                            align-self: center;
+                        }
+                        .quotation-value{
+                            font-weight: 600;
+                            color: $text-gray;
+                        }
+                        .quotation-quantity{
+                            font-weight: 600;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background-color: $text-gray;
+                            color: $text-white;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            font-size: 10px;
+                        }
+                    }
+                    .quotation-table-container{
+                        margin: 0;
+                        padding: 0 2px 0 2px;
+                        display: block;
+                        width: 100%;
+                        overflow-y: auto;
+                        height: 49.8vh;
+                        overflow-x: hidden;
+                        .quotation-table{
+                            .quotation-client{
+                                text-align: left;
+                            }
+                            .quotation-amount{
+                                white-space: nowrap;
+                                text-align: right;
+                            }
+                            .quotation-action{
+                                text-align: center;
+                                a{
+                                    color: $text-gray;
+                                    margin: 0;
+                                    padding: 0;
+                                }
+                            }
+                            thead{
+                                tr{
+                                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                                    box-shadow: 0px 3px 6px #00000029;
+                                    position: sticky;
+                                    top: 0;
+                                    left: 0;
+                                    font-size: .9em;
+                                    th{
+                                        padding: 4px;
+                                    }
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    cursor: pointer;
+                                    &:hover{
+                                        td{
+                                            background-color: $background-add-row;
+                                        }
+                                    }
+                                    td{
+                                        padding: 7px 4px;
+                                        vertical-align: middle;
+                                        transition: .3s;
+                                        p{
+                                            margin: 0;
+                                            padding: 0;
+                                            display: block;
+                                            width: 100%;
+                                            font-size: .9em;
+                                            color: $text-gray;
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                
+                            }
+                            .client-image{
+                                margin: 0 auto;
+                                padding: 0;   
+                                display: block;
+                                width: 20px; 
+                                align-self: center;
+                                border-radius: 50%;
+                            }
+                            .client-name{
+                                text-align: left;
+                            }
+                            .client-amount{
+                                text-align: right;
+                            }
+                            .client-days{
+                                text-align: right;
+                            }
+                        }
+                    }
+                }
+                .approve-incomes-segment{
+                    margin: 0 0 0 7.5px;
+                    padding: 15px;
+                    display: block;
+                    width: 50%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 10px 0;
+                        p{
+                            margin: 0;
+                            padding: 0;
+                            align-self: center;
+                        }
+                        .approve-incomes-value{
+                            font-weight: 600;
+                            color: $secondary;
+                            white-space: nowrap;
+                        }
+                        .approve-incomes-quantity{
+                            font-weight: 600;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background-color: $secondary;
+                            color: $text-white;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            font-size: 10px;
+                        }
+                    }
+                    .approve-incomes-table-container{
+                        margin: 0;
+                        padding: 0 2px 0 2px;
+                        display: block;
+                        width: 100%;
+                        overflow-y: auto;
+                        height: 49.8vh;
+                        overflow-x: hidden;
+                        .approve-incomes-table{
+                            thead{
+                                tr{
+                                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                                    box-shadow: 0px 3px 6px #00000029;
+                                    position: sticky;
+                                    top: 0;
+                                    left: 0;
+                                    font-size: .9em;
+                                    th{
+                                        padding: 4px;
+                                    }
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    cursor: pointer;
+                                    &:hover{
+                                        td{
+                                            background-color: $background-add-row;
+                                        }
+                                    }
+                                    td{
+                                        padding: 7px 4px;
+                                        vertical-align: middle;
+                                        transition: .3s;
+                                        p{
+                                            margin: 0;
+                                            padding: 0;
+                                            display: block;
+                                            width: 100%;
+                                            font-size: .9em;
+                                            color: $text-gray;
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                
+                            }
+                            .approve-incomes-link{
+                                text-align: center;
+                                .approve-incomes-a{
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 25px;
+                                    height: 25px;
+                                    border-radius: 50%;
+                                    background-color: $yellow;
+                                    color: $text-white;
+                                    text-decoration: none;
+                                    margin: 0 auto;
+                                    transition: .3s;
+                                    &:hover{
+                                        transform: scale(1.1);
+                                    }
+                                    i{
+                                        margin: 0;
+                                        padding: 0;
+                                        font-size: 12px;
+                                        &:hover{
+                                            color: $text-white !important;
+                                        }
+                                    }
+                                }
+                            }
+                            .approve-incomes-client{
+                                text-align: left;
+                            }
+                            .approve-incomes-amount{
+                                text-align: right;
+                            }
+                            .approve-incomes-action{
+                                text-align: center;
+                                a{
+                                    color: $text-gray;
+                                    margin: 0;
+                                    padding: 0;
+                                }
+                            }
+                        }
+                    }
+                
+                }
+                .sales-by-month-segment{
+                    margin: 0;
+                    padding: 15px;
+                    display: block;
+                    width: 100%;
+                    height: 27.5vh;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .input-date-range-container{
+                        margin: 0;
+                        padding: 0;
+                        width: 60%;
+                        text-align: right;
+                        input{
+                            display: inline-block;
+                            vertical-align: middle;
+                            width: 40%;
+                        }
+                        #income-outcome-graph-month-form-input{
+                            margin: 0 5px 0 0;
+                        }
+                        #income-outcome-graph-month-to-input{
+                            margin: 0 0 0 5px;
+                        }
+                    }
+                    #sales-by-month-graph{
+                        margin: 15px 0 0 0;
+                        padding: 0;
+                        display: block;
+                        width: 100% !important;
+                        height: 80% !important;
+                    }
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px) {
+    #dashboard-container{
+        margin: 0;
+        padding: 0;
+        display: block;
+        width: 100%;
+        max-height: 90vh;
+        .column-container{
+            margin: 0;
+            padding: 0 0.5vw;
+            display: block;
+            width: 100%;
+            .row-container{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                .segment-header{
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    .segment-title{
+                        font-size: 15px;
+                        font-weight: 600;
+                        margin: 0;
+                        padding: 0;
+                        color: $text-gray;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        .tooltip-icon{
+                            font-size: 14px;
+                            color: $text-gray;
+                            cursor: pointer;
+                            margin-left: 2px;
+                        }
+                    }
+                    .segment-month{
+                        display: none;
+                    }
+                }
+                .income-outcome-segment{
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    width: 100%;
+                    padding: 15px;
+                    margin-bottom: 2vh;
+                    .income-number-container{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                       .value-container{
+                            margin: 0;
+                            padding: 1vh 0;
+                            text-align: center;
+                            width: 100%;
+                            display: block;
+                            .income-number{
+                                font-size: 1.7em;
+                                font-weight: 600;
+                                color: $secondary;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                .income-number-icon{
+                                    color: $secondary;
+                                    margin: 0;
+                                    padding: 0 10px 0 0;
+                                    align-self: center;
+                                }
+                            }
+                            .income-title{
+                                font-size: 1em;
+                                font-weight: 600;
+                                color: $secondary;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                display: block;
+                                width: 100%;
+                            
+                            }
+                       }
+                       .last-month-comparison-message{
+                            margin: 0;
+                            padding: 0;
+                            display: block;
+                            color: $text-gray;
+                            font-size: 0.8em;
+                            width: 100%;
+                            text-align: center;
+                            i{
+                                margin-right: 4px;
+                            }
+                       }
+                    }
+                    .outcome-number-container{
+                        margin: 0;
+                        padding: 0;
+                        display: block;
+                        width: 100%;
+                        .value-container{
+                            margin: 0;
+                            padding: 1vh 0;
+                            text-align: center;
+                            width: 100%;
+                            display: block;
+                            .outcome-number{
+                                font-size: 1.7em;
+                                font-weight: 600;
+                                color: $danger;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                .outcome-number-icon{
+                                    color: $danger;
+                                    margin: 0;
+                                    padding: 0 10px 0 0;
+                                    align-self: center;
+                                }
+                            }
+                            .outcome-title{
+                                font-size: 1em;
+                                font-weight: 600;
+                                color: $danger;
+                                margin: 0;
+                                padding: 0;
+                                align-self: center;
+                                display: block;
+                                width: 100%;
+                            }
+                        }
+                        .last-month-comparison-message{
+                            margin: 0;
+                            padding: 0;
+                            display: block;
+                            color: $text-gray;
+                            font-size: 0.8em;
+                            width: 100%;
+                            text-align: center;
+                            i{
+                                margin-right: 4px;
+                            }
+                        }
+                    }
+                }
+                .collect-active-container{
+                    width: 100%;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    .collect-active-sub-container{
+                        box-shadow: 0px 3px 6px #00000029;
+                        border-radius: 30px;
+                        padding: 15px;
+                        margin-bottom: 2vh;
+                        &.collect-container{
+                            background-color: $secondary;
+                            .segment-title{
+                                color: $text-white !important;
+                                i{
+                                    color: $text-white !important;
+                                }
+                            }
+                            .receivable-value{
+                                color: $text-white;
+                                margin: 15px 0 0 0;
+                                padding: 0;
+                                display: block;
+                                width: 100%;
+                                text-align: center;
+                                font-size: 1.7em;
+                            }
+                        }
+                        &.active-clients-container{
+                            background-color: $primary;
+                            .segment-title{
+                                color: $text-white !important;
+                                i{
+                                    color: $text-white !important;
+                                }
+                            }
+                            .active-clients-value{
+                                color: $text-white;
+                                margin: 15px 0 0 0;
+                                padding: 0;
+                                display: block;
+                                width: 100%;
+                                text-align: center;
+                                font-size: 2.5em;
+                            }
+                            .active-clients-value-licenses{
+                                color: $text-white;
+                                margin: 0;
+                                padding: 0;
+                                display: block;
+                                width: 100%;
+                                text-align: center;
+                                font-size: .9em;
+                            }
+                        }
+                    }
+                    
+                }
+                .income-outcome-graph-segment{
+                    margin: 0;
+                    padding: 0 0 2vh 0;
+                    display: block;
+                    width: 100%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .input-date-range-container{
+                        display: none;
+                    }
+                    #income-outcome-graph{
+                        margin: 15px 0 0 0;
+                        padding: 0;
+                        display: block;
+                        width: 100% !important;
+                        height: 22vh !important;
+                    }
+                    .income-outcome-balance-container{
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        justify-content: start;
+                        align-items: center;
+                        width: 100%;
+                    }
+                    .income-outcome-average-container{
+                        margin: 10px 15px 15px 15px;
+                        padding: 10px 0 0 0;
+                        border-top: 1px solid #E0E0E0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        width: calc(100% - 30px);
+                        gap: 8px;
+                        .average-item{
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            .average-label{
+                                font-size: 11px;
+                                color: $text-gray;
+                                font-weight: 500;
+                            }
+                            .average-income-value{
+                                font-size: 12px;
+                                color: #0153FF;
+                                font-weight: 600;
+                            }
+                            .average-outcome-value{
+                                font-size: 12px;
+                                color: #ee6f6f;
+                                font-weight: 600;
+                            }
+                        }
+                    }
+                }
+                .due-clients-segment{
+                    margin: 0 0 2vh 0;
+                    padding: 15px;
+                    display: block;
+                    width: 100%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 5px 0;
+                    }
+                    .due-clients-table-container{
+                        margin: 0;
+                        padding: 0 2px;
+                        display: block;
+                        width: 100%;
+                        overflow-y: auto;
+                        max-height: 200px;
+                        overflow-x: hidden;
+                        .due-clients-table{
+                            thead{
+                                tr{
+                                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                                    box-shadow: 0px 3px 6px #00000029;
+                                    position: sticky;
+                                    top: 0;
+                                    left: 0;
+                                    font-size: .9em;
+                                    th{
+                                        padding: 4px;
+                                    }
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    margin: 0;
+                                    padding: 0;
+                                    cursor: pointer;
+                                    &:hover{
+                                        td{
+                                            background-color: $background-add-row;
+                                        }
+                                    }
+                                    td{
+                                        padding: 4px;
+                                        vertical-align: middle;
+                                        transition: .3s;
+                                        p{
+                                            margin: 0;
+                                            padding: 0;
+                                            display: block;
+                                            width: 100%;
+                                            font-size: .9em;
+                                            color: $text-gray;
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                
+                            }
+                            .client-image{
+                                margin: 0 auto;
+                                padding: 0;   
+                                display: block;
+                                width: 20px; 
+                                align-self: center;
+                                border-radius: 50%;
+                            }
+                            .client-name{
+                                text-align: left;
+                                width: 50%;
+                            }
+                            .client-amount{
+                                text-align: right;
+                                width: 50%;
+                            }
+                            .client-days{
+                                text-align: right;
+                            }
+                        }
+                    }
+                }
+                .new-clients-graphic-segment{
+                    margin: 0 0 2vh 0;
+                    padding: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    width: 100%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 5px 0;
+                        .input-date-range-container{
+                            display: none;
+                        }
+                        .calendar-icon{
+                            color: $text-gray;
+                        }
+                    }
+                    #new-clients-graph{
+                        padding: 15px 0 0 0;
+                        min-height: 70% !important;
+                    }
+                }
+                .quotation-segment{
+                    margin: 0 0 2vh 0;
+                    padding: 15px;
+                    display: block;
+                    width: 100%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 10px 0;
+                        p{
+                            margin: 0;
+                            padding: 0;
+                            align-self: center;
+                        }
+                        .quotation-value{
+                            font-weight: 600;
+                            color: $text-gray;
+                        }
+                        .quotation-quantity{
+                            font-weight: 600;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background-color: $text-gray;
+                            color: $text-white;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            font-size: 10px;
+                        }
+                    }
+                    .quotation-table-container{
+                        margin: 0;
+                        padding: 0 2px 0 2px;
+                        display: block;
+                        width: 100%;
+                        overflow-y: auto;
+                        max-height: 50vh;
+                        min-height: 20vh;
+                        overflow-x: hidden;
+                        .quotation-table{
+                            .quotation-client{
+                                text-align: left;
+                            }
+                            .quotation-amount{
+                                white-space: nowrap;
+                                text-align: right;
+                            }
+                            .quotation-action{
+                                text-align: center;
+                                a{
+                                    color: $text-gray;
+                                    margin: 0;
+                                    padding: 0;
+                                }
+                            }
+                            thead{
+                                tr{
+                                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                                    box-shadow: 0px 3px 6px #00000029;
+                                    position: sticky;
+                                    top: 0;
+                                    left: 0;
+                                    font-size: .9em;
+                                    th{
+                                        padding: 4px;
+                                    }
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    cursor: pointer;
+                                    &:hover{
+                                        td{
+                                            background-color: $background-add-row;
+                                        }
+                                    }
+                                    td{
+                                        padding: 7px 4px;
+                                        vertical-align: middle;
+                                        transition: .3s;
+                                        p{
+                                            margin: 0;
+                                            padding: 0;
+                                            display: block;
+                                            width: 100%;
+                                            font-size: .9em;
+                                            color: $text-gray;
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                
+                            }
+                            .client-image{
+                                margin: 0 auto;
+                                padding: 0;   
+                                display: block;
+                                width: 20px; 
+                                align-self: center;
+                                border-radius: 50%;
+                            }
+                            .client-name{
+                                text-align: left;
+                            }
+                            .client-amount{
+                                text-align: right;
+                            }
+                            .client-days{
+                                text-align: right;
+                            }
+                        }
+                    }
+                }
+                .approve-incomes-segment{
+                    margin: 0 0 2vh 0;
+                    padding: 15px;
+                    display: block;
+                    width: 100%;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .segment-header{
+                        padding: 0 0 10px 0;
+                        p{
+                            margin: 0;
+                            padding: 0;
+                            align-self: center;
+                        }
+                        .approve-incomes-value{
+                            font-weight: 600;
+                            color: $secondary;
+                            white-space: nowrap;
+                        }
+                        .approve-incomes-quantity{
+                            font-weight: 600;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background-color: $secondary;
+                            color: $text-white;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            font-size: 10px;
+                        }
+                    }
+                    .approve-incomes-table-container{
+                        margin: 0;
+                        padding: 0 2px 0 2px;
+                        display: block;
+                        width: 100%;
+                        overflow-y: auto;
+                        max-height: 50vh;
+                        min-height: 20vh;
+                        overflow-x: hidden;
+                        .approve-incomes-table{
+                            thead{
+                                tr{
+                                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                                    box-shadow: 0px 3px 6px #00000029;
+                                    position: sticky;
+                                    top: 0;
+                                    left: 0;
+                                    font-size: .9em;
+                                    th{
+                                        padding: 4px;
+                                    }
+                                }
+                            }
+                            tbody{
+                                tr{
+                                    cursor: pointer;
+                                    &:hover{
+                                        td{
+                                            background-color: $background-add-row;
+                                        }
+                                    }
+                                    td{
+                                        padding: 7px 4px;
+                                        vertical-align: middle;
+                                        transition: .3s;
+                                        p{
+                                            margin: 0;
+                                            padding: 0;
+                                            display: block;
+                                            width: 100%;
+                                            font-size: .9em;
+                                            color: $text-gray;
+                                        }
+                                    }
+                                    
+                                    
+                                }
+                                
+                            }
+                            .approve-incomes-link{
+                                text-align: center;
+                                .approve-incomes-a{
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 25px;
+                                    height: 25px;
+                                    border-radius: 50%;
+                                    background-color: $yellow;
+                                    color: $text-white;
+                                    text-decoration: none;
+                                    margin: 0 auto;
+                                    transition: .3s;
+                                    &:hover{
+                                        transform: scale(1.1);
+                                    }
+                                    i{
+                                        margin: 0;
+                                        padding: 0;
+                                        font-size: 12px;
+                                        &:hover{
+                                            color: $text-white !important;
+                                        }
+                                    }
+                                }
+                            }
+                            .approve-incomes-client{
+                                text-align: left;
+                            }
+                            .approve-incomes-amount{
+                                text-align: right;
+                            }
+                            .approve-incomes-action{
+                                text-align: center;
+                                a{
+                                    color: $text-gray;
+                                    margin: 0;
+                                    padding: 0;
+                                }
+                            }
+                        }
+                    }
+                
+                }
+                .sales-by-month-segment{
+                    margin: 0;
+                    padding: 15px;
+                    display: block;
+                    width: 100%;
+                    height: 27.5vh;
+                    background: #FFFFFF 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    border-radius: 30px;
+                    .input-date-range-container{
+                        display: none;
+                    }
+                    #sales-by-month-graph{
+                        margin: 15px 0 0 0;
+                        padding: 0;
+                        display: block;
+                        width: 100% !important;
+                        height: 80% !important;
+                    }
+                }
+            }
+        }
+    }
+}
