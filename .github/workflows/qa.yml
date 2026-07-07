@@ -76,7 +76,9 @@ jobs:
 
     - name: Add server to known_hosts
       run: |
-        ssh-keyscan -H 35.239.181.103 >> ~/.ssh/known_hosts
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        ssh-keyscan -T 10 -H 35.239.181.103 >> ~/.ssh/known_hosts || true
 
     - name: Ensure deployment directory exists
       run: |
