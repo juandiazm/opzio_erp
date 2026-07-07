@@ -67,7 +67,7 @@ jobs:
     
     - name: Package build for deployment
       run: |
-        tar -czf build.tar.gz app bootstrap config database resources composer.json composer.lock artisan routes
+        tar -czf build.tar.gz app bootstrap config database public/build resources composer.json composer.lock artisan routes
 
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.9.0
@@ -98,9 +98,8 @@ jobs:
           echo "Public directory not found. Copying from repository..."
           scp -r ./public git@35.239.181.103:/var/www/html/opzio_erp/
         else
-          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo rm -rf /var/www/html/opzio_erp/public/css /var/www/html/opzio_erp/public/js /var/www/html/opzio_erp/public/fonts /var/www/html/opzio_erp/public/images/payment-gateways'
-          scp -r ./public/css git@35.239.181.103:/var/www/html/opzio_erp/public
-          scp -r ./public/js git@35.239.181.103:/var/www/html/opzio_erp/public
+          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo rm -rf /var/www/html/opzio_erp/public/build /var/www/html/opzio_erp/public/fonts /var/www/html/opzio_erp/public/images/payment-gateways'
+          scp -r ./public/build git@35.239.181.103:/var/www/html/opzio_erp/public
           scp -r ./public/fonts git@35.239.181.103:/var/www/html/opzio_erp/public
           ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo mkdir -p /var/www/html/opzio_erp/public/images'
           scp -r ./public/images/payment-gateways git@35.239.181.103:/var/www/html/opzio_erp/public/images/
@@ -121,17 +120,14 @@ jobs:
         ssh git@35.239.181.103 << 'EOF'
         cd /var/www/html/opzio_erp
         tar -xzf build.tar.gz
-        sudo update-alternatives --set php /usr/bin/php8.1
-        curl -sS https://getcomposer.org/installer | php
-        php8.1 composer.phar install --no-dev --optimize-autoloader
-        composer install --no-dev --optimize-autoloader
-        php8.1 artisan migrate --force
-        php8.1 artisan storage:link
-        php8.1 artisan config:clear
-        php8.1 artisan route:cache
-        php8.1 artisan view:cache
-        sudo update-alternatives --set php /usr/bin/php8.3
-        rm build.tar.gz
+        curl -sS https://getcomposer.org/installer | php8.2
+        php8.2 composer.phar install --no-dev --optimize-autoloader
+        php8.2 artisan migrate --force
+        php8.2 artisan storage:link
+        php8.2 artisan config:clear
+        php8.2 artisan route:cache
+        php8.2 artisan view:cache
+        rm build.tar.gz composer.phar
         EOF
 
     - name: Setting ownership
