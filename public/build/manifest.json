@@ -505,6 +505,12 @@
     "src": "resources/sass/client/traceability.scss",
     "isEntry": true
   },
+  "resources/sass/erp/dashboard/dashboard-overdue.scss": {
+    "file": "assets/dashboard-overdue-l0sNRNKZ.js",
+    "name": "dashboard-overdue",
+    "src": "resources/sass/erp/dashboard/dashboard-overdue.scss",
+    "isEntry": true
+  },
   "resources/sass/erp/dashboard/dashboard.scss": {
     "file": "assets/dashboard-DEne--QU.css",
     "src": "resources/sass/erp/dashboard/dashboard.scss",
