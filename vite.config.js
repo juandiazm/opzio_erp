@@ -82,7 +82,6 @@ export default defineConfig({
     'resources/sass/erp/clients/clients.scss',
     'resources/sass/erp/clients/traceability.scss',
     'resources/sass/erp/dashboard/dashboard.scss',
-    'resources/sass/erp/dashboard/dashboard.scss.backup',
     'resources/sass/erp/departments/departments.scss',
     'resources/sass/erp/employees/employees.scss',
     'resources/sass/erp/ia_assistant/ia_assistant.scss',

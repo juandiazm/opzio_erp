@@ -213,28 +213,6 @@ function GetMethodFunction(URL, SuccesfullMessage, SuccessFunction, FailFunction
 		$('#loader-icon').addClass('d-none');
 	});
 }
-function PostMethodFunction(URL, DataSend, SuccesfullMessage, SuccessFunction, FailFunction){
-	$('#loader-icon').removeClass('d-none');
-	console.log(DataSend);
-	DataSend['_token'] = token
-	$.post(URL,DataSend, function(result){
-		if(SuccesfullMessage != null){
-			alertSuccess(SuccesfullMessage);
-		}
-		if(SuccessFunction != null){
-			SuccessFunction(result);
-		}
-	}).fail(function (jqXHR, textStatus, error) {
-		if (jqXHR.responseJSON.message) {
-			alertWarning(jqXHR.responseJSON.message, 3000);
-		}
-    	if(FailFunction != null){
-			FailFunction();
-		}
-	}).always(function(){
-		$('#loader-icon').addClass('d-none');
-	});
-}
 function PostMethodFunctionWhitOutLoader(URL, DataSend, SuccesfullMessage, SuccessFunction, FailFunction){
 	DataSend['_token'] = token;
 	$.post(URL,DataSend, function(result){

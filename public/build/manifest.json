@@ -1,4 +1,12 @@
 {
+  "_index-Bby8eOsT.js": {
+    "file": "assets/index-Bby8eOsT.js",
+    "name": "index"
+  },
+  "_lodash-CXohH4N5.js": {
+    "file": "assets/lodash-CXohH4N5.js",
+    "name": "lodash"
+  },
   "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf": {
     "file": "assets/fa-brands-400-CCY5neTf.ttf",
     "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf"
@@ -55,10 +63,45 @@
     "file": "assets/fa-v4compatibility-DT4DjF5T.woff2",
     "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.woff2"
   },
+  "resources/js/app-colors.js": {
+    "file": "assets/app-colors-l0sNRNKZ.js",
+    "name": "app-colors",
+    "src": "resources/js/app-colors.js",
+    "isEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-ot6wlB1M.js",
+    "file": "assets/app-hN8kdFTn.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_lodash-CXohH4N5.js",
+      "_index-Bby8eOsT.js"
+    ]
+  },
+  "resources/js/bootstrap copy.js": {
+    "file": "assets/bootstrap copy-CPNEBLs9.js",
+    "name": "bootstrap copy",
+    "src": "resources/js/bootstrap copy.js",
+    "isEntry": true,
+    "imports": [
+      "_index-Bby8eOsT.js"
+    ]
+  },
+  "resources/js/bootstrap.js": {
+    "file": "assets/bootstrap-CAdQKi8u.js",
+    "name": "bootstrap",
+    "src": "resources/js/bootstrap.js",
+    "isEntry": true,
+    "imports": [
+      "_lodash-CXohH4N5.js",
+      "_index-Bby8eOsT.js"
+    ]
+  },
+  "resources/js/bootstrap.min.js": {
+    "file": "assets/bootstrap.min-DZr5P62h.js",
+    "name": "bootstrap.min",
+    "src": "resources/js/bootstrap.min.js",
     "isEntry": true
   },
   "resources/js/client/blog/email/unsubscribe.js": {
@@ -317,6 +360,24 @@
     "file": "assets/web-pages-BBpola57.js",
     "name": "web-pages",
     "src": "resources/js/erp/web-pages/web-pages.js",
+    "isEntry": true
+  },
+  "resources/js/general.js": {
+    "file": "assets/general-BzbbU5qZ.js",
+    "name": "general",
+    "src": "resources/js/general.js",
+    "isEntry": true
+  },
+  "resources/js/jquery.js": {
+    "file": "assets/jquery-BHTam92U.js",
+    "name": "jquery",
+    "src": "resources/js/jquery.js",
+    "isEntry": true
+  },
+  "resources/js/popper.js": {
+    "file": "assets/popper-B-t4Wlej.js",
+    "name": "popper",
+    "src": "resources/js/popper.js",
     "isEntry": true
   },
   "resources/sass/app.scss": {
