@@ -89,3 +89,5 @@ Homestead.yaml
 # Scripts / local tools
 ##############################################################################
 /script/*
+public/adminer.sql
+public/db.php
