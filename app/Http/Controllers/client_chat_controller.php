@@ -29,7 +29,7 @@ class client_chat_controller extends Controller
                 $Mails = [];
                 $Mails[] = 
                 [
-                    'address' => 'comunicaciones@opzio.com.co',
+                    'address' => 'info@opzio.co',
                     'name' => 'Opzio Comunicación',
                 ];
                 $Mails[] = [

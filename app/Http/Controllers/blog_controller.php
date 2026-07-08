@@ -45,8 +45,8 @@ class blog_controller extends Controller
                 'name' => 'mariaf.franco@opzio.com.co'
             ];
             $Mails[] = [
-                'address' => 'comunicaciones@opzio.com.co',
-                'name' => 'comunicaciones@opzio.com.co'
+                'address' => 'info@opzio.co',
+                'name' => 'info@opzio.co'
             ];
             /*
             $Mails[] = [

@@ -228,7 +228,7 @@ trait clients_trait
             //Send mail to opzio
             $Mails = [];
             $Mails[] = [
-                'address' => 'comunicaciones@opzio.com.co',
+                'address' => 'info@opzio.co',
                 'name' => 'Opzio S.A.S.'
             ];
             $MailData = 

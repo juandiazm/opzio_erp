@@ -173,7 +173,7 @@ trait income_payments_trait
                     //Send Mail to Opzio
                     $Mails = [];
                     $Mails[] = [
-                        'address' => 'comunicaciones@opzio.com.co',
+                        'address' => 'info@opzio.co',
                         'name' => 'Opzio S.A.S'
                     ];
                     $MailData = 
@@ -409,7 +409,7 @@ trait income_payments_trait
                     // Send Mail to Opzio
                     $Mails = [];
                     $Mails[] = [
-                        'address' => 'comunicaciones@opzio.com.co',
+                        'address' => 'info@opzio.co',
                         'name' => 'Opzio S.A.S'
                     ];
                     $MailData = [
