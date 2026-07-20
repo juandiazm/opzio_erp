@@ -1,27 +1,40 @@
-// Palette – sober, neutral, professional
-$primary:             #1E293B; // Slate-800  — principal
-$secondary:           #475569; // Slate-600  — secundario
-$bg-primary:          #FFFFFF; // Blanco puro
-$bg-secondary:        #F8FAFC; // Slate-50   — fondo suave
-$bg-cancel-btn:       #E2E8F0; // Slate-200  — botón cancelar
+// ── Opzio Brand Palette ────────────────────────────────────────────────────
+// Exact values extracted from official branding assets (resources/images).
+// DO NOT approximate with Tailwind/Bootstrap utility names.
+//
+//  #220245  →  deep brand purple   (primary identity)
+//  #885FAE  →  medium violet       (secondary brand tone)
+//  #F36803  →  vivid orange        (accent — signature dot, CTAs with relevance)
+//  #F2F2E8  →  warm cream          (off-white surface / logo on dark backgrounds)
+//  #FFFFFF  →  pure white          (dominant background — keep white everywhere)
+
+$primary:             #220245; // Brand deep purple
+$secondary:           #885FAE; // Brand medium violet
+$accent:              #F36803; // Brand orange — use ONLY for high-relevance actions
+$brand-cream:         #F2F2E8; // Warm off-white — subtle surfaces, not main bg
+$bg-primary:          #FFFFFF; // Pure white — dominant page background
+$bg-secondary:        #F2F2E8; // Brand cream — cards, sidebars, soft sections
+$bg-cancel-btn:       #E8E8E0; // Neutral warm gray — cancel / secondary btn
 $text-white:          #FFFFFF;
-$text-black:          #0F172A; // Slate-900  — texto principal
-$text-gray:           #64748B; // Slate-500  — texto secundario
-$text-link:           #3B82F6; // Blue-500   — enlaces
-$background-add-row:  #F1F5F9; // Slate-100
+$text-black:          #0F172A; // Near-black — body text
+$text-gray:           #64748B; // Mid gray — secondary/helper text
+$text-link:           #F36803; // Brand orange — links & inline accents
+$background-add-row:  #F2F2E8; // Brand cream — table add-row highlight
 $success:             #16A34A; // Green-600
 $yellow:              #D97706; // Amber-600
 $danger:              #DC2626; // Red-600
-$border-gray:         #CBD5E1; // Slate-300
+$border-gray:         #D4D4C8; // Warm neutral border
 $excel-color:         #16A34A; // Green-600
 // Typography
 $font-family-sans-serif: 'Rajdhani', sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
-.text-white        { color: #FFFFFF; }
-.bg-success        { background-color: $success; }
-.bg-secondary      { background-color: $secondary; }
-.bg-primary        { background-color: $primary; }
-.text-gray-primary { color: $bg-primary; }
-.text-success      { color: $success; }
+.text-white          { color: #FFFFFF; }
+.bg-success          { background-color: $success; }
+.bg-secondary        { background-color: $secondary; }
+.bg-primary          { background-color: $primary; }
+.bg-accent           { background-color: $accent; }
+.text-gray-primary   { color: $bg-primary; }
+.text-success        { color: $success; }
 .text-gray-secondary { color: $bg-secondary; }
+.text-accent         { color: $accent; }
