@@ -43,15 +43,16 @@ class db_backup extends Command
             exec($command, $output, $returnVar);
             //if(Carbon::now()->format('H') == '00'){
                 $filename_google = 'opzio_erp_'.Carbon::now()->format('d');
+                $googleFolder   = 'Departament I.T/Backups/Opzio erp';
                 //Remove files with the same name
-                $files = Storage::disk('google')->files('');
+                $files = Storage::disk('google')->files($googleFolder);
                 foreach($files as $filePath){
                     if(pathinfo($filePath, PATHINFO_FILENAME) === $filename_google){
                         Storage::disk('google')->delete($filePath);
                     }
                 }
                 $filename_google = $filename_google.'.sql';
-                Storage::disk('google')->put($filename_google, fopen($backupPath . "/" . $filename, 'r+'));
+                Storage::disk('google')->put($googleFolder.'/'.$filename_google, fopen($backupPath . "/" . $filename, 'r+'));
                 // Get all files in a directory
                 $files =   Storage::disk('backups')->allFiles();
                 // Delete Files
