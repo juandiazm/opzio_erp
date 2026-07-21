@@ -32,22 +32,26 @@ class db_backup extends Command
                 $this->Bill_SendMissingBillsNotification(2);
             }*/
             /////////////////////
+            $backupPath = storage_path() . "/backups";
+            if (!file_exists($backupPath)) {
+                mkdir($backupPath, 0755, true);
+            }
             $filename = 'opzio_erp_'.Carbon::now()->format('d').'.sql';
-            $command = "mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . "  > " . storage_path() . "/backups/" . $filename;
+            $command = "mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . "  > " . $backupPath . "/" . $filename;
             $returnVar = NULL;
             $output = NULL;
             exec($command, $output, $returnVar);
             //if(Carbon::now()->format('H') == '00'){
                 $filename_google = 'opzio_erp_'.Carbon::now()->format('d');
                 //Remove files with the same name
-                $files = collect(Storage::disk('google')->listContents());
+                $files = collect(Storage::disk('google')->listContents('', false));
                 foreach($files as $file){
                     if($file['filename'] == $filename_google){
                         Storage::disk('google')->delete($file['basename']);
                     }
                 }
                 $filename_google = $filename_google.'.sql';
-                Storage::disk('google')->put($filename_google, fopen(storage_path() . "/backups/" . $filename, 'r+'));
+                Storage::disk('google')->put($filename_google, fopen($backupPath . "/" . $filename, 'r+'));
                 // Get all files in a directory
                 $files =   Storage::disk('backups')->allFiles();
                 // Delete Files
