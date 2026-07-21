@@ -358,7 +358,7 @@ function createUser(){
             $('#nav-create .permission-input').prop('checked',false);
             container.find('#create-user-color').val('#707070');
             container.find('input').change();
-            $(container).find('.image_preview').css('display', 'inline-block');
+            $(container).find('.image_preview').attr('src', '').css('display', 'none');
             $(container).find('.image-container').css('background-image', 'none');
 	        $(container).find('.image-icon').css('display', 'inline-block');
             $(container).find('.color-icon').css('display', 'inline-block');
@@ -388,7 +388,7 @@ function showCurrentUser(){
     $('#update-user-lastname').val(current_user.lastname);
     $('#update-user-username').val(current_user.username);
     $('#update-user-email').val(current_user.email);
-    $('#update-user-img-container').css('background-image','url("/images/erp/users/'+current_user.photo+'")');
+    $('#update-user-img-container .image_preview').attr('src', '/images/erp/users/'+current_user.photo).css('display','block');
     $('#update-user-img-container .image-icon').css('display','none');
     $('#update-user-color').val(current_user.color);
     $('#update-user-color').change();

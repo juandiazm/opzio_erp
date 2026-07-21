@@ -19,7 +19,7 @@
         <div id="pay-unlogged-data-container">
             <div class="payment-header">
                 <div class="payment-header-left">
-                    <img src="/images/bussines-logo-simple-blues.png" alt="Avatar" class="avatar-img">
+                    <img src="/images/opzio-logo-compact-purple-transparent.webp" alt="Opzio" class="avatar-img">
                     <h1 id="pay-unlogged-title">Realiza tu pago</h1>
                 </div>
                 <div class="payment-header-right">
@@ -112,7 +112,7 @@
     </div>
     <div id="pay-result-container" class="align-self-center justify-content-around">
         <div id="pay-result-data-continer">
-            <!--<img src="/images/bussines-logo-simple-blues.png" alt="Avatar" class="avatar-img">-->
+            <!--<img src="/images/opzio-logo-compact-purple-transparent.webp" alt="Opzio" class="avatar-img">-->
             <i class="fas fa-5x" id="pay-result-icon"></i>
             <h1 id="pay-result-title"></h1>
             <p id="pay-result-description"></p>

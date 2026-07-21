@@ -9,7 +9,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #555555; background-color: #FFFFFF; }
         .email-wrapper { width: 100%; background-color: #FFFFFF; padding: 20px 0; }
         .email-container { max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border: 1px solid #E0E0E0; border-radius: 6px; overflow: hidden; }
-        .email-header { padding: 24px 30px; text-align: center; border-bottom: 3px solid #0153FF; }
+        .email-header { padding: 24px 30px; text-align: center; border-bottom: 3px solid #220245; }
         .email-logo-img { max-width: 180px; height: auto; display: block; margin: 0 auto; }
         .email-content { padding: 32px 30px; }
         .email-greeting { font-size: 20px; font-weight: 600; color: #1A1A1A; margin-bottom: 16px; }
@@ -21,10 +21,10 @@
         .detail-row:last-child { border-bottom: none; }
         .detail-label { font-size: 13px; color: #888888; }
         .detail-value { font-size: 13px; font-weight: 600; color: #333333; }
-        .detail-value.primary { color: #0153FF; }
+        .detail-value.primary { color: #220245; }
         .email-footer { padding: 24px 30px; text-align: center; border-top: 1px solid #E6E6E6; }
         .footer-text { font-size: 12px; color: #999999; margin-bottom: 4px; }
-        .footer-link { color: #0153FF; text-decoration: none; font-size: 12px; }
+        .footer-link { color: #220245; text-decoration: none; font-size: 12px; }
         .social-icons { margin-top: 12px; }
         .social-icon { display: inline-block; margin: 0 6px; }
         .social-icon img { height: 24px; width: auto; vertical-align: middle; }
@@ -40,7 +40,7 @@
 <div class="email-wrapper">
     <div class="email-container">
         <div class="email-header">
-            <img src="{{ asset('images/business_blues.png') }}" alt="Opzio S.A.S" class="email-logo-img">
+            <img src="{{ asset('images/opzio-logo-wide-purple-transparent.webp') }}" alt="Opzio S.A.S" class="email-logo-img">
         </div>
         <div class="email-content">
             <h1 class="email-greeting">Reporte de Marketing</h1>

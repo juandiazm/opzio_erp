@@ -162,8 +162,8 @@ function showIncomesOutcomesByMonthRange(response){
                 {
                     label: 'Ingresos',
                     data: response.data.incomes.incomes_by_month,
-                    backgroundColor: '#0153FF',
-                    borderColor: '#0153FF',
+                    backgroundColor: '#220245',
+                    borderColor: '#220245',
                     borderWidth: 1
                 },
                 {
@@ -241,7 +241,7 @@ function showNewClientsByDateRange(response){
     let ctx = document.getElementById('new-clients-graph');
     var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 100);
     gradient.addColorStop(0, '#00057B');
-    gradient.addColorStop(1, '#0153FF');
+    gradient.addColorStop(1, '#220245');
     newClientGraph = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -306,8 +306,8 @@ function showSalesByMonthRange(response){
             datasets: [{
                 label: 'Ventas',
                 data: response.data.incomes_by_month,
-                backgroundColor: '#0153FF',
-                borderColor: '#0153FF',
+                backgroundColor: '#220245',
+                borderColor: '#220245',
                 borderWidth: 1
             }]	
         },
@@ -347,7 +347,7 @@ function showIncomesByClientDateRange(response){
     
     // Colores para el gráfico de torta
     const colors = [
-        '#0153FF',
+        '#220245',
         '#4A90E2',
         '#7CB5EC',
         '#00B4D8',

@@ -1,5 +1,5 @@
 export const colorPalette = [
-    "#0153ff",  // Azul oscuro
+    "#220245",  // Azul oscuro
     "#ddd57b",  // Amarillo
     "#ff5733",  // Naranja vibrante
     "#8e44ad",  // Púrpura

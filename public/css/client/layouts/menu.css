@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -308,7 +308,7 @@
     text-decoration: none;
   }
   #menu-nav #responsive-menu #responsive-ul-nav .nav-list:hover {
-    color: #0153FF;
+    color: #220245;
   }
   #menu-nav #responsive-menu #responsive-ul-nav .nav-list span {
     font-size: 18px;

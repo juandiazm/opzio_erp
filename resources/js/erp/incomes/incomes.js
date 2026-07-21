@@ -864,10 +864,10 @@ function changePayState(){
             title: '<span style="color:#484848 !important;">Pago</span>',
             html: '¿Está a punto de cambiar el estado de pago de este ingreso a pagado?<br><br><div class="form-check d-flex justify-content-center align-items-center gap-2"><input class="form-check-input mt-0" type="checkbox" id="swal-notify-client"><label class="form-check-label" for="swal-notify-client">Enviar correo de agradecimiento</label></div>',
             icon: 'success',
-            iconColor: '#0153FF',
+            iconColor: '#220245',
             showConfirmButton: true,
             confirmButtonText: 'Si, cambiar',
-            confirmButtonColor: '#0153FF',
+            confirmButtonColor: '#220245',
             showCancelButton: true,
             cancelButtonColor: '#C4C4C4',
             cancelButtonText: 'No, Cancelar',
@@ -1058,7 +1058,7 @@ function goToIncomesTraceability(search){
 function getImportAssistantsExcel() {
     if (!$('#import-report-excel-icon').hasClass('fa-bounce')) {
         swallMessage(
-            '<i class="fas fa-file-excel" style="font-size:100px; color:#0153FF; margin-bottom:1vh;"></i><br>Importar ingresos', 'Asegúrate de usar la plantilla oficial para que el proceso se realice correctamente.<br>Si aún no tienes la plantilla, puedes descargarla haciendo clic en el botón.<a href="/admin/incomes/download-template" id="download-assistant-template" target="_blank">Descargar plantilla <i class="fas fa-download"></i></a></a>¿deseas continuar?', null, 'Importar', 'Cancelar', null,
+            '<i class="fas fa-file-excel" style="font-size:100px; color:#220245; margin-bottom:1vh;"></i><br>Importar ingresos', 'Asegúrate de usar la plantilla oficial para que el proceso se realice correctamente.<br>Si aún no tienes la plantilla, puedes descargarla haciendo clic en el botón.<a href="/admin/incomes/download-template" id="download-assistant-template" target="_blank">Descargar plantilla <i class="fas fa-download"></i></a></a>¿deseas continuar?', null, 'Importar', 'Cancelar', null,
             function () {
                 $('#import-report-excel-input').click();
             },
@@ -1313,11 +1313,11 @@ function deleteAdvance(){
         title: '<span style="color:#484848 !important;">Eliminar Abono</span>',
         html: '¿Está seguro de eliminar este abono?',
         icon: 'warning',
-        iconColor: '#0153FF',
+        iconColor: '#220245',
         showCancelButton: true,
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#0153FF',
+        confirmButtonColor: '#220245',
         cancelButtonColor: '#C4C4C4',
         reverseButtons: true,
         width: ((window.innerWidth > 768) ? '768px' : '90%'),

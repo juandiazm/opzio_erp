@@ -193,7 +193,7 @@
                         margin: 0 0 0 auto;
                         padding: 10px;
                         display: block;
-                        color: $secondary;
+                        color: $primary;
                         font-size: 30px;
                         margin-top: 1vh;
                         width: min-content;
@@ -205,7 +205,7 @@
                         .update-license-button{
                             box-shadow: 0px 3px 6px #00000029;
                             border-radius: 40px;
-                            color: $secondary;
+                            color: $primary;
                             padding: 10px 35px;
                             margin-right: 10px;
                             background-color: #FAFAFA;
@@ -223,7 +223,7 @@
             #create-income-button{
                 margin: 0 0 0 auto;
                 display: block;
-                background-color: $secondary;
+                background-color: $primary;
                 color: $bg-primary;
                 font-size: 1em;
             }
@@ -356,7 +356,7 @@
                         margin: 0 0 0 auto;
                         padding: 10px;
                         display: block;
-                        color: $secondary;
+                        color: $primary;
                         font-size: 30px;
                         margin-top: 1vh;
                         width: min-content;
@@ -368,7 +368,7 @@
                         .update-license-button{
                             box-shadow: 0px 3px 6px #00000029;
                             border-radius: 40px;
-                            color: $secondary;
+                            color: $primary;
                             padding: 10px 35px;
                             margin-right: 10px;
                             background-color: #FAFAFA;
@@ -385,7 +385,7 @@
             }
             #update-income-button{
                 margin: 0;
-                background-color: $secondary;
+                background-color: $primary;
                 color: $bg-primary;
                 font-size: 1em;
                 &:hover{
@@ -405,7 +405,7 @@
                 }
             }
             #view-income-document{
-                background-color: $secondary;
+                background-color: $primary;
                 padding: 12px 35px;
                 color: $text-white;
                 font-size: 1em;
@@ -727,7 +727,7 @@
                         margin: 0 0 0 auto;
                         padding: 10px;
                         display: block;
-                        color: $secondary;
+                        color: $primary;
                         font-size: 30px !important;
                         margin-top: 1vh;
                         width: min-content;
@@ -739,7 +739,7 @@
                         .update-license-button{
                             box-shadow: 0px 3px 6px #00000029;
                             border-radius: 40px;
-                            color: $secondary;
+                            color: $primary;
                             padding: 10px 35px;
                             margin-right: 10px;
                             background-color: #FAFAFA;
@@ -757,7 +757,7 @@
             #create-income-button{
                 margin: 0 0 0 auto;
                 display: block;
-                background-color: $secondary;
+                background-color: $primary;
                 color: $bg-primary;
                 font-size: 1em;
             }
@@ -884,7 +884,7 @@
                         margin: 0 0 0 auto;
                         padding: 10px;
                         display: block;
-                        color: $secondary;
+                        color: $primary;
                         font-size: 30px;
                         margin-top: 1vh;
                         width: min-content;
@@ -896,7 +896,7 @@
                         .update-license-button{
                             box-shadow: 0px 3px 6px #00000029;
                             border-radius: 40px;
-                            color: $secondary;
+                            color: $primary;
                             padding: 10px 35px;
                             margin-right: 10px;
                             background-color: #FAFAFA;
@@ -913,7 +913,7 @@
             }
             #update-income-button{
                 margin: 0;
-                background-color: $secondary;
+                background-color: $primary;
                 color: $bg-primary;
                 font-size: 1em;
                 &:hover{
@@ -933,7 +933,7 @@
                 }
             }
             #view-income-document{
-                background-color: $secondary;
+                background-color: $primary;
                 padding: 12px 35px;
                 color: $text-white;
                 font-size: 1em;
@@ -1073,7 +1073,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid #0153FF;
+    border: 1px solid #220245;
     border-radius: 50px;
     gap: 5px;
     cursor: pointer;
@@ -1087,17 +1087,17 @@
 
 #import-report-excel-container #import-report-excel-icon {
     font-size: 17px;
-    color: #0153FF;
+    color: #220245;
 }
 
 #import-report-excel-container #import-report-excel-icon:hover {
-    color: #0153FF !important;
+    color: #220245 !important;
 }
 
 #import-report-excel-container #import-report-excel-text {
     display: none;
     transition: .3s;
-    color: #0153FF;
+    color: #220245;
 }
 
 #import-report-excel-container:hover {
@@ -1114,7 +1114,7 @@
     padding: 0;
     display: block;
     width: 100%;
-    color: #0153FF;
+    color: #220245;
     text-decoration: underline;
 }
 

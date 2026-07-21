@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -109,7 +109,7 @@
     color: #ffffff;
   }
   #login-container #login-centered #login-data-container #register-container #register-link {
-    color: #0153FF;
+    color: #220245;
     text-decoration: underline;
   }
 }
@@ -196,7 +196,7 @@
     color: #ffffff;
   }
   #login-container #login-centered #login-data-container #register-container #register-link {
-    color: #0153FF;
+    color: #220245;
     text-decoration: underline;
   }
 }

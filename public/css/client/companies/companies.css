@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -41,7 +41,7 @@
     color: #707070;
   }
   #companies-container #header-container #update-client-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #companies-container #header-container #update-client-verification i:hover {
@@ -100,7 +100,7 @@
     bottom: 0vw;
     right: 0vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -162,7 +162,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -216,7 +216,7 @@
     font-size: 1.1em;
   }
   #companies-container #sub-nav-documents #client-documents-table #client-documents-table-body .client-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }
@@ -231,7 +231,7 @@
     font-size: 1.1em;
   }
   #companies-container #sub-nav-documents #client-licenses-table #client-licenses-table-body .client-license-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }
@@ -257,7 +257,7 @@
     color: #707070;
   }
   #companies-container #header-container #update-client-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #companies-container #header-container #update-client-verification i:hover {
@@ -316,7 +316,7 @@
     bottom: 0vw;
     right: 0vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -378,7 +378,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -432,7 +432,7 @@
     font-size: 1.1em;
   }
   #companies-container #sub-nav-documents #client-documents-table #client-documents-table-body .client-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }
@@ -447,7 +447,7 @@
     font-size: 1.1em;
   }
   #companies-container #sub-nav-documents #client-licenses-table #client-licenses-table-body .client-license-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }

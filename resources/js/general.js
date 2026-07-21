@@ -497,7 +497,7 @@ function alertSuccess(text, duration = 3000){
 		,gravity: "bottom"
 		, style: {
 			background: "#FFFFFF",
-			color: "#0153FF"
+			color: "#220245"
 		}}
 		).showToast();
 }
@@ -524,7 +524,7 @@ function alertWarning(text, duration = 3000){
 				).showToast();
 }
 function swallMessage(title, text, icon, confirmMessage=null, cancelMessage=null, timer=null, confirmCallback=null, cancelCallback=null) {
-	let confirmButtonColor = '#0153FF';
+	let confirmButtonColor = '#220245';
 	if(icon == 'error'){
 		confirmButtonColor = '#C90D0D';
 	}

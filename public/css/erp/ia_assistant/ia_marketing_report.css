@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -121,7 +121,7 @@
 .ia-select:focus,
 .ia-input:focus {
   outline: none;
-  border-color: #0153FF;
+  border-color: #220245;
 }
 
 .ia-client-dropdown {
@@ -143,7 +143,7 @@
 }
 .ia-client-trigger:hover, .ia-client-trigger:focus {
   outline: none;
-  border-color: #0153FF;
+  border-color: #220245;
 }
 .ia-client-trigger__text {
   flex: 1;
@@ -217,7 +217,7 @@
 }
 .ia-client-option--active {
   background-color: #e6edff;
-  color: #0153FF;
+  color: #220245;
   font-weight: 600;
 }
 
@@ -235,7 +235,7 @@
 }
 .ia-textarea:focus {
   outline: none;
-  border-color: #0153FF;
+  border-color: #220245;
 }
 
 .ia-dropzone {
@@ -248,12 +248,12 @@
   position: relative;
 }
 .ia-dropzone:hover, .ia-dropzone--over {
-  border-color: #0153FF;
+  border-color: #220245;
   background-color: #f0f4ff;
 }
 .ia-dropzone__icon {
   font-size: 24px;
-  color: #0153FF;
+  color: #220245;
   margin-bottom: 6px;
   display: block;
 }
@@ -268,7 +268,7 @@
   margin: 0;
 }
 .ia-dropzone__link {
-  color: #0153FF;
+  color: #220245;
   font-weight: 600;
 }
 .ia-dropzone__input {
@@ -277,7 +277,7 @@
 
 .ia-file-name {
   font-size: 11px;
-  color: #0153FF;
+  color: #220245;
   margin: 6px 0 0 0;
   font-weight: 600;
   word-break: break-all;
@@ -304,7 +304,7 @@
   transform: translateY(-1px);
 }
 .ia-btn--primary {
-  background-color: #0153FF;
+  background-color: #220245;
   color: #fff;
   width: 100%;
   justify-content: center;
@@ -371,7 +371,7 @@
 }
 .ia-history-item__turns {
   font-size: 11px;
-  color: #0153FF;
+  color: #220245;
   margin: 0;
 }
 
@@ -449,7 +449,7 @@
 }
 .ia-loading-state__icon {
   font-size: 48px;
-  color: #0153FF;
+  color: #220245;
   margin-bottom: 16px;
 }
 .ia-loading-state__text {
@@ -492,7 +492,7 @@
   padding: 3px 10px;
   border-radius: 20px;
   background-color: #e6edff;
-  color: #0153FF;
+  color: #220245;
   white-space: nowrap;
 }
 
@@ -520,7 +520,7 @@
 .ia-section__title {
   font-size: 13px;
   font-weight: 700;
-  color: #0153FF;
+  color: #220245;
   margin: 0 0 8px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -550,7 +550,7 @@
 .ia-metric-value {
   font-size: 18px;
   font-weight: 700;
-  color: #0153FF;
+  color: #220245;
   margin: 0;
 }
 
@@ -572,7 +572,7 @@
   font-size: 12px;
 }
 .ia-table thead {
-  background-color: #0153FF;
+  background-color: #220245;
   color: #fff;
 }
 .ia-table thead th {

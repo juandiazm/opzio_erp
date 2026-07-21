@@ -44,7 +44,7 @@ function showCurrentUser(){
     $('#update-user-lastname').val(current_user.lastname);
     $('#update-user-username').val(current_user.username);
     $('#update-user-email').val(current_user.email);
-    $('#update-user-img-container').css('background-image','url("/images/erp/users/'+current_user.photo+'")');
+    $('#update-user-img-container .image_preview').attr('src', '/images/erp/users/'+current_user.photo).css('display','block');
     $('#update-user-img-container .image-icon').css('display','none');
     $('#update-user-color').val(current_user.color);
     $('#update-user-color').change();

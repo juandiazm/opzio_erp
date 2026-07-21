@@ -88,12 +88,12 @@
                             .income-number{
                                 font-size: 1.7em;
                                 font-weight: 600;
-                                color: $secondary;
+                                color: $primary;
                                 margin: 0;
                                 padding: 0;
                                 align-self: center;
                                 .income-number-icon{
-                                    color: $secondary;
+                                    color: $primary;
                                     margin: 0;
                                     padding: 0 10px 0 0;
                                     align-self: center;
@@ -102,7 +102,7 @@
                             .income-title{
                                 font-size: 1em;
                                 font-weight: 600;
-                                color: $secondary;
+                                color: $primary;
                                 margin: 0;
                                 padding: 0;
                                 align-self: center;
@@ -185,7 +185,7 @@
                         border-radius: 30px;
                         padding: 15px;
                         &.collect-container{
-                            background-color: $secondary;
+                            background-color: $primary;
                             .segment-title{
                                 color: $text-white !important;
                                 i{
@@ -280,7 +280,7 @@
                             cursor: pointer;
                         }
                         .income-total{
-                            color: #0153FF;
+                            color: #220245;
                         }
                         .outcome-total{
                             color: #ee6f6f;
@@ -309,7 +309,7 @@
                             }
                             .average-income-value{
                                 font-size: 12px;
-                                color: #0153FF;
+                                color: #220245;
                                 font-weight: 600;
                             }
                             .average-outcome-value{
@@ -466,7 +466,7 @@
                             padding: 0;
                             font-size: 1em;
                             font-weight: bold;
-                            color: #0153FF;
+                            color: #220245;
                             cursor: pointer;
                         }
                     }
@@ -613,7 +613,7 @@
                         }
                         .approve-incomes-value{
                             font-weight: 600;
-                            color: $secondary;
+                            color: $primary;
                             white-space: nowrap;
                         }
                         .approve-incomes-quantity{
@@ -621,7 +621,7 @@
                             width: 20px;
                             height: 20px;
                             border-radius: 50%;
-                            background-color: $secondary;
+                            background-color: $primary;
                             color: $text-white;
                             display: flex;
                             justify-content: center;
@@ -844,14 +844,14 @@
                             .income-number{
                                 font-size: 1.8em; // Más grande y legible
                                 font-weight: 700;
-                                color: $secondary;
+                                color: $primary;
                                 margin: 0;
                                 padding: 0;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
                                 .income-number-icon{
-                                    color: $secondary;
+                                    color: $primary;
                                     margin: 0 8px 0 0;
                                     font-size: 0.85em;
                                 }
@@ -859,7 +859,7 @@
                             .income-title{
                                 font-size: 0.95em;
                                 font-weight: 600;
-                                color: $secondary;
+                                color: $primary;
                                 margin: 6px 0 0 0;
                                 padding: 0;
                                 display: block;
@@ -947,7 +947,7 @@
                         flex-direction: column;
                         justify-content: space-between;
                         &.collect-container{
-                            background-color: $secondary;
+                            background-color: $primary;
                             .segment-header{
                                 margin-bottom: 8px;
                             }
@@ -1048,7 +1048,7 @@
                             }
                         }
                         .income-total{
-                            color: #0153FF;
+                            color: #220245;
                         }
                         .outcome-total{
                             color: #ee6f6f;
@@ -1080,7 +1080,7 @@
                             }
                             .average-income-value{
                                 font-size: 13px;
-                                color: #0153FF;
+                                color: #220245;
                                 font-weight: 700;
                             }
                             .average-outcome-value{
@@ -1140,7 +1140,7 @@
                                     cursor: pointer;
                                     transition: background-color 0.2s;
                                     &:active{
-                                        background-color: rgba($secondary, 0.08); // Feedback táctil
+                                        background-color: rgba($primary, 0.08); // Feedback táctil
                                     }
                                     &:hover{
                                         td{
@@ -1183,7 +1183,7 @@
                                 text-align: right;
                                 width: 35%;
                                 font-weight: 600;
-                                color: $secondary !important;
+                                color: $primary !important;
                             }
                             .client-days{
                                 text-align: center;
@@ -1247,14 +1247,14 @@
                             padding: 8px 16px;
                             font-size: 1.05em;
                             font-weight: 700;
-                            color: #0153FF;
-                            background-color: rgba(1, 83, 255, 0.08);
+                            color: #220245;
+                            background-color: rgba(34, 2, 69, 0.08);
                             border-radius: 12px;
                             cursor: pointer;
                             transition: all 0.2s;
                             &:active{
                                 transform: scale(0.96);
-                                background-color: rgba(1, 83, 255, 0.12);
+                                background-color: rgba(34, 2, 69, 0.12);
                             }
                         }
                     }
@@ -1426,7 +1426,7 @@
                         }
                         .approve-incomes-value{
                             font-weight: 600;
-                            color: $secondary;
+                            color: $primary;
                             white-space: nowrap;
                             font-size: 13px;
                         }
@@ -1435,7 +1435,7 @@
                             width: 22px;
                             height: 22px;
                             border-radius: 50%;
-                            background-color: $secondary;
+                            background-color: $primary;
                             color: $text-white;
                             display: flex;
                             justify-content: center;
@@ -1481,7 +1481,7 @@
                                     cursor: pointer;
                                     transition: background-color 0.2s;
                                     &:active{
-                                        background-color: rgba($secondary, 0.08);
+                                        background-color: rgba($primary, 0.08);
                                     }
                                     &:hover{
                                         td{

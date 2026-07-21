@@ -36357,7 +36357,7 @@ readers do not read off random characters that represent icons */
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -36407,7 +36407,7 @@ readers do not read off random characters that represent icons */
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
   --bs-primary: #00057B;
-  --bs-secondary: #0153FF;
+  --bs-secondary: #220245;
   --bs-success: #1bcc5a;
   --bs-info: #0dcaf0;
   --bs-warning: #F6AA1C;
@@ -39398,8 +39398,8 @@ textarea.form-control-lg {
 
 .btn-secondary {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #0153FF;
-  --bs-btn-border-color: #0153FF;
+  --bs-btn-bg: #220245;
+  --bs-btn-border-color: #220245;
   --bs-btn-hover-color: #fff;
   --bs-btn-hover-bg: #0147d9;
   --bs-btn-hover-border-color: #0142cc;
@@ -39409,8 +39409,8 @@ textarea.form-control-lg {
   --bs-btn-active-border-color: #013ebf;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   --bs-btn-disabled-color: #fff;
-  --bs-btn-disabled-bg: #0153FF;
-  --bs-btn-disabled-border-color: #0153FF;
+  --bs-btn-disabled-bg: #220245;
+  --bs-btn-disabled-border-color: #220245;
 }
 
 .btn-success {
@@ -39533,19 +39533,19 @@ textarea.form-control-lg {
 }
 
 .btn-outline-secondary {
-  --bs-btn-color: #0153FF;
-  --bs-btn-border-color: #0153FF;
+  --bs-btn-color: #220245;
+  --bs-btn-border-color: #220245;
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #0153FF;
-  --bs-btn-hover-border-color: #0153FF;
+  --bs-btn-hover-bg: #220245;
+  --bs-btn-hover-border-color: #220245;
   --bs-btn-focus-shadow-rgb: 1, 83, 255;
   --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: #0153FF;
-  --bs-btn-active-border-color: #0153FF;
+  --bs-btn-active-bg: #220245;
+  --bs-btn-active-border-color: #220245;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --bs-btn-disabled-color: #0153FF;
+  --bs-btn-disabled-color: #220245;
   --bs-btn-disabled-bg: transparent;
-  --bs-btn-disabled-border-color: #0153FF;
+  --bs-btn-disabled-border-color: #220245;
   --bs-gradient: none;
 }
 
@@ -48482,8 +48482,8 @@ input[type=number] {
   color: #fff;
 }
 .btn-primary:hover, .btn-primary:focus {
-  background-color: #0153FF;
-  border: 1px solid #0153FF;
+  background-color: #220245;
+  border: 1px solid #220245;
 }
 
 .btn-success {
@@ -48507,7 +48507,7 @@ i {
   cursor: pointer;
 }
 i:hover, i:focus {
-  color: #0153FF;
+  color: #220245;
 }
 
 .general-padding {
@@ -48547,7 +48547,7 @@ i:hover, i:focus {
   transition: 0.3s;
 }
 .image-container:hover, .image-container:focus, .image-container:hover .image-title, .image-container:focus .image-title {
-  color: #0153FF;
+  color: #220245;
 }
 
 .image-title {
@@ -48678,7 +48678,7 @@ table .action-cell i {
   color: #707070;
 }
 table .action-cell i:hover {
-  color: #0153FF;
+  color: #220245;
 }
 
 .form-switch .form-check-input {
@@ -48686,8 +48686,8 @@ table .action-cell i:hover {
   cursor: pointer;
 }
 .form-switch .form-check-input:checked {
-  background-color: #0153FF !important;
-  border-color: #0153FF !important;
+  background-color: #220245 !important;
+  border-color: #220245 !important;
 }
 
 .toggle-container {
@@ -48743,7 +48743,7 @@ i {
   transition: 0.3s;
 }
 i:hover, i:focus {
-  color: #0153FF;
+  color: #220245;
 }
 i.fa-trash-can:hover {
   color: #C90D0D !important;
@@ -48779,8 +48779,8 @@ tr.deleted td:not(:last-child) {
 }
 .selected.state-2, :hover.state-2 {
   color: #F2F2F2;
-  border: 1px solid #0153FF !important;
-  background-color: #0153FF;
+  border: 1px solid #220245 !important;
+  background-color: #220245;
 }
 .selected.state-3, :hover.state-3 {
   color: #F2F2F2;

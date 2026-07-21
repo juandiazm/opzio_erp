@@ -344,7 +344,7 @@
             {{-- Top meta bar --}}
             <div class="cover-top-meta">
                 <div class="opzio-brand">
-                    <img src="data:image/webp;base64,{{ base64_encode(file_get_contents(public_path('images/bussines-logo-rounded.webp'))) }}" alt="Opzio S.A.S">
+                    <img src="data:image/webp;base64,{{ base64_encode(file_get_contents(public_path('images/opzio-monogram-circle-purple-bg.webp'))) }}" alt="Opzio S.A.S">
                     <p class="opzio-name">Opzio S.A.S</p>
                     <p class="opzio-sub">Equipo de Marketing</p>
                 </div>

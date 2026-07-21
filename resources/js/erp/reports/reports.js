@@ -366,7 +366,7 @@ function showOutcomesReportData(response) {
                 data: Object.values(response.data.report).map(entry => entry.total),
                 borderWidth: 1,
                 borderRadius: 10,
-                backgroundColor:['#0153ff']
+                backgroundColor:['#220245']
             }]
         },
         options: {

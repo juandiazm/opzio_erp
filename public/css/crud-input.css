@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -63,7 +63,7 @@
 .crud-input-container .crud-list .crud-item-add {
   margin: 0;
   padding: 0 0 0 3px;
-  background-color: rgba(1, 83, 255, 0.1);
+  background-color: rgba(34, 2, 69, 0.1);
   position: sticky;
   top: 0;
   left: 0;

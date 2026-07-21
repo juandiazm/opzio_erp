@@ -86,7 +86,7 @@
                 text-align: right;
             }
             #timely_payment{
-                background: #0153FF 0% 0% no-repeat padding-box;
+                background: #220245 0% 0% no-repeat padding-box;
                 border-radius: 6px;
                 color: #fff !important;
                 padding: 7px 10px !important;
@@ -233,14 +233,14 @@
                 margin: 0;
                 padding: 2px 0;
                 font-size: 13px;
-                color: #0153FF;
+                color: #220245;
                 text-decoration: none;
             }
             #feed-container #feed-email{
                 margin: 0;
                 padding: 2px 0;
                 font-size: 13px;
-                color: #0153FF;
+                color: #220245;
             }
             #bank-data-container p{
                 text-align: right;
@@ -359,7 +359,7 @@
             @endif
             <div id="general-container">
                 <div id="header-container" class="container border-botton">
-                    <img src="{{ $Data['public_path'].'images/business_blues.webp' }}" alt="Opzio S.A.S" id="opzio-logo"/>
+                    <img src="{{ $Data['public_path'].'images/opzio-logo-wide-purple-transparent.webp' }}" alt="Opzio S.A.S" id="opzio-logo"/>
                     <div id="opzio-data-container">
                         <p class="title">Opzio S.A.S</p>
                         <br>
@@ -463,7 +463,7 @@
                 @endif
                 <div id="feed-container">
                     <div class="feed-sub-contianer">
-                    <img src="{{ $Data['public_path'].'images/bussines-logo-rounded.webp'}}" alt="Opzio S.A.S" id="opzio-logo-feed"/>
+                    <img src="{{ $Data['public_path'].'images/opzio-monogram-circle-purple-bg.webp'}}" alt="Opzio S.A.S" id="opzio-logo-feed"/>
                         <div id="feed-text-container">
                             <p id="feed-department"><strong>Departamento Comercial</strong></p>
                             <p id="feed-email">{{  session('user')==null?'':session('user')['email'] }}</p>

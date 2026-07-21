@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -168,7 +168,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -187,7 +187,7 @@
     transition: 0.3s;
   }
   #nav-view #view-inputs-container #balance-button:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-view #view-inputs-container #balance-button:hover i {
     color: #ffffff;
@@ -226,7 +226,7 @@
     border-radius: 40px;
   }
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-go-traceability:hover i {
     color: #ffffff;
@@ -234,7 +234,7 @@
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-delete {
     padding: 7px 15px;
@@ -335,7 +335,7 @@
     font-size: 1.1em;
   }
   #nav-view #sub-nav-documents #license-documents-table #license-documents-table-body .license-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }
@@ -518,7 +518,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -537,7 +537,7 @@
     transition: 0.3s;
   }
   #nav-view #view-inputs-container #balance-button:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-view #view-inputs-container #balance-button:hover i {
     color: #ffffff;
@@ -576,7 +576,7 @@
     border-radius: 40px;
   }
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-go-traceability:hover i {
     color: #ffffff;
@@ -584,7 +584,7 @@
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-view #view-inputs-container #license-sub-opt-container #view-license-delete {
     padding: 7px 15px;
@@ -685,7 +685,7 @@
     font-size: 1.1em;
   }
   #nav-view #sub-nav-documents #license-documents-table #license-documents-table-body .license-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }

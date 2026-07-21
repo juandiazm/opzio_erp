@@ -7,6 +7,6 @@
 @endsection
 @section('client-app-content')
 <div id="dashboard-container" class="d-flex justify-content-center">
-    <img src="{{ asset('images/business_blues.webp') }}" alt="dashboard" class="align-self-center" id="dashboard-logo">
+    <img src="{{ asset('images/opzio-logo-wide-purple-transparent.webp') }}" alt="dashboard" class="align-self-center" id="dashboard-logo">
 </div>
 @endsection

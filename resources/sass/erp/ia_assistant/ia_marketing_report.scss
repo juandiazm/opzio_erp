@@ -101,7 +101,7 @@
 
     &:focus {
         outline: none;
-        border-color: $secondary;
+        border-color: $primary;
     }
 }
 
@@ -126,7 +126,7 @@
     &:hover,
     &:focus {
         outline: none;
-        border-color: $secondary;
+        border-color: $primary;
     }
 
     &__text {
@@ -205,7 +205,7 @@
 
     &--active {
         background-color: #e6edff;
-        color: $secondary;
+        color: $primary;
         font-weight: 600;
     }
 }
@@ -225,7 +225,7 @@
 
     &:focus {
         outline: none;
-        border-color: $secondary;
+        border-color: $primary;
     }
 }
 
@@ -241,13 +241,13 @@
 
     &:hover,
     &--over {
-        border-color: $secondary;
+        border-color: $primary;
         background-color: #f0f4ff;
     }
 
     &__icon {
         font-size: 24px;
-        color: $secondary;
+        color: $primary;
         margin-bottom: 6px;
         display: block;
     }
@@ -265,7 +265,7 @@
     }
 
     &__link {
-        color: $secondary;
+        color: $primary;
         font-weight: 600;
     }
 
@@ -276,7 +276,7 @@
 
 .ia-file-name {
     font-size: 11px;
-    color: $secondary;
+    color: $primary;
     margin: 6px 0 0 0;
     font-weight: 600;
     word-break: break-all;
@@ -306,7 +306,7 @@
     }
 
     &--primary {
-        background-color: $secondary;
+        background-color: $primary;
         color: #fff;
         width: 100%;
         justify-content: center;
@@ -380,7 +380,7 @@
 
     &__turns {
         font-size: 11px;
-        color: $secondary;
+        color: $primary;
         margin: 0;
     }
 }
@@ -466,7 +466,7 @@
 
     &__icon {
         font-size: 48px;
-        color: $secondary;
+        color: $primary;
         margin-bottom: 16px;
     }
 
@@ -513,7 +513,7 @@
     padding: 3px 10px;
     border-radius: 20px;
     background-color: #e6edff;
-    color: $secondary;
+    color: $primary;
     white-space: nowrap;
 }
 
@@ -541,7 +541,7 @@
     &__title {
         font-size: 13px;
         font-weight: 700;
-        color: $secondary;
+        color: $primary;
         margin: 0 0 8px 0;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -574,7 +574,7 @@
 .ia-metric-value {
     font-size: 18px;
     font-weight: 700;
-    color: $secondary;
+    color: $primary;
     margin: 0;
 }
 
@@ -597,7 +597,7 @@
     font-size: 12px;
 
     thead {
-        background-color: $secondary;
+        background-color: $primary;
         color: #fff;
 
         th {

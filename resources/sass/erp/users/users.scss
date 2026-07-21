@@ -90,11 +90,21 @@
                     width: 70px;
                     height: 70px;
                     margin: 0 auto;
+                    overflow: hidden;
                     transition: .3s;
                     .image-icon, .color-icon{
                         font-size: 25px;
                         color: $text-gray;
                         transition: .3s;
+                    }
+                    .image_preview{
+                        display: none;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        object-position: center;
+                        border-radius: 50%;
+                        image-orientation: from-image;
                     }
                 }
                 
@@ -103,7 +113,7 @@
                     bottom: 0;
                     right: 0;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;
@@ -162,7 +172,7 @@
                 transition: .3s;
                 border-radius: 40px;
                 &:hover{
-                    background-color: $secondary;
+                    background-color: $primary;
                     i{
                         color: $text-white;
                     }
@@ -170,7 +180,7 @@
                 i{
                     font-size: 1.5em;
                     transition: .3s;
-                    color: $secondary;
+                    color: $primary;
                 
                 }
             }
@@ -255,11 +265,21 @@
                     width: 70px;
                     height: 70px;
                     margin: 0 auto;
+                    overflow: hidden;
                     transition: .3s;
                     .image-icon, .color-icon{
                         font-size: 25px;
                         color: $text-gray;
                         transition: .3s;
+                    }
+                    .image_preview{
+                        display: none;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        object-position: center;
+                        border-radius: 50%;
+                        image-orientation: from-image;
                     }
                 }
                 
@@ -268,7 +288,7 @@
                     bottom: 0;
                     right: 0;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;
@@ -419,11 +439,21 @@
                     width: 70px;
                     height: 70px;
                     margin: 0 auto;
+                    overflow: hidden;
                     transition: .3s;
                     .image-icon, .color-icon{
                         font-size: 25px;
                         color: $text-gray;
                         transition: .3s;
+                    }
+                    .image_preview{
+                        display: none;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        object-position: center;
+                        border-radius: 50%;
+                        image-orientation: from-image;
                     }
                 }
                 
@@ -432,7 +462,7 @@
                     bottom: 0;
                     right: 0;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;
@@ -491,7 +521,7 @@
                 transition: .3s;
                 border-radius: 40px;
                 &:hover{
-                    background-color: $secondary;
+                    background-color: $primary;
                     i{
                         color: $text-white;
                     }
@@ -499,7 +529,7 @@
                 i{
                     font-size: 1.5em;
                     transition: .3s;
-                    color: $secondary;
+                    color: $primary;
                 
                 }
             }
@@ -584,11 +614,21 @@
                     width: 70px;
                     height: 70px;
                     margin: 0 auto;
+                    overflow: hidden;
                     transition: .3s;
                     .image-icon, .color-icon{
                         font-size: 25px;
                         color: $text-gray;
                         transition: .3s;
+                    }
+                    .image_preview{
+                        display: none;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        object-position: center;
+                        border-radius: 50%;
+                        image-orientation: from-image;
                     }
                 }
                 
@@ -597,7 +637,7 @@
                     bottom: 0;
                     right: 0;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;

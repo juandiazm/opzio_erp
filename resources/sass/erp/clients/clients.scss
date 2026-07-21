@@ -128,7 +128,7 @@
                         color: $text-gray;
                     }
                     &.enabled{
-                        color: $secondary;
+                        color: $primary;
                         transform: scale(1.3);
                     }
                     &:hover{
@@ -189,7 +189,7 @@
                     bottom: 0.5vw;
                     right: 0.5vw;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;
@@ -221,7 +221,7 @@
                         color: $text-gray;
                     }
                     &.enabled{
-                        color: $secondary;
+                        color: $primary;
                         transform: scale(1.3);
                     }
                     &:hover{
@@ -282,7 +282,7 @@
                     bottom: 0.5vw;
                     right: 0.5vw;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;
@@ -350,7 +350,7 @@
                         bottom: 0;
                         right: 0;
                         z-index: 10;
-                        background-color: $secondary;
+                        background-color: $primary;
                         padding: 5px;
                         border-radius: 50%;
                         color: $text-white;
@@ -416,7 +416,7 @@
                         font-size: 1.1em;
                     }
                     .client-document-input-link{
-                        color: $secondary;
+                        color: $primary;
                         font-weight: 600;
                         font-size: 1.1em;
                     }
@@ -435,7 +435,7 @@
                         font-size: 1.1em;
                     }
                     .client-license-input-link{
-                        color: $secondary;
+                        color: $primary;
                         font-weight: 600;
                         font-size: 1.1em;
                     }
@@ -532,7 +532,7 @@
                         color: $text-gray;
                     }
                     &.enabled{
-                        color: $secondary;
+                        color: $primary;
                         transform: scale(1.3);
                     }
                     &:hover{
@@ -593,7 +593,7 @@
                     bottom: 0;
                     right: 0;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;
@@ -625,7 +625,7 @@
                         color: $text-gray;
                     }
                     &.enabled{
-                        color: $secondary;
+                        color: $primary;
                         transform: scale(1.3);
                     }
                     &:hover{
@@ -686,7 +686,7 @@
                     bottom: 0;
                     right: 0;
                     z-index: 10;
-                    background-color: $secondary;
+                    background-color: $primary;
                     padding: 5px;
                     border-radius: 50%;
                     color: $text-white;
@@ -755,7 +755,7 @@
                         bottom: 0;
                         right: 0;
                         z-index: 10;
-                        background-color: $secondary;
+                        background-color: $primary;
                         padding: 5px;
                         border-radius: 50%;
                         color: $text-white;
@@ -845,7 +845,7 @@
                         font-size: 1.1em;
                     }
                     .client-document-input-link{
-                        color: $secondary;
+                        color: $primary;
                         font-weight: 600;
                         font-size: 1.1em;
                     }
@@ -864,7 +864,7 @@
                         font-size: 1.1em;
                     }
                     .client-license-input-link{
-                        color: $secondary;
+                        color: $primary;
                         font-weight: 600;
                         font-size: 1.1em;
                     }

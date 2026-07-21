@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -150,7 +150,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -169,7 +169,7 @@
     transition: 0.3s;
   }
   #nav-create #create-inputs-container #balance-button:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-create #create-inputs-container #balance-button:hover i {
     color: #ffffff;
@@ -208,7 +208,7 @@
     border-radius: 40px;
   }
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-go-traceability:hover i {
     color: #ffffff;
@@ -216,7 +216,7 @@
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-delete {
     padding: 7px 15px;
@@ -271,7 +271,7 @@
     color: #707070;
   }
   #nav-update #header-container #update-department-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #nav-update #header-container #update-department-verification i:hover {
@@ -330,7 +330,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -349,7 +349,7 @@
     transition: 0.3s;
   }
   #nav-update #update-inputs-container #balance-button:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-update #update-inputs-container #balance-button:hover i {
     color: #ffffff;
@@ -388,7 +388,7 @@
     border-radius: 40px;
   }
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-go-traceability:hover i {
     color: #ffffff;
@@ -396,7 +396,7 @@
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-delete {
     padding: 7px 15px;
@@ -517,7 +517,7 @@
     font-size: 1.1em;
   }
   #nav-update #sub-nav-documents #department-documents-table #department-documents-table-body .department-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }
@@ -660,7 +660,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -679,7 +679,7 @@
     transition: 0.3s;
   }
   #nav-create #create-inputs-container #balance-button:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-create #create-inputs-container #balance-button:hover i {
     color: #ffffff;
@@ -718,7 +718,7 @@
     border-radius: 40px;
   }
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-go-traceability:hover i {
     color: #ffffff;
@@ -726,7 +726,7 @@
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-create #create-inputs-container #department-sub-opt-container #update-department-delete {
     padding: 7px 15px;
@@ -781,7 +781,7 @@
     color: #707070;
   }
   #nav-update #header-container #update-department-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #nav-update #header-container #update-department-verification i:hover {
@@ -840,7 +840,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -859,7 +859,7 @@
     transition: 0.3s;
   }
   #nav-update #update-inputs-container #balance-button:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-update #update-inputs-container #balance-button:hover i {
     color: #ffffff;
@@ -898,7 +898,7 @@
     border-radius: 40px;
   }
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-go-traceability:hover i {
     color: #ffffff;
@@ -906,7 +906,7 @@
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-update #update-inputs-container #department-sub-opt-container #update-department-delete {
     padding: 7px 15px;
@@ -1033,7 +1033,7 @@
     font-size: 1.1em;
   }
   #nav-update #sub-nav-employee #department-employee-table #department-employee-table-body .department-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }

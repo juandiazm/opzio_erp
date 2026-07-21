@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -92,7 +92,7 @@
     padding: 0;
     display: block;
     width: 100%;
-    color: #0153FF;
+    color: #220245;
     font-weight: 500;
   }
   #client-app-container #client-app-sidebar #sidebar-menu {
@@ -141,7 +141,7 @@
     font-weight: 500;
   }
   #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item:hover, #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item.selected {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item:hover .sidebar-menu-item-link .sidebar-menu-item-img path, #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item.selected .sidebar-menu-item-link .sidebar-menu-item-img path {
     fill: #fff;
@@ -154,7 +154,7 @@
     color: #fff;
   }
   #client-app-container #client-app-sidebar #close-session {
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFF;
     border: none;
     border-radius: 12px;
@@ -184,7 +184,7 @@
     font-size: 2.5em;
   }
   #client-app-container .nav-tabs.principal-nav-tabs .nav-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: bold;
     font-size: 1.3em;
     border-width: 2px;
@@ -277,7 +277,7 @@
     display: none;
   }
   #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item:hover, #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item.selected {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item:hover .sidebar-menu-item-link .sidebar-menu-item-img path, #client-app-container #client-app-sidebar #sidebar-menu .sidebar-menu-item.selected .sidebar-menu-item-link .sidebar-menu-item-img path {
     fill: #fff;
@@ -287,7 +287,7 @@
     color: #FFF;
   }
   #client-app-container #client-app-sidebar #close-session {
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFF;
     border: none;
     border-radius: 12px;
@@ -315,7 +315,7 @@
     font-size: 2.5em;
   }
   #client-app-container .nav-tabs.principal-nav-tabs .nav-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: bold;
     font-size: 1.3em;
     border-width: 2px;

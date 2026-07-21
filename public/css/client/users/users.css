@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -99,7 +99,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -186,7 +186,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -321,7 +321,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -408,7 +408,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;

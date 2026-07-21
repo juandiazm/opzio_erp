@@ -22,7 +22,7 @@
     <link rel="apple-touch-startup-image" href="/images/pwa/icon-512x512.png">
     
     {!! SEO::generate() !!}
-    <meta property="og:image" content="{{ asset('images/bussines-logo-rounded-white.webp') }}">
+    <meta property="og:image" content="{{ asset('images/opzio-monogram-circle-purple-bg.webp') }}">
     <meta property="og:image:width" content="801">
     <meta property="og:image:height" content="801">
     <!-- Scripts -->

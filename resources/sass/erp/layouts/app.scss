@@ -26,7 +26,7 @@
                 width: 30px;
                 height: 30px;
                 border-radius: 50%;
-                background-color: $secondary;
+                background-color: $primary;
                 color: #FFF;
                 border: none;
                 cursor: pointer;
@@ -41,7 +41,7 @@
                 &:hover{
                     transform: scale(1.15);
                     box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
-                    background-color: darken($secondary, 5%);
+                    background-color: darken($primary, 5%);
                 }
                 
                 &:active{
@@ -92,7 +92,8 @@
                     
                     #my-profile-image-container{
                         #my-profile-image{
-                            max-width: 45px;
+                            width: 45px;
+                            height: 45px;
                             border-width: 2px;
                         }
                     }
@@ -122,21 +123,21 @@
                         }
                         
                         &:hover{
-                            background-color: rgba($secondary, 0.1);
+                            background-color: rgba($primary, 0.1);
                             border-radius: 10px;
                             
                             .sidebar-menu-item-link{
                                 .sidebar-menu-item-img path{
-                                    fill: $secondary;
+                                    fill: $primary;
                                 }
                                 .sidebar-menu-item-icon{
-                                    color: $secondary;
+                                    color: $primary;
                                 }
                             }
                         }
                         
                         &.selected{
-                            background-color: $secondary;
+                            background-color: $primary;
                             border-radius: 10px;
                             
                             .sidebar-menu-item-link{
@@ -200,12 +201,16 @@
                         margin: 0;
                         padding: 0;
                         display: block;
-                        width: 100%;
-                        max-width: 80px;
+                        width: 80px;
+                        height: 80px;
                         border-radius: 50%;
                         border-width: 3px;
                         border-style: solid;
-                        transition: max-width 0.3s ease, border-width 0.3s ease;
+                        object-fit: cover;
+                        object-position: center;
+                        image-orientation: from-image;
+                        flex-shrink: 0;
+                        transition: width 0.3s ease, height 0.3s ease, border-width 0.3s ease;
                         cursor: pointer;
                         
                         &:hover{
@@ -246,7 +251,7 @@
                         padding: 0;
                         display: block;
                         width: 100%;
-                        color: $secondary;
+                        color: $primary;
                         font-weight: 500;
                         white-space: nowrap;
                         
@@ -323,7 +328,7 @@
                     
                     &:hover,
                     &.selected{
-                        background-color: $secondary;
+                        background-color: $primary;
                         
                         .sidebar-menu-item-link{
                             .sidebar-menu-item-img{
@@ -342,7 +347,7 @@
                 }
             }
             #close-session{
-                background-color: $secondary;
+                background-color: $primary;
                 color: #FFF;
                 border: none;
                 border-radius: 12px;
@@ -434,7 +439,7 @@
         .nav-tabs{
             &.principal-nav-tabs{
                 .nav-link{
-                    color: $secondary;
+                    color: $primary;
                     font-weight: bold;
                     font-size: 1.3em;
                     border-width: 2px;
@@ -487,7 +492,7 @@
             justify-content: space-between;
             overflow: visible;
             scrollbar-width: thin;
-            scrollbar-color: rgba($secondary, 0.3) transparent;
+            scrollbar-color: rgba($primary, 0.3) transparent;
 
             &::-webkit-scrollbar {
                 width: 4px;
@@ -498,7 +503,7 @@
             }
 
             &::-webkit-scrollbar-thumb {
-                background-color: rgba($secondary, 0.3);
+                background-color: rgba($primary, 0.3);
                 border-radius: 2px;
             }
 
@@ -604,11 +609,11 @@
                         .sidebar-menu-item-link{
                             .sidebar-menu-item-img{
                                 path{
-                                    fill: $secondary !important;
+                                    fill: $primary !important;
                                 }
                             }
                             .sidebar-menu-item-icon{
-                                color: $secondary !important;
+                                color: $primary !important;
                             }
                         }
                     }

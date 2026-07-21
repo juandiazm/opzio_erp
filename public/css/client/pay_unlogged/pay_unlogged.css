@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -470,7 +470,7 @@
   margin: 0 0 20px 0;
   padding: 0;
   font-size: 4em;
-  color: #0153FF;
+  color: #220245;
 }
 #pay-unlogged-container #pay-result-data-continer #pay-result-title {
   margin: 0 0 15px 0;

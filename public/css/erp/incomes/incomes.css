@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -211,7 +211,7 @@
     margin: 0 0 0 auto;
     padding: 10px;
     display: block;
-    color: #0153FF;
+    color: #220245;
     font-size: 30px;
     margin-top: 1vh;
     width: -moz-min-content;
@@ -223,7 +223,7 @@
   #nav-create #create-income-container .income-licenses-list .order-licenses-list-item.update-income-licenses-list-item .update-license-button {
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
     border-radius: 40px;
-    color: #0153FF;
+    color: #220245;
     padding: 10px 35px;
     margin-right: 10px;
     background-color: #FAFAFA;
@@ -238,7 +238,7 @@
   #nav-create #create-income-container #create-income-button {
     margin: 0 0 0 auto;
     display: block;
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFFFFF;
     font-size: 1em;
   }
@@ -367,7 +367,7 @@
     margin: 0 0 0 auto;
     padding: 10px;
     display: block;
-    color: #0153FF;
+    color: #220245;
     font-size: 30px;
     margin-top: 1vh;
     width: -moz-min-content;
@@ -379,7 +379,7 @@
   #nav-update #update-income-container .income-licenses-list .order-licenses-list-item.update-income-licenses-list-item .update-license-button {
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
     border-radius: 40px;
-    color: #0153FF;
+    color: #220245;
     padding: 10px 35px;
     margin-right: 10px;
     background-color: #FAFAFA;
@@ -393,7 +393,7 @@
   }
   #nav-update #update-income-container #update-income-button {
     margin: 0;
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFFFFF;
     font-size: 1em;
   }
@@ -413,7 +413,7 @@
     transform: scale(1.1);
   }
   #nav-update #update-income-container #view-income-document {
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 12px 35px;
     color: #ffffff;
     font-size: 1em;
@@ -724,7 +724,7 @@
     margin: 0 0 0 auto;
     padding: 10px;
     display: block;
-    color: #0153FF;
+    color: #220245;
     font-size: 30px !important;
     margin-top: 1vh;
     width: -moz-min-content;
@@ -736,7 +736,7 @@
   #nav-create #create-income-container .income-licenses-list .order-licenses-list-item.update-income-licenses-list-item .update-license-button {
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
     border-radius: 40px;
-    color: #0153FF;
+    color: #220245;
     padding: 10px 35px;
     margin-right: 10px;
     background-color: #FAFAFA;
@@ -751,7 +751,7 @@
   #nav-create #create-income-container #create-income-button {
     margin: 0 0 0 auto;
     display: block;
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFFFFF;
     font-size: 1em;
   }
@@ -874,7 +874,7 @@
     margin: 0 0 0 auto;
     padding: 10px;
     display: block;
-    color: #0153FF;
+    color: #220245;
     font-size: 30px;
     margin-top: 1vh;
     width: -moz-min-content;
@@ -886,7 +886,7 @@
   #nav-update #update-income-container .income-licenses-list .order-licenses-list-item.update-income-licenses-list-item .update-license-button {
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1607843137);
     border-radius: 40px;
-    color: #0153FF;
+    color: #220245;
     padding: 10px 35px;
     margin-right: 10px;
     background-color: #FAFAFA;
@@ -900,7 +900,7 @@
   }
   #nav-update #update-income-container #update-income-button {
     margin: 0;
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFFFFF;
     font-size: 1em;
   }
@@ -920,7 +920,7 @@
     transform: scale(1.1);
   }
   #nav-update #update-income-container #view-income-document {
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 12px 35px;
     color: #ffffff;
     font-size: 1em;
@@ -1056,7 +1056,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #0153FF;
+  border: 1px solid #220245;
   border-radius: 50px;
   gap: 5px;
   cursor: pointer;
@@ -1070,17 +1070,17 @@
 
 #import-report-excel-container #import-report-excel-icon {
   font-size: 17px;
-  color: #0153FF;
+  color: #220245;
 }
 
 #import-report-excel-container #import-report-excel-icon:hover {
-  color: #0153FF !important;
+  color: #220245 !important;
 }
 
 #import-report-excel-container #import-report-excel-text {
   display: none;
   transition: 0.3s;
-  color: #0153FF;
+  color: #220245;
 }
 
 #import-report-excel-container:hover {
@@ -1098,7 +1098,7 @@
   padding: 0;
   display: block;
   width: 100%;
-  color: #0153FF;
+  color: #220245;
   text-decoration: underline;
 }
 

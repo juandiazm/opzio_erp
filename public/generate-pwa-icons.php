@@ -4,7 +4,7 @@
  * Ejecutar desde la raíz del proyecto: php public/generate-pwa-icons.php
  */
 
-$sourceImage = __DIR__ . '/images/bussines-logo-rounded-white.png';
+$sourceImage = __DIR__ . '/images/opzio-monogram-circle-purple-bg-transparent.png';
 $outputDir = __DIR__ . '/images/pwa/';
 
 // Tamaños requeridos para PWA

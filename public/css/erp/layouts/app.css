@@ -8,7 +8,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -52,7 +52,7 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFF;
     border: none;
     cursor: pointer;
@@ -131,17 +131,17 @@
     font-size: 26px;
   }
   #erp-app-container #erp-app-sidebar.collapsed #sidebar-menu .sidebar-menu-item:hover {
-    background-color: rgba(1, 83, 255, 0.1);
+    background-color: rgba(34, 2, 69, 0.1);
     border-radius: 10px;
   }
   #erp-app-container #erp-app-sidebar.collapsed #sidebar-menu .sidebar-menu-item:hover .sidebar-menu-item-link .sidebar-menu-item-img path {
-    fill: #0153FF;
+    fill: #220245;
   }
   #erp-app-container #erp-app-sidebar.collapsed #sidebar-menu .sidebar-menu-item:hover .sidebar-menu-item-link .sidebar-menu-item-icon {
-    color: #0153FF;
+    color: #220245;
   }
   #erp-app-container #erp-app-sidebar.collapsed #sidebar-menu .sidebar-menu-item.selected {
-    background-color: #0153FF;
+    background-color: #220245;
     border-radius: 10px;
   }
   #erp-app-container #erp-app-sidebar.collapsed #sidebar-menu .sidebar-menu-item.selected .sidebar-menu-item-link .sidebar-menu-item-img path {
@@ -235,7 +235,7 @@
     padding: 0;
     display: block;
     width: 100%;
-    color: #0153FF;
+    color: #220245;
     font-weight: 500;
     white-space: nowrap;
   }
@@ -302,7 +302,7 @@
     position: relative;
   }
   #erp-app-container #erp-app-sidebar #sidebar-menu .sidebar-menu-item:hover, #erp-app-container #erp-app-sidebar #sidebar-menu .sidebar-menu-item.selected {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #erp-app-container #erp-app-sidebar #sidebar-menu .sidebar-menu-item:hover .sidebar-menu-item-link .sidebar-menu-item-img path, #erp-app-container #erp-app-sidebar #sidebar-menu .sidebar-menu-item.selected .sidebar-menu-item-link .sidebar-menu-item-img path {
     fill: #fff;
@@ -314,7 +314,7 @@
     color: #FFF;
   }
   #erp-app-container #erp-app-sidebar #close-session {
-    background-color: #0153FF;
+    background-color: #220245;
     color: #FFF;
     border: none;
     border-radius: 12px;
@@ -397,7 +397,7 @@
     font-size: 2em;
   }
   #erp-app-container .nav-tabs.principal-nav-tabs .nav-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: bold;
     font-size: 1.3em;
     border-width: 2px;
@@ -446,7 +446,7 @@
     justify-content: space-between;
     overflow: visible;
     scrollbar-width: thin;
-    scrollbar-color: rgba(1, 83, 255, 0.3) transparent;
+    scrollbar-color: rgba(34, 2, 69, 0.3) transparent;
     /* Mostrar logo en el menú inferior como un item más */
     /* ocultar perfil en barra inferior y usar sólo iconos */
     /* ocultar botón cerrar sesión desde la barra (mantener accesible en perfil) */
@@ -458,7 +458,7 @@
     background: transparent;
   }
   #erp-app-container #erp-app-sidebar::-webkit-scrollbar-thumb {
-    background-color: rgba(1, 83, 255, 0.3);
+    background-color: rgba(34, 2, 69, 0.3);
     border-radius: 2px;
   }
   #erp-app-container #erp-app-sidebar .sidebar-toggle-btn {
@@ -551,10 +551,10 @@
     background-color: transparent !important;
   }
   #erp-app-container #erp-app-sidebar #sidebar-menu .sidebar-menu-item.selected .sidebar-menu-item-link .sidebar-menu-item-img path {
-    fill: #0153FF !important;
+    fill: #220245 !important;
   }
   #erp-app-container #erp-app-sidebar #sidebar-menu .sidebar-menu-item.selected .sidebar-menu-item-link .sidebar-menu-item-icon {
-    color: #0153FF !important;
+    color: #220245 !important;
   }
   #erp-app-container #erp-app-sidebar #close-session {
     display: none !important;

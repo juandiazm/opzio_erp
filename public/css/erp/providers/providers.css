@@ -7,7 +7,7 @@
 }
 
 .bg-secondary {
-  background-color: #0153FF;
+  background-color: #220245;
 }
 
 .bg-primary {
@@ -111,7 +111,7 @@
     color: #707070;
   }
   #nav-create #header-container #create-provider-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #nav-create #header-container #create-provider-verification i:hover {
@@ -171,7 +171,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -198,7 +198,7 @@
     border-radius: 40px;
   }
   #nav-update #provider-sub-opt-container #update-provider-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-update #provider-sub-opt-container #update-provider-go-traceability:hover i {
     color: #ffffff;
@@ -206,7 +206,7 @@
   #nav-update #provider-sub-opt-container #update-provider-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-update #provider-sub-opt-container #update-provider-delete {
     padding: 7px 15px;
@@ -265,7 +265,7 @@
     color: #707070;
   }
   #nav-update #header-container #update-provider-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #nav-update #header-container #update-provider-verification i:hover {
@@ -325,7 +325,7 @@
     bottom: 0.5vw;
     right: 0.5vw;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -387,7 +387,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -429,7 +429,7 @@
     font-size: 1.1em;
   }
   #nav-update #sub-nav-documents #provider-documents-table #provider-documents-table-body .provider-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }
@@ -536,7 +536,7 @@
     color: #707070;
   }
   #nav-create #header-container #create-provider-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #nav-create #header-container #create-provider-verification i:hover {
@@ -596,7 +596,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -622,7 +622,7 @@
     border-radius: 40px;
   }
   #nav-update #provider-sub-opt-container #update-provider-go-traceability:hover {
-    background-color: #0153FF;
+    background-color: #220245;
   }
   #nav-update #provider-sub-opt-container #update-provider-go-traceability:hover i {
     color: #ffffff;
@@ -630,7 +630,7 @@
   #nav-update #provider-sub-opt-container #update-provider-go-traceability i {
     font-size: 1.5em;
     transition: 0.3s;
-    color: #0153FF;
+    color: #220245;
   }
   #nav-update #provider-sub-opt-container #update-provider-delete {
     padding: 7px 15px;
@@ -689,7 +689,7 @@
     color: #707070;
   }
   #nav-update #header-container #update-provider-verification i.enabled {
-    color: #0153FF;
+    color: #220245;
     transform: scale(1.3);
   }
   #nav-update #header-container #update-provider-verification i:hover {
@@ -749,7 +749,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -811,7 +811,7 @@
     bottom: 0;
     right: 0;
     z-index: 10;
-    background-color: #0153FF;
+    background-color: #220245;
     padding: 5px;
     border-radius: 50%;
     color: #ffffff;
@@ -853,7 +853,7 @@
     font-size: 1.1em;
   }
   #nav-update #sub-nav-documents #provider-documents-table #provider-documents-table-body .provider-document-input-link {
-    color: #0153FF;
+    color: #220245;
     font-weight: 600;
     font-size: 1.1em;
   }

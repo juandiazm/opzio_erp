@@ -10,7 +10,7 @@
 <section id="register-container" class="d-flex justify-content-center">
     <div id="register-centered" class="align-self-center d-flex justify-content-around">
         <div id="register-data-container">
-            <img src="/images/bussines-logo-simple-blues.png" alt="Avatar" id="avatar-img">
+            <img src="/images/opzio-logo-compact-purple-transparent.webp" alt="Opzio" id="avatar-img">
             <h1 id="register-title">Crear una cuenta</h1>
             <p id="register-message">App Clientes</p>
             <div id="inputs-container">
