@@ -57,7 +57,7 @@
         </div>
         <div class="email-footer">
             <p class="footer-text">&copy; {{ date('Y') }} Opzio S.A.S &mdash; Sistema Interno</p>
-            <p class="footer-text"><a href="https://www.opzio.com.co" class="footer-link">www.opzio.com.co</a></p>
+            <p class="footer-text"><a href="https://www.opzio.co" class="footer-link">www.opzio.co</a></p>
         </div>
     </div>
 </div>

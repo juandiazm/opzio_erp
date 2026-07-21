@@ -367,7 +367,7 @@
                         <p>Dir: CARRERA 76 80 20 P 4</p>
                         <p>Tel: (601) 4051307</p>
                         <p>Bogotá D.C., Colombia</p>
-                        <a href="https://opzio.com.co/" target="_blank">www.opzio.com.co</a>
+                        <a href="https://opzio.co/" target="_blank">www.opzio.co</a>
                     </div>
                     <div id="order-main-information">
                         <p class="title">COTIZACIÓN</p>
@@ -467,7 +467,7 @@
                         <div id="feed-text-container">
                             <p id="feed-department"><strong>Departamento Comercial</strong></p>
                             <p id="feed-email">{{  session('user')==null?'':session('user')['email'] }}</p>
-                            <a id="feed-link" href="https://opzio.com.co/" target="_blank">Opzio S.A.S</a>
+                            <a id="feed-link" href="https://opzio.co/" target="_blank">Opzio S.A.S</a>
                         </div>
                     </div>
                 </div>

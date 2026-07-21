@@ -199,7 +199,7 @@ trait instagram_trait
             $url = env('INSTAGRAM_API_USER_ID').'/media';
             $params = [
                 'access_token' => env('INSTAGRAM_API_ACCESS_TOKEN')
-                ,'image_url' => $post->image_url/*'https://erp.opzio.com.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
+                ,'image_url' => $post->image_url/*'https://erp.opzio.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
                 ,'caption' => $post->caption
             ];
             $instagramResponse = $this->InstagramAPI_PostRequest($url, $params, []);

@@ -48,7 +48,7 @@
                     </div>
                     <div class="input-container col-12 d-flex" title="Correo del usuario">
                         <label for="username" class="input-title align-self-center">Correo</label>
-                        <input type="text" id="update-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@opzio.com.co">
+                        <input type="text" id="update-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@opzio.co">
                     </div>
                 </div>
                 

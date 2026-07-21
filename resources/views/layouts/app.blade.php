@@ -3,21 +3,22 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="shortcut icon" href="/images/mini_icon.ico">
-    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <!-- PWA Configuration -->
     <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <meta name="theme-color" content="#00057B">
+    <meta name="theme-color" content="#1E0045">
     <meta name="mobile-web-app-capable" content="yes">
-    
+
     <!-- iOS PWA Configuration -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Opzio ERP">
-    <link rel="apple-touch-icon" href="/images/pwa/icon-192x192.png">
     <link rel="apple-touch-startup-image" href="/images/pwa/icon-512x512.png">
     
     {!! SEO::generate() !!}
@@ -46,7 +47,7 @@
     <div id="layout-app" class="mx-0 px-0 w-100">
         @yield('app-content')
     </div>
-    <a class="d-block w-100 px-0 mx-0 text-center" href="https://opzio.com.co" id="opzio-feet" target="_blank">® Powered by Opzio - {{ \Carbon\Carbon::now()->format('Y') }}</a>
+    <a class="d-block w-100 px-0 mx-0 text-center" href="https://opzio.co" id="opzio-feet" target="_blank">® Powered by Opzio - {{ \Carbon\Carbon::now()->format('Y') }}</a>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAF9AFSoPJMHWh_8EmeOGTFLVRTQcFCm-M">
     </script>

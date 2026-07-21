@@ -24,8 +24,8 @@ class facebook_controller extends Controller
             /*send approve mail*/
             $Mails = [];
             $Mails[] = [
-                'address' => 'mariaf.franco@opzio.com.co',
-                'name' => 'mariaf.franco@opzio.com.co'
+                'address' => 'mariaf.franco@opzio.co',
+                'name' => 'mariaf.franco@opzio.co'
             ];
             $Mails[] = [
                 'address' => 'info@opzio.co',
@@ -33,8 +33,8 @@ class facebook_controller extends Controller
             ];
             /*
             $Mails[] = [
-                'address' => 'daniel.mr@opzio.com.co',
-                'name' => 'daniel.mr@opzio.com.co'
+                'address' => 'daniel.mr@opzio.co',
+                'name' => 'daniel.mr@opzio.co'
             ];
             
             $Mails[] = [

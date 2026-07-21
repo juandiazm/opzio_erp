@@ -50,16 +50,16 @@ class generate_ia_twitter_post extends Command
             /*send approve mail*/
             $Mails = [];
             $Mails[] = [
-                'address' => 'mariaf.franco@opzio.com.co',
-                'name' => 'mariaf.franco@opzio.com.co'
+                'address' => 'mariaf.franco@opzio.co',
+                'name' => 'mariaf.franco@opzio.co'
             ];
             $Mails[] = [
                 'address' => 'info@opzio.co',
                 'name' => 'info@opzio.co'
             ];
             /*$Mails[] = [
-                'address' => 'juandiazm@opzio.com.co',
-                'name' => 'juandiazm@opzio.com.co'
+                'address' => 'juandiazm@opzio.co',
+                'name' => 'juandiazm@opzio.co'
             ];*/
             $MailData = 
             [

@@ -370,7 +370,7 @@
                         <div class="row w-100 p-0 m-0">
                             <div class="input-container col-12 d-flex" title="Correo del usuario">
                                 <label for="username" class="input-title align-self-center">Correo</label>
-                                <input type="text" id="create-client-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@opzio.com.co">
+                                <input type="text" id="create-client-user-email" class="input-value form-control align-self-center" name="email" placeholder="pperez@opzio.co">
                             </div>
                             <div class="input-container col-12 d-flex" title="Teléfono del usuario">
                                 <label for="username" class="input-title align-self-center">Teléfono</label>

@@ -635,7 +635,7 @@ Route::prefix('test')->group(function () {
             "updated_at"=> "2024-03-06T02:37:32.000000Z",
             "created_at"=> "2024-03-06T02:37:32.000000Z",
             "id"=> 39,
-            "url" => "https://erp.opzio.com.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
+            "url" => "https://erp.opzio.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
             "licenses"=> collect([
                 [
                 "income_id"=> 39,
@@ -689,7 +689,7 @@ Route::prefix('test')->group(function () {
             "created_at"=> "2024-01-13T17:58:44.000000Z",
             "updated_at"=> "2024-01-19T01:46:29.000000Z"
             ],
-            "public_path"=> "https://erp.opzio.com.co/"
+            "public_path"=> "https://erp.opzio.co/"
         ];
         return view('pdf.purchase_order',compact('Data'));
     });
@@ -709,7 +709,7 @@ Route::prefix('test')->group(function () {
                 "updated_at"=> "2024-03-06T02:37:32.000000Z",
                 "created_at"=> "2024-03-06T02:37:32.000000Z",
                 "id"=> 39,
-                "url" => "https://erp.opzio.com.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
+                "url" => "https://erp.opzio.co/storage/incomes/pdfs/47ab2fb4-cecf-4f29-a0f4-dae475608fe9.pdf",
                 "licenses"=> [
                     [
                     "income_id"=> 39,
@@ -762,7 +762,7 @@ Route::prefix('test')->group(function () {
                 "created_at"=> "2024-01-13T17:58:44.000000Z",
                 "updated_at"=> "2024-01-19T01:46:29.000000Z"
                 ],
-                "public_path"=> "https://erp.opzio.com.co/",
+                "public_path"=> "https://erp.opzio.co/",
                 "ia_message" => "Tu tienda virtual está lista para triunfar en la web. ¿Quieres más? Descubre nuestros servicios adicionales y destaca en línea como nunca antes.",
             ];
             return view('mail.purchase_order', compact('Data'));
@@ -770,7 +770,7 @@ Route::prefix('test')->group(function () {
         Route::get('client_user_restore_password', function(){
             $Data = [
                 "name"=> "Opzio",
-                "email"=> "juand@opzio.com.co",
+                "email"=> "juand@opzio.co",
                 "restore-code" => "123456",
                 "reset_password_date" => "2024-01-13T17:58:44.000000Z",
             ];

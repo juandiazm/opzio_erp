@@ -133,7 +133,7 @@
                     </div>
                     <div class="input-container col-12 d-flex">
                         <label for="employeename" class="input-title align-self-center">Correo E.</label>
-                        <input type="email" id="create-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@opzio.com.co">
+                        <input type="email" id="create-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@opzio.co">
                     </div>
                 </div>
             </div>
@@ -241,7 +241,7 @@
                     </div>
                     <div class="input-container col-12 d-flex">
                         <label for="employeename" class="input-title align-self-center">Correo E.</label>
-                        <input type="email" id="update-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@opzio.com.co">
+                        <input type="email" id="update-employee-work-email" class="input-work-email input-value form-control align-self-center" name="work-email" placeholder="juanp@opzio.co">
                     </div>
                 </div>
             </div>

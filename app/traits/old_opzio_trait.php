@@ -9,7 +9,7 @@ trait old_opzio_trait
 	private $Client = null;
 	public function Opzio_syh_GetConnection(){
 		$this->Client = new Client([
-			'base_uri' => 'https://old.opzio.com.co/API/',
+			'base_uri' => 'https://old.opzio.co/API/',
 			'timeout'  => 10.0,
 			'verify' => false,
 		]);

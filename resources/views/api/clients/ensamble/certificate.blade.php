@@ -20,7 +20,7 @@
             #pdf-container{
                 width: 100%;
                 height: 100%;
-                background-image: url('https://erp.opzio.com.co/images/api/clients/ensamble/diploma_fondo.jpg');
+                background-image: url('https://erp.opzio.co/images/api/clients/ensamble/diploma_fondo.jpg');
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
@@ -86,7 +86,7 @@
     <body>
         <div id="pdf-container">
             <div id="content-container">
-                <img id="house-img" src="https://erp.opzio.com.co/images/api/clients/ensamble/diploma_logo.jpg" alt="">
+                <img id="house-img" src="https://erp.opzio.co/images/api/clients/ensamble/diploma_logo.jpg" alt="">
                 <img src="" id="sponsors-img" alt="">
                 <p id="certificate-to">OTORGA EL SIGUIENTE CERTIFICADO A:</p>
                 <p id="certified-name">{{ $Data['name'] }}</p>
@@ -98,7 +98,7 @@
                     <br>
                     Diciembre de 2023
                 </p>
-                <img src="https://erp.opzio.com.co/images/api/clients/ensamble/diploma_firma completa.jpg" id="sign-img" alt="">
+                <img src="https://erp.opzio.co/images/api/clients/ensamble/diploma_firma completa.jpg" id="sign-img" alt="">
             </div>
         </div>
     </body>

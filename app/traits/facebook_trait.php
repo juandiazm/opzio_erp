@@ -200,7 +200,7 @@ trait facebook_trait
             $url = env('FACEBOOK_API_USER_ID').'/feed';
             $params = [
                 'access_token' => env('FACEBOOK_API_ACCESS_TOKEN')
-                ,'message' => $post->message/*'https://erp.opzio.com.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
+                ,'message' => $post->message/*'https://erp.opzio.co/storage/blog/principal/21f64d1f_09ff_4f6f_aaa2_1b21539517a5.webp'*/
                 ,'link' => $post->link
             ];
             $facebookResponse = $this->FacebookAPI_PostRequest($url, $params, []);

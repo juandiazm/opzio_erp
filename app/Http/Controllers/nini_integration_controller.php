@@ -11,7 +11,7 @@ use App\traits\nini_integration_trait;
  * API controller for handling sync requests from nini_admin_app.
  * Protected by api_token middleware for authentication.
  */
-class NiniIntegrationController extends Controller
+class nini_integration_controller extends Controller
 {
     use nini_integration_trait;
 
@@ -71,7 +71,7 @@ class NiniIntegrationController extends Controller
             return response()->json($result, $httpStatus);
 
         } catch (\Exception $e) {
-            info('NiniIntegrationController syncRecharge error: ' . $e->getMessage());
+            info('nini_integration_controller syncRecharge error: ' . $e->getMessage());
             return response()->json([
                 'status' => 0,
                 'message' => 'Error interno del servidor: ' . $e->getMessage(),

@@ -46,7 +46,7 @@ class CustomMail extends Mailable
         $email = $this->view($this->View)
             ->with(['Data' => $this->ViewData])
             ->subject($this->MailData['subject'])
-            ->bcc('soporte@opzio.com.co');
+            ->bcc('soporte@opzio.co');
 
         // Attach the files if provided
         if (isset($this->files) && $this->files != null) {

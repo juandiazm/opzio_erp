@@ -34,7 +34,7 @@ trait mail_trait
 			if (App::environment() === 'local') {
 				$Mails = [
 					[
-						'address' => 'soporte@opzio.com.co',
+						'address' => 'soporte@opzio.co',
 						'name' => 'Opzio Test'
 					]
 				];
@@ -85,7 +85,7 @@ trait mail_trait
 			if (App::environment() === 'local') {
 				$Mails = [
 					[
-						'address' => 'soporte@opzio.com.co',
+						'address' => 'soporte@opzio.co',
 						'name' => 'Opzio Test'
 					]
 				];

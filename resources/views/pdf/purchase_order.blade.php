@@ -397,7 +397,7 @@
                         <p>Dir: CARRERA 76 80 20 P 4</p>
                         <p>Tel: (601) 4051307</p>
                         <p>Bogotá D.C., Colombia</p>
-                        <a href="https://opzio.com.co/" target="_blank">www.opzio.com.co</a>
+                        <a href="https://opzio.co/" target="_blank">www.opzio.co</a>
                     </div>
                     <div id="order-main-information">
                         <p class="title">ORDEN DE COMPRA</p>
@@ -512,8 +512,8 @@
                         <img src="{{ $Data['public_path'].'images/bussines-logo-rounded.webp'}}" alt="Opzio S.A.S" id="opzio-logo-feed"/>
                         <div id="feed-text-container">
                             <p id="feed-department"><strong>Departamento Contable</strong></p>
-                            <p id="feed-email">Correo: contabilidad@opzio.com.co</p>
-                            <a id="feed-link" href="https://opzio.com.co/" target="_blank">Opzio S.A.S</a>
+                            <p id="feed-email">Correo: contabilidad@opzio.co</p>
+                            <a id="feed-link" href="https://opzio.co/" target="_blank">Opzio S.A.S</a>
                         </div>
                     </div>
                     <div class="feed-sub-contianer" id="bank-data-container">

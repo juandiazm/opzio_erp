@@ -33,15 +33,15 @@ class client_chat_controller extends Controller
                     'name' => 'Opzio Comunicación',
                 ];
                 $Mails[] = [
-                    'address' => 'analista.tech@opzio.com.co',
+                    'address' => 'analista.tech@opzio.co',
                     'name' => 'Yuli Garzón'
                 ];
                 $Mails[] = [
-                    'address' => 'mariaf.franco@opzio.com.co',
+                    'address' => 'mariaf.franco@opzio.co',
                     'name' => 'Maria Franco'
                 ];
                 $Mails[] = [
-                    'address' => 'juandiazm@opzio.com.co',
+                    'address' => 'juandiazm@opzio.co',
                     'name' => 'Juan Diaz'
                 ];
                 $MailData = 

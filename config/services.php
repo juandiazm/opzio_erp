@@ -53,4 +53,13 @@ return [
         'employee_name' => env('NINI_EMPLOYEE_NAME', null),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Web Integration (opzio_web → ERP)
+    |--------------------------------------------------------------------------
+    */
+    'web_integration' => [
+        'api_token' => env('WEB_INTEGRATION_API_TOKEN', ''),
+    ],
+
 ];

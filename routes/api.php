@@ -28,6 +28,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 |
 */
 Route::prefix('nini-integration')->middleware('api_token')->group(function () {
-    Route::get('/health', [\App\Http\Controllers\NiniIntegrationController::class, 'health']);
-    Route::post('/sync-recharge', [\App\Http\Controllers\NiniIntegrationController::class, 'syncRecharge']);
+    Route::get('/health', [\App\Http\Controllers\nini_integration_controller::class, 'health']);
+    Route::post('/sync-recharge', [\App\Http\Controllers\nini_integration_controller::class, 'syncRecharge']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Web Integration API Routes
+|--------------------------------------------------------------------------
+|
+| Endpoints consumed by opzio_web (landing page).
+| Protected by web_api_token middleware (X-Api-Token header).
+|
+*/
+Route::prefix('web-integration')->middleware(['web_api_token', 'throttle:10,1'])->group(function () {
+    Route::post('/contact-mail', [\App\Http\Controllers\web_integration_controller::class, 'sendContactMail']);
 });
