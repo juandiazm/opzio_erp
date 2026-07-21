@@ -11,8 +11,18 @@ function Service_getPusherData(){
 	PostMethodFunction('/admin/pusher/get', DataSend, null, Service_usePusherData, null);
 }
 function Service_usePusherData(data){
-  var pusher = new Pusher(data.pusher.key, {
-    cluster: 'us2'
+  if (!window.Pusher) {
+    console.warn('Pusher library is not available.');
+    return;
+  }
+  var pusherKey = data && data.pusher ? data.pusher.key : null;
+  if (!pusherKey) {
+    console.warn('Pusher key is missing in /admin/pusher/get response.');
+    return;
+  }
+  var pusherCluster = data && data.pusher && data.pusher.cluster ? data.pusher.cluster : 'us2';
+  var pusher = new Pusher(pusherKey, {
+    cluster: pusherCluster
   });
   //Canal de servicios
   var service_channel = pusher.subscribe('opzio-channel-chat');

@@ -32,6 +32,9 @@ var db_pagination = {
     total:0,
 };
 $(document).ready(function(){
+    if (!chat_message_input || !chatConvesationListElement || !chat_conversations_list) {
+        return;
+    }
     if (!window.readyExecuted) {
         window.readyExecuted = true;
         chat_message_input.removeEventListener('keypress', sendMessageAction);

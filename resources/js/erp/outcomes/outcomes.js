@@ -29,6 +29,10 @@ var tabs_view = {
     'nav-list-tab': false,
     'nav-create-tab': false
 }
+var current_tab = null;
+var current_container = null;
+var currentLicencesList = [];
+var outcomes = [];
 
 function openMassImportModal(){
     $('#import-form-container').css('display', 'flex');
@@ -164,6 +168,7 @@ function showOutcomesPage(response){
 }
 
 function changeTab(){
+    if($('#nav-tab .active').length === 0) return;
     current_tab = $('#nav-tab .active').attr('id');
     current_container = $($('#nav-tab .active').attr('data-bs-target'));
     currentLicencesList = [];
