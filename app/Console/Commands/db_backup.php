@@ -43,7 +43,7 @@ class db_backup extends Command
             exec($command, $output, $returnVar);
             //if(Carbon::now()->format('H') == '00'){
                 $filename_google = 'opzio_erp_'.Carbon::now()->format('d');
-                $googleFolder   = 'Departament I.T/Backups/Opzio erp';
+                $googleFolder   = 'Departamento I.T/Backups/Opzio erp';
                 //Remove files with the same name
                 $files = Storage::disk('google')->files($googleFolder);
                 foreach($files as $filePath){
