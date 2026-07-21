@@ -44,10 +44,10 @@ class db_backup extends Command
             //if(Carbon::now()->format('H') == '00'){
                 $filename_google = 'opzio_erp_'.Carbon::now()->format('d');
                 //Remove files with the same name
-                $files = collect(Storage::disk('google')->listContents('', false));
-                foreach($files as $file){
-                    if($file['filename'] == $filename_google){
-                        Storage::disk('google')->delete($file['basename']);
+                $files = Storage::disk('google')->files('');
+                foreach($files as $filePath){
+                    if(pathinfo($filePath, PATHINFO_FILENAME) === $filename_google){
+                        Storage::disk('google')->delete($filePath);
                     }
                 }
                 $filename_google = $filename_google.'.sql';
