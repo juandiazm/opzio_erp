@@ -90,7 +90,7 @@ return new class extends Migration
 
         // Hijos de ia_conversations
         if (!empty($iaConversationIds)) {
-            DB::table('ia_turns')->whereIn('ia_conversation_id', $iaConversationIds)->delete();
+            DB::table('ia_turns')->whereIn('conversation_id', $iaConversationIds)->delete();
         }
         DB::table('ia_conversations')->whereIn('client_id', $clientIds)->delete();
 
