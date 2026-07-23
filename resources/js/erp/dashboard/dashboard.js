@@ -239,6 +239,7 @@ function getNewClientsByDateRange(){
 function showNewClientsByDateRange(response){
     if(newClientGraph != null) newClientGraph.destroy();
     let ctx = document.getElementById('new-clients-graph');
+    if (!ctx) return;
     var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 100);
     gradient.addColorStop(0, '#00057B');
     gradient.addColorStop(1, '#220245');
@@ -299,6 +300,7 @@ function getSalesByMonthRange(){
 function showSalesByMonthRange(response){
     if(newSalesGraph != null) newSalesGraph.destroy();
     let ctx = document.getElementById('sales-by-month-graph');
+    if (!ctx) return;
     newSalesGraph = new Chart(ctx, {
         type: 'line',
         data: {

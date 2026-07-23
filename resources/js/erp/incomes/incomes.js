@@ -357,6 +357,7 @@ let clientsList =[];
 let currentClient = null;
 let selected_license = [];
 let currentLicencesList = [];
+let create_current_licenses = [];
 function changeCreateOrderState(){
     current_container.find('.state-input').removeClass('selected');
     $(this).addClass('selected');
