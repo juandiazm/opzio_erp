@@ -67,7 +67,7 @@ jobs:
     
     - name: Package build for deployment
       run: |
-        tar -czf build.tar.gz app bootstrap config database public/build public/images resources composer.json composer.lock artisan routes \
+        tar -czf build.tar.gz app bootstrap config database public/build public/images public/.htaccess resources composer.json composer.lock artisan routes \
           public/manifest.json public/service-worker.js public/favicon.ico public/apple-touch-icon.png public/offline.html
 
     - name: Set up SSH
@@ -111,6 +111,7 @@ jobs:
           if [ -d "./public/fonts" ]; then
             scp -r ./public/fonts git@35.239.181.103:/var/www/html/opzio_erp/public
           fi
+          scp ./public/.htaccess git@35.239.181.103:/var/www/html/opzio_erp/public/.htaccess
         fi
         ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo chmod -R 777 /var/www/html/opzio_erp/public'
         

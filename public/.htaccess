@@ -38,3 +38,9 @@
         Header set Service-Worker-Allowed "/"
     </FilesMatch>
 </IfModule>
+
+<IfModule mod_mime.c>
+    # Ensure ES modules are served as JavaScript in production
+    AddType application/javascript .js .mjs
+    AddType text/javascript .js .mjs
+</IfModule>
