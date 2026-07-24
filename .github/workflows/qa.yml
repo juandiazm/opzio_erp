@@ -104,8 +104,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo rm -rf /var/www/html/opzio_erp_qa/public/build /var/www/html/opzio_erp_qa/public/fonts /var/www/html/opzio_erp_qa/public/images/payment-gateways'
           scp -r ./public/build git@35.239.181.103:/var/www/html/opzio_erp_qa/public
           scp -r ./public/fonts git@35.239.181.103:/var/www/html/opzio_erp_qa/public
-          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo mkdir -p /var/www/html/opzio_erp_qa/public/images'
-          scp -r ./public/images/payment-gateways git@35.239.181.103:/var/www/html/opzio_erp_qa/public/images/
+          scp -r ./public/images git@35.239.181.103:/var/www/html/opzio_erp_qa/public
         fi
         ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo chmod -R 777 /var/www/html/opzio_erp_qa/public'
         
@@ -126,7 +125,7 @@ jobs:
         curl -sS https://getcomposer.org/installer | php8.2
         php8.2 composer.phar install --no-dev --optimize-autoloader
         php8.2 artisan migrate --force
-        php8.2 artisan storage:link
+        php8.2 artisan storage:link --force
         php8.2 artisan config:clear
         php8.2 artisan route:cache
         php8.2 artisan view:cache

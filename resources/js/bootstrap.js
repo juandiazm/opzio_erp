@@ -1,7 +1,26 @@
+import $ from 'jquery';
+window.$ = window.jQuery = $;
+
 import _ from 'lodash';
 window._ = _;
 
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
+
+// Bootstrap 5 tries to register jQuery plugins via window.jQuery during its
+// module initialization, but ES modules are deferred — window.jQuery isn't set
+// yet when Bootstrap's module code runs. We register them manually here.
+const bootstrapComponents = [
+    bootstrap.Alert, bootstrap.Button, bootstrap.Carousel, bootstrap.Collapse,
+    bootstrap.Dropdown, bootstrap.Modal, bootstrap.Offcanvas, bootstrap.Popover,
+    bootstrap.ScrollSpy, bootstrap.Tab, bootstrap.Toast, bootstrap.Tooltip,
+];
+bootstrapComponents.forEach(Component => {
+    if (Component && typeof Component.jQueryInterface === 'function') {
+        $.fn[Component.NAME] = Component.jQueryInterface;
+        $.fn[Component.NAME].Constructor = Component;
+    }
+});
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

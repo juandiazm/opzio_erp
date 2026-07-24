@@ -389,7 +389,7 @@
             @endif
             <div id="general-container">
                 <div id="header-container" class="container border-botton">
-                    <img src="{{ $Data['public_path'].'images/opzio-logo-wide-purple-transparent.webp' }}" alt="Opzio S.A.S" id="opzio-logo"/>
+                    <img src="{{ $Data['public_path'].'images/opzio-logo-wide-purple.webp' }}" alt="Opzio S.A.S" id="opzio-logo"/>
                     <div id="opzio-data-container">
                         <p class="title">Opzio S.A.S</p>
                         <br>

@@ -26,13 +26,10 @@
     <meta property="og:image:width" content="801">
     <meta property="og:image:height" content="801">
     <!-- Scripts -->
-    <script src="{{ asset('js/jquery.js') }}"></script>
-    <script src="{{ asset('js/popper.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     @vite('resources/js/app.js')
-    <script src="{{ asset('js/general.js')}}" defer></script>
+    @vite('resources/js/general.js')
     @vite('resources/js/crud-input.js')
-    <script src="{{ asset('js/pwa.js')}}" defer></script>
+    @vite('resources/js/pwa.js')
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,7 +46,7 @@
     </div>
     <a class="d-block w-100 px-0 mx-0 text-center" href="https://opzio.co" id="opzio-feet" target="_blank">® Powered by Opzio - {{ \Carbon\Carbon::now()->format('Y') }}</a>
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAF9AFSoPJMHWh_8EmeOGTFLVRTQcFCm-M">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAF9AFSoPJMHWh_8EmeOGTFLVRTQcFCm-M&loading=async">
     </script>
 </body>
 </html>

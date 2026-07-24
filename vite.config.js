@@ -148,6 +148,7 @@ export default defineConfig({
     'resources/js/general.js',
     'resources/js/jquery.js',
     'resources/js/popper.js',
+    'resources/js/pwa.js',
     'resources/sass/app.scss',
     'resources/sass/client/blog/email/unsubscribe.scss',
     'resources/sass/client/companies/companies.scss',

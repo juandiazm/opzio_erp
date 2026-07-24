@@ -26,7 +26,7 @@ function ReLoadImages(){
 $(document).ready(function(){
 	ReLoadImages();
 	//$('#LoadContainer').fadeOut(350);
-	token = $("meta[name='csrf-token']").attr("content"); 
+	window.token = $("meta[name='csrf-token']").attr("content"); 
 	//MENÚ DESPLEGABLE
 	$('.DropDownList .DropDownListItem .DropDownItemHeader .DropDownHeaderClicked').click(DropDownListEvent);
 	$('#MessageContainer #MessageContainerAceptButton').click(CloseMessageBanner);
@@ -599,3 +599,40 @@ function checkFileSize(file, maxSize){
 	}
 	return true;
 }
+// Expose all globals to window so legacy scripts can access them
+window.GeneralDateFormat = GeneralDateFormat;
+window.ReLoadImages = ReLoadImages;
+window.AgregarFoto = AgregarFoto;
+window.AddColor = AddColor;
+window.SeleccionarImagen = SeleccionarImagen;
+window.CargarFoto = CargarFoto;
+window.loadColor = loadColor;
+window.DefinirRGB = DefinirRGB;
+window.hexToRgb = hexToRgb;
+window.padZero = padZero;
+window.invertColor = invertColor;
+window.ImagetoPrint = ImagetoPrint;
+window.PrintImage = PrintImage;
+window.DropDownListEvent = DropDownListEvent;
+window.CloseMessageBanner = CloseMessageBanner;
+window.validateForm = validateForm;
+window.getRandomColor = getRandomColor;
+window.GetMethodFunction = GetMethodFunction;
+window.PostMethodFunctionWhitOutLoader = PostMethodFunctionWhitOutLoader;
+window.PostMethodFunction = PostMethodFunction;
+window.PostMethodFunctionSync = PostMethodFunctionSync;
+window.PostMethodMultimediaFunction = PostMethodMultimediaFunction;
+window.PostMethodMultimediaFunctionData = PostMethodMultimediaFunctionData;
+window.RandomProductOutClick = RandomProductOutClick;
+window.DateTimeToString = DateTimeToString;
+window.CounterDownFunction = CounterDownFunction;
+window.CloseBlurLayout = CloseBlurLayout;
+window.OpenBlurLayout = OpenBlurLayout;
+window.alertSuccess = alertSuccess;
+window.alertNormal = alertNormal;
+window.alertWarning = alertWarning;
+window.swallMessage = swallMessage;
+window.togglePasswordVisibility = togglePasswordVisibility;
+window.showLoadedImage = showLoadedImage;
+window.validateEmail = validateEmail;
+window.checkFileSize = checkFileSize;

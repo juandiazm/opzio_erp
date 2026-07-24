@@ -1,3 +1,4 @@
+import { loadPdfViewer, pdfPrevPage, pdfNextPage, pdfZoomIn, pdfZoomOut, printPdf, downloadPdf, sharePdf, fullscreenPdf, initPdfViewer, destroyPdfViewer } from '../../pdf-viewer.js';
 $(document).on('click', '#nav-tab .nav-link', changeTab);
 //list incomes
 $(document).on('change', '#db-pagination-per-page', DBchangePageSize);
@@ -26,6 +27,15 @@ $(document).on('click', '.list-go-to-pay', function(){
 });
 //Purchase Order Viewer
 $(document).on('click', '#close-order-viewer', closeOrderViewer);
+$(document).on('click', '#pdf-prev-page', pdfPrevPage);
+$(document).on('click', '#pdf-next-page', pdfNextPage);
+$(document).on('click', '#pdf-zoom-in', pdfZoomIn);
+$(document).on('click', '#pdf-zoom-out', pdfZoomOut);
+$(document).on('click', '#pdf-print', printPdf);
+$(document).on('click', '#pdf-download', downloadPdf);
+$(document).on('click', '#pdf-share', sharePdf);
+$(document).on('click', '#pdf-fullscreen', fullscreenPdf);
+$(document).ready(function() { initPdfViewer(); });
 $(document).on('click', '#send-order-button', sendOrder);
 $(document).on('click', '#cancel-send-order-button', cancelSendOrder);
 $(document).on('click', '#confirm-send-order-button', confirmSendOrder);
@@ -218,7 +228,8 @@ function goToPay(unique_id){
 let receiversList = [];
 function showIncomeOrder(openWindow = true){
     if(current_income != null){
-        $('#order-viewer').attr('src','/storage/incomes/pdfs/'+current_income.unique_id+'.pdf?'+Date.now());
+        let pdfUrl = '/storage/incomes/pdfs/'+current_income.unique_id+'.pdf?'+Date.now();
+        loadPdfViewer(pdfUrl);
         if(openWindow){
             $('#order-viewer-container').css('display','flex');
             $('#erp-app-sidebar').css('visibility','hidden');
@@ -227,19 +238,14 @@ function showIncomeOrder(openWindow = true){
     }
 }
 function closeOrderViewer(){
+    destroyPdfViewer();
     $('#order-viewer-container').fadeOut(100);
     $('#erp-app-sidebar').css('visibility','visible');
     $('#menu-nav').css('visibility','visible');
     cancelSendOrder();
 }
 function printOrderPdf(){
-    showIncomeOrder(false);
-    var pdfViewer = document.getElementById("order-viewer");
-    pdfViewer.onload = function() {
-        pdfViewer.contentWindow.print();
-        //remove pdf viewer after print
-        pdfViewer.onload = null;
-    };
+    printPdf();
 }
 function sendOrder(){
     $('#send-order-button').attr('disabled',true);

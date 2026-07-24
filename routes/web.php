@@ -97,6 +97,21 @@ Route::get('service-worker.js', function () {
 Route::get('Admin', function () {
     return redirect('/admin');
 });
+
+// Serve storage PDFs directly — fallback for php artisan serve (doesn't follow NTFS junctions)
+// On Apache/WAMP this route is never reached because Apache serves the file from the symlink directly.
+Route::get('storage/incomes/pdfs/{filename}', function (string $filename) {
+    $filename = basename($filename); // prevent path traversal
+    $path = storage_path('app/public/incomes/pdfs/' . $filename);
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response()->file($path, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        'Cache-Control'       => 'private, no-store',
+    ]);
+})->where('filename', '.+\.pdf');
 Route::prefix('admin')->group(function () {
     Route::get('/', [admin_pages_controller::class, 'login_page']);
     Route::post('login', [users_controller::class, 'login_user']);

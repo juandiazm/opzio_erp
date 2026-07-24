@@ -304,7 +304,28 @@
     <i class="fa-solid fa-times" id="close-order-viewer"></i>
     <div id="order-viewer-sub-container">
         <h1 id="order-viewer-title">Documento</h1>
-        <iframe id="order-viewer" src="/storage/incomes/pdfs/eb5646cf-bf6e-4517-9b77-a378b5ca076a.pdf" frameborder="0"></iframe>
+        <div id="order-viewer">
+            <div id="pdf-toolbar">
+                <div class="pdf-toolbar-nav">
+                    <button id="pdf-prev-page" class="btn btn-sm" title="Página anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                    <span id="pdf-page-info"><span id="pdf-page-num">1</span> / <span id="pdf-page-count">-</span></span>
+                    <button id="pdf-next-page" class="btn btn-sm" title="Página siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="pdf-toolbar-actions">
+                    <button id="pdf-zoom-out" class="btn btn-sm" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                    <button id="pdf-zoom-in" class="btn btn-sm" title="Acercar"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                    <span class="pdf-toolbar-divider"></span>
+                    <button id="pdf-print" class="btn btn-sm" title="Imprimir"><i class="fa-solid fa-print"></i></button>
+                    <button id="pdf-download" class="btn btn-sm" title="Descargar"><i class="fa-solid fa-download"></i></button>
+                    <button id="pdf-share" class="btn btn-sm" title="Compartir"><i class="fa-solid fa-share-nodes"></i></button>
+                    <button id="pdf-fullscreen" class="btn btn-sm" title="Pantalla completa"><i class="fa-solid fa-expand"></i></button>
+                </div>
+            </div>
+            <div id="pdf-canvas-container">
+                <div id="pdf-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                <canvas id="pdf-canvas"></canvas>
+            </div>
+        </div>
         <div id="order-viewer-buttons" class="d-flex justify-content-center">
             <button id="send-order-button" class="btn">
                 <i class="fa-solid fa-paper-plane"></i>
