@@ -772,7 +772,7 @@ trait incomes_trait
         // When $markAsPaid is true we use today's date as due_date since
         // the invoice is already paid. Otherwise use the cutoff_date.
         $paymentEntry = [
-            "id" => 1216,
+            "id" => 1217,
             "value" => floatval($income->total),
             "due_date" => $markAsPaid
                 ? Carbon::now()->format('Y-m-d')
