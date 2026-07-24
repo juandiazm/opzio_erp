@@ -1,8 +1,39 @@
 import { defineConfig } from 'vite'
 import laravel from 'laravel-vite-plugin'
 
+// Renames pdf.worker.min-[hash].mjs → .js in the build output so that
+// servers without a .mjs MIME-type mapping still serve it as JavaScript.
+function pdfWorkerMjsToJs() {
+    return {
+        name: 'pdf-worker-mjs-to-js',
+        apply: 'build',
+        generateBundle(_, bundle) {
+            const workerEntries = Object.entries(bundle).filter(
+                ([key]) => /pdf\.worker\.min-[^/]+\.mjs$/.test(key)
+            );
+            for (const [oldKey, chunk] of workerEntries) {
+                const newKey      = oldKey.replace(/\.mjs$/, '.js');
+                const oldBasename = oldKey.split('/').pop();
+                const newBasename = newKey.split('/').pop();
+
+                chunk.fileName = newKey;
+                bundle[newKey] = chunk;
+                delete bundle[oldKey];
+
+                // Patch the embedded URL string in every JS chunk.
+                for (const c of Object.values(bundle)) {
+                    if (c.type === 'chunk' && typeof c.code === 'string') {
+                        c.code = c.code.replaceAll(oldBasename, newBasename);
+                    }
+                }
+            }
+        },
+    };
+}
+
 export default defineConfig({
     plugins: [
+        pdfWorkerMjsToJs(),
         laravel({
             input: [
     'resources/images/opzio-logo-compact-cream-bg-transparent.png',

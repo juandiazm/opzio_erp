@@ -71,7 +71,7 @@
     "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.woff2"
   },
   "node_modules/pdfjs-dist/build/pdf.worker.min.mjs": {
-    "file": "assets/pdf.worker.min-DEtVeC4l.mjs",
+    "file": "assets/pdf.worker.min-DEtVeC4l.js",
     "src": "node_modules/pdfjs-dist/build/pdf.worker.min.mjs"
   },
   "resources/images/opzio-logo-compact-cream-bg-transparent.png": {
@@ -748,7 +748,7 @@
     "isEntry": true
   },
   "resources/js/general.js": {
-    "file": "assets/general-BxEuy3yV.js",
+    "file": "assets/general-BYGjDj0u.js",
     "name": "general",
     "src": "resources/js/general.js",
     "isEntry": true
