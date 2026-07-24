@@ -5,6 +5,8 @@ use Dompdf\Options;
 trait pdf_trait
 {
     public function PDF_GenerarPDF($view, $Data, $orientation = 'portrait'){
+        ini_set('memory_limit', '256M');
+
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);

@@ -184,13 +184,13 @@
             }
             #feed-container{
                 align-items: center;
-                margin: 20px 0 0 0;
-                padding: 0;
+                margin: 0;
+                padding: 20px 0 0 0;
                 width: 90%;
                 position: absolute; 
                 bottom: 25px; 
-                left: 5%; 
-                right: 0px;  
+                left: 5%;   
+                border-top: 1px solid #707070;
             }
             .feed-sub-contianer{
                 display: inline-block;
@@ -320,7 +320,7 @@
                 display: table;
                 width: 88%;
                 height: 92px;
-                padding-top: 0;
+                padding-top: 10px;
                 bottom: 18px;
                 left: 6%;
                 box-sizing: border-box;
@@ -523,6 +523,7 @@
                             <a id="feed-link" href="https://opzio.co/" target="_blank">Opzio S.A.S</a>
                         </div>
                     </div>
+                    <div class="feed-sub-contianer"></div>
                 </div>
             </div>
         @endforeach
