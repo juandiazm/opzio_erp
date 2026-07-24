@@ -451,7 +451,8 @@ trait incomes_trait
         $Data = [
             'income' => $income,
             'client' => $client,
-            'public_path' => env('APP_ENV') == 'local' ? 'https://erp.opzio.co/' : URL::to('/') . '/'
+            'public_path' => public_path() . '/',
+            'storage_path' => storage_path('app/public') . '/'
         ];
         try {
             $pdf = $this->PDF_GenerarPDF('pdf.purchase_order', $Data);
@@ -480,7 +481,8 @@ trait incomes_trait
         $Data = [
             'income' => $income->toArray(),
             'client' => $client->toArray(),
-            'public_path' => env('APP_ENV') == 'local' ? 'https://erp.opzio.co/' : URL::to('/') . '/'
+            'public_path' => public_path() . '/',
+            'storage_path' => storage_path('app/public') . '/'
         ];
         try {
             $pdf = $this->PDF_GenerarPDF('pdf.quotation_order', $Data);

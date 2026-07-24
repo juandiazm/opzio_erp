@@ -10,14 +10,7 @@ class income_payment_controller extends Controller
 {
     use income_payments_trait;
     public function add_wompi_payment_unlogged(Request $request){
-        $Response = $this->IncomePayment_AddWompiPayment(
-            $request->unique_id,
-            null
-        );
-        if($Response['status'] == 1){
-            return $Response;
-        }
-        return \Response::json($Response , 400);
+        return \Response::json(['status' => 0, 'message' => 'Wompi payments are disabled'], 403);
     }
     public function add_bold_payment_unlogged(Request $request){
         $Response = $this->IncomePayment_AddBoldPayment(
@@ -30,14 +23,7 @@ class income_payment_controller extends Controller
         return \Response::json($Response , 400);
     }
     public function finished_wompi_payment(Request $request){
-        $Response = $this->IncomePayment_FinishedWompiPayment(
-            $request->unique_id,
-            $request->transaction
-        );
-        if($Response['status'] == 1){
-            return $Response;
-        }
-        return \Response::json($Response , 400);
+        return \Response::json(['status' => 0, 'message' => 'Wompi payments are disabled'], 403);
     }
     //Get income payment response for unlogged user
     public function get_income_payment_data(Request $request){

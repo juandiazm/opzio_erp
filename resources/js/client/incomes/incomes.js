@@ -33,7 +33,22 @@ $(document).on('click', '#pdf-zoom-in', pdfZoomIn);
 $(document).on('click', '#pdf-zoom-out', pdfZoomOut);
 $(document).on('click', '#pdf-print', printPdf);
 $(document).on('click', '#pdf-download', downloadPdf);
-$(document).on('click', '#pdf-share', sharePdf);
+$(document).on('click', '#pdf-share', function() {
+    if (!current_income || !current_income.unique_id) return;
+    const payUrl = window.location.origin + '/client/payments/pay/' + current_income.unique_id;
+    if (navigator.share) {
+        navigator.share({ url: payUrl }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(payUrl).then(() => {
+            const btn = document.getElementById('pdf-share');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                icon.className = 'fa-solid fa-check';
+                setTimeout(() => { icon.className = 'fa-solid fa-share-nodes'; }, 2000);
+            }
+        }).catch(() => {});
+    }
+});
 $(document).on('click', '#pdf-fullscreen', fullscreenPdf);
 $(document).ready(function() { initPdfViewer(); });
 $(document).on('click', '#send-order-button', sendOrder);

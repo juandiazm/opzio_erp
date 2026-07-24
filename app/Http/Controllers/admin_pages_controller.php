@@ -46,6 +46,10 @@ class admin_pages_controller extends Controller
     {
         return view('erp.incomes');
     }
+    public function panel_payment_gateway(Request $request)
+    {
+        return redirect('/admin/incomes');
+    }
     public function outcomes_page(Request $request)
     {
         return view('erp.outcomes');

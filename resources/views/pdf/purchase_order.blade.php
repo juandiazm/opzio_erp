@@ -100,6 +100,9 @@
                 display: inline-block;
                 vertical-align: top;
             }
+            #client-container #paymethods-container a{
+                text-decoration: none;
+            }
             #client-container #client-data-container{
                 width: 35%;
                 padding-left: 10px;
@@ -283,11 +286,16 @@
             #bank-data-bank-name,
             #bank-data-bank,
             #bank-data-account,
-            #bank-data-id{
+            #bank-data-id,
+            #bank-key{
                 margin: 0;
                 padding: 2px 0;
                 font-size: 13px;
                 color: #222;
+            }
+            #bank-key span{
+                font-weight: bold;
+                color: #220245;
             }
             .service-row{
             }
@@ -298,6 +306,79 @@
                 /*all content in one line*/
                 white-space: nowrap;
             }
+        </style>
+        <style>
+            body { color: #0F172A; }
+            #general-container { width: 88%; padding-bottom: 60px; margin-top: 36px; }
+            #header-container { padding: 0 0 14px 0; margin-bottom: 18px; border-bottom: 2px solid #220245; }
+            #header-container #opzio-logo { width: 20%; left: 0; }
+            #header-container #opzio-data-container { width: 39%; }
+            #header-container #opzio-data-container p,
+            #header-container #opzio-data-container a { font-size: 10px; line-height: 1.45; color: #475569; }
+            #header-container #opzio-data-container .title { color: #220245; font-size: 13px; }
+            #order-main-information { width: 34%; padding: 10px 12px; background-color: #220245; box-sizing: border-box; }
+            #order-main-information p { color: #FFFFFF; font-size: 10px; line-height: 1.45; }
+            #order-main-information p.title { font-size: 14px; }
+            #timely_payment { background: #FFFFFF; color: #220245 !important; border-radius: 0; padding: 4px 0 !important; margin: 4px 0 0 0 !important; font-weight: bold; }
+            #client-container { padding: 13px 15px 11px 15px; margin-bottom: 20px; background-color: #F2F2E8; border-bottom: 0; box-sizing: border-box; }
+            #client-container #client-data-container { width: 39%; padding-left: 0; }
+            #client-container #client-data-container p { padding: 1px 0; font-size: 10px; line-height: 1.45; color: #475569; }
+            #client-container #client-data-container .title,
+            #qr-container .title,
+            #paymethods-container .title { margin-bottom: 5px; color: #220245; font-size: 11px; text-transform: uppercase; }
+            #qr-container { width: 25%; }
+            #qr-container #qr { width: 62%; }
+            #paymethods-container { width: 32%; }
+            #paymethods-container #pay-methods-image { width: 50%; margin-top: 20px; }
+            #licenses-container table { border: 1px solid #D4D4C8; }
+            #licenses-container table thead { background-color: #220245; color: #FFFFFF; }
+            #licenses-container table thead th { padding: 8px 9px; color: #FFFFFF; font-size: 10px; text-transform: uppercase; }
+            #licenses-container table tbody tr { border-bottom: 1px solid #D4D4C8; }
+            #licenses-container table tbody tr td,
+            #licenses-container table tbody tr td p { padding: 7px 9px; color: #334155; font-size: 10px; line-height: 1.4; }
+            #licenses-container .service-row td { padding-top: 6px; padding-bottom: 6px; background-color: #F2F2E8; color: #220245; font-size: 10px; }
+            #total-container { padding-top: 18px; }
+            #total-container .total-sub-container { width: 42%; margin-bottom: 5px; padding: 3px 0; border-bottom: 1px solid #D4D4C8; }
+            #total-container .total-sub-container p { color: #475569; font-size: 11px; }
+            #total-container .total-sub-container:last-child { padding: 8px 10px; background-color: #220245; border-bottom: 0; box-sizing: border-box; }
+            #total-container .total-sub-container:last-child p { color: #FFFFFF; font-size: 13px; }
+            #order-description p { width: 100%; margin-top: 12px; padding: 10px 12px; background-color: #F2F2E8; box-sizing: border-box; color: #475569; font-size: 10px; text-align: left; }
+            #feed-container { padding-top: 12px; border-top: 1px solid #D4D4C8; }
+            #feed-container #opzio-logo-feed { width: 52px; margin-right: 7px; padding: 0; box-shadow: none; }
+            #feed-container #feed-text-container p,
+            #bank-data-container p,
+            #bank-data-title,
+            #bank-data-bank-name,
+            #bank-data-bank,
+            #bank-data-account,
+            #bank-data-id,
+            #bank-key { padding: 1px 0; font-size: 9px; line-height: 1.35; }
+            #bank-data-title { color: #220245; text-transform: uppercase; }
+            #bank-key { color: #220245; font-weight: bold; }
+
+            /* White-only minimalist treatment. */
+            #header-container { border-bottom: 1px solid #D4D4C8; }
+            #order-main-information { background-color: #FFFFFF; border: 1px solid #220245; }
+            #order-main-information p { color: #334155; }
+            #order-main-information p.title { color: #220245; }
+            #client-container { background-color: #FFFFFF; border: 1px solid #D4D4C8; }
+            #licenses-container table thead { background-color: #FFFFFF; color: #220245; border-bottom: 2px solid #220245; }
+            #licenses-container table thead th { color: #220245; }
+            #licenses-container .service-row td { background-color: #FFFFFF; }
+            #total-container .total-sub-container:last-child { background-color: #FFFFFF; border: 1px solid #220245; }
+            #total-container .total-sub-container:last-child p { color: #220245; }
+            #order-description p { background-color: #FFFFFF; border: 1px solid #D4D4C8; }
+            .feed-sub-contianer { vertical-align: middle; }
+            #feed-container {
+                display: table;
+                width: 88%;
+                height: 92px;
+                padding-top: 0;
+                bottom: 18px;
+                left: 6%;
+                box-sizing: border-box;
+            }
+            #feed-container .feed-sub-contianer { display: table-cell; vertical-align: middle; }
         </style>
     </head>
     <body>
@@ -389,15 +470,12 @@
             @endif
             <div id="general-container">
                 <div id="header-container" class="container border-botton">
-                    <img src="{{ $Data['public_path'].'images/opzio-logo-wide-purple.webp' }}" alt="Opzio S.A.S" id="opzio-logo"/>
+                    <img src="{{ $Data['public_path'].'images/opzio-logo-wide-purple.jpg' }}" alt="Opzio S.A.S" id="opzio-logo"/>
                     <div id="opzio-data-container">
                         <p class="title">Opzio S.A.S</p>
-                        <br>
-                        <p>NIT: 901.721.687-1</p>
-                        <p>Dir: CARRERA 76 80 20 P 4</p>
-                        <p>Tel: (601) 4051307</p>
+                        <p>NIT: 902.086.745-1</p>
                         <p>Bogotá D.C., Colombia</p>
-                        <a href="https://opzio.co/" target="_blank">www.opzio.co</a>
+                        <a href="https://opzio.co/" target="_blank">opzio.co</a>
                     </div>
                     <div id="order-main-information">
                         <p class="title">ORDEN DE COMPRA</p>
@@ -418,15 +496,15 @@
                         <p>{{ $Data['client']['country']['name'] }}</p>
                     </div>
                     <div id="qr-container">
-                        <p class="title">Link de pago<br><br><br></p>
-                        <a href="{{ $Data['income']['url'] }}" target="_blank">
-                            <img src="{{ $Data['public_path'].'storage/incomes/qr/'.$Data['income']['unique_id'].'.png'}}" alt="QR" id="qr"/>
+                        <a href="{{ $Data['income']['url'] }}">
+                            <p class="title">Link de pago</p>
+                            <img src="{{ $Data['storage_path'].'incomes/qr/'.$Data['income']['unique_id'].'.png'}}" alt="QR" id="qr"/>
                         </a>
                     </div>
                     <div id="paymethods-container">
-                        <p class="title">Realiza tu pago</p>
-                        <a href="{{ $Data['income']['url'] }}" target="_blank">
-                            <img src="{{ $Data['public_path'].'images/logowompi.png'}}" alt="logowompi" id="pay-methods-image"/>
+                        <a href="{{ $Data['income']['url'] }}">
+                            <p class="title">Realiza tu pago con</p>
+                            <img src="{{ $Data['public_path'].'images/logobold.png'}}" alt="BOLD" id="pay-methods-image"/>
                         </a>
                     </div>
                 </div>
@@ -509,7 +587,7 @@
                 @endif
                 <div id="feed-container">
                     <div class="feed-sub-contianer">
-                        <img src="{{ $Data['public_path'].'images/opzio-monogram-circle-purple-bg.webp'}}" alt="Opzio S.A.S" id="opzio-logo-feed"/>
+                        <img src="{{ $Data['public_path'].'images/opzio-monogram-circle-purple-bg.jpg'}}" alt="Opzio S.A.S" id="opzio-logo-feed"/>
                         <div id="feed-text-container">
                             <p id="feed-department"><strong>Departamento Contable</strong></p>
                             <p id="feed-email">Correo: contabilidad@opzio.co</p>
@@ -518,10 +596,11 @@
                     </div>
                     <div class="feed-sub-contianer" id="bank-data-container">
                         <p id="bank-data-title">Información Bancaria</p>
-                        <p id="bank-data-bank-name"><span>Razón Social:</span> Opzio S.A.S</p>
-                        <p id="bank-data-bank"><span>Banco:</span> Bancolombia</p>
-                        <p id="bank-data-account"><span>Cuenta de Ahorros:</span> 467-000086-57</p>
-                        <p id="bank-data-id"><span>NIT:</span> 901.721.687-1</p>
+                        <p id="bank-data-bank-name"><span>Razón Social:</span> OPZIO S.A.S</p>
+                        <p id="bank-data-bank"><span>Banco:</span> BOLD C.F</p>
+                        <p id="bank-data-account"><span>Cuenta de Ahorros:</span> 1700-1363-1382</p>
+                        <p id="bank-key"><span>Llave:</span> contabilidad@opzio.co</p>
+                        <p id="bank-data-id"><span>NIT:</span> 902.086.745-1</p>
                     </div>
                 </div>
             </div>

@@ -19,10 +19,14 @@ export async function loadPdfViewer(url) {
     $('#pdf-canvas').hide().css('width', '');
 
     try {
-        if (pdfDoc) {
-            pdfDoc.destroy();
-            pdfDoc = null;
+        if (pdfDoc && typeof pdfDoc.destroy === 'function') {
+            try {
+                pdfDoc.destroy();
+            } catch (e) {
+                console.error('Error destroying previous PDF:', e);
+            }
         }
+        pdfDoc = null;
 
         // Use browser-native fetch (handles session cookies, no range requests)
         // so PDF.js never makes partial/range fetches that WAMP may mishandle
@@ -160,10 +164,15 @@ export function initPdfViewer() {
 }
 
 export function destroyPdfViewer() {
-    if (pdfDoc) {
-        pdfDoc.destroy();
-        pdfDoc = null;
+    if (pdfDoc && typeof pdfDoc.destroy === 'function') {
+        try {
+            pdfDoc.destroy();
+        } catch (e) {
+            console.error('Error destroying PDF:', e);
+        }
     }
+    pdfDoc = null;
+    rendering = false;
     currentUrl = null;
     currentPage = 1;
     totalPages = 0;

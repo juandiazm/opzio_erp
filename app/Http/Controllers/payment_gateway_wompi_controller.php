@@ -10,17 +10,6 @@ class payment_gateway_wompi_controller extends Controller
 {
     use income_payments_trait;
     public function post_wompi_payment(Request $request){
-        $Response = $this->IncomePayment_FinishedWompiPayment(
-            [
-                'signature' => $request['signature'],
-                'timestamp' => $request['timestamp'],
-            ],
-            $request['data']['transaction']['reference'],
-            $request['data']['transaction']
-        );
-        if($Response['status'] == 1){
-            return $Response;
-        }
-        return \Response::json($Response , 400);
+        return \Response::json(['status' => 0, 'message' => 'Wompi payments are disabled'], 403);
     }
 }

@@ -2,7 +2,6 @@
 @section('app-header')
 <title>Opzio - Realiza tu pago</title>
 <!-- Scripts de pasarelas de pago -->
-<script type="text/javascript" src="https://checkout.wompi.co/widget.js"></script>
 <script type="text/javascript" src="https://checkout.bold.co/library/boldPaymentButton.js"></script>
 <script>
     var income_unique_id = "{{ $income_unique_id }}";
@@ -19,7 +18,7 @@
         <div id="pay-unlogged-data-container">
             <div class="payment-header">
                 <div class="payment-header-left">
-                    <img src="/images/opzio-logo-compact-purple-transparent.webp" alt="Opzio" class="avatar-img">
+                    <img src="/images/opzio-logo-wide-purple-transparent.webp" alt="Opzio" class="avatar-img">
                     <h1 id="pay-unlogged-title">Realiza tu pago</h1>
                 </div>
                 <div class="payment-header-right">
@@ -79,25 +78,6 @@
                         </div>
                     </div>
 
-                    <!-- Selector de pasarela de pago -->
-                    <div id="payment-gateway-selector">
-                        <h3 class="gateway-selector-title">Selecciona tu método de pago</h3>
-                        <div class="gateway-options">
-                            <label class="gateway-option" data-gateway="bold">
-                                <input type="radio" name="payment_gateway" value="bold" checked>
-                                <div class="gateway-option-content">
-                                    <img src="/images/payment-gateways/logo-bold.webp" alt="Bold" class="gateway-logo">
-                                </div>
-                            </label>
-                            <label class="gateway-option" data-gateway="wompi">
-                                <input type="radio" name="payment_gateway" value="wompi">
-                                <div class="gateway-option-content">
-                                    <img src="/images/payment-gateways/logo-wompi.webp" alt="Wompi" class="gateway-logo">
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
                     <button class="btn" id="pay-unlogged-btn">
                         <i class="fas fa-lock"></i> Pagar de forma segura
                     </button>
@@ -112,7 +92,7 @@
     </div>
     <div id="pay-result-container" class="align-self-center justify-content-around">
         <div id="pay-result-data-continer">
-            <!--<img src="/images/opzio-logo-compact-purple-transparent.webp" alt="Opzio" class="avatar-img">-->
+            <!--<img src="/images/opzio-logo-wide-purple-transparent.webp" alt="Opzio" class="avatar-img">-->
             <i class="fas fa-5x" id="pay-result-icon"></i>
             <h1 id="pay-result-title"></h1>
             <p id="pay-result-description"></p>

@@ -1,10 +1,8 @@
 $(document).on('click', '#pay-unlogged-btn', startPaymentProcess);
 $(document).on('click', '#pay-result-btn', finishedTransactionAction);
 $(document).on('click', '#toggle-items-btn', toggleItems);
-$(document).on('change', 'input[name="payment_gateway"]', onGatewayChange);
 var processing_payment = false;
 var interval = null;
-var selected_gateway = 'bold'; // Bold por defecto
 $(document).ready(function(){
     let url = new URL(window.location.href);
     let external = url.searchParams.get('external');
@@ -21,13 +19,7 @@ $(document).ready(function(){
         );
     }
     getIncomeData();
-    // Inicializar gateway seleccionado
-    selected_gateway = $('input[name="payment_gateway"]:checked').val() || 'bold';
 });
-
-function onGatewayChange(){
-    selected_gateway = $('input[name="payment_gateway"]:checked').val();
-}
 function getIncomeData(){
     var DataSend = {
         unique_id: income_unique_id
@@ -119,11 +111,7 @@ function toggleItems(){
     }
 }
 function startPaymentProcess(){
-    if(selected_gateway === 'bold'){
-        startBoldPayment();
-    } else {
-        startWompiPayment();
-    }
+    startBoldPayment();
 }
 
 function startBoldPayment(){
@@ -164,37 +152,7 @@ function startPaymentStatusCheck(){
     }, 5000);
 }
 
-function startWompiPayment(){
-    var dataSend = {
-        unique_id: income_unique_id
-    };
-    PostMethodFunction('/client/payments/payment-gateway/wompi/create', dataSend, null, function(response){
-        let data = response.data;
-        let customerData = null;
-        if(data.notifications.length>0){
-            customerData= {
-                email:data.notifications.length==0?null:data.notifications[0].email,
-                fullName: data.client_name
-            };
-        }
-        var checkout = new WidgetCheckout({
-            currency: data.wompi.currency,
-            amountInCents: data.wompi.amount,
-            reference: data.wompi.reference,
-            publicKey: data.wompi.public_key,
-            signature: {integrity : data.wompi.integrity_signature},
-            redirectUrl: data.wompi.redirection_url,
-            taxInCents: {
-                vat: 0,
-                consumption: 0
-            },
-            customerData: customerData,
-        });
-        checkout.open(function ( result ) {
-            showProcessingState();
-        });
-    }, null);
-}
+
 
 function showProcessingState(){
     processing_payment = true;
