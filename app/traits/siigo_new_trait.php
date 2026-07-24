@@ -13,13 +13,13 @@ trait siigo_new_trait
 	private $username;
 	private $access_key;
 	private $partner_id;
-	private $DocCodeFV = 26195;
-	private $SiggoUserID = 279;
+	private $DocCodeFV = 32273;
+	private $SiggoUserID = 137;
 	public $Siggo_TaxAddName = "IVA 19%";
-    public $Siggo_TaxAddId =  5806;
+    public $Siggo_TaxAddId =  2845;
     public $Siggo_TaxAddPercentage = 19;
     public $Siggo_TaxDiscountName = "Retefuente 2.5%";
-    public $Siggo_TaxDiscountId =  5812;
+    public $Siggo_TaxDiscountId =  2851;
     public $Siggo_TaxDiscountPercentage = 2.50;
 	private $siigo_token = null; // Store token in memory for console commands
 
