@@ -1,9 +1,8 @@
 import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-// The worker is copied to public/pdf.worker.min.js by the Vite plugin in
-// vite.config.js. Using a .js extension ensures every server serves it with
-// application/javascript without requiring special MIME-type configuration.
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+// Let Vite bundle the worker as a hashed asset so the URL is always correct.
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
 let pdfDoc = null;
 let currentPage = 1;

@@ -583,7 +583,7 @@ function validateEmail(email) {
 	return re.test(email);
 }
 function checkFileSize(file, maxSize){
-	maxSizeinKB = maxSize * 1024 * 1024;
+	const maxSizeinKB = maxSize * 1024 * 1024;
 	if(file.files[0].size > maxSizeinKB){
 		swallMessage(
 			'Error'
