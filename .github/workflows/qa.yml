@@ -101,9 +101,16 @@ jobs:
           echo "Public directory not found. Copying from repository..."
           scp -r ./public git@35.239.181.103:/var/www/html/opzio_erp_qa/
         else
-          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo rm -rf /var/www/html/opzio_erp_qa/public/build /var/www/html/opzio_erp_qa/public/fonts /var/www/html/opzio_erp_qa/public/images'
-          scp -r ./public/build git@35.239.181.103:/var/www/html/opzio_erp_qa/public
-          scp -r ./public/fonts git@35.239.181.103:/var/www/html/opzio_erp_qa/public
+          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo rm -rf /var/www/html/opzio_erp_qa/public/build /var/www/html/opzio_erp_qa/public/images /var/www/html/opzio_erp_qa/public/fonts'
+          if [ -d "./public/build" ]; then
+            scp -r ./public/build git@35.239.181.103:/var/www/html/opzio_erp_qa/public
+          fi
+          if [ -d "./public/images" ]; then
+            scp -r ./public/images git@35.239.181.103:/var/www/html/opzio_erp_qa/public
+          fi
+          if [ -d "./public/fonts" ]; then
+            scp -r ./public/fonts git@35.239.181.103:/var/www/html/opzio_erp_qa/public
+          fi
         fi
         ssh -o StrictHostKeyChecking=no git@35.239.181.103 'sudo chmod -R 777 /var/www/html/opzio_erp_qa/public'
         
