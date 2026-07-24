@@ -7,12 +7,9 @@
     "file": "assets/lodash-Q-ipqAF7.js",
     "name": "lodash"
   },
-  "_pdf-viewer-CsqRfzPs.js": {
-    "file": "assets/pdf-viewer-CsqRfzPs.js",
-    "name": "pdf-viewer",
-    "assets": [
-      "assets/pdf-worker-entry-D-429D3d.js"
-    ]
+  "_pdf-viewer-D9NyOiPe.js": {
+    "file": "assets/pdf-viewer-D9NyOiPe.js",
+    "name": "pdf-viewer"
   },
   "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf": {
     "file": "assets/fa-brands-400-D2uq21Pt.ttf",
@@ -498,12 +495,12 @@
     "isEntry": true
   },
   "resources/js/client/incomes/incomes.js": {
-    "file": "assets/incomes-BZsomK0Z.js",
+    "file": "assets/incomes-CbyA9c2x.js",
     "name": "incomes",
     "src": "resources/js/client/incomes/incomes.js",
     "isEntry": true,
     "imports": [
-      "_pdf-viewer-CsqRfzPs.js"
+      "_pdf-viewer-D9NyOiPe.js"
     ]
   },
   "resources/js/client/layouts/app.js": {
@@ -657,12 +654,12 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-Be-ks9J4.js",
+    "file": "assets/incomes-CcR8KyeR.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
     "imports": [
-      "_pdf-viewer-CsqRfzPs.js"
+      "_pdf-viewer-D9NyOiPe.js"
     ]
   },
   "resources/js/erp/layouts/app.js": {
@@ -754,10 +751,6 @@
     "name": "jquery",
     "src": "resources/js/jquery.js",
     "isEntry": true
-  },
-  "resources/js/pdf-worker-entry.js": {
-    "file": "assets/pdf-worker-entry-D-429D3d.js",
-    "src": "resources/js/pdf-worker-entry.js"
   },
   "resources/js/popper.js": {
     "file": "assets/popper-B-t4Wlej.js",

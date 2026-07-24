@@ -1,8 +1,20 @@
 import { defineConfig } from 'vite'
 import laravel from 'laravel-vite-plugin'
+import fs from 'fs'
+import path from 'path'
 
 export default defineConfig({
     plugins: [
+        // Copy the PDF.js worker to public/ as a .js file so Apache/Nginx
+        // serves it with application/javascript without special MIME config.
+        {
+            name: 'pdf-worker-copy',
+            buildStart() {
+                const src = path.resolve('node_modules/pdfjs-dist/build/pdf.worker.min.mjs');
+                const dest = path.resolve('public/pdf.worker.min.js');
+                fs.copyFileSync(src, dest);
+            }
+        },
         laravel({
             input: [
     'resources/images/opzio-logo-compact-cream-bg-transparent.png',

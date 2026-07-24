@@ -1,12 +1,9 @@
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Reference the worker through a local .js wrapper so Vite emits a .js chunk
-// (not .mjs). This ensures the file is served with application/javascript
-// regardless of server-side MIME-type configuration (.htaccess / nginx.conf).
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    './pdf-worker-entry.js',
-    import.meta.url
-).href;
+// The worker is copied to public/pdf.worker.min.js by the Vite plugin in
+// vite.config.js. Using a .js extension ensures every server serves it with
+// application/javascript without requiring special MIME-type configuration.
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
 let pdfDoc = null;
 let currentPage = 1;
