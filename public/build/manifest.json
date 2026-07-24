@@ -7,11 +7,11 @@
     "file": "assets/lodash-Q-ipqAF7.js",
     "name": "lodash"
   },
-  "_pdf-viewer-ZSANNzoY.js": {
-    "file": "assets/pdf-viewer-ZSANNzoY.js",
+  "_pdf-viewer-CsqRfzPs.js": {
+    "file": "assets/pdf-viewer-CsqRfzPs.js",
     "name": "pdf-viewer",
     "assets": [
-      "assets/pdf.worker.min-DEtVeC4l.mjs"
+      "assets/pdf-worker-entry-D-429D3d.js"
     ]
   },
   "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf": {
@@ -69,10 +69,6 @@
   "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.woff2": {
     "file": "assets/fa-v4compatibility-BM8kBeXM.woff2",
     "src": "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-v4compatibility.woff2"
-  },
-  "node_modules/pdfjs-dist/build/pdf.worker.min.mjs": {
-    "file": "assets/pdf.worker.min-DEtVeC4l.mjs",
-    "src": "node_modules/pdfjs-dist/build/pdf.worker.min.mjs"
   },
   "resources/images/opzio-logo-compact-cream-bg-transparent.png": {
     "file": "assets/opzio-logo-compact-cream-bg-transparent-UoqjiVlJ.png",
@@ -502,12 +498,12 @@
     "isEntry": true
   },
   "resources/js/client/incomes/incomes.js": {
-    "file": "assets/incomes-C-63-wMt.js",
+    "file": "assets/incomes-BZsomK0Z.js",
     "name": "incomes",
     "src": "resources/js/client/incomes/incomes.js",
     "isEntry": true,
     "imports": [
-      "_pdf-viewer-ZSANNzoY.js"
+      "_pdf-viewer-CsqRfzPs.js"
     ]
   },
   "resources/js/client/layouts/app.js": {
@@ -661,12 +657,12 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-DXj2VU1j.js",
+    "file": "assets/incomes-Be-ks9J4.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
     "imports": [
-      "_pdf-viewer-ZSANNzoY.js"
+      "_pdf-viewer-CsqRfzPs.js"
     ]
   },
   "resources/js/erp/layouts/app.js": {
@@ -759,6 +755,10 @@
     "src": "resources/js/jquery.js",
     "isEntry": true
   },
+  "resources/js/pdf-worker-entry.js": {
+    "file": "assets/pdf-worker-entry-D-429D3d.js",
+    "src": "resources/js/pdf-worker-entry.js"
+  },
   "resources/js/popper.js": {
     "file": "assets/popper-B-t4Wlej.js",
     "name": "popper",
@@ -777,7 +777,7 @@
     "isEntry": true
   },
   "resources/sass/client/blog/email/unsubscribe.scss": {
-    "file": "assets/unsubscribe-4BZogGWT.css",
+    "file": "assets/unsubscribe-CLs-ajA0.css",
     "src": "resources/sass/client/blog/email/unsubscribe.scss",
     "isEntry": true
   },
@@ -817,12 +817,12 @@
     "isEntry": true
   },
   "resources/sass/client/pay_unlogged/pay_unlogged.scss": {
-    "file": "assets/pay_unlogged-gCVUNQIF.css",
+    "file": "assets/pay_unlogged-n-Ra7iQe.css",
     "src": "resources/sass/client/pay_unlogged/pay_unlogged.scss",
     "isEntry": true
   },
   "resources/sass/client/payment_response_unlogged/payment_response_unlogged.scss": {
-    "file": "assets/payment_response_unlogged-0ltlENdV.css",
+    "file": "assets/payment_response_unlogged-Czhw0O9C.css",
     "src": "resources/sass/client/payment_response_unlogged/payment_response_unlogged.scss",
     "isEntry": true
   },
@@ -837,7 +837,7 @@
     "isEntry": true
   },
   "resources/sass/client/set_password/set_password.scss": {
-    "file": "assets/set_password-Cnabsfls.css",
+    "file": "assets/set_password-CGub8L2I.css",
     "src": "resources/sass/client/set_password/set_password.scss",
     "isEntry": true
   },
