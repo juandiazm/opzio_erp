@@ -1,1 +1,0 @@
-{"version":3,"file":"/js/client/dashboard/dashboard.js","mappings":"AAAAA,EAAEC,UAAUC,OAAM,WAClB","sources":["webpack:///./resources/js/client/dashboard/dashboard.js"],"sourcesContent":["$(document).ready(function(){\r\n});"],"names":["$","document","ready"],"sourceRoot":""}

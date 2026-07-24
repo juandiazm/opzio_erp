@@ -1,1 +1,0 @@
-{"version":3,"file":"/js/erp/web-pages/web-pages.js","mappings":"AAAAA,EAAEC,UAAUC,OAAM,WAClB","sources":["webpack:///./resources/js/erp/web-pages/web-pages.js"],"sourcesContent":["$(document).ready(function(){\n});\n"],"names":["$","document","ready"],"sourceRoot":""}
