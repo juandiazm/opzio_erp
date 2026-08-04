@@ -192,6 +192,7 @@ trait licenses_trait
     }
     public function Licese_CalculateRemainingDays($last_payed_date, $recurrence_months, $next_billing_date){
         $remaining_days = 0;
+        $recurrence_months = (int) $recurrence_months;
         if($last_payed_date == null){
             $remaining_days = Carbon::now()->startOfDay()->diffInDays(Carbon::parse($next_billing_date)->startOfDay(), false);
         }else{

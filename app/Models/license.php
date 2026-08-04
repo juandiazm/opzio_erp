@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class license extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $casts = [
+        'recurrence_months' => 'integer',
+    ];
     protected $appends = ['locked', 'server_date', 'value_string', 'type_string', 'active_string'];
     public function getLockedAttribute(){
         $locked = $this->active==1?false:true;
