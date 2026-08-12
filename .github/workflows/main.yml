@@ -128,9 +128,9 @@ jobs:
         scp build.tar.gz git@35.239.181.103:/var/www/html/opzio_erp
         ssh git@35.239.181.103 << 'EOF'
         cd /var/www/html/opzio_erp
-        tar -xzf build.tar.gz
+        tar --no-same-owner --no-same-permissions --no-overwrite-dir -xzf build.tar.gz
         curl -sS https://getcomposer.org/installer | php8.2
-        php8.2 composer.phar install --no-dev --optimize-autoloader
+        php8.2 composer.phar install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
         php8.2 artisan migrate --force
         php8.2 artisan storage:link --force
         php8.2 artisan config:clear
