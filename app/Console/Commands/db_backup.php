@@ -30,6 +30,7 @@ class db_backup extends Command
         $backupPath = storage_path() . "/backups";
         $filename = 'opzio_erp_'.Carbon::now()->format('d').'.sql';
         $localFile = $backupPath . DIRECTORY_SEPARATOR . $filename;
+        $errorFile = $localFile . '.error';
 
         try {
             /////////////////////
@@ -52,7 +53,8 @@ class db_backup extends Command
                 . ' --password=' . escapeshellarg((string) env('DB_PASSWORD'))
                 . ' --host=' . escapeshellarg((string) env('DB_HOST'))
                 . ' ' . escapeshellarg((string) env('DB_DATABASE'))
-                . ' > ' . escapeshellarg($localFile) . ' 2>&1';
+                . ' > ' . escapeshellarg($localFile)
+                . ' 2> ' . escapeshellarg($errorFile);
             $returnVar = 0;
             $output = [];
             Log::info('ERP BACKUP: starting database dump', [
@@ -60,8 +62,15 @@ class db_backup extends Command
                 'mysqldump' => $mysqldump,
             ]);
             exec($command, $output, $returnVar);
+            $errorOutput = is_file($errorFile) ? trim((string) file_get_contents($errorFile)) : '';
             if ($returnVar !== 0 || !is_file($localFile) || filesize($localFile) === 0) {
-                throw new \RuntimeException('Database dump failed: ' . implode(PHP_EOL, $output));
+                if (is_file($localFile)) {
+                    unlink($localFile);
+                }
+                throw new \RuntimeException('Database dump failed: ' . ($errorOutput ?: implode(PHP_EOL, $output) ?: 'no error output'));
+            }
+            if (is_file($errorFile)) {
+                unlink($errorFile);
             }
             Log::info('ERP BACKUP: local dump created', [
                 'file' => $localFile,
