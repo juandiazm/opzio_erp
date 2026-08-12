@@ -15,10 +15,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('command:send_queued_mails')->cron('* */6 * * *');
+        $schedule->command('command:send_queued_mails')
+            ->cron('*/10 7-19 * * *')
+            ->withoutOverlapping(9);
         $schedule->command('command:create_month_incomes')->cron('0 8 * * *');
         $schedule->command('command:update_licenses_remaining_days')->cron('0 4 * * *');
-        $schedule->command('command:send_pay_remaining')->cron('0 11 * * *');
+        $schedule->command('command:send_pay_remaining')
+            ->cron('0 11 * * *')
+            ->withoutOverlapping(60);
         $schedule->command('db:backup')->cron('0 2 * * *');
     }
 

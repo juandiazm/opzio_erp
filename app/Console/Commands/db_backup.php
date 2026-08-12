@@ -37,13 +37,19 @@ class db_backup extends Command
                 mkdir($backupPath, 0755, true);
             }
             $filename = 'opzio_erp_'.Carbon::now()->format('d').'.sql';
-            $command = "mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . "  > " . $backupPath . "/" . $filename;
+            $mysqldump = env('MYSQLDUMP_PATH', 'mysqldump');
+            if (PHP_OS_FAMILY === 'Windows' && $mysqldump === 'mysqldump') {
+                $paths = glob('C:\\wamp64\\bin\\mysql\\*\\bin\\mysqldump.exe');
+                $mysqldump = !empty($paths) ? $paths[0] : $mysqldump;
+            }
+            $command = '"' . $mysqldump . '" --user=' . env('DB_USERNAME') . ' --password=' . env('DB_PASSWORD') . ' --host=' . env('DB_HOST') . ' ' . env('DB_DATABASE') . '  > ' . $backupPath . '/' . $filename;
             $returnVar = NULL;
             $output = NULL;
             exec($command, $output, $returnVar);
             //if(Carbon::now()->format('H') == '00'){
                 $filename_google = 'opzio_erp_'.Carbon::now()->format('d');
                 $googleFolder   = 'Departamento I.T/Backups/Opzio erp';
+                $this->ensureGoogleFolder($googleFolder);
                 //Remove files with the same name
                 $files = Storage::disk('google')->files($googleFolder);
                 foreach($files as $filePath){
@@ -58,8 +64,19 @@ class db_backup extends Command
                 // Delete Files
                 Storage::disk('backups')->delete($files);
             //}
-        } catch (ProcessFailedException $exception) {
+        } catch (\Throwable $exception) {
             info('ERP BACKUP =>'.$exception);
+        }
+    }
+
+    private function ensureGoogleFolder(string $googleFolder): void
+    {
+        $disk = Storage::disk('google');
+        $currentPath = '';
+
+        foreach (array_filter(explode('/', trim($googleFolder, '/'))) as $folder) {
+            $currentPath = $currentPath === '' ? $folder : $currentPath . '/' . $folder;
+            $disk->makeDirectory($currentPath);
         }
     }
 }
