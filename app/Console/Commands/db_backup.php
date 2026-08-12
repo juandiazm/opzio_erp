@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use \Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -24,48 +25,96 @@ class db_backup extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
+        $backupPath = storage_path() . "/backups";
+        $filename = 'opzio_erp_'.Carbon::now()->format('d').'.sql';
+        $localFile = $backupPath . DIRECTORY_SEPARATOR . $filename;
+
         try {
             /////////////////////
             /*if(Carbon::now()->format('i') == '00'){
                 $this->Bill_SendMissingBillsNotification(2);
             }*/
             /////////////////////
-            $backupPath = storage_path() . "/backups";
             if (!file_exists($backupPath)) {
-                mkdir($backupPath, 0755, true);
+                if (!mkdir($backupPath, 0755, true) && !is_dir($backupPath)) {
+                    throw new \RuntimeException("Could not create backup directory: {$backupPath}");
+                }
             }
-            $filename = 'opzio_erp_'.Carbon::now()->format('d').'.sql';
             $mysqldump = env('MYSQLDUMP_PATH', 'mysqldump');
             if (PHP_OS_FAMILY === 'Windows' && $mysqldump === 'mysqldump') {
                 $paths = glob('C:\\wamp64\\bin\\mysql\\*\\bin\\mysqldump.exe');
                 $mysqldump = !empty($paths) ? $paths[0] : $mysqldump;
             }
-            $command = '"' . $mysqldump . '" --user=' . env('DB_USERNAME') . ' --password=' . env('DB_PASSWORD') . ' --host=' . env('DB_HOST') . ' ' . env('DB_DATABASE') . '  > ' . $backupPath . '/' . $filename;
-            $returnVar = NULL;
-            $output = NULL;
+            $command = escapeshellarg($mysqldump)
+                . ' --user=' . escapeshellarg((string) env('DB_USERNAME'))
+                . ' --password=' . escapeshellarg((string) env('DB_PASSWORD'))
+                . ' --host=' . escapeshellarg((string) env('DB_HOST'))
+                . ' ' . escapeshellarg((string) env('DB_DATABASE'))
+                . ' > ' . escapeshellarg($localFile) . ' 2>&1';
+            $returnVar = 0;
+            $output = [];
+            Log::info('ERP BACKUP: starting database dump', [
+                'file' => $localFile,
+                'mysqldump' => $mysqldump,
+            ]);
             exec($command, $output, $returnVar);
+            if ($returnVar !== 0 || !is_file($localFile) || filesize($localFile) === 0) {
+                throw new \RuntimeException('Database dump failed: ' . implode(PHP_EOL, $output));
+            }
+            Log::info('ERP BACKUP: local dump created', [
+                'file' => $localFile,
+                'bytes' => filesize($localFile),
+            ]);
             //if(Carbon::now()->format('H') == '00'){
                 $filename_google = 'opzio_erp_'.Carbon::now()->format('d');
                 $googleFolder   = 'Departamento I.T/Backups/Opzio erp';
                 $this->ensureGoogleFolder($googleFolder);
+                Log::info('ERP BACKUP: Google Drive folder checked', ['folder' => $googleFolder]);
                 //Remove files with the same name
                 $files = Storage::disk('google')->files($googleFolder);
+                $replacedFiles = 0;
                 foreach($files as $filePath){
                     if(pathinfo($filePath, PATHINFO_FILENAME) === $filename_google){
-                        Storage::disk('google')->delete($filePath);
+                        if (Storage::disk('google')->delete($filePath)) {
+                            $replacedFiles++;
+                        }
                     }
                 }
+                Log::info('ERP BACKUP: previous Google Drive files removed', [
+                    'folder' => $googleFolder,
+                    'files_deleted' => $replacedFiles,
+                ]);
                 $filename_google = $filename_google.'.sql';
-                Storage::disk('google')->put($googleFolder.'/'.$filename_google, fopen($backupPath . "/" . $filename, 'r+'));
+                $fileHandle = fopen($localFile, 'rb');
+                if ($fileHandle === false) {
+                    throw new \RuntimeException("Could not open local backup: {$localFile}");
+                }
+                $uploaded = Storage::disk('google')->put($googleFolder.'/'.$filename_google, $fileHandle);
+                fclose($fileHandle);
+                if ($uploaded !== true) {
+                    throw new \RuntimeException('Google Drive adapter did not confirm the upload.');
+                }
+                Log::info('ERP BACKUP: upload completed', [
+                    'disk' => 'google',
+                    'file' => $googleFolder.'/'.$filename_google,
+                ]);
                 // Get all files in a directory
                 $files =   Storage::disk('backups')->allFiles();
                 // Delete Files
                 Storage::disk('backups')->delete($files);
+                Log::info('ERP BACKUP: local backups cleaned', ['files_deleted' => count($files)]);
             //}
+            return self::SUCCESS;
         } catch (\Throwable $exception) {
-            info('ERP BACKUP =>'.$exception);
+            Log::error('ERP BACKUP: failed', [
+                'message' => $exception->getMessage(),
+                'exception' => $exception,
+                'local_file' => $localFile,
+            ]);
+            $this->error('ERP BACKUP failed: ' . $exception->getMessage());
+            return self::FAILURE;
         }
     }
 
@@ -76,7 +125,9 @@ class db_backup extends Command
 
         foreach (array_filter(explode('/', trim($googleFolder, '/'))) as $folder) {
             $currentPath = $currentPath === '' ? $folder : $currentPath . '/' . $folder;
-            $disk->makeDirectory($currentPath);
+            if ($disk->makeDirectory($currentPath) === false) {
+                throw new \RuntimeException("Could not create or access Google Drive folder: {$currentPath}");
+            }
         }
     }
 }
