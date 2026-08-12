@@ -100,8 +100,14 @@ class db_backup extends Command
                 if ($fileHandle === false) {
                     throw new \RuntimeException("Could not open local backup: {$localFile}");
                 }
-                $uploaded = Storage::disk('google')->put($googleFolder.'/'.$filename_google, $fileHandle);
-                fclose($fileHandle);
+                try {
+                    $uploaded = Storage::disk('google')->put($googleFolder.'/'.$filename_google, $fileHandle);
+                } finally {
+                    // Some Flysystem adapters close the stream after uploading.
+                    if (is_resource($fileHandle)) {
+                        fclose($fileHandle);
+                    }
+                }
                 if ($uploaded !== true) {
                     throw new \RuntimeException('Google Drive adapter did not confirm the upload.');
                 }
