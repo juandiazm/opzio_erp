@@ -62,4 +62,10 @@ return [
         'api_token' => env('WEB_INTEGRATION_API_TOKEN', ''),
     ],
 
+    'observability' => [
+        'token' => env('OPZIO_OBSERVER_TOKEN', ''),
+        'loopback_only' => (bool) env('OPZIO_OBSERVER_LOOPBACK_ONLY', true),
+        'max_payload_bytes' => (int) env('OPZIO_OBSERVER_MAX_PAYLOAD_BYTES', 10485760),
+    ],
+
 ];

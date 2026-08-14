@@ -36,6 +36,7 @@ use App\Http\Controllers\client_users_controller;
 use App\Http\Controllers\income_payment_controller;
 use App\Http\Controllers\payment_gateway_wompi_controller;
 use App\Http\Controllers\payment_gateway_bold_controller;
+use App\Http\Controllers\observability_dashboard_controller;
 //Opzio
 use App\Http\Controllers\old_opzio_controller;
 use App\Http\Controllers\client_chat_controller;
@@ -129,6 +130,10 @@ Route::prefix('admin')->group(function () {
             Route::post('get-new-clients-by-date-range', [dashboard_controller::class, 'get_new_clients_by_date_range']);
             Route::post('get-sales-by-month-range', [dashboard_controller::class, 'get_sales_by_month_range']);
             Route::post('get-incomes-by-client-date-range', [dashboard_controller::class, 'get_incomes_by_client_date_range']);
+        });
+        Route::prefix('observability')->group(function () {
+            Route::get('', [observability_dashboard_controller::class, 'page']);
+            Route::post('summary', [observability_dashboard_controller::class, 'summary']);
         });
         Route::prefix('users')->group(function () {
             Route::get('', [admin_pages_controller::class, 'users_page']);

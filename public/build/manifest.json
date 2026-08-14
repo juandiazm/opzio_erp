@@ -693,6 +693,12 @@
     "src": "resources/js/erp/my_profile/my_profile.js",
     "isEntry": true
   },
+  "resources/js/erp/observability/observability.js": {
+    "file": "assets/observability-DhjByEfp.js",
+    "name": "observability",
+    "src": "resources/js/erp/observability/observability.js",
+    "isEntry": true
+  },
   "resources/js/erp/outcomes/outcomes.js": {
     "file": "assets/outcomes-C4ccZRfy.js",
     "name": "outcomes",
@@ -950,6 +956,11 @@
   "resources/sass/erp/my_profile/my_profile.scss": {
     "file": "assets/my_profile-DnTELn8o.css",
     "src": "resources/sass/erp/my_profile/my_profile.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/observability/observability.scss": {
+    "file": "assets/observability-BehEZH6J.css",
+    "src": "resources/sass/erp/observability/observability.scss",
     "isEntry": true
   },
   "resources/sass/erp/outcomes/outcomes.scss": {

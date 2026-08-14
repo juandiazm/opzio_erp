@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'home_page_middleware' => \App\Http\Middleware\home_page_middleware::class,
         'api_token' => \App\Http\Middleware\api_token_middleware::class,
         'web_api_token' => \App\Http\Middleware\web_api_token_middleware::class,
+        'observability' => \App\Http\Middleware\observability_token::class,
     ];
 }

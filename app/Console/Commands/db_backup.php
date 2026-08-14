@@ -6,10 +6,12 @@ use Illuminate\Console\Command;
 use \Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\traits\mail_trait;
 
 
 class db_backup extends Command
 {
+    use mail_trait;
     
     protected $signature = 'db:backup';
     protected $description = 'Make a backup of the db';
@@ -128,6 +130,11 @@ class db_backup extends Command
                 'exception' => $exception,
                 'local_file' => $localFile,
             ]);
+            try {
+                $this->SendMail(['subject' => 'Opzio ERP backup failed'], [['address' => 'soporte@opzio.co', 'name' => 'Soporte Opzio']], 'emails.backup_failed', ['project' => 'Opzio ERP', 'error' => $exception->getMessage()], null);
+            } catch (\Throwable $mailException) {
+                Log::error('ERP BACKUP: failure notification failed', ['message' => $mailException->getMessage()]);
+            }
             $this->error('ERP BACKUP failed: ' . $exception->getMessage());
             return self::FAILURE;
         }

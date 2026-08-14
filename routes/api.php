@@ -44,3 +44,10 @@ Route::prefix('nini-integration')->middleware('api_token')->group(function () {
 Route::prefix('web-integration')->middleware(['web_api_token', 'throttle:10,1'])->group(function () {
     Route::post('/contact-mail', [\App\Http\Controllers\web_integration_controller::class, 'sendContactMail']);
 });
+
+Route::prefix('internal/observability/v1')->middleware('observability')->group(function () {
+    Route::get('/health', [\App\Domain\Observability\Http\Controllers\observability_controller::class, 'health']);
+    Route::get('/config', [\App\Domain\Observability\Http\Controllers\observability_controller::class, 'config']);
+    Route::post('/ingest', [\App\Domain\Observability\Http\Controllers\observability_controller::class, 'ingest']);
+    Route::post('/heartbeat', [\App\Domain\Observability\Http\Controllers\observability_controller::class, 'heartbeat']);
+});

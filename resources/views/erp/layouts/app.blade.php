@@ -126,6 +126,15 @@
                 </a>
             </li>
             @endif
+            @php($observability_permission = collect(session('app_permissions'))->firstWhere('url', 'admin/observability/'))
+            @if($observability_permission && collect(session('permissions'))->firstWhere('user_permission_id', $observability_permission->id)!=null)
+            <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/observability')?' selected':'' }}">
+                <a href="/admin/observability" class="sidebar-menu-item-link">
+                    <i class="fa-light fa-chart-line align-self-center sidebar-menu-item-icon"></i>
+                    <p class="align-self-center sidebar-menu-item-text">Observabilidad</p>
+                </a>
+            </li>
+            @endif
         </ul>
         <button class="align-self-center mt-auto mb-0 d-flex justify-content-center" id="close-session">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27.244 29.009" id="close-session-img">
