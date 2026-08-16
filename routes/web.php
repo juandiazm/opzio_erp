@@ -133,6 +133,8 @@ Route::prefix('admin')->group(function () {
         });
         Route::prefix('observability')->group(function () {
             Route::get('', [observability_dashboard_controller::class, 'page']);
+            Route::post('get-page', [observability_dashboard_controller::class, 'get_page']);
+            Route::get('export', [observability_dashboard_controller::class, 'export']);
             Route::post('summary', [observability_dashboard_controller::class, 'summary']);
         });
         Route::prefix('users')->group(function () {

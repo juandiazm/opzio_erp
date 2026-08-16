@@ -230,6 +230,212 @@ class observability_api_test extends TestCase
         ], 'sqlite');
     }
 
+    public function test_dashboard_lists_filtered_project_metrics_with_pagination()
+    {
+        $firstSampleAt = now()->subMinutes(5)->toDateTimeString();
+        $lastSampleAt = now()->subMinute()->toDateTimeString();
+        DB::table('observability_agents')->where('agent_id', 'test-agent')->update([
+            'last_seen_at' => $lastSampleAt,
+            'version' => '0.2.0',
+        ]);
+        DB::table('observability_project_samples')->insert([
+            [
+                'project_id' => 1,
+                'agent_id' => 'test-agent',
+                'sampled_at' => $firstSampleAt,
+                'attribution_mode' => 'pool',
+                'cpu_percent' => 10,
+                'memory_rss_bytes' => 1000,
+                'process_count' => 4,
+                'fpm_active_processes' => 2,
+                'fpm_idle_processes' => 6,
+                'fpm_listen_queue' => 1,
+                'fpm_max_listen_queue' => 10,
+                'fpm_max_children_reached' => 3,
+                'fpm_slow_requests' => 1,
+                'storage_total_bytes' => 1000,
+            ],
+            [
+                'project_id' => 1,
+                'agent_id' => 'test-agent',
+                'sampled_at' => $lastSampleAt,
+                'attribution_mode' => 'pool',
+                'cpu_percent' => 25,
+                'memory_rss_bytes' => 2000,
+                'process_count' => 5,
+                'fpm_active_processes' => 3,
+                'fpm_idle_processes' => 7,
+                'fpm_listen_queue' => 2,
+                'fpm_max_listen_queue' => 10,
+                'fpm_max_children_reached' => 8,
+                'fpm_slow_requests' => 4,
+                'storage_total_bytes' => 1200,
+            ],
+        ]);
+        DB::table('observability_http_buckets')->insert([
+            'project_id' => 1,
+            'agent_id' => 'test-agent',
+            'bucket_start' => $lastSampleAt,
+            'bucket_seconds' => 60,
+            'requests_total' => 100,
+            'status_2xx' => 95,
+            'status_3xx' => 1,
+            'status_4xx' => 4,
+            'status_5xx' => 1,
+            'status_499' => 1,
+            'status_500' => 0,
+            'status_502' => 1,
+            'status_503' => 0,
+            'status_504' => 0,
+            'request_bytes' => 5000,
+            'response_bytes' => 10000,
+            'latency_count' => 100,
+            'latency_sum_ms' => 2000,
+            'p50_ms' => 12,
+            'p95_ms' => 30,
+            'p99_ms' => 45,
+        ]);
+
+        $response = $this->withoutMiddleware()->postJson('/admin/observability/get-page', [
+            'minutes' => 60,
+            'health' => 'reporting',
+            'search' => 'test-project',
+            'pagination' => [
+                'page' => 1,
+                'per_page' => 5,
+            ],
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('pagination.total', 1)
+            ->assertJsonPath('data.0.key', 'test-project')
+            ->assertJsonPath('data.0.requests_total', 100)
+            ->assertJsonPath('data.0.availability_percent', 99)
+            ->assertJsonPath('data.0.latency_average_ms', 20)
+            ->assertJsonPath('data.0.fpm_max_children_reached_delta', 5)
+            ->assertJsonPath('data.0.storage_growth_bytes', 200);
+
+        for ($index = 1; $index <= 5; $index++) {
+            observability_project::create([
+                'host_id' => $this->agent->host_id,
+                'key' => 'empty-project-' . $index,
+                'name' => 'Empty project ' . $index,
+                'path' => '/var/www/empty-project-' . $index,
+                'environment' => 'testing',
+                'enabled' => true,
+            ]);
+        }
+        $secondPageResponse = $this->withoutMiddleware()->postJson('/admin/observability/get-page', [
+            'minutes' => 60,
+            'pagination' => [
+                'page' => 2,
+                'per_page' => 5,
+            ],
+        ]);
+        $secondPageResponse
+            ->assertOk()
+            ->assertJsonPath('pagination.total', 6)
+            ->assertJsonPath('pagination.page', 2)
+            ->assertJsonPath('data.0.key', 'empty-project-1');
+
+        $exportResponse = $this->withoutMiddleware()->get('/admin/observability/export?minutes=60&search=test-project');
+
+        $this->assertSame(
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            $exportResponse->headers->get('Content-Type')
+        );
+    }
+
+    public function test_dashboard_sorts_by_name_and_selected_metric_before_pagination()
+    {
+        $alphaProject = observability_project::create([
+            'host_id' => $this->agent->host_id,
+            'key' => 'alpha-project',
+            'name' => 'Alpha project',
+            'path' => '/var/www/alpha-project',
+            'environment' => 'testing',
+            'enabled' => true,
+        ]);
+        $zuluProject = observability_project::create([
+            'host_id' => $this->agent->host_id,
+            'key' => 'zulu-project',
+            'name' => 'Zulu project',
+            'path' => '/var/www/zulu-project',
+            'environment' => 'testing',
+            'enabled' => true,
+        ]);
+        foreach (['Beta project', 'Gamma project', 'Omega project'] as $projectName) {
+            observability_project::create([
+                'host_id' => $this->agent->host_id,
+                'key' => strtolower(str_replace(' ', '-', $projectName)),
+                'name' => $projectName,
+                'path' => '/var/www/' . strtolower(str_replace(' ', '-', $projectName)),
+                'environment' => 'testing',
+                'enabled' => true,
+            ]);
+        }
+        $bucketStart = now()->subMinutes(5)->toDateTimeString();
+        DB::table('observability_http_buckets')->insert([
+            [
+                'project_id' => $alphaProject->id,
+                'agent_id' => 'test-agent',
+                'bucket_start' => $bucketStart,
+                'requests_total' => 10,
+            ],
+            [
+                'project_id' => $zuluProject->id,
+                'agent_id' => 'test-agent',
+                'bucket_start' => $bucketStart,
+                'requests_total' => 100,
+            ],
+        ]);
+
+        $defaultResponse = $this->withoutMiddleware()->postJson('/admin/observability/get-page', [
+            'minutes' => 60,
+            'pagination' => [
+                'page' => 1,
+                'per_page' => 5,
+            ],
+        ]);
+        $defaultResponse
+            ->assertOk()
+            ->assertJsonPath('sort_by', 'name')
+            ->assertJsonPath('sort_direction', 'desc')
+            ->assertJsonPath('data.0.key', 'zulu-project');
+
+        $secondPageResponse = $this->withoutMiddleware()->postJson('/admin/observability/get-page', [
+            'minutes' => 60,
+            'pagination' => [
+                'page' => 2,
+                'per_page' => 5,
+            ],
+        ]);
+        $secondPageResponse->assertJsonPath('data.0.key', 'alpha-project');
+
+        $nameAscendingResponse = $this->withoutMiddleware()->postJson('/admin/observability/get-page', [
+            'minutes' => 60,
+            'sort_by' => 'name',
+            'sort_direction' => 'asc',
+            'pagination' => [
+                'page' => 1,
+                'per_page' => 10,
+            ],
+        ]);
+        $nameAscendingResponse->assertJsonPath('data.0.key', 'alpha-project');
+
+        $trafficResponse = $this->withoutMiddleware()->postJson('/admin/observability/get-page', [
+            'minutes' => 60,
+            'sort_by' => 'requests_per_minute',
+            'sort_direction' => 'desc',
+            'pagination' => [
+                'page' => 1,
+                'per_page' => 10,
+            ],
+        ]);
+        $trafficResponse->assertJsonPath('data.0.key', 'zulu-project');
+    }
+
     public function test_registry_commands_create_host_agent_and_project()
     {
             $this->assertSame(0, Artisan::call('observability:host', [
