@@ -7,6 +7,7 @@ use App\Domain\Observability\Models\observability_event;
 use App\Domain\Observability\Models\observability_host_sample;
 use App\Domain\Observability\Models\observability_http_bucket;
 use App\Domain\Observability\Models\observability_ingest_batch;
+use App\Domain\Observability\Models\observability_project;
 use App\Domain\Observability\Models\observability_project_sample;
 use App\Domain\Observability\Models\observability_storage_sample;
 use App\Http\Controllers\Controller;
@@ -279,6 +280,119 @@ class observability_controller extends Controller
             'duplicate' => false,
             'batch_id' => $validated['batch_id'],
         ], 202);
+    }
+
+    public function discovery(Request $request)
+    {
+        $validated = $request->validate([
+            'agent_id' => 'required|string|max:100',
+            'discovered_at' => 'nullable|date',
+            'projects' => 'required|array|max:100',
+            'projects.*.key' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'projects.*.name' => 'required|string|max:255',
+            'projects.*.path' => 'required|string|max:500',
+            'projects.*.environment' => 'nullable|string|max:50',
+            'projects.*.php_version' => 'nullable|string|max:50',
+            'projects.*.fpm_pool' => 'nullable|string|max:100',
+            'projects.*.fpm_status_url' => 'nullable|url|max:500',
+            'projects.*.nginx_access_log' => 'nullable|string|max:500',
+            'projects.*.nginx_error_log' => 'nullable|string|max:500',
+            'projects.*.attribution_mode' => 'nullable|in:approximate,pool,cgroup',
+            'projects.*.metadata' => 'nullable|array',
+        ]);
+
+        $agent = $this->findAgent($validated['agent_id']);
+
+        if (! $agent) {
+            return response()->json(['message' => 'Observer agent is not registered or disabled.'], 404);
+        }
+
+        if (! $agent->host || ! $agent->host->enabled) {
+            return response()->json(['message' => 'Observer host is disabled.'], 503);
+        }
+
+        $created = 0;
+        $updated = 0;
+        $projectKeys = [];
+
+        DB::transaction(function () use ($agent, $validated, &$created, &$updated, &$projectKeys) {
+            foreach ($validated['projects'] as $discovered) {
+                $projectKeys[] = $discovered['key'];
+                $project = observability_project::where('host_id', $agent->host_id)
+                    ->where('key', $discovered['key'])
+                    ->first();
+
+                if (! $project) {
+                    observability_project::create([
+                        'host_id' => $agent->host_id,
+                        'key' => $discovered['key'],
+                        'name' => $discovered['name'],
+                        'path' => $discovered['path'],
+                        'environment' => $discovered['environment'] ?? 'production',
+                        'enabled' => true,
+                        'php_version' => $discovered['php_version'] ?? null,
+                        'fpm_pool' => $discovered['fpm_pool'] ?? null,
+                        'fpm_status_url' => $discovered['fpm_status_url'] ?? null,
+                        'nginx_access_log' => $discovered['nginx_access_log'] ?? null,
+                        'nginx_error_log' => $discovered['nginx_error_log'] ?? null,
+                        'attribution_mode' => $discovered['attribution_mode'] ?? 'approximate',
+                        'metadata' => array_merge(
+                            $discovered['metadata'] ?? [],
+                            ['discovery_source' => 'observer']
+                        ),
+                    ]);
+                    $created++;
+                    continue;
+                }
+
+                $updates = [
+                    'path' => $discovered['path'],
+                    'environment' => $discovered['environment'] ?? $project->environment,
+                    'metadata' => array_merge(
+                        (array) $project->metadata,
+                        $discovered['metadata'] ?? [],
+                        ['discovery_source' => 'observer']
+                    ),
+                ];
+
+                foreach ([
+                    'php_version',
+                    'fpm_pool',
+                    'fpm_status_url',
+                    'nginx_access_log',
+                    'nginx_error_log',
+                    'attribution_mode',
+                ] as $field) {
+                    if (! empty($discovered[$field])) {
+                        $updates[$field] = $discovered[$field];
+                    }
+                }
+
+                $changed = false;
+                foreach ($updates as $field => $value) {
+                    if ($project->{$field} != $value) {
+                        $changed = true;
+                        break;
+                    }
+                }
+
+                if ($changed) {
+                    $project->update($updates);
+                    $updated++;
+                }
+            }
+
+            if ($created > 0 || $updated > 0) {
+                $agent->host->increment('config_version');
+            }
+        });
+
+        return response()->json([
+            'version' => (int) $agent->host->fresh()->config_version,
+            'created' => $created,
+            'updated' => $updated,
+            'projects' => $projectKeys,
+        ]);
     }
 
     public function heartbeat(Request $request)

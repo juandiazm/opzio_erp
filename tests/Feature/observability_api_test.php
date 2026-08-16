@@ -96,6 +96,57 @@ class observability_api_test extends TestCase
             ->assertJsonPath('projects.0.key', 'test-project');
     }
 
+    public function test_discovery_registers_projects_and_is_idempotent()
+    {
+        $project = [
+            'key' => 'discovered-project',
+            'name' => 'Discovered project',
+            'path' => '/var/www/discovered-project',
+            'environment' => 'production',
+            'php_version' => '8.2',
+            'fpm_status_url' => 'http://127.0.0.1:9091/__fpm_status/discovered-project',
+            'nginx_access_log' => '/var/log/nginx/opzio/discovered-project.access.json',
+            'attribution_mode' => 'approximate',
+            'metadata' => ['discovery_source' => 'filesystem'],
+        ];
+
+        $firstResponse = $this->withHeaders($this->observerHeaders())->postJson(
+            '/api/internal/observability/v1/discovery',
+            [
+                'agent_id' => 'test-agent',
+                'discovered_at' => '2026-08-16T15:00:00Z',
+                'projects' => [$project],
+            ]
+        );
+
+        $firstResponse
+            ->assertOk()
+            ->assertJsonPath('created', 1)
+            ->assertJsonPath('updated', 0)
+            ->assertJsonPath('version', 4);
+        $this->assertDatabaseHas('observability_projects', [
+            'host_id' => $this->agent->host_id,
+            'key' => 'discovered-project',
+            'path' => '/var/www/discovered-project',
+            'fpm_status_url' => 'http://127.0.0.1:9091/__fpm_status/discovered-project',
+        ], 'sqlite');
+
+        $secondResponse = $this->withHeaders($this->observerHeaders())->postJson(
+            '/api/internal/observability/v1/discovery',
+            [
+                'agent_id' => 'test-agent',
+                'discovered_at' => '2026-08-16T15:01:00Z',
+                'projects' => [$project],
+            ]
+        );
+
+        $secondResponse
+            ->assertOk()
+            ->assertJsonPath('created', 0)
+            ->assertJsonPath('updated', 0)
+            ->assertJsonPath('version', 4);
+    }
+
     public function test_ingest_is_idempotent_by_batch_id()
     {
         $payload = [

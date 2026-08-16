@@ -13,6 +13,10 @@ All timestamps are UTC. The agent sends batches, never one row per HTTP request.
 
 `GET /config` returns the active projects assigned to the registered agent host, including NGINX log paths, PHP-FPM status URL, pool and attribution mode.
 
+## Discovery
+
+`POST /discovery` accepts a bounded report from the registered loopback observer. The ERP upserts discovered projects by host and stable key, preserves existing manual project fields when the report omits them, and increments the host configuration version only when a project changes. The observer refreshes `GET /config` after a successful synchronization.
+
 ## Ingest
 
 `POST /ingest` accepts `agent_id`, `batch_id`, `captured_at`, an optional host sample, project samples, one-minute HTTP buckets, storage samples and events. The ERP validates every project key against the active registry and responds `202` after a short transaction. Reusing a `batch_id` with a different payload returns `409`.
