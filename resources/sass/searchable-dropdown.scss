@@ -5,6 +5,8 @@
     width: 100%;
     min-width: 0;
 
+    &.col-8{ width: 66.66666667%; }
+
     .searchable-dropdown__native{
         position: absolute !important;
         width: 1px !important;

@@ -114,11 +114,20 @@ function renderTraceabilityContent(){
 //Traceability
 function getAllUsers(){
     GetMethodFunction('/client/users/all',null,function(response){
-        let appendData = '<option value="">Todos</option>';
-        $.each(response.data,function(index,value){
-            appendData += '<option value="'+value.id+'"'+(typeof user_id !== 'undefined' && value.id==user_id?' selected':'')+'>'+value.name+(value.lastname==null?'':' '+value.lastname)+'</option>';
+        const selectedUserId = typeof user_id !== 'undefined' ? String(user_id) : '';
+        const options = [
+            {value: '', label: 'Todos'},
+            ...response.data.map(function(value){ return {value: value.id, label: value.name+(value.lastname == null ? '' : ' '+value.lastname)}; }),
+        ];
+        $('.traceability-filter-user').each(function(){
+            if(window.SearchableDropdown){
+                window.SearchableDropdown.setOptions(this, options);
+                this.value = selectedUserId;
+                window.SearchableDropdown.init(this);
+            }else{
+                $(this).html(options.map(function(option){ return '<option value="'+option.value+'"'+(option.value === selectedUserId ? ' selected' : '')+'>'+option.label+'</option>'; }).join(''));
+            }
         });
-        $('.traceability-filter-user').html(appendData);
     },null);
 }
 function getTraceability(index){
@@ -126,7 +135,7 @@ function getTraceability(index){
     //check default values
     let attrValue = container.attr('user-id');
     if (typeof attrValue !== 'undefined' && attrValue !== false) {
-        container.find('.traceability-filter-user').val(attrValue);
+        container.find('.traceability-filter-user').val(attrValue).trigger('change');
         container.removeAttr('user-id');
     }
     attrValue = container.attr('search');

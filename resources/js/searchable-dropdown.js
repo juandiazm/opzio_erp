@@ -13,8 +13,12 @@ function getOptions(select){
     return Array.from(select.options).filter(function(option){ return !option.disabled; });
 }
 
+function normalizeSearchText(value){
+    return value.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function getSearchText(option){
-    return (option.textContent+' '+option.value).trim().toLowerCase();
+    return normalizeSearchText((option.textContent+' '+option.value).trim());
 }
 
 function getBaseId(select){
@@ -37,7 +41,7 @@ function syncState(instance){
 }
 
 function renderOptions(instance, search = ''){
-    const query = search.trim().toLowerCase();
+    const query = normalizeSearchText(search.trim());
     const options = getOptions(instance.select).filter(function(option){
         return query === '' || getSearchText(option).includes(query);
     });
@@ -153,6 +157,10 @@ function enhance(select){
     const wrapper = document.createElement('div');
     wrapper.className = 'searchable-dropdown';
     wrapper.dataset.searchableDropdownFor = select.id || '';
+    Array.from(select.classList).forEach(function(className){
+        if(className === 'form-select' || className === 'form-control' || className === 'js-searchable-dropdown') return;
+        if(className === 'input-value' || className === 'input' || /^(col-|w-|p-|m-|align-self-)/.test(className)) wrapper.classList.add(className);
+    });
     select.parentNode.insertBefore(wrapper, select);
     wrapper.appendChild(select);
     select.classList.add('searchable-dropdown__native');
@@ -225,7 +233,17 @@ function enhance(select){
     trigger.addEventListener('keydown', function(event){ handleTriggerKeydown(event, instance); });
     searchInput.addEventListener('input', function(){ renderOptions(instance, searchInput.value); });
     searchInput.addEventListener('keydown', function(event){ handleSearchKeydown(event, instance); });
-    select.addEventListener('change', function(){ syncState(instance); renderOptions(instance, searchInput.value); });
+    const syncFromChange = function(){
+        syncState(instance);
+        renderOptions(instance, searchInput.value);
+    };
+    if(window.jQuery){
+        window.jQuery(select).on('change.searchableDropdown', syncFromChange);
+        instance.removeChangeListener = function(){ window.jQuery(select).off('change.searchableDropdown', syncFromChange); };
+    }else{
+        select.addEventListener('change', syncFromChange);
+        instance.removeChangeListener = function(){ select.removeEventListener('change', syncFromChange); };
+    }
 
     const selectObserver = new MutationObserver(function(){
         syncState(instance);
@@ -243,7 +261,21 @@ function init(target = document){
     if(element && element.tagName === 'SELECT') return enhance(element);
     const root = element && element.querySelectorAll ? element : document;
     const scope = root && root.querySelectorAll ? root : document;
-    return Array.from(scope.querySelectorAll('select.js-searchable-dropdown')).map(enhance);
+    return Array.from(scope.querySelectorAll('select:not([multiple])')).map(enhance);
+}
+
+function observeDynamicSelects(){
+    if(!document.body) return;
+    const observer = new MutationObserver(function(records){
+        records.forEach(function(record){
+            Array.from(record.addedNodes).forEach(function(node){
+                if(node.nodeType !== 1) return;
+                if(node.matches && node.matches('select:not([multiple])')) enhance(node);
+                if(node.querySelectorAll) node.querySelectorAll('select:not([multiple])').forEach(enhance);
+            });
+        });
+    });
+    observer.observe(document.body, {childList: true, subtree: true});
 }
 
 function setOptions(target, options){
@@ -278,6 +310,7 @@ function destroy(target){
     if(!instance) return;
     close(instance);
     instance.selectObserver.disconnect();
+    instance.removeChangeListener();
     instance.wrapper.parentNode.insertBefore(select, instance.wrapper);
     instance.wrapper.remove();
     select.classList.remove('searchable-dropdown__native');
@@ -295,7 +328,12 @@ document.addEventListener('click', function(event){
 const SearchableDropdown = {init, setOptions, setValue, getValue, destroy};
 window.SearchableDropdown = SearchableDropdown;
 
-if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(); });
-else init();
+function boot(){
+    init();
+    observeDynamicSelects();
+}
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
 
 export {destroy, getValue, init, setOptions, setValue};

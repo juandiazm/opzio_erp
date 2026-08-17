@@ -11,10 +11,17 @@ export function verificationInputChange(){
 export function getAllDepartments(){
     PostMethodFunction('/admin/departments/get-all',{},null, function(response){
         employeeState.departments = response.departments;
-        let appendContent = '<option value="" selected disabled>Selecciona un departamento</option>';
-        $.each(employeeState.departments,function(index,value){
-            appendContent += '<option value="'+value.id+'">'+value.name+'</option>';
-        });
-        $('#hiring-employee-department').empty().append(appendContent);
+        const select = $('#hiring-employee-department')[0];
+        const options = [
+            {value: '', label: 'Selecciona un departamento', disabled: true},
+            ...employeeState.departments.map(function(value){ return {value: value.id, label: value.name}; }),
+        ];
+        if(select && window.SearchableDropdown){
+            window.SearchableDropdown.setOptions(select, options);
+            select.selectedIndex = 0;
+            window.SearchableDropdown.init(select);
+        }else if(select){
+            $(select).empty().append(options.map(function(option){ return '<option value="'+option.value+'"'+(option.disabled ? ' selected disabled' : '')+'>'+option.label+'</option>'; }).join(''));
+        }
     },null);
 }

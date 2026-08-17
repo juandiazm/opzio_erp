@@ -11,9 +11,9 @@
     "file": "assets/messages-Cw9jqMJz.js",
     "name": "messages"
   },
-  "_pdf-viewer-ZSANNzoY.js": {
-    "file": "assets/pdf-viewer-ZSANNzoY.js",
-    "name": "pdf-viewer",
+  "_pdf.worker.min-B-tS55GQ.js": {
+    "file": "assets/pdf.worker.min-B-tS55GQ.js",
+    "name": "pdf.worker.min",
     "assets": [
       "assets/pdf.worker.min-DEtVeC4l.mjs"
     ]
@@ -510,12 +510,13 @@
     "isEntry": true
   },
   "resources/js/client/incomes/incomes.js": {
-    "file": "assets/incomes-C-63-wMt.js",
+    "file": "assets/incomes-Ckq9ON1d.js",
     "name": "incomes",
     "src": "resources/js/client/incomes/incomes.js",
     "isEntry": true,
     "imports": [
-      "_pdf-viewer-ZSANNzoY.js"
+      "resources/js/erp/incomes/order.js",
+      "_pdf.worker.min-B-tS55GQ.js"
     ]
   },
   "resources/js/client/layouts/app.js": {
@@ -573,7 +574,7 @@
     "isEntry": true
   },
   "resources/js/client/traceability.js": {
-    "file": "assets/traceability-62omIa6t.js",
+    "file": "assets/traceability-Dy0o3_ts.js",
     "name": "traceability",
     "src": "resources/js/client/traceability.js",
     "isEntry": true
@@ -588,6 +589,12 @@
     "file": "assets/crud-input-AzBPKbA1.js",
     "name": "crud-input",
     "src": "resources/js/crud-input.js",
+    "isEntry": true
+  },
+  "resources/js/erp/approval/post.js": {
+    "file": "assets/post-l0sNRNKZ.js",
+    "name": "post",
+    "src": "resources/js/erp/approval/post.js",
     "isEntry": true
   },
   "resources/js/erp/approve_blog/approve_blog.js": {
@@ -641,10 +648,76 @@
       "_messages-Cw9jqMJz.js"
     ]
   },
+  "resources/js/erp/chat/conversations.js": {
+    "file": "assets/conversations-l0sNRNKZ.js",
+    "name": "conversations",
+    "src": "resources/js/erp/chat/conversations.js",
+    "isEntry": true
+  },
+  "resources/js/erp/chat/ia-response.js": {
+    "file": "assets/ia-response-l0sNRNKZ.js",
+    "name": "ia-response",
+    "src": "resources/js/erp/chat/ia-response.js",
+    "isEntry": true
+  },
+  "resources/js/erp/chat/messages.js": {
+    "file": "assets/messages-l0sNRNKZ.js",
+    "name": "messages",
+    "src": "resources/js/erp/chat/messages.js",
+    "isEntry": true
+  },
+  "resources/js/erp/chat/state.js": {
+    "file": "assets/state-l0sNRNKZ.js",
+    "name": "state",
+    "src": "resources/js/erp/chat/state.js",
+    "isEntry": true
+  },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-D5Aeujbz.js",
+    "file": "assets/clients-C5h5-EHt.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/create.js": {
+    "file": "assets/create-l0sNRNKZ.js",
+    "name": "create",
+    "src": "resources/js/erp/clients/create.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/documents.js": {
+    "file": "assets/documents-l0sNRNKZ.js",
+    "name": "documents",
+    "src": "resources/js/erp/clients/documents.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/licenses.js": {
+    "file": "assets/licenses-l0sNRNKZ.js",
+    "name": "licenses",
+    "src": "resources/js/erp/clients/licenses.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/list.js": {
+    "file": "assets/list-l0sNRNKZ.js",
+    "name": "list",
+    "src": "resources/js/erp/clients/list.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/shared.js": {
+    "file": "assets/shared-l0sNRNKZ.js",
+    "name": "shared",
+    "src": "resources/js/erp/clients/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/state.js": {
+    "file": "assets/state-DP2rzg_V.js",
+    "name": "state",
+    "src": "resources/js/erp/clients/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/sync.js": {
+    "file": "assets/sync-l0sNRNKZ.js",
+    "name": "sync",
+    "src": "resources/js/erp/clients/sync.js",
     "isEntry": true
   },
   "resources/js/erp/clients/traceability.js": {
@@ -653,22 +726,154 @@
     "src": "resources/js/erp/clients/traceability.js",
     "isEntry": true
   },
+  "resources/js/erp/clients/update.js": {
+    "file": "assets/update-l0sNRNKZ.js",
+    "name": "update",
+    "src": "resources/js/erp/clients/update.js",
+    "isEntry": true
+  },
+  "resources/js/erp/clients/users.js": {
+    "file": "assets/users-l0sNRNKZ.js",
+    "name": "users",
+    "src": "resources/js/erp/clients/users.js",
+    "isEntry": true
+  },
+  "resources/js/erp/dashboard/charts.js": {
+    "file": "assets/charts-l0sNRNKZ.js",
+    "name": "charts",
+    "src": "resources/js/erp/dashboard/charts.js",
+    "isEntry": true
+  },
   "resources/js/erp/dashboard/dashboard.js": {
     "file": "assets/dashboard-Bz1WiGPs.js",
     "name": "dashboard",
     "src": "resources/js/erp/dashboard/dashboard.js",
     "isEntry": true
   },
+  "resources/js/erp/dashboard/indicators.js": {
+    "file": "assets/indicators-l0sNRNKZ.js",
+    "name": "indicators",
+    "src": "resources/js/erp/dashboard/indicators.js",
+    "isEntry": true
+  },
+  "resources/js/erp/dashboard/state.js": {
+    "file": "assets/state-K6Dvbx-E.js",
+    "name": "state",
+    "src": "resources/js/erp/dashboard/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/dashboard/tables.js": {
+    "file": "assets/tables-l0sNRNKZ.js",
+    "name": "tables",
+    "src": "resources/js/erp/dashboard/tables.js",
+    "isEntry": true
+  },
+  "resources/js/erp/departments/create.js": {
+    "file": "assets/create-DP2rzg_V.js",
+    "name": "create",
+    "src": "resources/js/erp/departments/create.js",
+    "isEntry": true
+  },
   "resources/js/erp/departments/departments.js": {
-    "file": "assets/departments-vZrALMot.js",
+    "file": "assets/departments-B6gYFZQc.js",
     "name": "departments",
     "src": "resources/js/erp/departments/departments.js",
     "isEntry": true
   },
+  "resources/js/erp/departments/list.js": {
+    "file": "assets/list-DP2rzg_V.js",
+    "name": "list",
+    "src": "resources/js/erp/departments/list.js",
+    "isEntry": true
+  },
+  "resources/js/erp/departments/shared.js": {
+    "file": "assets/shared-DP2rzg_V.js",
+    "name": "shared",
+    "src": "resources/js/erp/departments/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/departments/state.js": {
+    "file": "assets/state-C6Kfwj0f.js",
+    "name": "state",
+    "src": "resources/js/erp/departments/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/departments/update.js": {
+    "file": "assets/update-DP2rzg_V.js",
+    "name": "update",
+    "src": "resources/js/erp/departments/update.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/create.js": {
+    "file": "assets/create-K6Dvbx-E.js",
+    "name": "create",
+    "src": "resources/js/erp/employees/create.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/documents.js": {
+    "file": "assets/documents-DP2rzg_V.js",
+    "name": "documents",
+    "src": "resources/js/erp/employees/documents.js",
+    "isEntry": true
+  },
   "resources/js/erp/employees/employees.js": {
-    "file": "assets/employees-Bs7swoPk.js",
+    "file": "assets/employees-DmAcSB9R.js",
     "name": "employees",
     "src": "resources/js/erp/employees/employees.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/licenses.js": {
+    "file": "assets/licenses-DP2rzg_V.js",
+    "name": "licenses",
+    "src": "resources/js/erp/employees/licenses.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/list.js": {
+    "file": "assets/list-K6Dvbx-E.js",
+    "name": "list",
+    "src": "resources/js/erp/employees/list.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/shared.js": {
+    "file": "assets/shared-K6Dvbx-E.js",
+    "name": "shared",
+    "src": "resources/js/erp/employees/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/state.js": {
+    "file": "assets/state-RnTpOC5-.js",
+    "name": "state",
+    "src": "resources/js/erp/employees/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/employees/update.js": {
+    "file": "assets/update-K6Dvbx-E.js",
+    "name": "update",
+    "src": "resources/js/erp/employees/update.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/clients.js": {
+    "file": "assets/clients-l0sNRNKZ.js",
+    "name": "clients",
+    "src": "resources/js/erp/ia_assistant/clients.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/email.js": {
+    "file": "assets/email-l0sNRNKZ.js",
+    "name": "email",
+    "src": "resources/js/erp/ia_assistant/email.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/generation.js": {
+    "file": "assets/generation-l0sNRNKZ.js",
+    "name": "generation",
+    "src": "resources/js/erp/ia_assistant/generation.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/history.js": {
+    "file": "assets/history-l0sNRNKZ.js",
+    "name": "history",
+    "src": "resources/js/erp/ia_assistant/history.js",
     "isEntry": true
   },
   "resources/js/erp/ia_assistant/ia_assistant.js": {
@@ -683,13 +888,87 @@
     "src": "resources/js/erp/ia_assistant/ia_marketing_report.js",
     "isEntry": true
   },
+  "resources/js/erp/ia_assistant/report.js": {
+    "file": "assets/report-l0sNRNKZ.js",
+    "name": "report",
+    "src": "resources/js/erp/ia_assistant/report.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/shared.js": {
+    "file": "assets/shared-C6Kfwj0f.js",
+    "name": "shared",
+    "src": "resources/js/erp/ia_assistant/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/ia_assistant/state.js": {
+    "file": "assets/state-DVN7Oi2P.js",
+    "name": "state",
+    "src": "resources/js/erp/ia_assistant/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/incomes/advances.js": {
+    "file": "assets/advances-l0sNRNKZ.js",
+    "name": "advances",
+    "src": "resources/js/erp/incomes/advances.js",
+    "isEntry": true
+  },
+  "resources/js/erp/incomes/create.js": {
+    "file": "assets/create-C6Kfwj0f.js",
+    "name": "create",
+    "src": "resources/js/erp/incomes/create.js",
+    "isEntry": true
+  },
+  "resources/js/erp/incomes/import.js": {
+    "file": "assets/import-l0sNRNKZ.js",
+    "name": "import",
+    "src": "resources/js/erp/incomes/import.js",
+    "isEntry": true
+  },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-BK4dPoPN.js",
+    "file": "assets/incomes-ugvDkOiI.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
     "imports": [
-      "_pdf-viewer-ZSANNzoY.js"
+      "resources/js/erp/incomes/order.js",
+      "_pdf.worker.min-B-tS55GQ.js"
+    ]
+  },
+  "resources/js/erp/incomes/list.js": {
+    "file": "assets/list-C6Kfwj0f.js",
+    "name": "list",
+    "src": "resources/js/erp/incomes/list.js",
+    "isEntry": true
+  },
+  "resources/js/erp/incomes/order.js": {
+    "file": "assets/order-DDkWuIyV.js",
+    "name": "order",
+    "src": "resources/js/erp/incomes/order.js",
+    "isEntry": true,
+    "imports": [
+      "_pdf.worker.min-B-tS55GQ.js"
+    ]
+  },
+  "resources/js/erp/incomes/shared.js": {
+    "file": "assets/shared-RnTpOC5-.js",
+    "name": "shared",
+    "src": "resources/js/erp/incomes/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/incomes/state.js": {
+    "file": "assets/state-DdXTRxfG.js",
+    "name": "state",
+    "src": "resources/js/erp/incomes/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/incomes/update.js": {
+    "file": "assets/update-Dd1QQR7_.js",
+    "name": "update",
+    "src": "resources/js/erp/incomes/update.js",
+    "isEntry": true,
+    "imports": [
+      "resources/js/erp/incomes/order.js",
+      "_pdf.worker.min-B-tS55GQ.js"
     ]
   },
   "resources/js/erp/layouts/app.js": {
@@ -710,10 +989,70 @@
     "src": "resources/js/erp/layouts/sidebar.js",
     "isEntry": true
   },
+  "resources/js/erp/licenses/create.js": {
+    "file": "assets/create-RnTpOC5-.js",
+    "name": "create",
+    "src": "resources/js/erp/licenses/create.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/details.js": {
+    "file": "assets/details-l0sNRNKZ.js",
+    "name": "details",
+    "src": "resources/js/erp/licenses/details.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/documents.js": {
+    "file": "assets/documents-K6Dvbx-E.js",
+    "name": "documents",
+    "src": "resources/js/erp/licenses/documents.js",
+    "isEntry": true
+  },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-Cf1nZT7a.js",
+    "file": "assets/licenses-mjr-nGj8.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/list.js": {
+    "file": "assets/list-RnTpOC5-.js",
+    "name": "list",
+    "src": "resources/js/erp/licenses/list.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/notifications.js": {
+    "file": "assets/notifications-l0sNRNKZ.js",
+    "name": "notifications",
+    "src": "resources/js/erp/licenses/notifications.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/shared.js": {
+    "file": "assets/shared-DVN7Oi2P.js",
+    "name": "shared",
+    "src": "resources/js/erp/licenses/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/state.js": {
+    "file": "assets/state-BIjMHF-b.js",
+    "name": "state",
+    "src": "resources/js/erp/licenses/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/licenses/update.js": {
+    "file": "assets/update-C6Kfwj0f.js",
+    "name": "update",
+    "src": "resources/js/erp/licenses/update.js",
+    "isEntry": true
+  },
+  "resources/js/erp/login/authentication.js": {
+    "file": "assets/authentication-l0sNRNKZ.js",
+    "name": "authentication",
+    "src": "resources/js/erp/login/authentication.js",
+    "isEntry": true
+  },
+  "resources/js/erp/login/forgot_password.js": {
+    "file": "assets/forgot_password-l0sNRNKZ.js",
+    "name": "forgot_password",
+    "src": "resources/js/erp/login/forgot_password.js",
     "isEntry": true
   },
   "resources/js/erp/login/login.js": {
@@ -728,16 +1067,118 @@
     "src": "resources/js/erp/my_profile/my_profile.js",
     "isEntry": true
   },
+  "resources/js/erp/my_profile/permissions.js": {
+    "file": "assets/permissions-l0sNRNKZ.js",
+    "name": "permissions",
+    "src": "resources/js/erp/my_profile/permissions.js",
+    "isEntry": true
+  },
+  "resources/js/erp/my_profile/profile.js": {
+    "file": "assets/profile-l0sNRNKZ.js",
+    "name": "profile",
+    "src": "resources/js/erp/my_profile/profile.js",
+    "isEntry": true
+  },
+  "resources/js/erp/my_profile/state.js": {
+    "file": "assets/state-BQEWTaK-.js",
+    "name": "state",
+    "src": "resources/js/erp/my_profile/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/my_profile/update.js": {
+    "file": "assets/update-RnTpOC5-.js",
+    "name": "update",
+    "src": "resources/js/erp/my_profile/update.js",
+    "isEntry": true
+  },
+  "resources/js/erp/outcomes/create.js": {
+    "file": "assets/create-DVN7Oi2P.js",
+    "name": "create",
+    "src": "resources/js/erp/outcomes/create.js",
+    "isEntry": true
+  },
+  "resources/js/erp/outcomes/import.js": {
+    "file": "assets/import-DP2rzg_V.js",
+    "name": "import",
+    "src": "resources/js/erp/outcomes/import.js",
+    "isEntry": true
+  },
+  "resources/js/erp/outcomes/list.js": {
+    "file": "assets/list-DVN7Oi2P.js",
+    "name": "list",
+    "src": "resources/js/erp/outcomes/list.js",
+    "isEntry": true
+  },
   "resources/js/erp/outcomes/outcomes.js": {
     "file": "assets/outcomes-WphTo0av.js",
     "name": "outcomes",
     "src": "resources/js/erp/outcomes/outcomes.js",
     "isEntry": true
   },
+  "resources/js/erp/outcomes/shared.js": {
+    "file": "assets/shared-DdXTRxfG.js",
+    "name": "shared",
+    "src": "resources/js/erp/outcomes/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/outcomes/state.js": {
+    "file": "assets/state-My_wb10K.js",
+    "name": "state",
+    "src": "resources/js/erp/outcomes/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/outcomes/update.js": {
+    "file": "assets/update-DVN7Oi2P.js",
+    "name": "update",
+    "src": "resources/js/erp/outcomes/update.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/contacts.js": {
+    "file": "assets/contacts-l0sNRNKZ.js",
+    "name": "contacts",
+    "src": "resources/js/erp/providers/contacts.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/create.js": {
+    "file": "assets/create-DdXTRxfG.js",
+    "name": "create",
+    "src": "resources/js/erp/providers/create.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/documents.js": {
+    "file": "assets/documents-C6Kfwj0f.js",
+    "name": "documents",
+    "src": "resources/js/erp/providers/documents.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/list.js": {
+    "file": "assets/list-DdXTRxfG.js",
+    "name": "list",
+    "src": "resources/js/erp/providers/list.js",
+    "isEntry": true
+  },
   "resources/js/erp/providers/providers.js": {
-    "file": "assets/providers-Xu-Gz_uf.js",
+    "file": "assets/providers-BUo4BnOI.js",
     "name": "providers",
     "src": "resources/js/erp/providers/providers.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/shared.js": {
+    "file": "assets/shared-BIjMHF-b.js",
+    "name": "shared",
+    "src": "resources/js/erp/providers/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/state.js": {
+    "file": "assets/state-D0WdxB02.js",
+    "name": "state",
+    "src": "resources/js/erp/providers/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/providers/update.js": {
+    "file": "assets/update-DdXTRxfG.js",
+    "name": "update",
+    "src": "resources/js/erp/providers/update.js",
     "isEntry": true
   },
   "resources/js/erp/pusher/pusher.js": {
@@ -755,10 +1196,34 @@
       "_messages-Cw9jqMJz.js"
     ]
   },
+  "resources/js/erp/reports/charts.js": {
+    "file": "assets/charts-DP2rzg_V.js",
+    "name": "charts",
+    "src": "resources/js/erp/reports/charts.js",
+    "isEntry": true
+  },
+  "resources/js/erp/reports/export.js": {
+    "file": "assets/export-l0sNRNKZ.js",
+    "name": "export",
+    "src": "resources/js/erp/reports/export.js",
+    "isEntry": true
+  },
   "resources/js/erp/reports/reports.js": {
-    "file": "assets/reports-CqCk-9Qz.js",
+    "file": "assets/reports-BlzlYTy7.js",
     "name": "reports",
     "src": "resources/js/erp/reports/reports.js",
+    "isEntry": true
+  },
+  "resources/js/erp/reports/state.js": {
+    "file": "assets/state-C3LV8HgG.js",
+    "name": "state",
+    "src": "resources/js/erp/reports/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/reports/zoom.js": {
+    "file": "assets/zoom-l0sNRNKZ.js",
+    "name": "zoom",
+    "src": "resources/js/erp/reports/zoom.js",
     "isEntry": true
   },
   "resources/js/erp/reset_password/reset_password.js": {
@@ -767,20 +1232,74 @@
     "src": "resources/js/erp/reset_password/reset_password.js",
     "isEntry": true
   },
+  "resources/js/erp/servers/data.js": {
+    "file": "assets/data-l0sNRNKZ.js",
+    "name": "data",
+    "src": "resources/js/erp/servers/data.js",
+    "isEntry": true
+  },
+  "resources/js/erp/servers/formatters.js": {
+    "file": "assets/formatters-l0sNRNKZ.js",
+    "name": "formatters",
+    "src": "resources/js/erp/servers/formatters.js",
+    "isEntry": true
+  },
   "resources/js/erp/servers/servers.js": {
-    "file": "assets/servers-9fbk1s0R.js",
+    "file": "assets/servers-CpRjXl_8.js",
     "name": "servers",
     "src": "resources/js/erp/servers/servers.js",
     "isEntry": true
   },
+  "resources/js/erp/servers/state.js": {
+    "file": "assets/state-LjUnHRa3.js",
+    "name": "state",
+    "src": "resources/js/erp/servers/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/servers/view.js": {
+    "file": "assets/view-l0sNRNKZ.js",
+    "name": "view",
+    "src": "resources/js/erp/servers/view.js",
+    "isEntry": true
+  },
   "resources/js/erp/traceability.js": {
-    "file": "assets/traceability-C39MmUBf.js",
+    "file": "assets/traceability-BbN0QTi7.js",
     "name": "traceability",
     "src": "resources/js/erp/traceability.js",
     "isEntry": true
   },
+  "resources/js/erp/users/create.js": {
+    "file": "assets/create-BIjMHF-b.js",
+    "name": "create",
+    "src": "resources/js/erp/users/create.js",
+    "isEntry": true
+  },
+  "resources/js/erp/users/list.js": {
+    "file": "assets/list-BIjMHF-b.js",
+    "name": "list",
+    "src": "resources/js/erp/users/list.js",
+    "isEntry": true
+  },
+  "resources/js/erp/users/permissions.js": {
+    "file": "assets/permissions-DP2rzg_V.js",
+    "name": "permissions",
+    "src": "resources/js/erp/users/permissions.js",
+    "isEntry": true
+  },
+  "resources/js/erp/users/state.js": {
+    "file": "assets/state-B_LMHKg6.js",
+    "name": "state",
+    "src": "resources/js/erp/users/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/users/update.js": {
+    "file": "assets/update-BIjMHF-b.js",
+    "name": "update",
+    "src": "resources/js/erp/users/update.js",
+    "isEntry": true
+  },
   "resources/js/erp/users/users.js": {
-    "file": "assets/users-CZoYqcC3.js",
+    "file": "assets/users-Utp3oVbF.js",
     "name": "users",
     "src": "resources/js/erp/users/users.js",
     "isEntry": true
@@ -803,6 +1322,15 @@
     "src": "resources/js/jquery.js",
     "isEntry": true
   },
+  "resources/js/pdf-viewer.js": {
+    "file": "assets/pdf-viewer-C2Bxfk3j.js",
+    "name": "pdf-viewer",
+    "src": "resources/js/pdf-viewer.js",
+    "isEntry": true,
+    "imports": [
+      "_pdf.worker.min-B-tS55GQ.js"
+    ]
+  },
   "resources/js/popper.js": {
     "file": "assets/popper-B-t4Wlej.js",
     "name": "popper",
@@ -816,7 +1344,7 @@
     "isEntry": true
   },
   "resources/js/searchable-dropdown.js": {
-    "file": "assets/searchable-dropdown-CuNhc1FE.js",
+    "file": "assets/searchable-dropdown-C3hV4Rg4.js",
     "name": "searchable-dropdown",
     "src": "resources/js/searchable-dropdown.js",
     "isEntry": true
@@ -882,7 +1410,7 @@
     "isEntry": true
   },
   "resources/sass/client/register/register.scss": {
-    "file": "assets/register-DB3JbuTv.css",
+    "file": "assets/register-CRC2iiXh.css",
     "src": "resources/sass/client/register/register.scss",
     "isEntry": true
   },
@@ -1053,7 +1581,7 @@
     "isEntry": true
   },
   "resources/sass/searchable-dropdown.scss": {
-    "file": "assets/searchable-dropdown-DXf8AChY.css",
+    "file": "assets/searchable-dropdown-DElSquev.css",
     "src": "resources/sass/searchable-dropdown.scss",
     "isEntry": true
   }

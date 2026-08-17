@@ -14,7 +14,7 @@ export function showCurrentClient(){
     $('#update-client-verification  .verification-input-icon[value="'+currentClient.verified+'"]').click();
     $('#update-client-name').val(currentClient.name);
     $('#update-client-lastname').val(currentClient.lastname);
-    $('#update-client-id-type').val(currentClient.identification_type);
+    $('#update-client-id-type').val(currentClient.identification_type).trigger('change');
     $('#update-client-identification').val(currentClient.identification);
     if(currentClient.country == null){
         $('#update-client-country').attr('item-id', '');

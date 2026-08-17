@@ -21,14 +21,27 @@ export const renderFilterOptions = (state, filters) => {
     if (state.filterOptionsLoaded) return;
     const selectedHost = state.hostSelect.value;
     const selectedEnvironment = state.environmentSelect.value;
-    state.hostSelect.innerHTML = '<option value="">Todos</option>' + (filters.hosts || []).map((host) =>
-        `<option value="${escapeHtml(host.key)}">${escapeHtml(host.name)}</option>`
-    ).join('');
-    state.environmentSelect.innerHTML = '<option value="">Todos</option>' + (filters.environments || []).map((environment) =>
-        `<option value="${escapeHtml(environment)}">${escapeHtml(environment)}</option>`
-    ).join('');
+    const hostOptions = [{value: '', label: 'Todos'}, ...(filters.hosts || []).map((host) => ({
+        value: host.key,
+        label: host.name,
+    }))];
+    const environmentOptions = [{value: '', label: 'Todos'}, ...(filters.environments || []).map((environment) => ({
+        value: environment,
+        label: environment,
+    }))];
+    if (window.SearchableDropdown) {
+        window.SearchableDropdown.setOptions(state.hostSelect, hostOptions);
+        window.SearchableDropdown.setOptions(state.environmentSelect, environmentOptions);
+    } else {
+        state.hostSelect.innerHTML = hostOptions.map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`).join('');
+        state.environmentSelect.innerHTML = environmentOptions.map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`).join('');
+    }
     state.hostSelect.value = selectedHost;
     state.environmentSelect.value = selectedEnvironment;
+    if (window.SearchableDropdown) {
+        window.SearchableDropdown.init(state.hostSelect);
+        window.SearchableDropdown.init(state.environmentSelect);
+    }
     state.filterOptionsLoaded = true;
 };
 
@@ -145,4 +158,6 @@ export const renderPagination = (state) => {
         ${pageItems}
         <li class="page-item${currentPage >= totalPages ? ' disabled' : ''}" data-page="${currentPage + 1}"><button type="button" class="page-link" aria-label="Página siguiente">&gt;</button></li>
         <li class="page-item"><span class="page-link"><select id="db-pagination-per-page" aria-label="Registros por página"><option value="5"${state.pagination.per_page === 5 ? ' selected' : ''}>5</option><option value="10"${state.pagination.per_page === 10 ? ' selected' : ''}>10</option><option value="25"${state.pagination.per_page === 25 ? ' selected' : ''}>25</option><option value="50"${state.pagination.per_page === 50 ? ' selected' : ''}>50</option></select></span></li>`;
+    const perPageSelect = state.paginationContainer.querySelector('#db-pagination-per-page');
+    if (perPageSelect && window.SearchableDropdown) window.SearchableDropdown.init(perPageSelect);
 };

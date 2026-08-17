@@ -212,3 +212,26 @@
         
     }
 }
+
+#register-container .searchable-dropdown.input{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    color: $text-black;
+    font-size: 1em;
+    font-weight: 600;
+
+    .searchable-dropdown__trigger{
+        min-height: 0;
+        padding: 0;
+        color: inherit;
+        font: inherit;
+        background-color: transparent;
+        border: 0;
+        border-bottom: 1px solid $border-gray;
+        border-radius: 0;
+        box-shadow: none;
+        &:hover, &:focus{ border-color: $border-gray; box-shadow: none; }
+    }
+}

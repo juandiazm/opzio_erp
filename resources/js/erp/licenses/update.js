@@ -7,14 +7,14 @@ export function showCurrentLicense(){
     $('#update-license-unique-id').text(currentLicense.unique_id);
     $('#update-license-state').attr('value', currentLicense.active);
     $('#update-license-state .toggle-value[value="'+currentLicense.active+'"]').click();
-    $('#update-license-client').val(currentLicense.client_id);
+    $('#update-license-client').val(currentLicense.client_id).trigger('change');
     $('#update-license-name').val(currentLicense.name);
     $('#update-license-service').attr('item-id', currentLicense.service_id);
     $('#update-license-service input').val(currentLicense.service.name);
-    $('#update-license-employee').val(currentLicense.employee_id);
+    $('#update-license-employee').val(currentLicense.employee_id).trigger('change');
     $('#update-license-value').val(currentLicense.value);
     $('#update-license-description').val(currentLicense.description);
-    $('#update-license-type').val(currentLicense.type);
+    $('#update-license-type').val(currentLicense.type).trigger('change');
     $('#update-license-recurrence-months').val(currentLicense.recurrence_months);
     $('#update-license-billing-day').val(currentLicense.billing_day);
     $('#update-license-days-to-expire').val(currentLicense.days_to_expire);

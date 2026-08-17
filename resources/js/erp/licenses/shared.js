@@ -11,12 +11,21 @@ export function getClients(){
 }
 
 function showClients(response){
-    let appendContent = '<option value="">Selecciona un cliente</option>';
-    $.each(response.data, function(index, value){
-        appendContent += '<option value="'+value.id+'">'+value.name+'</option>';
+    const options = [
+        {value: '', label: 'Selecciona un cliente', disabled: true},
+        ...response.data.map(function(value){ return {value: value.id, label: value.name}; }),
+    ];
+    ['#create-license-client', '#update-license-client'].forEach(function(selector){
+        const select = $(selector)[0];
+        if(!select) return;
+        if(window.SearchableDropdown){
+            window.SearchableDropdown.setOptions(select, options);
+            select.selectedIndex = 0;
+            window.SearchableDropdown.init(select);
+        }else{
+            $(select).html(options.map(function(option){ return '<option value="'+option.value+'"'+(option.disabled ? ' selected disabled' : '')+'>'+option.label+'</option>'; }).join(''));
+        }
     });
-    $('#create-license-client').html(appendContent);
-    $('#update-license-client').html(appendContent);
 }
 
 export function getEmployees(){
@@ -24,10 +33,19 @@ export function getEmployees(){
 }
 
 function showEmployees(response){
-    let appendContent = '<option value="">Selecciona un empleado</option>';
-    $.each(response.data, function(index, value){
-        appendContent += '<option value="'+value.id+'">'+value.name+'</option>';
+    const options = [
+        {value: '', label: 'Selecciona un empleado', disabled: true},
+        ...response.data.map(function(value){ return {value: value.id, label: value.name}; }),
+    ];
+    ['#create-license-employee', '#update-license-employee'].forEach(function(selector){
+        const select = $(selector)[0];
+        if(!select) return;
+        if(window.SearchableDropdown){
+            window.SearchableDropdown.setOptions(select, options);
+            select.selectedIndex = 0;
+            window.SearchableDropdown.init(select);
+        }else{
+            $(select).html(options.map(function(option){ return '<option value="'+option.value+'"'+(option.disabled ? ' selected disabled' : '')+'>'+option.label+'</option>'; }).join(''));
+        }
     });
-    $('#create-license-employee').html(appendContent);
-    $('#update-license-employee').html(appendContent);
 }

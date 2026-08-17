@@ -7,7 +7,7 @@ export function showCurrentEmployee(){
     $('#update-employee-uid').text(currentEmployee.uid);
     $('#update-employee-name').val(currentEmployee.name);
     $('#update-employee-last-name').val(currentEmployee.last_name);
-    $('#update-employee-id-type').val(currentEmployee.id_type);
+    $('#update-employee-id-type').val(currentEmployee.id_type).trigger('change');
     $('#update-employee-identification').val(currentEmployee.identification);
     $('#update-employee-state').attr('value', currentEmployee.state);
     $('#update-employee-state .toggle-value[value="'+currentEmployee.state+'"]').click();
@@ -22,13 +22,13 @@ export function showCurrentEmployee(){
     $('#update-employee-personal-email').val(currentEmployee.personal_email);
     $('#update-employee-work-email').val(currentEmployee.work_email);
     $('#hiring-employee-entry-date').val(currentEmployee.entry_date);
-    $('#hiring-employee-payment-type').val(currentEmployee.payment_type);
+    $('#hiring-employee-payment-type').val(currentEmployee.payment_type).trigger('change');
     $('#hiring-employee-bank').val(currentEmployee.bank);
     $('#hiring-employee-account-number').val(currentEmployee.account_number);
-    $('#hiring-employee-account-type').val(currentEmployee.account_type);
+    $('#hiring-employee-account-type').val(currentEmployee.account_type).trigger('change');
     $('#hiring-employee-salary').val(currentEmployee.salary);
     $('#hiring-employee-contract').val(currentEmployee.contract);
-    $('#hiring-employee-department').val(currentEmployee.department_id);
+    $('#hiring-employee-department').val(currentEmployee.department_id).trigger('change');
     $('#hiring-employee-charge').val(currentEmployee.charge);
     $('#hiring-employee-eps').attr('item-id', currentEmployee.eps_id);
     $('#hiring-employee-eps input').val(currentEmployee.eps==null?'':currentEmployee.eps.name);

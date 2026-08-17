@@ -11,11 +11,20 @@ export function verificationInputChange(){
 export function getAllEmployees(){
     PostMethodFunction('/admin/employees/get-all',{department_id: null},null,function(response){
         departmentState.notAssignedEmployees = response.data;
-        let appendContent = '<option value="0" selected disabled>Seleccione un director</option>';
-        $.each(departmentState.notAssignedEmployees,function(index,value){
-            appendContent += '<option value="'+value.id+'">'+value.name+' '+(value.last_name?value.last_name:'')+'</option>';
+        const options = [
+            {value: '0', label: 'Seleccione un director', disabled: true},
+            ...departmentState.notAssignedEmployees.map(function(value){ return {value: value.id, label: value.name+' '+(value.last_name ? value.last_name : '')}; }),
+        ];
+        ['#add-department-director', '#update-department-director'].forEach(function(selector){
+            const select = $(selector)[0];
+            if(!select) return;
+            if(window.SearchableDropdown){
+                window.SearchableDropdown.setOptions(select, options);
+                select.selectedIndex = 0;
+                window.SearchableDropdown.init(select);
+            }else{
+                $(select).empty().append(options.map(function(option){ return '<option value="'+option.value+'"'+(option.disabled ? ' selected disabled' : '')+'>'+option.label+'</option>'; }).join(''));
+            }
         });
-        $('#add-department-director').empty().append(appendContent);
-        $('#update-department-director').empty().append(appendContent);
     },null);
 }

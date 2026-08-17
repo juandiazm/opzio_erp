@@ -3,7 +3,7 @@ import { getDepartmentsPage } from './list.js';
 
 export function showCurrentDepartment(){
     let currentDepartment = departmentState.currentDepartment;
-    $('#update-department-uid').text(currentDepartment.unique_id); $('#update-department-name').val(currentDepartment.name); $('#update-department-budget').val(currentDepartment.budget); $('#update-department-employees').text(currentDepartment.employees_count); $('#update-department-director').val(currentDepartment.director != null ? currentDepartment.director.id : 0);
+    $('#update-department-uid').text(currentDepartment.unique_id); $('#update-department-name').val(currentDepartment.name); $('#update-department-budget').val(currentDepartment.budget); $('#update-department-employees').text(currentDepartment.employees_count); $('#update-department-director').val(currentDepartment.director != null ? currentDepartment.director.id : 0).trigger('change');
     const deleted = currentDepartment.deleted_at != null;
     $('#update-department-button').toggleClass('d-none',deleted).toggleClass('d-block',!deleted); $('#update-department-delete').toggleClass('d-none',deleted).toggleClass('d-block',!deleted); $('#update-department-restore').toggleClass('d-block',deleted).toggleClass('d-none',!deleted);
     let appendContent = '';

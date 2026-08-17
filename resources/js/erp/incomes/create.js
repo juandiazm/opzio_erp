@@ -13,9 +13,21 @@ function showAllClients(response, onLoaded = null){
     incomeState.createCurrentLicenses = [];
     incomeState.selectedLicense = null;
     incomeState.currentLicencesList = [];
-    let html = '';
-    $.each(incomeState.clientsList, function(i, client){ html += '<option value="'+client.id+'">'+client.name+'</option>'; });
-    $('.input-client').append(html);
+    const options = [
+        {value: '0', label: 'Seleccione un cliente', disabled: true},
+        ...incomeState.clientsList.map(function(client){ return {value: client.id, label: client.name}; }),
+    ];
+    $('.input-client').each(function(){
+        if(window.SearchableDropdown){
+            window.SearchableDropdown.setOptions(this, options);
+            this.selectedIndex = 0;
+            window.SearchableDropdown.init(this);
+        }else{
+            let html = '';
+            $.each(options, function(i, option){ html += '<option value="'+option.value+'"'+(option.disabled ? ' selected disabled' : '')+'>'+option.label+'</option>'; });
+            $(this).html(html);
+        }
+    });
     if(onLoaded) onLoaded();
 }
 
@@ -37,9 +49,20 @@ function getClientLicenses(){ PostMethodFunction('/admin/clients/licenses/get-by
 
 function showClientLicenses(response){
     incomeState.createCurrentLicenses = response.licenses;
-    let html = '<option value="0" selected disabled>Seleccione una licencia</option>';
-    $.each(incomeState.createCurrentLicenses, function(i, license){ html += '<option value="'+license.id+'">'+license.name+'</option>'; });
-    incomeState.currentContainer.find('.input-item-license').html(html);
+    const select = incomeState.currentContainer.find('.input-item-license')[0];
+    const options = [
+        {value: '0', label: 'Seleccione una licencia', disabled: true},
+        ...incomeState.createCurrentLicenses.map(function(license){ return {value: license.id, label: license.name}; }),
+    ];
+    if(select && window.SearchableDropdown){
+        window.SearchableDropdown.setOptions(select, options);
+        select.selectedIndex = 0;
+        window.SearchableDropdown.init(select);
+    }else if(select){
+        let html = '';
+        $.each(options, function(i, option){ html += '<option value="'+option.value+'"'+(option.disabled ? ' selected disabled' : '')+'>'+option.label+'</option>'; });
+        $(select).html(html);
+    }
 }
 
 export function loadLicenseData(){

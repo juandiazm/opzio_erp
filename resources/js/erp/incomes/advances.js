@@ -21,7 +21,7 @@ function showAdvancesList(response){
         $('#advances-list-body').empty().append(appendedContent);
     }else alertWarning(response.message);
 }
-export function showCreateAdvanceForm(){ incomeState.currentAdvance = null; $('#advance-form-title').text('Agregar Abono'); $('#advance-form-amount').val(''); $('#advance-form-date').val(new Date().toISOString().split('T')[0]); $('#advance-form-method').val(''); $('#advance-form-reference').val(''); $('#advance-form-notes').val(''); $('#advance-form-container').slideDown(300); $('#create-advance-button').hide(); }
+export function showCreateAdvanceForm(){ incomeState.currentAdvance = null; $('#advance-form-title').text('Agregar Abono'); $('#advance-form-amount').val(''); $('#advance-form-date').val(new Date().toISOString().split('T')[0]); $('#advance-form-method').val('').trigger('change'); $('#advance-form-reference').val(''); $('#advance-form-notes').val(''); $('#advance-form-container').slideDown(300); $('#create-advance-button').hide(); }
 export function hideAdvanceForm(){ $('#advance-form-container').slideUp(300); $('#create-advance-button').show(); incomeState.currentAdvance = null; }
 export function saveAdvance(){
     let amount = $('#advance-form-amount').val();
@@ -40,7 +40,7 @@ export function saveAdvance(){
 export function editAdvance(){
     let advanceId = $(this).closest('tr').attr('advance-id');
     incomeState.currentAdvance = incomeState.advancesList.find(advance => advance.id == advanceId);
-    if(incomeState.currentAdvance){ $('#advance-form-title').text('Editar Abono'); $('#advance-form-amount').val(incomeState.currentAdvance.amount); $('#advance-form-date').val(incomeState.currentAdvance.payment_date); $('#advance-form-method').val(incomeState.currentAdvance.payment_method || ''); $('#advance-form-reference').val(incomeState.currentAdvance.reference || ''); $('#advance-form-notes').val(incomeState.currentAdvance.notes || ''); $('#advance-form-container').slideDown(300); $('#create-advance-button').hide(); }
+    if(incomeState.currentAdvance){ $('#advance-form-title').text('Editar Abono'); $('#advance-form-amount').val(incomeState.currentAdvance.amount); $('#advance-form-date').val(incomeState.currentAdvance.payment_date); $('#advance-form-method').val(incomeState.currentAdvance.payment_method || '').trigger('change'); $('#advance-form-reference').val(incomeState.currentAdvance.reference || ''); $('#advance-form-notes').val(incomeState.currentAdvance.notes || ''); $('#advance-form-container').slideDown(300); $('#create-advance-button').hide(); }
 }
 export function deleteAdvance(){
     let advanceId = $(this).closest('tr').attr('advance-id');

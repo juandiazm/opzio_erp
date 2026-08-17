@@ -11,7 +11,7 @@ export function showCurrentProvider(){
     $('#update-provider-state').attr('value', currentProvider.active);
     $('#update-provider-state .toggle-value[value="'+currentProvider.active+'"]').click();
     $('#update-provider-name').val(currentProvider.name);
-    $('#update-provider-id-type').val(currentProvider.identification_type);
+    $('#update-provider-id-type').val(currentProvider.identification_type).trigger('change');
     $('#update-provider-identification').val(currentProvider.identification);
     if(currentProvider.country == null){ $('#update-provider-country').attr('item-id',''); $('#update-provider-country input').val(''); }
     else { $('#update-provider-country').attr('item-id', currentProvider.country.id); $('#update-provider-country input').val(currentProvider.country.name); }

@@ -10,8 +10,11 @@ Reemplazar progresivamente los `<select>` nativos del ERP y del portal cliente p
 - Existe un dropdown específico para clientes en IA Marketing Report.
 - Se añadió `resources/js/searchable-dropdown.js`, un adaptador progresivo para `<select>` simples.
 - Se añadió `resources/sass/searchable-dropdown.scss` y se carga desde el layout base.
-- El piloto está activo en `resources/views/erp/outcomes/form.blade.php`.
-- El `<select>` original permanece en el DOM, conserva `id`, `name` y `value`, y recibe los eventos `change` para mantener compatibilidad.
+- La migración global está activa desde `resources/views/layouts/app.blade.php`.
+- Todos los `<select>` simples del proyecto se inicializan automáticamente; no se encontraron controles `<select multiple>`.
+- El `<select>` original permanece oculto en el DOM, conserva `id`, `name` y `value`, y recibe los eventos `change` para mantener compatibilidad.
+- Los selects insertados posteriormente por AJAX, paginación o renderizado dinámico también se convierten mediante un `MutationObserver`.
+- Los catálogos dinámicos de Servers, Incomes, Licenses, Departments, Employees y Traceability ya usan explícitamente `SearchableDropdown.setOptions`.
 
 ## API del componente
 
@@ -48,7 +51,7 @@ Actualmente se localizaron 23 vistas con markup `<select>` y 38 líneas que lo c
 - Employees: `create`, `hiring`, `update`
 - Incomes: `advances`, `create`, `list`, `update`
 - Licenses: `create`, `details`, `list`, `update`
-- Outcomes: `form` (piloto)
+- Outcomes: `form`
 - Providers: `create`, `update`
 - Servers: vista principal
 
@@ -61,43 +64,42 @@ Actualmente se localizaron 23 vistas con markup `<select>` y 38 líneas que lo c
 
 ### Generación dinámica desde JavaScript
 
-Hay superficies que reconstruyen opciones desde AJAX en clientes, empleados, departamentos, ingresos, licencias, outcomes, proveedores, usuarios, servidores y trazabilidad. Deben migrarse junto con sus listeners y no solo cambiando el markup Blade.
+Hay superficies que reconstruyen opciones desde AJAX en clientes, empleados, departamentos, ingresos, licencias, outcomes, proveedores, usuarios, servidores y trazabilidad. Las superficies cubiertas usan la API directa; las restantes quedan protegidas por la inicialización automática y el observador de nodos.
 
 ## Fases de trabajo
 
-### Fase 0: contrato y piloto
+### Fase 0: contrato y piloto - completada
 
-- Completado con `searchable-dropdown.js` y `searchable-dropdown.scss`.
-- Validar búsqueda, selección, teclado, click fuera, opciones inyectadas por AJAX, `change`, estados invalid/disabled y responsive en Outcomes.
+- Completada con `searchable-dropdown.js` y `searchable-dropdown.scss`.
+- La prueba inicial se realizó en Outcomes y se extendió al inicializador global.
 
-### Fase 1: filtros y listados de bajo acoplamiento
+### Fase 1: filtros y listados de bajo acoplamiento - completada
 
-- Migrar filtros de estado y selects de listados en Licenses e Incomes.
-- Migrar filtros de Servers después de identificar si el valor se usa para ordenar, paginar o pedir datos.
-- Mantener el mismo `id` y disparar `change` en el select nativo.
+- Cubiertos filtros de estado, paginación y servidores.
+- Se conservan los mismos `id`, clases, valores y eventos `change`.
 
-### Fase 2: formularios ERP con catálogos
+### Fase 2: formularios ERP con catálogos - completada
 
-- Migrar Clients, Providers, Employees y Departments.
-- Migrar Clients, Employees y Services dentro de Licenses.
-- Migrar Clients, Employees y asociaciones de Incomes.
-- Revisar selects CRUD y mantener `crud-input` cuando exista alta/edición/borrado inline; el nuevo control cubre selección, no administración del catálogo.
+- Cubiertos Clients, Providers, Employees, Departments, Licenses, Incomes y Outcomes.
+- Los controles `crud-input` ya eran dropdowns personalizados y se mantienen porque administran catálogos inline; no son dropdowns nativos.
 
-### Fase 3: portal cliente
+### Fase 3: portal cliente - completada
 
-- Migrar Companies, Incomes, Licenses y Register.
-- Verificar permisos, sesiones de cliente y nombres de payload separados del panel administrativo.
+- Cubiertos Companies, Incomes, Licenses y Register.
+- Los permisos, sesiones y payloads no cambian porque el select nativo subyacente se conserva.
 
-### Fase 4: superficies dinámicas
+### Fase 4: superficies dinámicas - completada
 
-- Sustituir los `.html('<option...')`, `.append('<option...')` y selects creados desde JS por `SearchableDropdown.setOptions` o por `init` después de insertar el select.
-- Revisar respuestas vacías, catálogos grandes y búsqueda remota cuando un catálogo no deba cargarse completo.
+- Los selects creados por `.html()`, `.append()`, `innerHTML` y paginación se detectan automáticamente después de insertarse.
+- Las opciones modificadas dentro de un select existente se sincronizan mediante `MutationObserver`.
+- Servers, Incomes, Licenses, Departments, Employees y Traceability cargan sus catálogos con `SearchableDropdown.setOptions` y conservan sus selecciones sin disparar consultas duplicadas.
+- La búsqueda actual es local sobre las opciones cargadas; los catálogos que requieran búsqueda remota quedan como evolución futura.
 
-### Fase 5: limpieza y retirada
+### Fase 5: limpieza y retirada - completada
 
-- Confirmar que no quedan `<select>` nativos sin justificar.
-- Retirar estilos y listeners duplicados solo después de cerrar todos los módulos.
-- Mantener `crud-input` y el dropdown específico de IA hasta que sus responsabilidades estén cubiertas por componentes equivalentes.
+- Confirmado: 38 líneas con `<select>` en 23 vistas, sin `multiple`, quedan cubiertas por el inicializador global.
+- No se retiraron listeners existentes porque continúan operando sobre el select oculto compatible.
+- `crud-input` y el dropdown específico de IA se mantienen por tener responsabilidades distintas y no usar el dropdown nativo del navegador.
 
 ## Criterios de aceptación por módulo
 
@@ -110,12 +112,24 @@ Hay superficies que reconstruyen opciones desde AJAX en clientes, empleados, dep
 - No hay regresiones en paginación, filtros, tabs ni modales.
 - El control conserva legibilidad y desplazamiento usable en móvil.
 
+## Resultado de la migración
+
+- Estado: completada para el inventario actual del proyecto; continúa la consolidación de renderizadores dinámicos mediante la API explícita.
+- Cobertura: 100% de los selects simples estáticos y dinámicos detectados.
+- Compatibilidad: `id`, `name`, `.val()`, eventos `change`, estados disabled/invalid y opciones AJAX preservados.
+- Exclusión explícita: los controles múltiples requerirán una variante multiselección si se incorporan en el futuro.
+
 ## Validación global
 
-Por cada fase:
+Para la migración ejecutada:
 
 1. `php artisan view:cache`
 2. `npm run build`
 3. `php artisan route:list --path=<modulo>` cuando aplique
 4. Diagnósticos del editor y `git diff --check`
 5. Smoke test de alta, edición, filtros, carga AJAX y envío del formulario
+
+Para cambios futuros:
+
+- Todo nuevo `<select>` simple queda cubierto automáticamente por `SearchableDropdown`.
+- Los nuevos `<select multiple>` deben diseñarse con un componente específico antes de incorporarse.
