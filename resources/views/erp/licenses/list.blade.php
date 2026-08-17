@@ -15,18 +15,13 @@
                 </select>
             </div>
         </div>
-        <table id="license-list-table" class="table table-hover table-sm align-middle w-100">
+        <table id="license-list-table" class="table table-hover table-sm align-middle w-100 erp-data-table">
             <thead id="license-list-table-header">
                 <tr>
-                    <th scope="col" class="columns-id text-left">ID</th>
-                    <th scope="col" class="columns-client text-left">Cliente</th>
-                    <th scope="col" class="columns-name text-left">Nombre</th>
-                    <th scope="col" class="columns-service text-left">Servicio</th>
-                    <th scope="col" class="columns-type text-left">Tipo L.</th>
+                    <th scope="col" class="columns-identity text-start">Licencia</th>
+                    <th scope="col" class="columns-service text-start">Servicio</th>
                     <th scope="col" class="columns-value text-end">Valor</th>
-                    <th scope="col" class="columns-last-billing-date text-center">Última factura</th>
-                    <th scope="col" class="columns-last-payed_date text-center">Último pago</th>
-                    <th scope="col" class="columns-remaining-days text-center">Dias restantes</th>
+                    <th scope="col" class="columns-validity text-center">Vigencia</th>
                     <th scope="col" class="columns-state text-center">Estado</th>
                     <th scope="col" class="columns-actions text-end">Acciones</th>
                 </tr>

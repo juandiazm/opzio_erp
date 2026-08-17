@@ -1,4 +1,5 @@
 import { licenseState } from './state.js';
+import { renderEntityAvatar } from '../shared/list.js';
 
 export function DBshowPagination(){
     let paginationContainer = $('#db-pagination');
@@ -115,17 +116,16 @@ function showLicensesPage(response){
     let appendContent = '';
     $.each(licenseState.licenses,function(index,value){
         value.value_string = value.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        const licenseName = value.name || 'Licencia sin nombre';
+        const associatedClient = value.client || null;
+        const clientName = associatedClient ? associatedClient.name : 'Sin cliente';
+        const licenseType = value.type_string+(value.type==1?(' ('+value.recurrence_months+')'):'');
         appendContent += '<tr license-id='+value.id+' class="license-row-info'+(value.deleted_at==null?'':' deleted')+'">';
-            appendContent += '<td class="columns-id text-left" title="'+value.unique_id+'"><p><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</p></td>';
-            appendContent += '<td class="columns-client text-left"><p>'+value.client.name+'</p></td>';
-            appendContent += '<td class="columns-name text-left"><p>'+value.name+'</p></td>';
-            appendContent += '<td class="columns-service text-left"><p>'+value.service.name+'</p></td>';
-            appendContent += '<td class="columns-type text-left"><p>'+value.type_string+(value.type==1?(" ("+value.recurrence_months+")"):'')+'</p></td>';
+            appendContent += '<td class="columns-identity text-start erp-identity-cell"><div class="erp-identity">'+renderEntityAvatar(associatedClient, 'clients')+'<div class="erp-identity-copy"><p class="erp-identity-name" title="'+licenseName+'">'+licenseName+'</p><span class="erp-identity-meta" title="'+value.unique_id+'"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.unique_id+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.unique_id.substr(value.unique_id.length - 5)+'</span></span><small class="erp-meta-label">'+clientName+'</small></div></div></td>';
+            appendContent += '<td class="columns-service text-start"><div class="erp-meta-stack"><span>'+value.service.name+'</span><small>'+licenseType+'</small></div></td>';
             appendContent += '<td class="columns-value text-end" title="'+value.value+'"><p>$'+value.value_string+'</p></td>';
-            appendContent += '<td class="columns-last-billing-date text-center"><p>'+(value.last_billing_date==null?'':value.last_billing_date)+'</p></td>';
-            appendContent += '<td class="columns-last-payed_date text-center"><p>'+(value.last_payed_date==null?'':value.last_payed_date)+'</p></td>';
-            appendContent += '<td class="columns-remaining-days text-center"><p>'+(value.remaining_days==null?'':value.remaining_days)+'</p></td>';
-            appendContent += '<td class="columns-state text-center active-col"><p class="active-state active-state-'+value.active+'"></p></td>';
+            appendContent += '<td class="columns-validity text-center"><div class="erp-meta-stack"><span>Factura: '+(value.last_billing_date==null?'-':value.last_billing_date)+'</span><small>Pago: '+(value.last_payed_date==null?'-':value.last_payed_date)+' · '+(value.remaining_days==null?'-':value.remaining_days)+' días</small></div></td>';
+            appendContent += '<td class="columns-state text-center"><span class="erp-status '+(value.active?'is-active':'is-inactive')+'"><span class="erp-status-label">'+(value.active?'Activa':'Inactiva')+'</span></span></td>';
             appendContent += '<td class="columns-actions text-end action-cell">';
                 if(value.deleted_at==null){
                     appendContent += '<i class="fa-solid fa-pen-to-square list-update-btn"></i>';

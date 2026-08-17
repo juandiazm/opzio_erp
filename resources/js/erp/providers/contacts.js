@@ -32,7 +32,7 @@ function showServiceContacts(response){
         appendContent += '<td class="text-center"><p><input type="text" class="text-center form-control align-self-center contact-position" placeholder="100000" value="'+value.position+'"></p></td><td class="text-center action-cell">';
         if(providerState.currentProvider.deleted_at == null){
             if(value.deleted_at == null) appendContent += '<i class="fa-solid fa-pen-to-square update-contact-btn"></i><i class="fa-solid fa-trash-can delete-contact-btn"></i>';
-            else appendContent += '<i class="fa-solid fa-trash-arrow-up restore-contact-btn"></i>';
+            else appendContent += '<i class="fa-solid fa-trash-arrow-up restore-contact-btn" title="Restaurar contacto"></i><i class="fa-solid fa-trash-can force-delete-contact-btn" title="Eliminar contacto permanentemente"></i>';
         }
         appendContent += '</td></tr>';
     });
@@ -61,5 +61,14 @@ export function restoreContact(){
     let container = $(this).parent().parent();
     swallMessage('¿Seguro desea reactivar este contacto?','Tenga en cuenta que el contacto volverá a tener acceso a la aplicación.','warning','Si, Reactivar','No, Cancelar',null,function(){
         PostMethodFunction('/admin/providers/contacts/restore',{id: container.attr('contact-id')},null,function(){swallMessage('Contacto REACTIVADO con éxito',null,'success',null,null,3000,null,null); getProviderContacts();},null);
+    },null);
+}
+export function forceDeleteContact(){
+    let container = $(this).parent().parent();
+    swallMessage('Eliminar permanentemente','Esta acción no se puede deshacer. ¿Desea eliminar este contacto de forma permanente?','error','Sí, eliminar permanentemente','No, cancelar',null,function(){
+        PostMethodFunction('/admin/providers/contacts/force-delete',{id: container.attr('contact-id')},null,function(){
+            swallMessage('Exito','Contacto eliminado permanentemente','success',null,null,3000,null,null);
+            getProviderContacts();
+        },null);
     },null);
 }

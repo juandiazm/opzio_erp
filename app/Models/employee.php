@@ -57,4 +57,7 @@ class employee extends Model
     public function arl(){
         return $this->belongsTo(arl::class, 'arl_id');
     }
+    public function contracts(){
+        return $this->morphMany(contract::class, 'contractable');
+    }
 }

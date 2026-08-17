@@ -64,6 +64,8 @@
                     height: 7vw;
                     margin: 0 auto;
                     transition: .3s;
+                    background-size: contain;
+                    background-repeat: no-repeat;
                     .image-icon, .color-icon{
                         font-size: 4vw;
                         color: $text-gray;
@@ -308,6 +310,8 @@
                     height: 17vw;
                     margin: 0 auto;
                     transition: .3s;
+                    background-size: contain;
+                    background-repeat: no-repeat;
                     .image-icon, .color-icon{
                         font-size: 4vw;
                         color: $text-gray;

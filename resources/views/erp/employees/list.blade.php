@@ -7,13 +7,11 @@
                 <input type="text" id="search-list-input" class="form-control align-self-center" autofocus placeholder="Buscar..." autofocus>
             </div>
         </div>
-        <table id="employee-list-table" class="table table-hover table-sm align-middle w-100">
+        <table id="employee-list-table" class="table table-hover table-sm align-middle w-100 erp-data-table">
             <thead id="employee-list-table-header">
                 <tr>
-                    <th scope="col" class="columns-id text-left">ID</th>
-                    <th scope="col" class="columns-photo text-center">Foto</th>
+                    <th scope="col" class="columns-identity text-start">Empleado</th>
                     <th scope="col" class="columns-identification text-start">Identificación</th>
-                    <th scope="col" class="columns-name text-start">Nombre</th>
                     <th scope="col" class="columns-department text-start">Departamento</th>
                     <th scope="col" class="columns-position text-start">Cargo</th>
                     <th scope="col" class="columns-email text-start">Correo E.</th>

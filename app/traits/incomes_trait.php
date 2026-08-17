@@ -233,7 +233,7 @@ trait incomes_trait
         $with_trashed = false
     ) {
         try {
-            $incomes = income::orderBy('created_at', 'desc');
+            $incomes = income::with('client')->orderBy('created_at', 'desc');
             if ($with_trashed) {
                 $incomes = $incomes->withTrashed();
             }
@@ -282,7 +282,7 @@ trait incomes_trait
         $with_trashed = false
     ) {
         try {
-            $incomes = income::where('client_id', $client_id)->orderBy('created_at', 'desc');
+            $incomes = income::with('client')->where('client_id', $client_id)->orderBy('created_at', 'desc');
             if ($with_trashed) {
                 $incomes = $incomes->withTrashed();
             }

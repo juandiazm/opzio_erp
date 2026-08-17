@@ -16,20 +16,13 @@
         </div>
 
         <!-- tabla -->
-        <table id="outcome-list-table" class="table table-hover table-sm align-middle w-100">
+        <table id="outcome-list-table" class="table table-hover table-sm align-middle w-100 erp-data-table">
         <thead id="outcome-list-table-header">
             <tr>
-            <th scope="col" class="columns-id text-center">ID</th>
-            <th scope="col" class="columns-date text-center">Fecha</th>
-            <th scope="col" class="columns-type text-center">Tipo</th>
-            <th scope="col" class="columns-name text-center">Nombre</th>
-            <th scope="col" class="columns-description text-left">Descripción</th>
-            <th scope="col" class="columns-association text-center">Proveedor</th>
-            <th scope="col" class="columns-association text-center">Empleado</th>
-            <th scope="col" class="columns-association text-center">Departamento</th>
-            <th scope="col" class="columns-association text-center">Usuario</th>
-            <th scope="col" class="columns-association text-center">Cliente</th>
-            <th scope="col" class="columns-amount text-center">Monto</th>
+            <th scope="col" class="columns-identity text-start">Egreso</th>
+            <th scope="col" class="columns-detail text-start">Detalle</th>
+            <th scope="col" class="columns-associations text-start">Asociaciones</th>
+            <th scope="col" class="columns-amount text-end">Monto</th>
             <th scope="col" class="columns-actions text-center">Acciones</th>
             </tr>
         </thead>

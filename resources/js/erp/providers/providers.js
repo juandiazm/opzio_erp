@@ -4,7 +4,7 @@ import * as list from './list.js';
 import { addProvider } from './create.js';
 import * as update from './update.js';
 import { addProviderDocument, updateProviderDocument, deleteProviderDocument } from './documents.js';
-import { addContact, updateContact, deleteContact, restoreContact } from './contacts.js';
+import { addContact, updateContact, deleteContact, restoreContact, forceDeleteContact } from './contacts.js';
 
 function showCurrentProvider(){ update.showCurrentProvider(); }
 function goToProvidersTraceability(search){
@@ -50,4 +50,5 @@ $(document).on('click', '#add-contact', addContact);
 $(document).on('click', '.update-contact-btn', updateContact);
 $(document).on('click', '.delete-contact-btn', deleteContact);
 $(document).on('click', '.restore-contact-btn', restoreContact);
+$(document).on('click', '.force-delete-contact-btn', forceDeleteContact);
 $(document).ready(changeTab);

@@ -5,7 +5,7 @@ import { addLicense } from './create.js';
 import * as update from './update.js';
 import { licenseTypeChange } from './details.js';
 import { addLicenseDocument, updateLicenseDocument, deleteLicenseDocument } from './documents.js';
-import { addnotification, changeNotificationPosition, updateNotification, deleteNotification, restoreNotification } from './notifications.js';
+import { addnotification, changeNotificationPosition, updateNotification, deleteNotification, restoreNotification, forceDeleteNotification } from './notifications.js';
 
 function showCurrentLicense(){
     update.showCurrentLicense();
@@ -78,6 +78,7 @@ $(document).on('click', '.notification-position-down-buttons', function(){change
 $(document).on('click', '.update-notification-btn', updateNotification);
 $(document).on('click', '.delete-notification-btn', deleteNotification);
 $(document).on('click', '.restore-notification-btn', restoreNotification);
+$(document).on('click', '.force-delete-notification-btn', forceDeleteNotification);
 
 $(document).ready(function(){
     const queryString = window.location.search;

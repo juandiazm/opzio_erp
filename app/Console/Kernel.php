@@ -20,6 +20,9 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(9);
         $schedule->command('command:create_month_incomes')->cron('0 8 * * *');
         $schedule->command('command:update_licenses_remaining_days')->cron('0 4 * * *');
+        $schedule->command('contracts:process-schedules')
+            ->everyMinute()
+            ->withoutOverlapping(5);
         $schedule->command('command:send_pay_remaining')
             ->cron('0 11 * * *')
             ->withoutOverlapping(60);

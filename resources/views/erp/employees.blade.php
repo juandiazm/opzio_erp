@@ -2,6 +2,7 @@
 @section('component_title', 'EMPLEADOS')
 @section('erp-app-header')
 @vite('resources/js/erp/employees/employees.js')
+@vite('resources/js/erp/contracts/associations.js')
 @vite('resources/js/erp/traceability.js')
 <!-- Styles -->
 @vite('resources/sass/erp/traceability.scss')

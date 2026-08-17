@@ -290,6 +290,15 @@ class licenses_controller extends Controller
         }
         return \Response::json($Response , 400);    
     }
+    public function force_delete_license_notification(Request $request){
+        $Response = $this->License_ForceDeleteLicenseNotification(
+            $request->id
+        );
+        if($Response['status'] == 1){
+            return $Response;
+        }
+        return \Response::json($Response , 400);
+    }
     public function change_license_notification_position(Request $request){
         $Response = $this->License_ChangeLicenseNotificationPosition(
             $request->id,

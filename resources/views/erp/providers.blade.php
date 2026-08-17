@@ -2,6 +2,7 @@
 @section('component_title', 'PROVEEDORES')
 @section('erp-app-header')
 @vite('resources/js/erp/providers/providers.js')
+@vite('resources/js/erp/contracts/associations.js')
 @vite('resources/js/erp/traceability.js')
 <!-- Styles -->
 @vite('resources/sass/erp/providers/providers.scss')

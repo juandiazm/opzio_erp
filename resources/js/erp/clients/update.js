@@ -5,6 +5,8 @@ import { getClientUsers } from './users.js';
 
 export function showCurrentClient(){
     let currentClient = clientState.currentClient;
+    $('#sub-nav-contracts').attr('data-contractable-id', currentClient.id);
+    if(window.ContractAssociations) window.ContractAssociations.load('client', currentClient.id);
     $('#update-client-img-container').css('background-image','url("/images/erp/clients/'+currentClient.photo+'")');
     $('#update-client-img-container .image-icon').css('display','none');
     $('#update-client-unique-id').text(currentClient.unique_id);

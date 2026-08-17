@@ -1,0 +1,139 @@
+@import '../../variables';
+
+.contracts-pane {
+    padding: 1rem 0;
+}
+
+.contracts-filter-bar,
+.contracts-inline-form,
+.contracts-action-bar,
+.contracts-update-header {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.contracts-filter-bar {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f8f8f8;
+    box-shadow: 0 3px 6px #00000029;
+}
+
+.contracts-filter-bar .form-control,
+.contracts-filter-bar .form-select {
+    flex: 1 1 14rem;
+    min-width: 12rem;
+}
+
+.contracts-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.contracts-form-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 8px #00000018;
+}
+
+.contracts-form-section h3 {
+    margin: 0 0 1rem;
+    color: $primary;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.contracts-form-section .input-container {
+    margin-bottom: 0.75rem;
+}
+
+.contracts-editor-section textarea {
+    min-height: 8rem;
+    resize: vertical;
+}
+
+.contracts-inline-form .form-control,
+.contracts-inline-form .form-select {
+    flex: 1 1 14rem;
+}
+
+.contracts-help,
+.contracts-muted-label {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.contracts-update-header {
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    background: #f8f8f8;
+}
+
+.contracts-muted-label {
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+}
+
+.contract-status-badge {
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    background: #e9ecef;
+    color: #343a40;
+    font-size: 0.8rem;
+}
+
+.contract-status-badge.status-sent,
+.contract-status-badge.status-signed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.contract-status-badge.status-expired,
+.contract-status-badge.status-cancelled {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.contract-row.deleted,
+.contract-catalog-row.deleted {
+    opacity: 0.55;
+}
+
+.contracts-action-bar {
+    padding: 0 1rem 1rem;
+}
+
+.contracts-action-bar button {
+    white-space: nowrap;
+}
+
+.contracts-pane .action-cell i {
+    margin-left: 0.6rem;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+    .contracts-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .contracts-filter-bar {
+        display: block;
+    }
+
+    .contracts-filter-bar .form-control,
+    .contracts-filter-bar .form-select {
+        width: 100%;
+        margin-bottom: 0.65rem;
+    }
+
+    #contract-list-table th:nth-child(3),
+    #contract-list-table td:nth-child(3) {
+        display: none;
+    }
+}

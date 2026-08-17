@@ -106,14 +106,19 @@ function showClientsPage(response){
     clientState.clients = response.data;
     let appendContent = '';
     $.each(clientState.clients,function(index,value){
+        const fullName = value.name+(value.lastname ? (' '+value.lastname) : '');
         appendContent += '<tr client-id='+value.id+'>';
-            appendContent += '<td class="columns-id text-left" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td>';
-            appendContent += '<td class="columns-logo text-center image-column">';
-                appendContent += '<div class="image-column-container d-blox mx-auto" style="background-image:url(\'/'+(value.photo_path)+'\');">';
-            appendContent += ' </td>';
+            appendContent += '<td class="columns-identity text-start erp-identity-cell">';
+                appendContent += '<div class="erp-identity">';
+                    appendContent += '<div class="image-column-container erp-avatar erp-logo" style="background-image:url(\'/'+(value.photo_path)+'\');"></div>';
+                    appendContent += '<div class="erp-identity-copy">';
+                        appendContent += '<p class="erp-identity-name" title="'+fullName+'">'+fullName+'</p>';
+                        appendContent += '<span class="erp-identity-meta" title="'+value.unique_id+'"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.unique_id+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.unique_id.substr(value.unique_id.length - 5)+'</span></span>';
+                    appendContent += '</div>';
+                appendContent += '</div>';
+            appendContent += '</td>';
             appendContent += '<td class="columns-identification text-left"><p>'+value.identification+'</p></td>';
-            appendContent += '<td class="columns-name text-left"><p>'+value.name+(value.lastname==null?'':(' '+value.lastname))+'</p></td>';
-            appendContent += '<td class="columns-state text-center active-col"><p class="active-state active-state-'+value.active+'">'+(value.active?'Activo':'Inactivo')+'</p></td>';
+            appendContent += '<td class="columns-state text-center"><span class="erp-status '+(value.active?'is-active':'is-inactive')+'"><span class="erp-status-label">'+(value.active?'Activo':'Inactivo')+'</span></span></td>';
             appendContent += '<td class="columns-phone text-center"><p>'+(value.phone==null?'':value.phone)+'</p></td>';
             appendContent += '<td class="columns-email text-left email-col" title="'+value.email+'"><p>'+value.email+'</p></td>';
             appendContent += '<td class="columns-license text-center"><p>'+value.licenses_count+'</p></td>';

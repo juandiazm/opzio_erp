@@ -16,6 +16,7 @@ use App\Http\Controllers\sector_controller;
 use App\Http\Controllers\departments_controller;
 use App\Http\Controllers\service_controller;
 use App\Http\Controllers\licenses_controller;
+use App\Http\Controllers\contracts_controller;
 use App\Http\Controllers\incomes_controller;
 use App\Http\Controllers\income_advances_controller;
 use App\Http\Controllers\outcomes_controller;
@@ -229,6 +230,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('update', [providers_controller::class, 'update_provider_contact']);
                 Route::post('delete', [providers_controller::class, 'delete_provider_contact']);
                 Route::post('restore', [providers_controller::class, 'restore_provider_contact']);
+                Route::post('force-delete', [providers_controller::class, 'force_delete_provider_contact']);
             });
         });
         Route::prefix('departments')->group(function(){
@@ -263,7 +265,42 @@ Route::prefix('admin')->group(function () {
                 Route::post('update', [licenses_controller::class, 'update_license_notification']);
                 Route::post('delete', [licenses_controller::class, 'delete_license_notification']);
                 Route::post('restore', [licenses_controller::class, 'restore_license_notification']);
+                Route::post('force-delete', [licenses_controller::class, 'force_delete_license_notification']);
                 Route::post('change-position', [licenses_controller::class, 'change_license_notification_position']);
+            });
+        });
+        Route::prefix('contracts')->group(function(){
+            Route::get('/', [admin_pages_controller::class, 'contracts_page']);
+            Route::post('get-catalogs', [contracts_controller::class, 'get_catalogs']);
+            Route::post('get-page', [contracts_controller::class, 'get_page']);
+            Route::post('get-by-id', [contracts_controller::class, 'get_by_id']);
+            Route::post('add', [contracts_controller::class, 'add']);
+            Route::post('update', [contracts_controller::class, 'update']);
+            Route::post('delete', [contracts_controller::class, 'delete']);
+            Route::post('restore', [contracts_controller::class, 'restore']);
+            Route::post('generate', [contracts_controller::class, 'generate']);
+            Route::post('send', [contracts_controller::class, 'send']);
+            Route::post('get-associated', [contracts_controller::class, 'get_associated']);
+            Route::prefix('types')->group(function(){
+                Route::post('get', [contracts_controller::class, 'get_types']);
+                Route::post('add', [contracts_controller::class, 'add_type']);
+                Route::post('update', [contracts_controller::class, 'update_type']);
+                Route::post('delete', [contracts_controller::class, 'delete_type']);
+                Route::post('restore', [contracts_controller::class, 'restore_type']);
+            });
+            Route::prefix('templates')->group(function(){
+                Route::post('get', [contracts_controller::class, 'get_templates']);
+                Route::post('add', [contracts_controller::class, 'add_template']);
+                Route::post('update', [contracts_controller::class, 'update_template']);
+                Route::post('delete', [contracts_controller::class, 'delete_template']);
+                Route::post('restore', [contracts_controller::class, 'restore_template']);
+            });
+            Route::prefix('schedules')->group(function(){
+                Route::post('get', [contracts_controller::class, 'get_schedules']);
+                Route::post('add', [contracts_controller::class, 'add_schedule']);
+                Route::post('update', [contracts_controller::class, 'update_schedule']);
+                Route::post('delete', [contracts_controller::class, 'delete_schedule']);
+                Route::post('restore', [contracts_controller::class, 'restore_schedule']);
             });
         });
         Route::prefix('incomes')->group(function(){

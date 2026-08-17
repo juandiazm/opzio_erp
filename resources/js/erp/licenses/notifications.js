@@ -81,7 +81,8 @@ function showServiceNotifications(response){
                     appendContent += '<i class="fa-solid fa-pen-to-square update-notification-btn"></i>';
                     appendContent += '<i class="fa-solid fa-trash-can delete-notification-btn"></i>';
                 }else{
-                    appendContent += '<i class="fa-solid fa-trash-arrow-up restore-notification-btn"></i>';
+                    appendContent += '<i class="fa-solid fa-trash-arrow-up restore-notification-btn" title="Restaurar notificación"></i>';
+                    appendContent += '<i class="fa-solid fa-trash-can force-delete-notification-btn" title="Eliminar notificación permanentemente"></i>';
                 }
             appendContent += '</td>';
         appendContent += '</tr>';
@@ -208,4 +209,14 @@ export function restoreNotification(){
         }
         , null
     );
+}
+export function forceDeleteNotification(){
+    let container = $(this).parent().parent();
+    let notificationId = container.attr('notification-id');
+    swallMessage('Eliminar permanentemente','Esta acción no se puede deshacer. ¿Deseas eliminar esta notificación de forma permanente?','error','Sí, eliminar permanentemente','No, cancelar',null,function(){
+        PostMethodFunction('/admin/licenses/notifications/force-delete',{id: notificationId},null,function(){
+            swallMessage('Exito','Notificación eliminada permanentemente','success',null,null,3000,null,null);
+            getServiceNotifications();
+        },null);
+    },null);
 }

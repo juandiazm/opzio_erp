@@ -1,4 +1,5 @@
 import { incomeState } from './state.js';
+import { renderEntityAvatar } from '../shared/list.js';
 
 export function showPagination(){
     let paginationContainer = $('#db-pagination');
@@ -64,16 +65,14 @@ export function showIncomesPage(response){
     let appendedContent = '';
     $.each(incomeState.incomes, function(index, value){
         value.total = Math.round(value.total);
+        const associatedClient = value.client || null;
         appendedContent += '<tr income-id='+value.id+' class="income-row-info'+(value.state != 1 ? '' : ' deleted')+'">';
-        appendedContent += '<td class="columns-id text-left" title="'+value.uid+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td>';
-        appendedContent += '<td class="columns-client text-start" title="'+value.client_name+'"><p>'+value.client_name+'</p></td>';
-        appendedContent += '<td class="columns-timely-payment text-center"><p>'+value.timely_payment+'</p></td>';
-        appendedContent += '<td class="columns-cutoff-date text-center"><p>'+value.cutoff_date+'</p></td>';
+        appendedContent += '<td class="columns-identity text-start erp-identity-cell" title="'+value.unique_id+'"><div class="erp-identity">'+renderEntityAvatar(associatedClient, 'clients')+'<div class="erp-identity-copy"><p class="erp-identity-name" title="'+value.client_name+'">'+value.client_name+'</p><span class="erp-identity-meta"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.unique_id+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.unique_id.substr(value.unique_id.length - 5)+'</span></span></div></div></td>';
+        appendedContent += '<td class="columns-cycle text-center"><div class="erp-meta-stack"><span>Pago O.: '+value.timely_payment+'</span><small>Corte: '+value.cutoff_date+'</small></div></td>';
         appendedContent += '<td class="columns-total text-end" title="'+value.total+'"><p>$'+value.total.toLocaleString('es-CO')+'</p></td>';
-        appendedContent += '<td class="columns-bill text-center" title="">'+(value.bill_name == null ? '' : value.bill_name)+'</td>';
+        appendedContent += '<td class="columns-bill text-center"><div class="erp-meta-stack"><span>'+(value.bill_name == null ? '-' : value.bill_name)+'</span><span>'+(value.siigo_invoice_url ? '<a href="'+value.siigo_invoice_url+'" target="_blank" title="Ver factura electrónica"><i class="fa-solid fa-file-invoice text-primary"></i></a>' : '<a href="javascript:void(0)" onclick="window.createSiigoInvoice('+value.id+')" title="Crear factura electrónica"><i class="fa-solid fa-file-circle-plus text-success"></i></a>')+'</span></div></td>';
         appendedContent += '<td class="columns-created-at text-center"><p>'+value.created_at_string+'</p></td>';
-        appendedContent += '<td class="columns-bill text-center">'+(value.siigo_invoice_url ? '<a href="'+value.siigo_invoice_url+'" target="_blank" title="Ver factura electrónica"><i class="fa-solid fa-file-invoice text-primary"></i></a>' : '<a href="javascript:void(0)" onclick="window.createSiigoInvoice('+value.id+')" title="Crear factura electrónica"><i class="fa-solid fa-file-circle-plus text-success"></i></a>')+'</td>';
-        appendedContent += '<td class="columns-state text-center active-col"><label class="selected active-state state-'+value.state+'">'+value.state_text+'</label></td><td class="columns-actions text-end action-cell">';
+        appendedContent += '<td class="columns-state text-center"><span class="erp-status status-state-'+value.state+'"><span class="erp-status-label">'+value.state_text+'</span></span></td><td class="columns-actions text-end action-cell">';
         if(value.payment_state != 1 && value.state != 1) appendedContent += '<i class="fa-regular fa-link copy-action me-1 list-pay-link" data-clipboard-text="'+window.location.origin+'/client/payments/pay/'+value.unique_id+'"></i>';
         appendedContent += '<i class="fa-solid fa-receipt list-view-order"></i>';
         if(value.state != 1){ if(value.state == 2) appendedContent += '<i class="fa-solid fa-hand-holding-dollar list-manage-advances" title="Gestionar abonos"></i>'; appendedContent += '<i class="fa-solid fa-pen-to-square list-update-btn"></i><i class="fa-solid fa-bars-progress list-update-traceability"></i>'; }

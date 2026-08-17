@@ -55,18 +55,19 @@ export function showOutcomesPage(response){
     $.each(outcomeState.outcomes, function(index, value){
         value.total = Math.round(value.total);
         appendedContent += '<tr outcome-id='+value.id+' class="'+(value.deleted_at == null ? '' : ' deleted')+'">';
-        appendedContent += '<td class="columns-id text-center" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td>';
-        appendedContent += '<td class="columns-date text-center" title="'+value.date+'"><p>'+value.date.substring(0, 10)+'</p></td>';
+        const outcomeDate = value.date ? value.date.substring(0, 10) : '-';
+        const associationItems = [
+            ['Proveedor', associationLabel(value.provider)],
+            ['Empleado', associationLabel(value.employee)],
+            ['Departamento', associationLabel(value.department)],
+            ['Usuario', associationLabel(value.user)],
+            ['Cliente', associationLabel(value.client)],
+        ].map(function(item){ return '<small><span class="erp-meta-label">'+item[0]+':</span> '+escapeHtml(item[1])+'</small>'; }).join('');
         let displayType = (value.type === -1) ? 'Otro' : 'Otro';
-        appendedContent += '<td class="columns-timely-payment text-center"><p>'+displayType+'</p></td>';
-        appendedContent += '<td class="columns-cutoff-date text-center"><p>'+value.name+'</p></td>';
-        appendedContent += '<td class="columns-bill text-start"><p>'+(value.description == null ? '' : value.description)+'</p></td>';
-        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.provider))+'"><p>'+escapeHtml(associationLabel(value.provider))+'</p></td>';
-        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.employee))+'"><p>'+escapeHtml(associationLabel(value.employee))+'</p></td>';
-        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.department))+'"><p>'+escapeHtml(associationLabel(value.department))+'</p></td>';
-        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.user))+'"><p>'+escapeHtml(associationLabel(value.user))+'</p></td>';
-        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.client))+'"><p>'+escapeHtml(associationLabel(value.client))+'</p></td>';
-        appendedContent += '<td class="columns-total text-center" title="'+value.amount+'"><p style="font-weight: bold; color: #CE7488" >$'+parseInt(value.amount).toLocaleString('es-CO')+'</p></td>';
+        appendedContent += '<td class="columns-identity text-start erp-identity-cell"><div class="erp-identity erp-identity-plain"><div class="erp-identity-copy"><p class="erp-identity-name" title="'+escapeHtml(value.name)+'">'+escapeHtml(value.name)+'</p><span class="erp-identity-meta" title="'+escapeHtml(value.unique_id)+'"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+escapeHtml(value.unique_id)+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+escapeHtml(value.unique_id.substr(value.unique_id.length - 5))+'</span><span> - '+outcomeDate+'</span></span></div></div></td>';
+        appendedContent += '<td class="columns-detail text-start"><div class="erp-meta-stack"><span>'+displayType+'</span><small title="'+escapeHtml(value.description)+'">'+escapeHtml(value.description == null ? '-' : value.description)+'</small></div></td>';
+        appendedContent += '<td class="columns-associations text-start"><div class="erp-meta-stack erp-association-stack">'+associationItems+'</div></td>';
+        appendedContent += '<td class="columns-total text-end" title="'+value.amount+'"><p class="erp-amount">$'+parseInt(value.amount).toLocaleString('es-CO')+'</p></td>';
         appendedContent += '<td class="columns-actions text-center action-cell">';
         if(value.deleted_at == null) appendedContent += '<i class="fa fa-pen-to-square edit-outcome" title="Editar"></i><i class="fa fa-trash-alt delete-outcome" title="Eliminar"></i>';
         else appendedContent += '<i class="fa fa-ban recover-outcome" title="Recuperar" style="color: red;"></i>';

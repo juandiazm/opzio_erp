@@ -1,6 +1,6 @@
 <!-- Tab Update -->
 <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab">
-    <nav><div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist"><button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button><button class="nav-link" id="sub-nav-hiring-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-hiring" type="button" role="tab" aria-controls="sub-nav-hiring" aria-selected="false">Contratación</button><button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="false">Documentos</button><button class="nav-link" id="sub-nav-licenses-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-licenses" type="button" role="tab" aria-controls="sub-nav-licenses" aria-selected="false">Licencias</button></div></nav>
+    <nav><div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist"><button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button><button class="nav-link" id="sub-nav-hiring-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-hiring" type="button" role="tab" aria-controls="sub-nav-hiring" aria-selected="false">Contratación</button><button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="false">Documentos</button><button class="nav-link" id="sub-nav-licenses-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-licenses" type="button" role="tab" aria-controls="sub-nav-licenses" aria-selected="false">Licencias</button><button class="nav-link" id="sub-nav-contracts-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-contracts" type="button" role="tab" aria-controls="sub-nav-contracts" aria-selected="false">Contratos</button></div></nav>
     <div class="tab-content" id="sub-nav-tabContent">
         <div class="tab-pane fade show active" id="sub-nav-general" role="tabpanel" aria-labelledby="sub-nav-general-tab">
     <div id="update-inputs-container" class="row m-0 w-100 justify-content-center">
@@ -26,5 +26,6 @@
         @include('erp.employees.hiring')
         @include('erp.employees.documents')
         @include('erp.employees.licenses')
+        @include('erp.contracts.associated', ['contractableType' => 'employee'])
     </div>
 </div>

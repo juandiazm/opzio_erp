@@ -111,13 +111,18 @@ function showEmployeesPage(response){
     let appendContent = '';
     $.each(employeeState.employees,function(index,value){
         value.charge = value.charge?value.charge:'';
+        const fullName = value.name+(value.last_name ? (' '+value.last_name) : '');
         appendContent += '<tr employee-id='+value.id+' class="employee-row-info'+(value.deleted_at==null?'':' deleted')+'">';
-        appendContent += '<td class="columns-id text-left" title="'+value.uid+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.uid+'"></i>'+value.uid.substr(value.uid.length - 5)+'</td>';
-            appendContent += '<td class="columns-photo text-center image-column">';
-                appendContent += '<div class="image-column-container d-blox mx-auto" style="background-image:url(\'/images/erp/employees/'+value.photo+'\');">';
-            appendContent += ' </td>';
+            appendContent += '<td class="columns-identity text-start erp-identity-cell">';
+                appendContent += '<div class="erp-identity">';
+                    appendContent += '<div class="image-column-container erp-avatar" style="background-image:url(\'/images/erp/employees/'+value.photo+'\');"></div>';
+                    appendContent += '<div class="erp-identity-copy">';
+                        appendContent += '<p class="erp-identity-name" title="'+fullName+'">'+fullName+'</p>';
+                        appendContent += '<span class="erp-identity-meta" title="'+value.uid+'"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.uid+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.uid.substr(value.uid.length - 5)+'</span></span>';
+                    appendContent += '</div>';
+                appendContent += '</div>';
+            appendContent += '</td>';
             appendContent += '<td class="columns-identification text-start" title="'+value.identification+'"><p>'+value.identification+'</p></td>';
-            appendContent += '<td class="columns-name text-start" title="'+value.name+'"><p>'+value.name+(value.last_name?'':(' '+value.last_name))+'</p></td>';
             if(value.department==null){
                 appendContent += '<td class="columns-department text-start" title=""><p></p></td>';
             }else{
@@ -125,7 +130,7 @@ function showEmployeesPage(response){
             }
             appendContent += '<td class="columns-position text-start" title="'+value.charge+'"><p>'+value.charge+'</p></td>';
             appendContent += '<td class="columns-email text-start" title="'+value.work_email+'"><p>'+value.work_email+'</p></td>';
-            appendContent += '<td class="columns-statte text-center active-col"><p class="active-state active-state-'+value.state+'">'+(value.state?'Activo':'Inactivo')+'</p></td>';
+            appendContent += '<td class="columns-state text-center"><span class="erp-status '+(value.state?'is-active':'is-inactive')+'"><span class="erp-status-label">'+(value.state?'Activo':'Inactivo')+'</span></span></td>';
             appendContent += '<td class="columns-actions text-end action-cell">';
                 if(value.deleted_at==null){
                     appendContent += '<i class="fa-solid fa-pen-to-square list-update-btn"></i>';

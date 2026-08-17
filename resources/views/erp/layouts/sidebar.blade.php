@@ -64,6 +64,15 @@
                 </a>
             </li>
             @endif
+            @php($contracts_permission = collect(session('app_permissions'))->firstWhere('url', 'admin/contracts/'))
+            @if($contracts_permission && collect(session('permissions'))->firstWhere('user_permission_id', $contracts_permission->id)!=null)
+            <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/contracts')?' selected':'' }}">
+                <a href="/admin/contracts" class="sidebar-menu-item-link">
+                    <i class="fa-light fa-file-signature align-self-center sidebar-menu-item-icon"></i>
+                    <p class="align-self-center sidebar-menu-item-text">Contratos</p>
+                </a>
+            </li>
+            @endif
             @if(collect(session('permissions'))->firstWhere('user_permission_id', 7)!=null)
             <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/incomes')?' selected':'' }}">
                 <a href="/admin/incomes" class="sidebar-menu-item-link">

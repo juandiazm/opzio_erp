@@ -3,6 +3,10 @@
     "file": "assets/index-PewBSTf8.js",
     "name": "index"
   },
+  "_list-BVEt8OV2.js": {
+    "file": "assets/list-BVEt8OV2.js",
+    "name": "list"
+  },
   "_lodash-Q-ipqAF7.js": {
     "file": "assets/lodash-Q-ipqAF7.js",
     "name": "lodash"
@@ -21,6 +25,10 @@
   "_post-6x08ZAR6.js": {
     "file": "assets/post-6x08ZAR6.js",
     "name": "post"
+  },
+  "_shared-C-FfQeKA.js": {
+    "file": "assets/shared-C-FfQeKA.js",
+    "name": "shared"
   },
   "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf": {
     "file": "assets/fa-brands-400-D2uq21Pt.ttf",
@@ -673,7 +681,7 @@
     "isEntry": true
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-C5h5-EHt.js",
+    "file": "assets/clients-DtegvhhA.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
     "isEntry": true
@@ -738,6 +746,25 @@
     "src": "resources/js/erp/clients/users.js",
     "isEntry": true
   },
+  "resources/js/erp/contracts/associations.js": {
+    "file": "assets/associations-DWadf3E9.js",
+    "name": "associations",
+    "src": "resources/js/erp/contracts/associations.js",
+    "isEntry": true,
+    "imports": [
+      "_shared-C-FfQeKA.js"
+    ]
+  },
+  "resources/js/erp/contracts/contracts.js": {
+    "file": "assets/contracts-D4NXsPfT.js",
+    "name": "contracts",
+    "src": "resources/js/erp/contracts/contracts.js",
+    "isEntry": true,
+    "imports": [
+      "_shared-C-FfQeKA.js",
+      "_list-BVEt8OV2.js"
+    ]
+  },
   "resources/js/erp/dashboard/charts.js": {
     "file": "assets/charts-l0sNRNKZ.js",
     "name": "charts",
@@ -775,7 +802,7 @@
     "isEntry": true
   },
   "resources/js/erp/departments/departments.js": {
-    "file": "assets/departments-B6gYFZQc.js",
+    "file": "assets/departments-BMTthSEH.js",
     "name": "departments",
     "src": "resources/js/erp/departments/departments.js",
     "isEntry": true
@@ -817,7 +844,7 @@
     "isEntry": true
   },
   "resources/js/erp/employees/employees.js": {
-    "file": "assets/employees-DmAcSB9R.js",
+    "file": "assets/employees-9Newd5-a.js",
     "name": "employees",
     "src": "resources/js/erp/employees/employees.js",
     "isEntry": true
@@ -925,11 +952,12 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-ugvDkOiI.js",
+    "file": "assets/incomes-CJnPum-r.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
     "imports": [
+      "_list-BVEt8OV2.js",
       "resources/js/erp/incomes/order.js",
       "_pdf.worker.min-B-tS55GQ.js"
     ]
@@ -1008,10 +1036,13 @@
     "isEntry": true
   },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-BAp99zEd.js",
+    "file": "assets/licenses-CRlQllQl.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_list-BVEt8OV2.js"
+    ]
   },
   "resources/js/erp/licenses/list.js": {
     "file": "assets/list-RnTpOC5-.js",
@@ -1110,7 +1141,7 @@
     "isEntry": true
   },
   "resources/js/erp/outcomes/outcomes.js": {
-    "file": "assets/outcomes-WphTo0av.js",
+    "file": "assets/outcomes-Quzg6y_j.js",
     "name": "outcomes",
     "src": "resources/js/erp/outcomes/outcomes.js",
     "isEntry": true
@@ -1158,7 +1189,7 @@
     "isEntry": true
   },
   "resources/js/erp/providers/providers.js": {
-    "file": "assets/providers-BUo4BnOI.js",
+    "file": "assets/providers-CQlYxPal.js",
     "name": "providers",
     "src": "resources/js/erp/providers/providers.js",
     "isEntry": true
@@ -1299,7 +1330,7 @@
     "isEntry": true
   },
   "resources/js/erp/users/users.js": {
-    "file": "assets/users-C_zU_-mq.js",
+    "file": "assets/users-D2Zu0HWu.js",
     "name": "users",
     "src": "resources/js/erp/users/users.js",
     "isEntry": true
@@ -1360,7 +1391,7 @@
     "isEntry": true
   },
   "resources/sass/client/companies/companies.scss": {
-    "file": "assets/companies-MVgkZb60.css",
+    "file": "assets/companies-Bgc-wnus.css",
     "src": "resources/sass/client/companies/companies.scss",
     "isEntry": true
   },
@@ -1375,7 +1406,7 @@
     "isEntry": true
   },
   "resources/sass/client/layouts/app.scss": {
-    "file": "assets/app-9mFZuhod.css",
+    "file": "assets/app-C1TxtQvp.css",
     "src": "resources/sass/client/layouts/app.scss",
     "isEntry": true
   },
@@ -1465,13 +1496,18 @@
     "isEntry": true
   },
   "resources/sass/erp/clients/clients.scss": {
-    "file": "assets/clients-Dy81qEFm.css",
+    "file": "assets/clients-DpM24EiW.css",
     "src": "resources/sass/erp/clients/clients.scss",
     "isEntry": true
   },
   "resources/sass/erp/clients/traceability.scss": {
     "file": "assets/traceability-DJwzdBom.css",
     "src": "resources/sass/client/traceability.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/contracts/contracts.scss": {
+    "file": "assets/contracts-BraGKTIG.css",
+    "src": "resources/sass/erp/contracts/contracts.scss",
     "isEntry": true
   },
   "resources/sass/erp/dashboard/dashboard-overdue.scss": {
@@ -1481,7 +1517,7 @@
     "isEntry": true
   },
   "resources/sass/erp/dashboard/dashboard.scss": {
-    "file": "assets/dashboard-DFOZjteE.css",
+    "file": "assets/dashboard-BrLWLAHt.css",
     "src": "resources/sass/erp/dashboard/dashboard.scss",
     "isEntry": true
   },
@@ -1511,7 +1547,7 @@
     "isEntry": true
   },
   "resources/sass/erp/layouts/app.scss": {
-    "file": "assets/app-uQquEHi6.css",
+    "file": "assets/app-BdYHTsh7.css",
     "src": "resources/sass/erp/layouts/app.scss",
     "isEntry": true
   },
@@ -1541,7 +1577,7 @@
     "isEntry": true
   },
   "resources/sass/erp/outcomes/outcomes.scss": {
-    "file": "assets/outcomes-C4RH4dMA.css",
+    "file": "assets/outcomes-DXj4EeUj.css",
     "src": "resources/sass/erp/outcomes/outcomes.scss",
     "isEntry": true
   },

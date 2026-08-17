@@ -908,6 +908,36 @@ trait licenses_trait
             ];
         }   
     }
+    public function License_ForceDeleteLicenseNotification(
+        $id
+    ){
+        try{
+            $notification = license_notification::withTrashed()->where('id', $id)->first();
+            if(!$notification){
+                return [
+                    'status' => 0,
+                    'message' => 'La notificacion no existe'
+                ];
+            }
+            if($notification->deleted_at === null){
+                return [
+                    'status' => 0,
+                    'message' => 'Solo se pueden eliminar permanentemente notificaciones ya eliminadas'
+                ];
+            }
+            $notification->forceDelete();
+            return [
+                'status' => 1,
+                'message' => 'Notificacion eliminada permanentemente'
+            ];
+        }catch(\Exception $e){
+            info('License_ForceDeleteLicenseNotification error: '.$e->getMessage());
+            return [
+                'status' => 0,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
     public function License_ChangeLicenseNotificationPosition(
         $id
         ,$direction

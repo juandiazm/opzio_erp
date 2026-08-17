@@ -55,6 +55,9 @@ class client extends Model
     public function incomes(){
         return $this->hasMany(income::class, 'client_id');
     }
+    public function contracts(){
+        return $this->morphMany(contract::class, 'contractable');
+    }
     public function country(){
         return $this->belongsTo(country::class, 'country_id');
     }

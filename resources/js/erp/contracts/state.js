@@ -1,0 +1,30 @@
+export const contractState = {
+    tabsView: {
+        'nav-list-tab': false,
+        'nav-create-tab': false,
+        'nav-types-tab': false,
+        'nav-templates-tab': false,
+        'nav-schedules-tab': false,
+        'nav-update-tab': false,
+    },
+    contracts: [],
+    currentContract: null,
+    catalogs: {
+        clients: [],
+        employees: [],
+        providers: [],
+        types: [],
+        templates: [],
+    },
+    editingTypeId: null,
+    editingTemplateId: null,
+    editingScheduleId: null,
+    currentTab: null,
+    urlContractId: null,
+    dbPagination: {
+        page: 1,
+        per_page: 10,
+        total: 0,
+        totalPages: 0,
+    },
+};

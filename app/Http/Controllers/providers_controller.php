@@ -192,5 +192,14 @@ class providers_controller extends Controller
         }
         return \Response::json($Response , 400);    
     }
+    public function force_delete_provider_contact(Request $request){
+        $Response = $this->Provider_ForceDeleteProviderContact(
+            $request->id
+        );
+        if($Response['status'] == 1){
+            return $Response;
+        }
+        return \Response::json($Response , 400);
+    }
     
 }

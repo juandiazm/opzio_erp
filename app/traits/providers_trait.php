@@ -567,4 +567,34 @@ trait providers_trait
             ];
         }   
     }
+    public function Provider_ForceDeleteProviderContact(
+        $id
+    ){
+        try{
+            $contact = provider_contact::withTrashed()->where('id', $id)->first();
+            if(!$contact){
+                return [
+                    'status' => 0,
+                    'message' => 'El contacto no existe'
+                ];
+            }
+            if($contact->deleted_at === null){
+                return [
+                    'status' => 0,
+                    'message' => 'Solo se pueden eliminar permanentemente contactos ya eliminados'
+                ];
+            }
+            $contact->forceDelete();
+            return [
+                'status' => 1,
+                'message' => 'Contacto eliminado permanentemente'
+            ];
+        }catch(\Exception $e){
+            info('Provider_ForceDeleteProviderContact error: '.$e->getMessage());
+            return [
+                'status' => 0,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }

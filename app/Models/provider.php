@@ -9,4 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes; // add this line
 class provider extends Model
 {
     use HasFactory, SoftDeletes; // add this line
+
+    public function contracts(){
+        return $this->morphMany(contract::class, 'contractable');
+    }
 }

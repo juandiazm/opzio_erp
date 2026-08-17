@@ -28,7 +28,8 @@ class admin_middleware
         $app_permissions = collect(Session::get('app_permissions', []));
         $hasLegacyServersPermission = $app_permissions->firstWhere('url', 'admin/observability/') !== null;
         $hasServersPermission = $app_permissions->firstWhere('url', 'admin/servers/') !== null;
-        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission){
+        $hasContractsPermission = $app_permissions->firstWhere('url', 'admin/contracts/') !== null;
+        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission || !$hasContractsPermission){
             $app_permissions = collect(user_permission::get());
             Session::put('app_permissions', $app_permissions);
             if (Session::has('user')) {

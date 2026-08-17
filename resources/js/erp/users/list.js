@@ -113,12 +113,17 @@ function showUsersPage(response){
     userState.users = response.data;
     let appendContent = '';
     $.each(userState.users,function(index,value){
+        const fullName = value.name+(value.lastname ? (' '+value.lastname) : '');
         appendContent += '<tr user-id='+value.id+' class="'+(value.deleted_at==null?'':'deleted')+'">';
-            appendContent += '<td class="columns-id text-left" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td>';
-            appendContent += '<td class="columns-photo text-center image-column">';
-                appendContent += '<div class="image-column-container d-blox mx-auto" style="background-image:url(\'/images/erp/users/'+value.photo+'\');border-color:'+value.color+';">';
-            appendContent += ' </td>';
-            appendContent += '<td class="columns-name text-left"><p>'+value.name+(value.lastname==null?'':(' '+value.lastname))+'</p></td>';
+            appendContent += '<td class="columns-identity text-start erp-identity-cell">';
+                appendContent += '<div class="erp-identity">';
+                    appendContent += '<div class="image-column-container erp-avatar" style="background-image:url(\'/images/erp/users/'+value.photo+'\');border-color:'+value.color+';"></div>';
+                    appendContent += '<div class="erp-identity-copy">';
+                        appendContent += '<p class="erp-identity-name" title="'+fullName+'">'+fullName+'</p>';
+                        appendContent += '<span class="erp-identity-meta" title="'+value.unique_id+'"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.unique_id+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.unique_id.substr(value.unique_id.length - 5)+'</span></span>';
+                    appendContent += '</div>';
+                appendContent += '</div>';
+            appendContent += '</td>';
             appendContent += '<td class="columns-username text-center"><p>'+value.username+'</p></td>';
             appendContent += '<td class="columns-identification text-center"><p>'+value.identification+'</p></td>';
             appendContent += '<td class="columns-email text-left"><p>'+value.email+'</p></td>';

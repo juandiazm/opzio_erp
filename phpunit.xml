@@ -14,6 +14,9 @@
         <testsuite name="Servers Feature">
             <file>./tests/Feature/servers_api_test.php</file>
         </testsuite>
+        <testsuite name="Contracts Feature">
+            <file>./tests/Feature/contracts_test.php</file>
+        </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
         <include>
