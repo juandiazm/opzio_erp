@@ -113,9 +113,11 @@ Separar la lista, el formulario de creación y la importación masiva; conservar
 
 ### Outcomes
 
-- Blade dividido en `list` e `import`, preservando los filtros de fecha, paginación, acciones de recuperación y modal de importación.
-- JS dividido en estado, lista e importación; `outcomes.js` conserva la orquestación de tabs y listeners sin duplicarlos.
-- SCSS dividido en `_list.scss` y `_import.scss`; `outcomes.scss` conserva el orden de composición.
+- Blade dividido en `list`, `create`, `form`, `update` e `import`, preservando los filtros de fecha, paginación, acciones de recuperación y modal de importación.
+- JS dividido en estado, lista, catálogos, creación, actualización e importación; `outcomes.js` conserva la orquestación de tabs y listeners sin duplicarlos.
+- SCSS dividido en `_list.scss`, `_form.scss` y `_import.scss`; `outcomes.scss` conserva el orden de composición.
+- Outcomes permite asociar cada egreso, de forma opcional, a proveedor, empleado, departamento, usuario y cliente mediante columnas nullable y sus relaciones Eloquent.
+- Añadidos endpoints de catálogo, creación y actualización, con validación de claves foráneas y compatibilidad con la importación masiva existente.
 - Validado con `php artisan view:cache`, `npm run build`, diagnósticos del editor, `php artisan route:list --path=admin/outcomes` y `git diff --check`.
 
 ### Próximo módulo: Reports

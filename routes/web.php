@@ -292,6 +292,9 @@ Route::prefix('admin')->group(function () {
         });
         Route::prefix('outcomes')->group(function(){
             Route::get('/', [admin_pages_controller::class, 'outcomes_page']);
+            Route::post('form-data', [outcomes_controller::class, 'get_outcome_form_data']);
+            Route::post('create', [outcomes_controller::class, 'create_outcome']);
+            Route::post('update', [outcomes_controller::class, 'update_outcome']);
             Route::post('import', [outcomes_controller::class, 'import_outcomes']);
             Route::post('get', [outcomes_controller::class, 'get_outcomes']);
             Route::post('delete', [outcomes_controller::class, 'delete_outcome']);

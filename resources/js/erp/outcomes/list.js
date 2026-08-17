@@ -1,5 +1,11 @@
 import { outcomeState } from './state.js';
 
+function escapeHtml(value){ return $('<div>').text(value == null ? '' : value).html(); }
+function associationLabel(value){
+    if(!value) return '-';
+    return value.label || [value.name, value.last_name || value.lastname].filter(Boolean).join(' ') || value.complete_name || '-';
+}
+
 export function showPagination(){
     let paginationContainer = $('#db-pagination');
     paginationContainer.empty();
@@ -33,6 +39,15 @@ export function getOutcomesPage(){
     PostMethodFunction('/admin/outcomes/get', dataSend, null, showOutcomesPage, null);
 }
 
+export function goToUpdateTab(){
+    const outcomeId = $(this).closest('tr').attr('outcome-id');
+    outcomeState.currentOutcome = outcomeState.outcomes.find(outcome => outcome.id == outcomeId);
+    if(outcomeState.currentOutcome == null || outcomeState.currentOutcome.deleted_at != null) return;
+    outcomeState.tabsView['nav-update-tab'] = false;
+    $('#nav-update-tab').removeClass('d-none').tab('show');
+    $('#nav-update-tab').trigger('click');
+}
+
 export function showOutcomesPage(response){
     outcomeState.pagination = response.pagination;
     outcomeState.outcomes = response.data;
@@ -46,9 +61,14 @@ export function showOutcomesPage(response){
         appendedContent += '<td class="columns-timely-payment text-center"><p>'+displayType+'</p></td>';
         appendedContent += '<td class="columns-cutoff-date text-center"><p>'+value.name+'</p></td>';
         appendedContent += '<td class="columns-bill text-start"><p>'+(value.description == null ? '' : value.description)+'</p></td>';
+        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.provider))+'"><p>'+escapeHtml(associationLabel(value.provider))+'</p></td>';
+        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.employee))+'"><p>'+escapeHtml(associationLabel(value.employee))+'</p></td>';
+        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.department))+'"><p>'+escapeHtml(associationLabel(value.department))+'</p></td>';
+        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.user))+'"><p>'+escapeHtml(associationLabel(value.user))+'</p></td>';
+        appendedContent += '<td class="columns-association text-center" title="'+escapeHtml(associationLabel(value.client))+'"><p>'+escapeHtml(associationLabel(value.client))+'</p></td>';
         appendedContent += '<td class="columns-total text-center" title="'+value.amount+'"><p style="font-weight: bold; color: #CE7488" >$'+parseInt(value.amount).toLocaleString('es-CO')+'</p></td>';
         appendedContent += '<td class="columns-actions text-center action-cell">';
-        if(value.deleted_at == null) appendedContent += '<i class="fa fa-trash-alt delete-outcome" title="Eliminar"></i>';
+        if(value.deleted_at == null) appendedContent += '<i class="fa fa-pen-to-square edit-outcome" title="Editar"></i><i class="fa fa-trash-alt delete-outcome" title="Eliminar"></i>';
         else appendedContent += '<i class="fa fa-ban recover-outcome" title="Recuperar" style="color: red;"></i>';
         appendedContent += '</td></tr>';
     });

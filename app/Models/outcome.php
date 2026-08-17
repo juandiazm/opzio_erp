@@ -17,4 +17,24 @@ class outcome extends Model
     public function getDateStringAttribute(){
         return Carbon::parse($this->date)->format('Y-m-d');
     }
+
+    public function provider(){
+        return $this->belongsTo(provider::class, 'provider_id');
+    }
+
+    public function employee(){
+        return $this->belongsTo(employee::class, 'employee_id');
+    }
+
+    public function department(){
+        return $this->belongsTo(department::class, 'department_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(user::class, 'user_id');
+    }
+
+    public function client(){
+        return $this->belongsTo(client::class, 'client_id');
+    }
 }

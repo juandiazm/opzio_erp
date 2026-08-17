@@ -7,9 +7,18 @@ export const outcomeState = {
     tabsView: {
         'nav-list-tab': false,
         'nav-create-tab': false,
+        'nav-update-tab': false,
     },
     currentTab: null,
     currentContainer: null,
-    currentLicencesList: [],
+    currentOutcome: null,
+    catalogs: {
+        providers: [],
+        employees: [],
+        departments: [],
+        users: [],
+        clients: [],
+        current_user_id: null,
+    },
     outcomes: [],
 };

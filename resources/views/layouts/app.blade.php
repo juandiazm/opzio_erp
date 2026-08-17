@@ -29,6 +29,7 @@
     @vite('resources/js/app.js')
     @vite('resources/js/general.js')
     @vite('resources/js/crud-input.js')
+    @vite('resources/js/searchable-dropdown.js')
     @vite('resources/js/pwa.js')
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,6 +38,7 @@
     <!-- Styles -->
     @vite('resources/sass/app.scss')
     @vite('resources/sass/crud-input.scss')
+    @vite('resources/sass/searchable-dropdown.scss')
     @yield('app-header')
 </head>
 <body>

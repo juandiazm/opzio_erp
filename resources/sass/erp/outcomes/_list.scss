@@ -1,5 +1,13 @@
 @import '../../variables';
 
+#user-list-container{
+    overflow-x: auto;
+    #outcome-list-table{
+        min-width: 1180px;
+        .columns-association{ min-width: 120px; }
+    }
+}
+
 @media screen and (min-width: 768px) {
     #search-list-container{
         background: #F8F8F8 0% 0% no-repeat padding-box;

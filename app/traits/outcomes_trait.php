@@ -8,6 +8,11 @@ use App\Imports\outcomes_import;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\outcome;
+use App\Models\provider;
+use App\Models\employee;
+use App\Models\department;
+use App\Models\user;
+use App\Models\client;
 
 trait outcomes_trait
 {
@@ -20,10 +25,13 @@ trait outcomes_trait
         ,$type
         ,$user_id
         ,$provider_id = null
+        ,$employee_id = null
+        ,$department_id = null
+        ,$client_id = null
         ){
         $Response = [
             'status' => 0,
-            'message' => 'Error al crear el ingreso'
+            'message' => 'Error al crear el egreso'
         ];
         try{
             $outcome = new outcome();
@@ -35,16 +43,105 @@ trait outcomes_trait
             $outcome->type = $type;
             $outcome->user_id = $user_id;
             $outcome->provider_id = $provider_id;
+            $outcome->employee_id = $employee_id;
+            $outcome->department_id = $department_id;
+            $outcome->client_id = $client_id;
             $outcome->save();
+            $outcome->load(['provider', 'employee', 'department', 'user', 'client']);
             $Response = [
                 'status' => 1,
-                'message' => 'Ingreso creado correctamente'
+                'message' => 'Egreso creado correctamente',
+                'data' => $outcome
             ];
         }catch(\Exception $e){
             info('Outcome_CreateOutcome error: '.$e->getMessage());
         }
         return $Response;
     }
+
+    public function Outcome_UpdateOutcome(
+        $id
+        ,$date
+        ,$name
+        ,$description
+        ,$amount
+        ,$type
+        ,$user_id
+        ,$provider_id = null
+        ,$employee_id = null
+        ,$department_id = null
+        ,$client_id = null
+        ){
+        $Response = [
+            'status' => 0,
+            'message' => 'Error al actualizar el egreso'
+        ];
+        try{
+            $outcome = outcome::find($id);
+            if(!$outcome){
+                $Response['message'] = 'El egreso no existe';
+                return $Response;
+            }
+            $outcome->date = Carbon::parse($date);
+            $outcome->name = $name;
+            $outcome->description = $description;
+            $outcome->amount = $amount;
+            $outcome->type = $type;
+            $outcome->user_id = $user_id;
+            $outcome->provider_id = $provider_id;
+            $outcome->employee_id = $employee_id;
+            $outcome->department_id = $department_id;
+            $outcome->client_id = $client_id;
+            $outcome->save();
+            $outcome->load(['provider', 'employee', 'department', 'user', 'client']);
+            $Response = [
+                'status' => 1,
+                'message' => 'Egreso actualizado correctamente',
+                'data' => $outcome
+            ];
+        }catch(\Exception $e){
+            info('Outcome_UpdateOutcome error: '.$e->getMessage());
+            $Response['message'] = 'Error al actualizar el egreso: '.$e->getMessage();
+        }
+        return $Response;
+    }
+
+    public function Outcome_GetOutcomeFormData(){
+        try{
+            $formatPeople = function($items){
+                return $items->map(function($item){
+                    return [
+                        'id' => $item->id,
+                        'label' => trim($item->name.' '.($item->last_name ?? $item->lastname ?? '')),
+                    ];
+                })->values();
+            };
+            $sessionUser = Session::get('user');
+            return [
+                'status' => 1,
+                'message' => 'Catálogos de egresos obtenidos',
+                'data' => [
+                    'providers' => provider::orderBy('name')->get(['id', 'name', 'lastname'])->map(function($item){
+                        return ['id' => $item->id, 'label' => trim($item->name.' '.$item->lastname)];
+                    })->values(),
+                    'employees' => $formatPeople(employee::orderBy('name')->get(['id', 'name', 'last_name'])),
+                    'departments' => department::orderBy('name')->get(['id', 'name'])->map(function($item){
+                        return ['id' => $item->id, 'label' => $item->name];
+                    })->values(),
+                    'users' => $formatPeople(user::orderBy('name')->get(['id', 'name', 'lastname'])),
+                    'clients' => $formatPeople(client::orderBy('name')->get(['id', 'name', 'lastname'])),
+                    'current_user_id' => data_get($sessionUser, 'id'),
+                ]
+            ];
+        }catch(\Exception $e){
+            info('Outcome_GetOutcomeFormData error: '.$e->getMessage());
+            return [
+                'status' => 0,
+                'message' => 'Error al obtener los catálogos de egresos'
+            ];
+        }
+    }
+
     //IMPORT
     public function Outcome_ImportOutcomes($file){
         $Response = [

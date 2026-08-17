@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Session;
 
 use App\traits\outcomes_trait;
 
@@ -10,6 +11,94 @@ class outcomes_controller extends Controller
 {
     use outcomes_trait;
     //
+    public function create_outcome(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'name' => 'required|string|max:100',
+            'description' => 'nullable|string',
+            'amount' => 'required|numeric|min:0.01',
+            'type' => 'required|integer',
+            'user_id' => 'nullable|integer|exists:users,id',
+            'provider_id' => 'nullable|integer|exists:providers,id',
+            'employee_id' => 'nullable|integer|exists:employees,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'client_id' => 'nullable|integer|exists:clients,id',
+        ]);
+
+        $userId = $request->input('user_id') ?: data_get(Session::get('user'), 'id');
+        if(!$userId){
+            return response()->json(['status' => 0, 'message' => 'No se encontró un usuario asociado'], 422);
+        }
+
+        $Response = $this->Outcome_CreateOutcome(
+            $request->input('date'),
+            $request->input('name'),
+            $request->input('description') ?? '',
+            $request->input('amount'),
+            $request->input('type'),
+            $userId,
+            $request->input('provider_id'),
+            $request->input('employee_id'),
+            $request->input('department_id'),
+            $request->input('client_id')
+        );
+        if($Response['status'] == 1){
+            return $Response;
+        }
+        return response()->json($Response, 400);
+    }
+
+    public function update_outcome(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:outcomes,id',
+            'date' => 'required|date',
+            'name' => 'required|string|max:100',
+            'description' => 'nullable|string',
+            'amount' => 'required|numeric|min:0.01',
+            'type' => 'required|integer',
+            'user_id' => 'nullable|integer|exists:users,id',
+            'provider_id' => 'nullable|integer|exists:providers,id',
+            'employee_id' => 'nullable|integer|exists:employees,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'client_id' => 'nullable|integer|exists:clients,id',
+        ]);
+
+        $outcome = \App\Models\outcome::find($request->input('id'));
+        $userId = $request->input('user_id') ?: ($outcome ? $outcome->user_id : data_get(Session::get('user'), 'id'));
+        if(!$userId){
+            return response()->json(['status' => 0, 'message' => 'No se encontró un usuario asociado'], 422);
+        }
+
+        $Response = $this->Outcome_UpdateOutcome(
+            $request->input('id'),
+            $request->input('date'),
+            $request->input('name'),
+            $request->input('description') ?? '',
+            $request->input('amount'),
+            $request->input('type'),
+            $userId,
+            $request->input('provider_id'),
+            $request->input('employee_id'),
+            $request->input('department_id'),
+            $request->input('client_id')
+        );
+        if($Response['status'] == 1){
+            return $Response;
+        }
+        return response()->json($Response, 400);
+    }
+
+    public function get_outcome_form_data()
+    {
+        $Response = $this->Outcome_GetOutcomeFormData();
+        if($Response['status'] == 1){
+            return $Response;
+        }
+        return response()->json($Response, 400);
+    }
+
     public function get_outcomes(Request $request)
     {
         $Response = $this->Outcome_GetOutcomes($request);
