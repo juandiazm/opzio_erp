@@ -129,7 +129,13 @@ trait licenses_trait
         $service_id,
         $employee_id,
         $value,
-        $description
+        $description,
+        $type = null,
+        $recurrence_months = null,
+        $billing_day = null,
+        $days_to_expire = null,
+        $next_billing_date = null,
+        $last_payed_date = null
     ){
         try{
             $license = license::where('id', $id)->first();
@@ -146,6 +152,15 @@ trait licenses_trait
             $license->employee_id = $employee_id;
             $license->value = $value;
             $license->description = $description;
+            if($type !== null){
+                $license->type = $type;
+                $license->recurrence_months = $recurrence_months;
+                $license->billing_day = $billing_day;
+                $license->days_to_expire = $days_to_expire;
+                $license->next_billing_date = $next_billing_date;
+                $license->remaining_days = $this->Licese_CalculateRemainingDays($last_payed_date, $recurrence_months, $next_billing_date);
+                $license->last_payed_date = $last_payed_date;
+            }
             $license->save();
             $license = $this->License_WebData($license);
             return [

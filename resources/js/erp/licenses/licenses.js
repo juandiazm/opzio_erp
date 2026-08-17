@@ -3,7 +3,7 @@ import { getClients, getEmployees, verificationInputChange } from './shared.js';
 import * as list from './list.js';
 import { addLicense } from './create.js';
 import * as update from './update.js';
-import { updateLicenseDetails, licenseTypeChange } from './details.js';
+import { licenseTypeChange } from './details.js';
 import { addLicenseDocument, updateLicenseDocument, deleteLicenseDocument } from './documents.js';
 import { addnotification, changeNotificationPosition, updateNotification, deleteNotification, restoreNotification } from './notifications.js';
 
@@ -65,7 +65,6 @@ $(document).on('click', '.list-update-traceability', function(){
 $(document).on('click', '#update-license-button', update.updateLicense);
 $(document).on('click', '#update-license-delete', function(){update.deleteLicense(licenseState.currentLicense.id, list.getLicensesPage);});
 $(document).on('click', '#update-license-restore', update.restoreLicense);
-$(document).on('click', '#update-license-details-button', function(){updateLicenseDetails(showCurrentLicense);});
 $(document).on('change', '#update-license-type', licenseTypeChange);
 $(document).on('click', '#update-license-go-traceability', function(){
     goToLicensesTraceability('id%'+licenseState.currentLicense.id);

@@ -1,4 +1,4 @@
-<div class="tab-pane fade show active" id="sub-nav-hiring" role="tabpanel" aria-labelledby="sub-nav-hiring-tab">
+<div class="tab-pane fade" id="sub-nav-hiring" role="tabpanel" aria-labelledby="sub-nav-hiring-tab">
     <div id="create-employee-inputs-container" class="row w-100">
         <div class="col-12 col-md-4">
             <div class="row w-100 p-0 m-0">

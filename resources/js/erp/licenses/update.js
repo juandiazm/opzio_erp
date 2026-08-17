@@ -31,7 +31,6 @@ export function showCurrentLicense(){
         $('#update-license-delete').addClass('d-block').removeClass('d-none');
         $('#update-license-restore').addClass('d-none').removeClass('d-block');
         $('#update-license-button').addClass('d-block').removeClass('d-none');
-        $('#update-license-details-button').addClass('d-block').removeClass('d-none');
         $('#update-license-state').prop('disabled', false);
         $('#update-license-client').prop('disabled', false);
         $('#update-license-name').prop('disabled', false);
@@ -42,11 +41,12 @@ export function showCurrentLicense(){
         $('#update-license-recurrence-months').prop('disabled', false);
         $('#update-license-billing-day').prop('disabled', false);
         $('#update-license-days-to-expire').prop('disabled', false);
+        $('#update-license-last-payed-date').prop('disabled', false);
+        $('#update-license-next-billing-date').prop('disabled', false);
     }else{
         $('#update-license-delete').addClass('d-none').removeClass('d-block');
         $('#update-license-restore').addClass('d-block').removeClass('d-none');
         $('#update-license-button').addClass('d-none').removeClass('d-block');
-        $('#update-license-details-button').addClass('d-none').removeClass('d-block');
         $('#update-license-state').prop('disabled', true);
         $('#update-license-client').prop('disabled', true);
         $('#update-license-name').prop('disabled', true);
@@ -57,6 +57,8 @@ export function showCurrentLicense(){
         $('#update-license-recurrence-months').prop('disabled', true);
         $('#update-license-billing-day').prop('disabled', true);
         $('#update-license-days-to-expire').prop('disabled', true);
+        $('#update-license-last-payed-date').prop('disabled', true);
+        $('#update-license-next-billing-date').prop('disabled', true);
     }
     getLicenseDocuments();
     getServiceNotifications();
@@ -70,6 +72,12 @@ export function updateLicense(){
     let employeeId = $('#update-license-employee').val();
     let value = $('#update-license-value').val();
     let description = $('#update-license-description').val();
+    let type = $('#update-license-type').val();
+    let recurrenceMonths = $('#update-license-recurrence-months').val();
+    let billingDay = $('#update-license-billing-day').val();
+    let daysToExpire = $('#update-license-days-to-expire').val();
+    let nextBillingDate = $('#update-license-next-billing-date').val();
+    let lastPayedDate = $('#update-license-last-payed-date').val();
     let flag = true;
     if(state == null || state == ''){
         $('#update-license-state').addClass('is-invalid');
@@ -106,6 +114,36 @@ export function updateLicense(){
     }else{
         $('#update-license-value').removeClass('is-invalid');
     }
+    if(type == null || type == ''){
+        $('#update-license-type').addClass('is-invalid');
+        alertWarning('Debe seleccionar un tipo de licencia');
+        flag = false;
+    }else{
+        $('#update-license-type').removeClass('is-invalid');
+        if(type == '1'){
+            if(recurrenceMonths == null || recurrenceMonths == ''){
+                $('#update-license-recurrence-months').addClass('is-invalid');
+                alertWarning('Debe ingresar la frecuencia mensual');
+                flag = false;
+            }else{
+                $('#update-license-recurrence-months').removeClass('is-invalid');
+            }
+            if(billingDay == null || billingDay == ''){
+                $('#update-license-billing-day').addClass('is-invalid');
+                alertWarning('Debe ingresar el dia de facturación');
+                flag = false;
+            }else{
+                $('#update-license-billing-day').removeClass('is-invalid');
+            }
+            if(daysToExpire == null || daysToExpire == ''){
+                $('#update-license-days-to-expire').addClass('is-invalid');
+                alertWarning('Debe ingresar los días de expiración');
+                flag = false;
+            }else{
+                $('#update-license-days-to-expire').removeClass('is-invalid');
+            }
+        }
+    }
     if(flag){
         $('#update-license-button').prop('disabled', true);
         let dataSend = {
@@ -117,6 +155,12 @@ export function updateLicense(){
             employee_id: employeeId,
             value: value,
             description: description,
+            type: type,
+            recurrence_months: recurrenceMonths,
+            billing_day: billingDay,
+            days_to_expire: daysToExpire,
+            next_billing_date: nextBillingDate,
+            last_payed_date: lastPayedDate,
         };
         PostMethodFunction('/admin/licenses/update',dataSend,null, function(response){
             $('#update-license-button').attr('disabled', false);
@@ -132,6 +176,7 @@ export function updateLicense(){
             );
             licenseState.tabsView['nav-list-tab'] = false;
             licenseState.currentLicense = response.license;
+            showCurrentLicense();
         }, function(){$('#update-license-button').attr('disabled', false);});
     }
 }

@@ -1,5 +1,8 @@
 <!-- Tab Update -->
 <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab">
+    <nav><div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist"><button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button><button class="nav-link" id="sub-nav-hiring-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-hiring" type="button" role="tab" aria-controls="sub-nav-hiring" aria-selected="false">Contratación</button><button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="false">Documentos</button><button class="nav-link" id="sub-nav-licenses-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-licenses" type="button" role="tab" aria-controls="sub-nav-licenses" aria-selected="false">Licencias</button></div></nav>
+    <div class="tab-content" id="sub-nav-tabContent">
+        <div class="tab-pane fade show active" id="sub-nav-general" role="tabpanel" aria-labelledby="sub-nav-general-tab">
     <div id="update-inputs-container" class="row m-0 w-100 justify-content-center">
         <div class="col-12 d-flex flex-column justify-content-center" id="header-container"><div class="row justify-content-center"><div class="col-12"><div class="d-flex justify-content-center"><div class="multimedia-input-container"><div id="update-employee-img-container" class="image-container d-flex justify-content-center"><input type="file" name="photo" id="update-employee-img" class="d-none input_image" accept="image/*"><i class="fa-regular fa-image align-self-center image-icon"></i></div><i class="fa-solid fa-plus image-plus-icon"></i></div></div></div></div></div>
         <div class="col-12 col-md-4"><div class="row w-100 p-0 m-0">
@@ -19,8 +22,7 @@
         <div class="col-12 col-md-4 d-flex flex-column justify-content-center"><div class="d-flex justify-content-center" id="balance-button"><i class="fa-solid fa-scale-balanced"></i><p class="align-self-center">Balance</p></div><div class="d-block" id="employee-sub-opt-container"><div class="d-flex justify-content-between"><div class="align-self-center" id="update-employee-go-traceability"><i class="fa-solid fa-bars-progress"></i></div><div class="align-self-center" id="update-employee-delete"><i class="fa-solid fa-ban"></i></div><div class="align-self-center d-none" id="update-employee-restore"><i class="fa-solid fa-lightbulb"></i></div></div></div></div>
     </div>
     <button class="btn btn-secondary" id="update-employee-button">Actualizar</button>
-    <nav><div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist"><button class="nav-link active" id="sub-nav-hiring-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-hiring" type="button" role="tab" aria-controls="sub-nav-hiring" aria-selected="true">Contratación</button><button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="true">Documentos</button><button class="nav-link" id="sub-nav-licenses-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-licenses" type="button" role="tab" aria-controls="sub-nav-licenses" aria-selected="true">Licencias</button></div></nav>
-    <div class="tab-content" id="sub-nav-tabContent">
+        </div>
         @include('erp.employees.hiring')
         @include('erp.employees.documents')
         @include('erp.employees.licenses')

@@ -1,6 +1,6 @@
-<div class="tab-pane fade show active" id="sub-nav-details" role="tabpanel" aria-labelledby="sub-nav-details-tab">
-    <div id="license-details-inputs-container" class="row w-100">
-        <div class="col-12 col-md-6">
+<div id="sub-nav-details">
+    <div id="license-details-inputs-container" class="row w-100 m-0 p-0">
+        <div class="col-12 col-md-4">
             <div class="row w-100 p-0 m-0">
                 <div class="input-container col-12 d-flex" title="Tipo de licencia">
                     <label for="license-type" class="input-title align-self-center">Tipo de licencia</label>
@@ -17,6 +17,10 @@
                     <label for="license-billing-day" class="input-title align-self-center">Día de facturación</label>
                     <input type="number" autofocus id="update-license-billing-day" class="input-value form-control align-self-center" name="billing-day" placeholder="1">
                 </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="row w-100 p-0 m-0">
                 <div class="input-container col-12 d-flex" title="Días de gracia">
                     <label for="license-days-to-expire" class="input-title align-self-center">Días de gracia</label>
                     <input type="number" autofocus id="update-license-days-to-expire" class="input-value form-control align-self-center" name="grace-days" placeholder="1">
@@ -31,7 +35,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <div class="row w-100 p-0 m-0">
                 <div class="input-container col-12 d-flex" title="Llave de usuario">
                     <label for="license-user-key" class="input-title align-self-center"><i class="fa-regular fa-copy copy-action" id="copy-update-license-user-key" data-clipboard-text=""></i>Llave de usuario</label>
@@ -51,6 +55,5 @@
                 </div>
             </div>
         </div>
-        <button class="btn btn-secondary align-self-center" id="update-license-details-button"><i class="fa-solid fa-file-invoice"></i></button>
     </div>
 </div>

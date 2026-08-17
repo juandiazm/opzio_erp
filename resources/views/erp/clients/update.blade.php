@@ -1,5 +1,15 @@
 <!-- Tab Update -->
 <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab">
+    <nav>
+        <div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist">
+            <button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button>
+            <button class="nav-link" id="sub-nav-users-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-users" type="button" role="tab" aria-controls="sub-nav-users" aria-selected="false">Usuarios</button>
+            <button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="false">Documentos</button>
+            <button class="nav-link" id="sub-nav-licenses-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-licenses" type="button" role="tab" aria-controls="sub-nav-licenses" aria-selected="false">Licencias</button>
+        </div>
+    </nav>
+    <div class="tab-content" id="sub-nav-tabContent">
+        <div class="tab-pane fade show active" id="sub-nav-general" role="tabpanel" aria-labelledby="sub-nav-general-tab">
     <div id="update-inputs-container" class="row m-0 p-0 w-100">
         <div class="col-12 d-flex flex-column justify-content-center" id="header-container">
             <div class="row justify-content-center">
@@ -132,14 +142,7 @@
         </div>
     </div>
     <button class="btn btn-secondary" id="update-client-button">Actualizar</button>
-    <nav>
-        <div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist">
-            <button class="nav-link active" id="sub-nav-users-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-users" type="button" role="tab" aria-controls="sub-nav-users" aria-selected="true">Usuarios</button>
-            <button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="true">Documentos</button>
-            <button class="nav-link" id="sub-nav-licenses-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-licenses" type="button" role="tab" aria-controls="sub-nav-licenses" aria-selected="true">Licencias</button>
         </div>
-    </nav>
-    <div class="tab-content" id="sub-nav-tabContent">
         @include('erp.clients.users')
         @include('erp.clients.documents')
         @include('erp.clients.licenses')

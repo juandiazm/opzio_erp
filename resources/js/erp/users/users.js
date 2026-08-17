@@ -1,36 +1,3 @@
-$(document).on('click', '#nav-tab .nav-link', changeTab);
-//////////
-$(document).on('change', '#db-pagination-per-page', DBchangePageSize);
-$(document).on('click', '#db-pagination .page-item-number', DBchangePage);
-$(document).on('click', '#db-page-item-back', DBselectBackPage);
-$(document).on('click', '#db-page-item-next', DBselectNextPage);
-$(document).on('change', '#search-list-input', getUsersPage);
-$(document).on('click', '.list-update-btn', goToUpdateTab);
-$(document).on('click', '.list-update-traceability', function(){
-    goToTraceabilityTab('id%'+$(this).parent().parent().attr('user-id'));
-});
-//////////
-$(document).on('click', '#nav-create .image-plus-icon',function(){
-    $(this).parent().find('.input-color').click();
-});
-$(document).on('change', '#nav-create .input-color',loadCreateImageBorder);
-$(document).on('click', '#add-button', createUser);
-/////////
-$(document).on('click', '#nav-update .image-plus-icon',function(){
-    $(this).parent().find('.input-color').click();
-});
-$(document).on('change', '#nav-update .input-color',loadUpdateImageBorder);
-$(document).on('click', '#update-button', updateUser);
-$(document).on('click', '#update-user-delete',function(){
-    deleteUser(current_user.id);
-});
-$(document).on('click', '#update-user-restore',function(){
-    restoreUser(current_user.id);
-});
-$(document).on('click', '#update-user-go-traceability',function(){
-    goToTraceabilityTab('id%'+current_user.id);
-});
-
 ////VAR TABS
 var tabs_view = {
     'nav-list-tab': false,

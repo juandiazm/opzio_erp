@@ -158,16 +158,12 @@
             width: 200px;
             display: block;
         }
-        #sub-nav-tab{
-            margin-top: 3vh;
-        }
         #sub-nav-details{
             .input-container{
                 margin: 5px 0;
                 padding: 0;
                 .input-title{
                     width: 30%;
-                    margin-right: 5px;
                     i{
                         margin-right: 5px;
                     }
@@ -425,9 +421,6 @@
             width: 200px;
             display: block;
         }
-        #sub-nav-tab{
-            margin-top: 3vh;
-        }
         #sub-nav-details{
             .input-title{
                 width: 30%;
@@ -523,6 +516,153 @@
                     margin: 0 auto;
                 }
             }
+        }
+    }
+}
+
+#nav-update #license-update-actions{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 2vh 2vw 0;
+
+    #license-secondary-actions{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    #balance-button{
+        width: 170px;
+        flex: 0 0 170px;
+        margin: 0 !important;
+        padding: 10px;
+        background: #FAFAFA 0% 0% no-repeat padding-box;
+        box-shadow: 0px 3px 6px #00000029;
+        text-align: center;
+        border-radius: 40px;
+        cursor: pointer;
+        transition: .3s;
+
+        &:hover{
+            background-color: $primary;
+
+            i,
+            p{
+                color: $text-white;
+            }
+        }
+
+        i{
+            margin-right: 10px;
+            color: $text-gray;
+            font-size: 20px;
+            transition: .3s;
+        }
+
+        p{
+            width: min-content;
+            margin: 0;
+            padding: 0;
+            color: $text-gray;
+            font-size: .9em;
+            font-weight: bold;
+            transition: .3s;
+        }
+    }
+
+    #license-sub-opt-container{
+        width: 170px;
+        flex: 0 0 170px;
+        margin: 0 !important;
+
+        > div{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #update-license-go-traceability,
+        #update-license-delete,
+        #update-license-restore{
+            margin: 0;
+            background: #FAFAFA 0% 0% no-repeat padding-box;
+            box-shadow: 0px 3px 6px #00000029;
+            cursor: pointer;
+            transition: .3s;
+            border-radius: 40px;
+
+            i{
+                color: $text-gray;
+                font-size: 1.5em;
+                transition: .3s;
+            }
+        }
+
+        #update-license-go-traceability{
+            padding: 5px 35px;
+
+            &:hover{
+                background-color: $primary;
+
+                i{
+                    color: $text-white;
+                }
+            }
+
+            i{
+                color: $primary;
+            }
+        }
+
+        #update-license-delete{
+            padding: 7px 15px;
+        }
+
+        #update-license-restore{
+            padding: 5px 10px;
+
+            &:hover{
+                background-color: $yellow;
+
+                i{
+                    color: $text-white;
+                }
+            }
+        }
+    }
+
+    #update-license-button{
+        width: 200px;
+        flex: 0 0 200px;
+        margin: 0 !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #nav-update #license-update-actions{
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px;
+        margin: 2vh 0 0;
+
+        #license-secondary-actions{
+            width: 100%;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        #balance-button,
+        #license-sub-opt-container{
+            width: auto;
+            flex: 1 1 0;
+        }
+
+        #update-license-button{
+            width: 100%;
+            flex: 0 0 auto;
         }
     }
 }

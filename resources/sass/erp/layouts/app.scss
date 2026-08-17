@@ -1879,3 +1879,116 @@
         padding-top: 6px !important;
     }
 }
+
+#erp-app-content{
+    .input-container{
+        margin: 5px 0 !important;
+        padding: 0 !important;
+    }
+
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]):not([type="hidden"]):not([type="range"]):not(.searchable-dropdown__search):not(.crud-current-selected-input),
+    select,
+    .form-control:not(textarea),
+    .form-select:not(.searchable-dropdown__native){
+        background-color: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid $input-border-color !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: $input-control-padding !important;
+    }
+
+    textarea,
+    textarea.form-control{
+        background-color: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid $input-border-color !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: $input-textarea-padding !important;
+    }
+
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]):not([type="hidden"]):not([type="range"]):not(.searchable-dropdown__search):not(.crud-current-selected-input):focus,
+    select:focus,
+    textarea:focus,
+    .form-control:not(textarea):focus,
+    .form-select:not(.searchable-dropdown__native):focus,
+    textarea.form-control:focus{
+        outline: none;
+        box-shadow: none !important;
+    }
+
+    select.form-select,
+    select.input-value{
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid $input-border-color !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .searchable-dropdown__trigger{
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: $input-control-padding !important;
+        color: $text-gray;
+        font: inherit;
+        line-height: inherit;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid $input-border-color !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .searchable-dropdown__trigger:hover,
+    .searchable-dropdown__trigger:focus{
+        border-bottom-color: $input-border-color !important;
+        outline: none;
+        box-shadow: none !important;
+    }
+
+    .searchable-dropdown.is-invalid .searchable-dropdown__trigger{
+        border-bottom-color: $danger !important;
+    }
+
+    .crud-input-selected-container{
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid $input-border-color !important;
+        border-radius: 0 !important;
+    }
+
+    .crud-input-selected-container .crud-current-selected-input{
+        margin: 0 !important;
+        padding: $input-control-padding !important;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-bottom: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .crud-list .crud-item-add-input{
+        margin: 0 !important;
+        padding: $input-control-padding !important;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-bottom: 1px solid $input-border-color !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .form-control.is-invalid,
+    .form-select.is-invalid,
+    .crud-input-container.is-invalid .crud-input-selected-container{
+        border-bottom-color: $danger !important;
+    }
+}
