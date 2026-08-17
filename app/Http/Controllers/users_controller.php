@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Session;
 
+use App\Models\user;
+use App\Models\user_permission_assoc;
 use App\traits\users_trait;
 
 class users_controller extends Controller
@@ -54,8 +56,10 @@ class users_controller extends Controller
         return \Response::json($Response , 400);
     }
     public function update_my_profile(Request $request){
+        $sessionUser = Session::get('user');
+        $userId = data_get($sessionUser, 'id');
         $Response = $this->User_UpdateUser(
-            Session::get('user')['id']
+            $userId
             ,$request->name
             ,$request->lastname
             ,$request->username
@@ -67,6 +71,12 @@ class users_controller extends Controller
             ,$request->permissions
         );
         if($Response['status'] == 1){
+            $updatedUser = user::find($userId);
+            $updatedPermissions = user_permission_assoc::where('user_id', $userId)->get();
+            Session::put('user', $updatedUser);
+            Session::put('permissions', $updatedPermissions);
+            $Response['user'] = $updatedUser;
+            $Response['permissions'] = $updatedPermissions;
             return $Response;
         }
         return \Response::json($Response , 400);

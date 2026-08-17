@@ -1,0 +1,79 @@
+@import '../../variables';
+
+#erp-app-content{ background-color: #F7F7F7; }
+#dashboard-container{ line-height: 1.1; }
+.separate-line{ border: 1px solid $border-gray; width: 100%; margin: 1vh 0; }
+#principal-logo-opzio{ background-color: transparent !important; }
+.chartjs-legend{ li.hidden{ opacity: 0.3; text-decoration: line-through; } }
+
+@media screen and (min-width: 768px){
+    #dashboard-container{
+        margin: 0;
+        padding: 0;
+        display: flex;
+        width: 100%;
+        .column-container{
+            margin: 0;
+            padding: 0 0.5vw;
+            display: block;
+            width: 50%;
+            .row-container{
+                margin: 0 0 2vh 0;
+                padding: 0;
+                width: 100%;
+                display: flex;
+                .segment-header{
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    .segment-title{ font-size: 15px; font-weight: 600; margin: 0; padding: 0; color: $text-gray; display: flex; justify-content: space-between; align-items: center; .tooltip-icon{ font-size: 14px; color: $text-gray; cursor: pointer; margin-left: 2px; } }
+                    .segment-month{ border: 1px solid #707070; border-radius: 13px; width: 40%; text-align: center; cursor: pointer; padding: 3px 5px; font-size: 12px; }
+                }
+            }
+        }
+    }
+    .approve-incomes-cutoff{ text-align: center !important; white-space: nowrap; }
+    .approve-incomes-overdue{ text-align: center !important; }
+    .overdue-text{ color: #C90D0D !important; font-weight: 600 !important; }
+}
+
+@media screen and (max-width: 768px){
+    #dashboard-container{
+        margin: 0;
+        padding: 10px 12px 90px 12px !important;
+        display: block;
+        width: 100%;
+        max-height: calc(100vh - 64px);
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        .column-container{
+            margin: 0;
+            padding: 0;
+            display: block;
+            width: 100%;
+            .row-container{
+                margin: 0 0 16px 0;
+                padding: 0;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                .segment-header{
+                    margin: 0 0 12px 0;
+                    padding: 0;
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    align-items: center;
+                    .segment-title{ font-size: 14px; font-weight: 600; margin: 0; padding: 0; color: $text-gray; display: flex; align-items: center; gap: 6px; .tooltip-icon{ font-size: 13px; color: $text-gray; cursor: pointer; flex-shrink: 0; } }
+                    .segment-month{ display: none; }
+                }
+            }
+        }
+    }
+    .separate-line{ margin: 12px 0; border-color: #E8E8E8; }
+    .due-clients-table-container::-webkit-scrollbar, .quotation-table-container::-webkit-scrollbar, .approve-incomes-table-container::-webkit-scrollbar{ width: 4px; height: 4px; }
+    .due-clients-table-container::-webkit-scrollbar-track, .quotation-table-container::-webkit-scrollbar-track, .approve-incomes-table-container::-webkit-scrollbar-track{ background: #F5F5F5; border-radius: 2px; }
+    .due-clients-table-container::-webkit-scrollbar-thumb, .quotation-table-container::-webkit-scrollbar-thumb, .approve-incomes-table-container::-webkit-scrollbar-thumb{ background: #CCCCCC; border-radius: 2px; &:hover{ background: #AAAAAA; } }
+}

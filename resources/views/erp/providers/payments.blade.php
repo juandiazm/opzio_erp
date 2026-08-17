@@ -1,0 +1,1 @@
+<div class="tab-pane fade" id="sub-nav-payments" role="tabpanel" aria-labelledby="sub-nav-payments-tab">Pagos...</div>

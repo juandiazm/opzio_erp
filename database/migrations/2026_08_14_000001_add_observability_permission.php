@@ -3,18 +3,18 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-class AddObservabilityPermission extends Migration
+class AddServersPermission extends Migration
 {
     public function up()
     {
         $permission = DB::table('user_permissions')
-            ->where('url', 'admin/observability/')
+            ->where('url', 'admin/servers/')
             ->first();
 
         if (! $permission) {
             $permissionId = DB::table('user_permissions')->insertGetId([
-                'name' => 'Observability',
-                'url' => 'admin/observability/',
+                'name' => 'Servidores',
+                'url' => 'admin/servers/',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -42,7 +42,7 @@ class AddObservabilityPermission extends Migration
     public function down()
     {
         $permission = DB::table('user_permissions')
-            ->where('url', 'admin/observability/')
+            ->where('url', 'admin/servers/')
             ->first();
 
         if (! $permission) {

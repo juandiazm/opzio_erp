@@ -1,0 +1,204 @@
+@media screen and (min-width: 768px) {
+    #nav-create{
+        #header-container{ margin-bottom: 2vh; }
+        #create-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            #create-employee-description{
+                border: 1px solid #707070;
+                border-radius: 20px;
+                width: 100%;
+                padding: 10px;
+            }
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{ width: 30%; font-size: 1.1em; }
+                .input-value{ width: 70%; margin: 0; }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{ transform: scale(1.05); }
+                }
+                #create-employee-img-container,
+                #create-employee-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 10vw;
+                    height: 10vw;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{
+                        font-size: 4vw;
+                        color: $text-gray;
+                        transition: .3s;
+                    }
+                }
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0.5vw;
+                    right: 0.5vw;
+                    z-index: 10;
+                    background-color: $primary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 20px;
+                    transition: .3s;
+                }
+            }
+            #balance-button{
+                width: 170px;
+                margin: 0 auto;
+                padding: 10px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                text-align: center;
+                border-radius: 40px;
+                cursor: pointer;
+                transition: .3s;
+                &:hover{
+                    background-color: $primary;
+                    i, p{ color: $text-white; }
+                }
+                i{ font-size: 20px; transition: .3s; color: $text-gray; margin-right: 10px; }
+                p{ margin: 0; padding: 0; width: min-content; font-size: .9em; font-weight: bold; color: $text-gray; transition: .3s; }
+            }
+            #employee-sub-opt-container{
+                margin-top: 20px;
+                width: 170px;
+                margin: 10px auto 0 auto;
+                #update-employee-go-traceability,
+                #update-employee-delete,
+                #update-employee-restore{
+                    background: #FAFAFA 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    cursor: pointer;
+                    transition: .3s;
+                    border-radius: 40px;
+                    i{ font-size: 1.5em; transition: .3s; color: $text-gray; }
+                }
+                #update-employee-go-traceability{
+                    padding: 5px 35px;
+                    &:hover{ background-color: $primary; i{ color: $text-white; } }
+                    i{ color: $primary; }
+                }
+                #update-employee-delete{ padding: 7px 15px; }
+                #update-employee-restore{
+                    padding: 5px 10px;
+                    margin: 0 1%;
+                    &:hover{ background-color: $yellow; i{ color: $text-white; } }
+                }
+            }
+        }
+        #add-employee-button{
+            margin: 4vh auto 0 auto;
+            width: 200px;
+            display: block;
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #nav-create{
+        #header-container{ margin-bottom: 2vh; margin-top: 2vh; }
+        #create-inputs-container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            #create-employee-description{
+                border: 1px solid #707070;
+                border-radius: 20px;
+                width: 100%;
+                padding: 10px;
+            }
+            .input-container{
+                margin: 5px 0;
+                padding: 0;
+                .input-title{ width: 30%; font-size: 1.1em; }
+                .input-value{ width: 70%; margin: 0; }
+            }
+            .multimedia-input-container{
+                position: relative;
+                cursor: pointer;
+                margin: 0 5%;
+                &:hover{
+                    .image-icon,
+                    .image-plus-icon{ transform: scale(1.05); }
+                }
+                #create-employee-img-container,
+                #create-employee-color-container{
+                    border: 4px solid $text-gray;
+                    border-radius: 50%;
+                    width: 15vw;
+                    height: 15vw;
+                    margin: 0 auto;
+                    transition: .3s;
+                    .image-icon, .color-icon{ font-size: 4vw; color: $text-gray; transition: .3s; }
+                }
+                .image-plus-icon{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 10;
+                    background-color: $primary;
+                    padding: 5px;
+                    border-radius: 50%;
+                    color: $text-white;
+                    font-size: 14px;
+                    transition: .3s;
+                }
+            }
+            #balance-button{
+                width: 170px;
+                margin: 0 auto;
+                padding: 10px;
+                background: #FAFAFA 0% 0% no-repeat padding-box;
+                box-shadow: 0px 3px 6px #00000029;
+                text-align: center;
+                border-radius: 40px;
+                cursor: pointer;
+                transition: .3s;
+                &:hover{ background-color: $primary; i, p{ color: $text-white; } }
+                i{ font-size: 20px; transition: .3s; color: $text-gray; margin-right: 10px; }
+                p{ margin: 0; padding: 0; width: min-content; font-size: .9em; font-weight: bold; color: $text-gray; transition: .3s; }
+            }
+            #employee-sub-opt-container{
+                margin-top: 20px;
+                width: 170px;
+                margin: 10px auto 0 auto;
+                #update-employee-go-traceability,
+                #update-employee-delete,
+                #update-employee-restore{
+                    background: #FAFAFA 0% 0% no-repeat padding-box;
+                    box-shadow: 0px 3px 6px #00000029;
+                    cursor: pointer;
+                    transition: .3s;
+                    border-radius: 40px;
+                    i{ font-size: 1.5em; transition: .3s; color: $text-gray; }
+                }
+                #update-employee-go-traceability{
+                    padding: 5px 35px;
+                    &:hover{ background-color: $primary; i{ color: $text-white; } }
+                    i{ color: $primary; }
+                }
+                #update-employee-delete{ padding: 7px 15px; }
+                #update-employee-restore{
+                    padding: 5px 10px;
+                    margin: 0 1%;
+                    &:hover{ background-color: $yellow; i{ color: $text-white; } }
+                }
+            }
+        }
+        #add-employee-button{
+            margin: 4vh auto 0 auto;
+            width: 200px;
+            display: block;
+        }
+    }
+}

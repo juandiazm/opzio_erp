@@ -36,7 +36,7 @@ use App\Http\Controllers\client_users_controller;
 use App\Http\Controllers\income_payment_controller;
 use App\Http\Controllers\payment_gateway_wompi_controller;
 use App\Http\Controllers\payment_gateway_bold_controller;
-use App\Http\Controllers\observability_dashboard_controller;
+use App\Http\Controllers\servers_dashboard_controller;
 //Opzio
 use App\Http\Controllers\old_opzio_controller;
 use App\Http\Controllers\client_chat_controller;
@@ -131,11 +131,11 @@ Route::prefix('admin')->group(function () {
             Route::post('get-sales-by-month-range', [dashboard_controller::class, 'get_sales_by_month_range']);
             Route::post('get-incomes-by-client-date-range', [dashboard_controller::class, 'get_incomes_by_client_date_range']);
         });
-        Route::prefix('observability')->group(function () {
-            Route::get('', [observability_dashboard_controller::class, 'page']);
-            Route::post('get-page', [observability_dashboard_controller::class, 'get_page']);
-            Route::get('export', [observability_dashboard_controller::class, 'export']);
-            Route::post('summary', [observability_dashboard_controller::class, 'summary']);
+        Route::prefix('servers')->group(function () {
+            Route::get('', [servers_dashboard_controller::class, 'page']);
+            Route::post('get-page', [servers_dashboard_controller::class, 'get_page']);
+            Route::get('export', [servers_dashboard_controller::class, 'export']);
+            Route::post('summary', [servers_dashboard_controller::class, 'summary']);
         });
         Route::prefix('users')->group(function () {
             Route::get('', [admin_pages_controller::class, 'users_page']);

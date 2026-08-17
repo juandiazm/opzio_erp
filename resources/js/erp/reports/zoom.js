@@ -1,0 +1,62 @@
+import { reportState } from './state.js';
+
+export function openZoomInModal(){
+    $('#zoom-in-super-container').removeClass('d-none');
+    if(reportState.graphs.zoom != null) reportState.graphs.zoom.destroy();
+    reportState.zoomGraphId = $(this).closest('.report-item').find('.report-item-date-input').attr('id');
+    let graphConfig = null;
+    let total = '';
+    let partition = '';
+    let average = '';
+    let tableHtml = '';
+    let zoomTitle = '';
+    let dateRangeInput = null;
+    switch(reportState.zoomGraphId){
+        case 'date-range-input-users': zoomTitle = 'Reporte usuarios'; dateRangeInput = $('#date-range-input-users').data('daterangepicker'); graphConfig = reportState.graphs.users; total = Object.values(reportState.data.users.data.report).reduce((acc, entry) => acc + entry.total, 0); partition = Object.values(reportState.data.users.data.report).length; average = Math.round(total / partition); total = total.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); partition = partition.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); tableHtml = setUserZoomInTable(); break;
+        case 'date-range-input-clients': zoomTitle = 'Reporte clientes'; dateRangeInput = $('#date-range-input-clients').data('daterangepicker'); graphConfig = reportState.graphs.clients; total = Object.values(reportState.data.clients.data.report).reduce((acc, entry) => acc + entry.total, 0); partition = Object.values(reportState.data.clients.data.report).length; average = Math.round(total / partition); total = total.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); partition = partition.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); tableHtml = setClientZoomInTable(); break;
+        case 'date-range-input-employees': zoomTitle = 'Reporte empleados'; dateRangeInput = $('#date-range-input-employees').data('daterangepicker'); graphConfig = reportState.graphs.employees; total = Object.values(reportState.data.employees.data.report).reduce((acc, entry) => acc + entry.total, 0); partition = Object.values(reportState.data.employees.data.report).length; average = Math.round(total / partition); total = total.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); partition = partition.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); tableHtml = setEmployeeZoomInTable(); break;
+        case 'date-range-input-licenses': zoomTitle = 'Reporte licencias'; dateRangeInput = $('#date-range-input-licenses').data('daterangepicker'); graphConfig = reportState.graphs.licenses; total = Object.values(reportState.data.licenses.data.labels).reduce((acc, entry) => acc + entry.total, 0); partition = Object.values(reportState.data.licenses.data.labels).length; average = Math.round(total / partition); total = total.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); partition = partition.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); tableHtml = setLicenseZoomInTable(); break;
+        case 'date-range-input-incomes': zoomTitle = 'Reporte ingresos'; dateRangeInput = $('#date-range-input-incomes').data('daterangepicker'); graphConfig = reportState.graphs.incomes; total = Object.values(reportState.data.payedIncomes.data.report).reduce((acc, entry) => acc + entry.total, 0); partition = Object.values(reportState.data.allIncomes.data.report).length; average = '$'+Math.round(total / partition).toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); total = '$'+total.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); partition = partition.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); tableHtml = setIncomeZoomInTable(); break;
+        case 'date-range-input-outcomes': zoomTitle = 'Reporte egresos'; dateRangeInput = $('#date-range-input-outcomes').data('daterangepicker'); graphConfig = reportState.graphs.outcomes; total = Object.values(reportState.data.outcomes.data.report).reduce((acc, entry) => acc + entry.total, 0); partition = Object.values(reportState.data.outcomes.data.report).length; average = Math.round(total / partition); total = total.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); partition = partition.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0}); tableHtml = setOutcomeZoomInTable(); break;
+    }
+    $('#date-range-input-zoom-in').data('daterangepicker').setStartDate(dateRangeInput.startDate);
+    $('#date-range-input-zoom-in').data('daterangepicker').setEndDate(dateRangeInput.endDate);
+    reportState.graphs.zoom = new Chart(document.getElementById('zoom-in-report-graph'), graphConfig.config);
+    setZoomInLabelData(total, partition, average);
+    $('#zoom-in-table').html(tableHtml);
+    $('#zoom-in-title').text(zoomTitle);
+}
+
+export function closeZoomInModal(){ $('#zoom-in-super-container').addClass('d-none'); }
+function setZoomInLabelData(total, partition, average){ $('#zoom-in-total-value').text(total); $('#zoom-in-partition-value').text(partition); $('#zoom-in-average-value').text(average); }
+
+function setIncomeZoomInTable(){
+    let tableHtml = '<thead><tr><th scope="col" class="text-start">ID</th><th scope="col" class="client-name text-start">Cliente</th><th scope="col" class="text-end">Valor Cobrado</th><th scope="col" class="text-end">Valor Pagado</th><th scope="col" class="bill-name text-start">Factura</th><th scope="col" class="text-center">Estado</th><th scope="col" class="text-center">Fecha de Pago</th><th scope="col" class="text-center">Fecha de creación</th></tr></thead><tbody>';
+    $.each(reportState.data.allIncomes.data.incomes, function(index, value){ tableHtml += '<tr><td class="text-start" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td><td class="client-name text-start" title="'+value.client.complete_name+'">'+value.client.complete_name+'</td><td class="text-end">$'+value.total_string+'</td><td class="text-end">$'+value.bill_final_value_string+'</td><td class="bill-name text-start" title="'+value.bill_name+'">'+(value.bill_name == null ? '' : value.bill_name)+'</td><td class="text-center">'+value.state_text+'</td><td class="text-center">'+(value.payment_date == null ? '' : value.payment_date)+'</td><td class="text-center">'+value.created_at_string+'</td></tr>'; });
+    return tableHtml+'</tbody>';
+}
+function setUserZoomInTable(){
+    let tableHtml = '<thead><tr><th scope="col" class="text-start">ID</th><th scope="col" class="text-start">Identificación</th><th scope="col" class="text-start">Nombre Completo</th><th scope="col" class="text-start">Usuario</th><th scope="col" class="text-start">Correo Electrónico</th></tr></thead><tbody>';
+    $.each(reportState.data.users.data.users, function(index, value){ tableHtml += '<tr><td class="text-start" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td><td class="text-start" title="'+value.identification+'">'+value.identification+'</td><td class="text-start" title="'+value.complete_name+'">'+value.complete_name+'</td><td class="text-start" title="'+value.username+'">'+value.username+'</td><td class="text-start" title="'+value.email+'">'+value.email+'</td></tr>'; });
+    return tableHtml+'</tbody>';
+}
+function setClientZoomInTable(){
+    let tableHtml = '<thead><tr><th scope="col" class="text-start">ID</th><th scope="col" class="text-start">Identificación</th><th scope="col" class="text-center identification-type">Tipo de Identificación</th><th scope="col" class="text-start name-col">Nombre Completo</th><th scope="col" class="text-start name-col">Correo Electrónico</th><th scope="col" class="text-start">Teléfono</th><th scope="col" class="text-center">Activo</th></tr></thead><tbody>';
+    $.each(reportState.data.clients.data.clients, function(index, value){ tableHtml += '<tr><td class="text-start" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td><td class="text-start" title="'+value.identification+'">'+value.identification+'</td><td class="text-center identification-type" title="'+value.identification_type_string+'">'+value.identification_type_string+'</td><td class="text-start name-col" title="'+value.complete_name+'">'+value.complete_name+'</td><td class="text-start name-col" title="'+value.email+'">'+value.email+'</td><td class="text-start" title="'+value.phone+'">'+value.phone+'</td><td class="text-center">'+(value.active == 1 ? 'Sí' : 'No')+'</td></tr>'; });
+    return tableHtml+'</tbody>';
+}
+function setEmployeeZoomInTable(){
+    let tableHtml = '<thead><tr><th scope="col" class="text-start">ID</th><th scope="col" class="text-start">Identificación</th><th scope="col" class="text-start">Nombre Completo</th><th scope="col" class="text-start">Cargo</th><th scope="col" class="text-start">Correo personal</th><th scope="col" class="text-start">Correo empresarial</th></tr></thead><tbody>';
+    $.each(reportState.data.employees.data.employees, function(index, value){ tableHtml += '<tr><td class="text-start" title="'+value.uid+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.uid+'"></i>'+value.uid.substr(value.uid.length - 5)+'</td><td class="text-start" title="'+value.identification+'">'+value.identification+'</td><td class="text-start" title="'+value.complete_name+'">'+value.complete_name+'</td><td class="text-start" title="'+value.charge+'">'+value.charge+'</td><td class="text-start" title="'+value.email+'">'+value.personal_email+'</td><td class="text-start" title="'+value.email+'">'+value.work_email+'</td></tr>'; });
+    return tableHtml+'</tbody>';
+}
+function setLicenseZoomInTable(){
+    let tableHtml = '<thead><tr><th scope="col" class="text-start">ID</th><th scope="col" class="text-start name-col">Nombre</th><th scope="col" class="text-start client-name">Cliente</th><th scope="col" class="text-start name-col">Servicio</th><th scope="col" class="text-start">Tipo</th><th scope="col" class="text-end">Valor</th><th scope="col" class="text-center">Estado</th><th scope="col" class="text-center">Último Pago</th><th scope="col" class="text-center">Días Restantes</th></tr></thead><tbody>';
+    $.each(reportState.data.licenses.data.licenses, function(index, value){ tableHtml += '<tr><td class="text-start" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td><td class="text-start name-col" title="'+value.name+'">'+value.name+'</td><td class="text-start client-name" title="'+value.client+'">'+value.client.complete_name+'</td><td class="text-start name-col" title="'+value.service.name+'">'+value.service.name+'</td><td class="text-start" title="'+value.type_string+'">'+value.type_string+'</td><td class="text-end" title="'+value.value_string+'">$'+value.value_string+'</td><td class="text-center">'+value.active_string+'</td><td class="text-center" title="'+value.last_payed_date+'">'+value.last_payed_date+'</td><td class="text-center">'+value.remaining_days+'</td></tr>'; });
+    return tableHtml+'</tbody>';
+}
+function setOutcomeZoomInTable(){
+    let tableHtml = '<thead><tr><th scope="col" class="text-start">ID</th><th scope="col" class="text-start">Concepto</th><th scope="col" class="text-end">Valor</th><th scope="col" class="text-center">Fecha</th></tr></thead><tbody>';
+    $.each(reportState.data.outcomes.data.outcomes, function(index, value){ tableHtml += '<tr><td class="text-start" title="'+value.unique_id+'"><i class="fa-regular fa-copy copy-action me-1" data-clipboard-text="'+value.unique_id+'"></i>'+value.unique_id.substr(value.unique_id.length - 5)+'</td><td class="text-start" title="'+value.name+'">'+value.name+'</td><td class="text-end" title="'+value.amount+'">$'+value.amount+'</td><td class="text-center" title="'+value.date_string+'">'+value.date_string+'</td></tr>'; });
+    return tableHtml+'</tbody>';
+}

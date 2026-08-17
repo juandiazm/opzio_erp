@@ -1,0 +1,38 @@
+@mixin provider-sub-actions {
+    #provider-sub-opt-container{ margin-top: 20px; width: 170px; margin: 10px auto 0 auto;
+        #update-provider-go-traceability,#update-provider-delete,#update-provider-restore{ background: #FAFAFA 0% 0% no-repeat padding-box; box-shadow: 0px 3px 6px #00000029; cursor: pointer; transition: .3s; border-radius: 40px; i{ font-size: 1.5em; transition: .3s; color: $text-gray; } }
+        #update-provider-go-traceability{ padding: 5px 35px; margin: 0 3px; &:hover{ background-color: $primary; i{ color: $text-white; } } i{ color: $primary; } }
+        #update-provider-delete{ padding: 7px 15px; margin: 0 3px; &:hover{ background-color: $danger; i{ color: $text-white; } } }
+        #update-provider-restore{ padding: 5px 10px; margin: 0 3px; &:hover{ background-color: $yellow; i{ color: $text-white; } } }
+    }
+}
+@mixin provider-update-inputs($size) {
+    #update-inputs-container{ margin: 0; padding: 0; width: 100%; #update-provider-description{ border: 1px solid #707070; border-radius: 20px; width: 100%; padding: 10px; } .input-container{ margin: 5px 0; padding: 0; .input-title{ width: 30%; font-size: 1.1em; } .input-value{ width: 70%; margin: 0; } } .multimedia-input-container{ position: relative; cursor: pointer; margin: 0 5%; &:hover{ .image-icon,.image-plus-icon{ transform: scale(1.05); } } #update-provider-img-container,#update-provider-color-container{ border: 4px solid $text-gray; border-radius: 50%; width: $size; height: $size; margin: 0 auto; transition: .3s; background-size: contain; .image-icon,.color-icon{ font-size: 4vw; color: $text-gray; transition: .3s; } } .image-plus-icon{ position: absolute; bottom: if($size == 10vw, 0.5vw, 0); right: if($size == 10vw, 0.5vw, 0); z-index: 10; background-color: $primary; padding: 5px; border-radius: 50%; color: $text-white; font-size: 20px; transition: .3s; } } }
+}
+@mixin provider-sub-content {
+    #sub-nav-documents #provider-documents-add-container{ background: #F7F7F7 0% 0% no-repeat padding-box; border-radius: 20px; padding: 3vh 5%; .provider-document-input-title{ margin: 0; padding: 0; display: block; height: min-content; color: $text-gray; font-weight: 600; } .provider-document-input-name{ background-color: transparent; } .provider-document-input-file{ border: 1px solid $text-gray; border-radius: 20px; } }
+    #sub-nav-documents #provider-documents-table #provider-documents-table-body{ .provider-document-input-name{ margin: 0; padding: 0; display: block; width: 100%; border: none; color: $text-gray; font-weight: 500; font-size: 1.1em; } .provider-document-input-link{ color: $primary; font-weight: 600; font-size: 1.1em; } }
+    #sub-nav-contacts #contacts-table{ thead{ background: #FFFFFF 0% 0% no-repeat padding-box; box-shadow: 0px 3px 6px #00000029; } .update-contact-row .form-control{ border: none; width: 100%; } tr{ td{ vertical-align: middle; } &.deleted td:not(:last-child){ opacity: .3; } } }
+}
+@media screen and (min-width: 768px) {
+    #nav-update{
+        @include provider-sub-actions;
+        #header-container{ margin: 2vh 0 3vh 0; padding: 0; width: 100%; }
+        @include provider-update-inputs(10vw);
+        #update-provider-button{ margin: 2vh 2% 0 auto; width: 200px; display: block; }
+        #create-provider-inputs-container{ margin: 1vh 0; padding: 2vh 1vw; width: 100%; background: #F7F7F7 0% 0% no-repeat padding-box; border-radius: 20px; }
+        @include provider-sub-content;
+    }
+}
+@media screen and (max-width: 768px) {
+    #nav-update{
+        @include provider-sub-actions;
+        #header-container{ margin: 2vh 0 3vh 0; padding: 0; width: 100%; }
+        @include provider-update-inputs(10vw);
+        #update-provider-button{ margin: 2vh 2% 0 auto; width: 200px; display: block; }
+        #update-inputs-container .multimedia-input-container #update-provider-img-container,#update-inputs-container .multimedia-input-container #update-provider-color-container{ width: 15vw; height: 15vw; }
+        #update-inputs-container .multimedia-input-container .image-plus-icon{ bottom: 0; right: 0; }
+        @include provider-sub-content;
+        #sub-nav-documents p, #sub-nav-documents a{ font-size: 14px !important; }
+    }
+}

@@ -1,0 +1,49 @@
+.servers-overview {
+    background: var(--servers-surface);
+    border: 1px solid var(--servers-line);
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    margin-bottom: 14px;
+}
+
+.servers-overview-item {
+    border-right: 1px solid var(--servers-line);
+    min-height: 70px;
+    padding: 12px 14px;
+}
+
+.servers-overview-item:last-child {
+    border-right: 0;
+}
+
+.servers-overview-item span,
+.servers-detail-metric span,
+#servers-projects-table small {
+    color: var(--servers-muted);
+    display: block;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.servers-overview-item span {
+    margin: 0 0 6px;
+}
+
+.servers-overview-item strong {
+    font-size: 18px;
+    font-weight: 650;
+}
+
+.servers-overview-item.is-healthy strong,
+.servers-pill.is-healthy {
+    color: var(--servers-teal);
+}
+
+.servers-overview-item.is-warn strong,
+.servers-pill.is-warn {
+    color: var(--servers-amber);
+}
+
+.servers-overview-item.is-danger strong {
+    color: var(--servers-red);
+}

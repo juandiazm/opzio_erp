@@ -1,0 +1,24 @@
+@import '../../variables';
+
+@media screen and (min-width: 768px) {
+    #search-list-container{
+        background: #F8F8F8 0% 0% no-repeat padding-box;
+        box-shadow: 0px 3px 6px #00000029;
+        padding: 2vh 0;
+        width: 90%;
+        display: flex;
+        justify-content: space-around;
+        margin: 1vh auto;
+    }
+    #search-list-input-contaner{ margin: 0 5px; }
+    #search-list-title{ margin: 0 15px 0 0; padding: 0; color: $primary; font-weight: bold; }
+    #search-list-input{ background-color: transparent; border: none; border-radius: 0; border-bottom: 1px solid $text-gray; padding: 0; width: 25vw; }
+    #search-date-range{
+        .date-input{ background-color: transparent; border: none; border-bottom: 1px solid $text-gray; border-radius: 0; padding: 0; width: 10vw; }
+        label{ color: #999; font-weight: bold; }
+        span{ color: #999; }
+    }
+}
+
+@media screen and (max-width: 768px) {
+}

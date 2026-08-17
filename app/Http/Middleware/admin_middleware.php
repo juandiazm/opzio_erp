@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 
 
 use App\Models\user_permission;
+use App\Models\user_permission_assoc;
 use App\Models\user_traceability;
 
 class admin_middleware
@@ -24,11 +25,16 @@ class admin_middleware
     {
         $action = $request->method();
         $path = $request->path();
-        if(Session::has('app_permissions')){
-            $app_permissions = collect(Session::get('app_permissions'));
-        }else{
+        $app_permissions = collect(Session::get('app_permissions', []));
+        $hasLegacyServersPermission = $app_permissions->firstWhere('url', 'admin/observability/') !== null;
+        $hasServersPermission = $app_permissions->firstWhere('url', 'admin/servers/') !== null;
+        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission){
             $app_permissions = collect(user_permission::get());
             Session::put('app_permissions', $app_permissions);
+            if (Session::has('user')) {
+                $userId = data_get(Session::get('user'), 'id');
+                Session::put('permissions', user_permission_assoc::where('user_id', $userId)->get());
+            }
         }
         //if user is not logged in or does not have permissions
         if(!Session::has('user') || !Session::has('permissions')){

@@ -1,0 +1,29 @@
+@mixin provider-create-inputs {
+    #create-inputs-container{
+        margin: 0; padding: 0; width: 100%;
+        #create-provider-description{ border: 1px solid #707070; border-radius: 20px; width: 100%; padding: 10px; }
+        .input-container{ margin: 5px 0; padding: 0; .input-title{ width: 30%; font-size: 1.1em; } .input-value{ width: 70%; margin: 0; } }
+        .multimedia-input-container{
+            position: relative; cursor: pointer; margin: 0 5%;
+            &:hover{ .image-icon, .image-plus-icon{ transform: scale(1.05); } }
+            #create-provider-img-container,#create-provider-color-container{ border: 4px solid $text-gray; border-radius: 50%; width: 10vw; height: 10vw; margin: 0 auto; transition: .3s; background-size: contain; .image-icon,.color-icon{ font-size: 4vw; color: $text-gray; transition: .3s; } }
+            .image-plus-icon{ position: absolute; bottom: 0.5vw; right: 0.5vw; z-index: 10; background-color: $primary; padding: 5px; border-radius: 50%; color: $text-white; font-size: 20px; transition: .3s; }
+        }
+    }
+}
+@media screen and (min-width: 768px) {
+    #nav-create{
+        #header-container{ margin: 2vh 0 3vh 0; padding: 0; width: 100%; #create-provider-verification i{ transition: .3s; margin: 0 5px; font-size: 18px; &.disabled{ color: $text-gray; } &.enabled{ color: $primary; transform: scale(1.3); } &:hover{ transform: scale(1.1); } } }
+        @include provider-create-inputs;
+        #add-provider-button{ margin: 2vh 2% 0 auto; width: 200px; display: block; }
+    }
+}
+@media screen and (max-width: 768px) {
+    #nav-create{
+        #header-container{ margin: 2vh 0 3vh 0; padding: 0; width: 100%; #create-provider-verification i{ transition: .3s; margin: 0 5px; font-size: 18px; &.disabled{ color: $text-gray; } &.enabled{ color: $primary; transform: scale(1.3); } &:hover{ transform: scale(1.1); } } }
+        @include provider-create-inputs;
+        #create-inputs-container .multimedia-input-container #create-provider-img-container,#create-inputs-container .multimedia-input-container #create-provider-color-container{ width: 15vw; height: 15vw; }
+        #create-inputs-container .multimedia-input-container .image-plus-icon{ bottom: 0; right: 0; }
+        #add-provider-button{ margin: 2vh 2% 0 auto; width: 200px; display: block; }
+    }
+}

@@ -7,12 +7,20 @@
     "file": "assets/lodash-Q-ipqAF7.js",
     "name": "lodash"
   },
+  "_messages-Cw9jqMJz.js": {
+    "file": "assets/messages-Cw9jqMJz.js",
+    "name": "messages"
+  },
   "_pdf-viewer-ZSANNzoY.js": {
     "file": "assets/pdf-viewer-ZSANNzoY.js",
     "name": "pdf-viewer",
     "assets": [
       "assets/pdf.worker.min-DEtVeC4l.mjs"
     ]
+  },
+  "_post-6x08ZAR6.js": {
+    "file": "assets/post-6x08ZAR6.js",
+    "name": "post"
   },
   "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf": {
     "file": "assets/fa-brands-400-D2uq21Pt.ttf",
@@ -449,7 +457,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-WE9MEhZo.js",
+    "file": "assets/app-CKnt_nVn.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -589,37 +597,52 @@
     "isEntry": true
   },
   "resources/js/erp/approve_facebook_post/approve_facebook_post.js": {
-    "file": "assets/approve_facebook_post-BkJsu_ge.js",
+    "file": "assets/approve_facebook_post-BO6LmXAe.js",
     "name": "approve_facebook_post",
     "src": "resources/js/erp/approve_facebook_post/approve_facebook_post.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_post-6x08ZAR6.js"
+    ]
   },
   "resources/js/erp/approve_instagram_post/approve_instagram_post.js": {
-    "file": "assets/approve_instagram_post-rHFe2vcK.js",
+    "file": "assets/approve_instagram_post-BKNWr-6Q.js",
     "name": "approve_instagram_post",
     "src": "resources/js/erp/approve_instagram_post/approve_instagram_post.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_post-6x08ZAR6.js"
+    ]
   },
   "resources/js/erp/approve_linkedin_post/approve_linkedin_post.js": {
-    "file": "assets/approve_linkedin_post-B4jYnAeI.js",
+    "file": "assets/approve_linkedin_post-Drytz_Ag.js",
     "name": "approve_linkedin_post",
     "src": "resources/js/erp/approve_linkedin_post/approve_linkedin_post.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_post-6x08ZAR6.js"
+    ]
   },
   "resources/js/erp/approve_twitter_post/approve_twitter_post.js": {
-    "file": "assets/approve_twitter_post-CbeOELik.js",
+    "file": "assets/approve_twitter_post-Dau7uX7-.js",
     "name": "approve_twitter_post",
     "src": "resources/js/erp/approve_twitter_post/approve_twitter_post.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_post-6x08ZAR6.js"
+    ]
   },
   "resources/js/erp/chat/chat.js": {
-    "file": "assets/chat-du2TIHXX.js",
+    "file": "assets/chat-CYpSVety.js",
     "name": "chat",
     "src": "resources/js/erp/chat/chat.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_messages-Cw9jqMJz.js"
+    ]
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-B7KfBaGj.js",
+    "file": "assets/clients-D5Aeujbz.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
     "isEntry": true
@@ -631,19 +654,19 @@
     "isEntry": true
   },
   "resources/js/erp/dashboard/dashboard.js": {
-    "file": "assets/dashboard-DlOovOyN.js",
+    "file": "assets/dashboard-Bz1WiGPs.js",
     "name": "dashboard",
     "src": "resources/js/erp/dashboard/dashboard.js",
     "isEntry": true
   },
   "resources/js/erp/departments/departments.js": {
-    "file": "assets/departments-Csu9lvzR.js",
+    "file": "assets/departments-vZrALMot.js",
     "name": "departments",
     "src": "resources/js/erp/departments/departments.js",
     "isEntry": true
   },
   "resources/js/erp/employees/employees.js": {
-    "file": "assets/employees-Rk67SxK2.js",
+    "file": "assets/employees-Bs7swoPk.js",
     "name": "employees",
     "src": "resources/js/erp/employees/employees.js",
     "isEntry": true
@@ -655,13 +678,13 @@
     "isEntry": true
   },
   "resources/js/erp/ia_assistant/ia_marketing_report.js": {
-    "file": "assets/ia_marketing_report-CedPAHdv.js",
+    "file": "assets/ia_marketing_report-CqfEVvGs.js",
     "name": "ia_marketing_report",
     "src": "resources/js/erp/ia_assistant/ia_marketing_report.js",
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-DXj2VU1j.js",
+    "file": "assets/incomes-BK4dPoPN.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
@@ -670,43 +693,49 @@
     ]
   },
   "resources/js/erp/layouts/app.js": {
-    "file": "assets/app-Ckpp0atQ.js",
+    "file": "assets/app-C3dvbuWG.js",
     "name": "app",
     "src": "resources/js/erp/layouts/app.js",
     "isEntry": true
   },
+  "resources/js/erp/layouts/header.js": {
+    "file": "assets/header-DBQ3qKGw.js",
+    "name": "header",
+    "src": "resources/js/erp/layouts/header.js",
+    "isEntry": true
+  },
+  "resources/js/erp/layouts/sidebar.js": {
+    "file": "assets/sidebar-Cc3nyM0L.js",
+    "name": "sidebar",
+    "src": "resources/js/erp/layouts/sidebar.js",
+    "isEntry": true
+  },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-JB94mmga.js",
+    "file": "assets/licenses-Cf1nZT7a.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
     "isEntry": true
   },
   "resources/js/erp/login/login.js": {
-    "file": "assets/login-Bnv3nxWd.js",
+    "file": "assets/login-BxF9RdEi.js",
     "name": "login",
     "src": "resources/js/erp/login/login.js",
     "isEntry": true
   },
   "resources/js/erp/my_profile/my_profile.js": {
-    "file": "assets/my_profile-I-k8dSnM.js",
+    "file": "assets/my_profile-BwYJfNYV.js",
     "name": "my_profile",
     "src": "resources/js/erp/my_profile/my_profile.js",
     "isEntry": true
   },
-  "resources/js/erp/observability/observability.js": {
-    "file": "assets/observability-DgeAhsx3.js",
-    "name": "observability",
-    "src": "resources/js/erp/observability/observability.js",
-    "isEntry": true
-  },
   "resources/js/erp/outcomes/outcomes.js": {
-    "file": "assets/outcomes-C4ccZRfy.js",
+    "file": "assets/outcomes-H3FdRSaE.js",
     "name": "outcomes",
     "src": "resources/js/erp/outcomes/outcomes.js",
     "isEntry": true
   },
   "resources/js/erp/providers/providers.js": {
-    "file": "assets/providers-BT2rDrXk.js",
+    "file": "assets/providers-Xu-Gz_uf.js",
     "name": "providers",
     "src": "resources/js/erp/providers/providers.js",
     "isEntry": true
@@ -718,13 +747,16 @@
     "isEntry": true
   },
   "resources/js/erp/pusher/pusher_channels_chat.js": {
-    "file": "assets/pusher_channels_chat-vK_68xPA.js",
+    "file": "assets/pusher_channels_chat-edIUNwkE.js",
     "name": "pusher_channels_chat",
     "src": "resources/js/erp/pusher/pusher_channels_chat.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_messages-Cw9jqMJz.js"
+    ]
   },
   "resources/js/erp/reports/reports.js": {
-    "file": "assets/reports-Cf3FX7Qh.js",
+    "file": "assets/reports-CqCk-9Qz.js",
     "name": "reports",
     "src": "resources/js/erp/reports/reports.js",
     "isEntry": true
@@ -735,6 +767,12 @@
     "src": "resources/js/erp/reset_password/reset_password.js",
     "isEntry": true
   },
+  "resources/js/erp/servers/servers.js": {
+    "file": "assets/servers-9fbk1s0R.js",
+    "name": "servers",
+    "src": "resources/js/erp/servers/servers.js",
+    "isEntry": true
+  },
   "resources/js/erp/traceability.js": {
     "file": "assets/traceability-C39MmUBf.js",
     "name": "traceability",
@@ -742,7 +780,7 @@
     "isEntry": true
   },
   "resources/js/erp/users/users.js": {
-    "file": "assets/users-CYyM9t4Z.js",
+    "file": "assets/users-CZoYqcC3.js",
     "name": "users",
     "src": "resources/js/erp/users/users.js",
     "isEntry": true
@@ -868,32 +906,32 @@
     "isEntry": true
   },
   "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss": {
-    "file": "assets/approve_facebook_post-Bo-mt8mr.css",
+    "file": "assets/approve_facebook_post-DhKbjYVu.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
   "resources/sass/erp/approve_instagram_post/approve_instagram_post.scss": {
-    "file": "assets/approve_facebook_post-Bo-mt8mr.css",
+    "file": "assets/approve_facebook_post-DhKbjYVu.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
   "resources/sass/erp/approve_linkedin_post/approve_linkedin_post.scss": {
-    "file": "assets/approve_facebook_post-Bo-mt8mr.css",
+    "file": "assets/approve_facebook_post-DhKbjYVu.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
   "resources/sass/erp/approve_twitter_post/approve_twitter_post.scss": {
-    "file": "assets/approve_facebook_post-Bo-mt8mr.css",
+    "file": "assets/approve_facebook_post-DhKbjYVu.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
   "resources/sass/erp/chat/chat.scss": {
-    "file": "assets/chat-Z9jD-vAD.css",
+    "file": "assets/chat-DDzHj5wo.css",
     "src": "resources/sass/erp/chat/chat.scss",
     "isEntry": true
   },
   "resources/sass/erp/clients/clients.scss": {
-    "file": "assets/clients-CbiusonZ.css",
+    "file": "assets/clients-Dy81qEFm.css",
     "src": "resources/sass/erp/clients/clients.scss",
     "isEntry": true
   },
@@ -909,17 +947,17 @@
     "isEntry": true
   },
   "resources/sass/erp/dashboard/dashboard.scss": {
-    "file": "assets/dashboard-BTLBjfTr.css",
+    "file": "assets/dashboard-DFOZjteE.css",
     "src": "resources/sass/erp/dashboard/dashboard.scss",
     "isEntry": true
   },
   "resources/sass/erp/departments/departments.scss": {
-    "file": "assets/departments-bWchJ1SW.css",
+    "file": "assets/departments-CV69giqv.css",
     "src": "resources/sass/erp/departments/departments.scss",
     "isEntry": true
   },
   "resources/sass/erp/employees/employees.scss": {
-    "file": "assets/employees-By2eW6FQ.css",
+    "file": "assets/employees-DcmMudSC.css",
     "src": "resources/sass/erp/employees/employees.scss",
     "isEntry": true
   },
@@ -934,17 +972,27 @@
     "isEntry": true
   },
   "resources/sass/erp/incomes/incomes.scss": {
-    "file": "assets/incomes-CePO0r5m.css",
+    "file": "assets/incomes-Bs8TnKNo.css",
     "src": "resources/sass/erp/incomes/incomes.scss",
     "isEntry": true
   },
   "resources/sass/erp/layouts/app.scss": {
-    "file": "assets/app-D9b3ASdX.css",
+    "file": "assets/app-CuT4JF3U.css",
     "src": "resources/sass/erp/layouts/app.scss",
     "isEntry": true
   },
+  "resources/sass/erp/layouts/header.scss": {
+    "file": "assets/header-BbN6gDZt.css",
+    "src": "resources/sass/erp/layouts/header.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/layouts/sidebar.scss": {
+    "file": "assets/sidebar-kDuzELLN.css",
+    "src": "resources/sass/erp/layouts/sidebar.scss",
+    "isEntry": true
+  },
   "resources/sass/erp/licenses/licenses.scss": {
-    "file": "assets/licenses-K8Hv5egS.css",
+    "file": "assets/licenses-Bp26DqUN.css",
     "src": "resources/sass/erp/licenses/licenses.scss",
     "isEntry": true
   },
@@ -954,27 +1002,22 @@
     "isEntry": true
   },
   "resources/sass/erp/my_profile/my_profile.scss": {
-    "file": "assets/my_profile-DnTELn8o.css",
+    "file": "assets/my_profile-CB1uL7bQ.css",
     "src": "resources/sass/erp/my_profile/my_profile.scss",
     "isEntry": true
   },
-  "resources/sass/erp/observability/observability.scss": {
-    "file": "assets/observability-Bgy0KVHx.css",
-    "src": "resources/sass/erp/observability/observability.scss",
-    "isEntry": true
-  },
   "resources/sass/erp/outcomes/outcomes.scss": {
-    "file": "assets/outcomes-BeW5Wn8Y.css",
+    "file": "assets/outcomes-DK2vzVcR.css",
     "src": "resources/sass/erp/outcomes/outcomes.scss",
     "isEntry": true
   },
   "resources/sass/erp/providers/providers.scss": {
-    "file": "assets/providers-liWtoUwm.css",
+    "file": "assets/providers-4oNAL4iY.css",
     "src": "resources/sass/erp/providers/providers.scss",
     "isEntry": true
   },
   "resources/sass/erp/reports/reports.scss": {
-    "file": "assets/reports-D2oM9wd4.css",
+    "file": "assets/reports-BCRvwuXO.css",
     "src": "resources/sass/erp/reports/reports.scss",
     "isEntry": true
   },
@@ -983,13 +1026,18 @@
     "src": "resources/sass/erp/reset_password/reset_password.scss",
     "isEntry": true
   },
+  "resources/sass/erp/servers/servers.scss": {
+    "file": "assets/servers-CXPGqeWf.css",
+    "src": "resources/sass/erp/servers/servers.scss",
+    "isEntry": true
+  },
   "resources/sass/erp/traceability.scss": {
     "file": "assets/traceability-DL7nlVO5.css",
     "src": "resources/sass/erp/traceability.scss",
     "isEntry": true
   },
   "resources/sass/erp/users/users.scss": {
-    "file": "assets/users-CdJfPLMq.css",
+    "file": "assets/users-Bu0pyhlj.css",
     "src": "resources/sass/erp/users/users.scss",
     "isEntry": true
   },

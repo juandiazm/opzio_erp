@@ -1,0 +1,14 @@
+#servers-container {
+    --servers-ink: #1f2933;
+    --servers-muted: #6b7785;
+    --servers-line: #dce3e8;
+    --servers-surface: #ffffff;
+    --servers-canvas: #f4f7f8;
+    --servers-teal: #0f766e;
+    --servers-amber: #b45309;
+    --servers-red: #b42318;
+    background: var(--servers-canvas);
+    color: var(--servers-ink);
+    min-height: 100%;
+    padding: 18px 24px 24px;
+}

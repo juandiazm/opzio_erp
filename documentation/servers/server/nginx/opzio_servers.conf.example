@@ -1,0 +1,17 @@
+log_format opzio_servers escape=json
+    '{'
+      '"ts":"$msec",'
+      '"host":"$host",'
+      '"server_name":"$server_name",'
+      '"method":"$request_method",'
+      '"uri":"$uri",'
+      '"status":$status,'
+      '"request_length":$request_length,'
+      '"bytes_sent":$bytes_sent,'
+      '"request_time":$request_time,'
+      '"upstream_response_time":"$upstream_response_time",'
+      '"upstream_connect_time":"$upstream_connect_time"'
+    '}';
+
+# Add one access_log directive per monitored vhost after validating the real path:
+# access_log /var/log/nginx/opzio/project.access.json opzio_servers;

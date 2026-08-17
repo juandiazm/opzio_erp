@@ -9,12 +9,5 @@
 @yield('home-app-header')
 @endsection
 @section('app-content')
-<div id="approve-post-container">
-    <div id="approve-post-centered">
-        <h1 id="approve-post-title">Proceso de aprobación de post</h1>
-        <p id="approve-post-message">Al aprobar el siguiente post, este será publicado en linkedin.</p>
-        <i id="approve-post-loading-icon" class="fas fa-spinner fa-spin"></i>
-        <p id="approve-post-status-message">Aprobando...</p>
-    </div>
-</div>
+@include('erp.approval.post', ['platform' => 'linkedin'])
 @endsection

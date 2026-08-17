@@ -1,0 +1,22 @@
+#ia-marketing-container {
+    display: flex;
+    gap: 20px;
+    height: calc(100vh - 100px);
+    overflow: hidden;
+}
+
+#ia-marketing-left {
+    width: 300px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+}
+
+#ia-marketing-right {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}

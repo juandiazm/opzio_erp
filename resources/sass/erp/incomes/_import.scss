@@ -1,0 +1,11 @@
+@import '../../variables';
+
+.hidden{ display: none; }
+
+#import-report-excel-container{ margin: 0; padding: 0; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border: 1px solid #220245; border-radius: 50px; gap: 5px; cursor: pointer; transition: .3s; position: fixed; bottom: 20px; right: 20px; background: white; z-index: 999; }
+#import-report-excel-container #import-report-excel-icon{ font-size: 17px; color: #220245; }
+#import-report-excel-container #import-report-excel-icon:hover{ color: #220245 !important; }
+#import-report-excel-container #import-report-excel-text{ display: none; transition: .3s; color: #220245; }
+#import-report-excel-container:hover{ padding: 5px 20px; width: fit-content; }
+#import-report-excel-container:hover #import-report-excel-text{ display: block; }
+#download-assistant-template{ margin: 20px 0; padding: 0; display: block; width: 100%; color: #220245; text-decoration: underline; }

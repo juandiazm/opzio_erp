@@ -1,0 +1,23 @@
+<!-- Tab List -->
+<div class="tab-pane fade show active" id="nav-list" role="tabpanel" aria-labelledby="nav-home-tab">
+    <div id="user-list-container" class="scrollable">
+        <table id="user-list-table" class="table table-hover table-sm align-middle w-100">
+            <thead id="user-list-table-header">
+                <tr>
+                    <th scope="col" class="text-center">ID</th>
+                    <th scope="col" class="text-center">Foto</th>
+                    <th scope="col" class="text-left">Nombre</th>
+                    <th scope="col" class="text-center">Usuario</th>
+                    <th scope="col" class="text-center">Identificación</th>
+                    <th scope="col" class="text-left">Correo</th>
+                    <th scope="col" class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="user-list-table-body">
+                
+            </tbody>
+        </table>
+    </div>
+    
+    <ul id="db-pagination" class="pagination pagination-sm justify-content-end px-0 mx-0 d-flex"></ul>
+</div>

@@ -79,7 +79,7 @@ trait users_trait
             $user = new user();
             $user->unique_id = strtoupper(Str::uuid()->toString());
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
+                $photo = Image::make($photo)->orientate()->encode('webp', 90);
                 $user->photo = $user->unique_id.'.webp';
                 $photo->save($this->URL_USERS_PATH . $user->photo);
                 ImageOptimizer::optimize($this->URL_USERS_PATH . $user->photo);
@@ -139,7 +139,7 @@ trait users_trait
             $user->email = $email;
             $user->identification = $identification;
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
+                $photo = Image::make($photo)->orientate()->encode('webp', 90);
                 $user->photo = $user->unique_id.'.webp';
                 $photo->save($this->URL_USERS_PATH . $user->photo);
                 ImageOptimizer::optimize($this->URL_USERS_PATH . $user->photo);

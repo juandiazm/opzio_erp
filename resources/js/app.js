@@ -6,8 +6,13 @@ window.Swal = Swal;
 window.Toastify = Toastify;
 
 $(document).on('click', ".image-container", change_image_action);
-$(document).on('click', ".image-plus-icon", function(){
-    $(this).parent().find('.image-container').click();
+$(document).on('click', ".image-plus-icon", function(event){
+    event.preventDefault();
+    event.stopPropagation();
+    const input = $(this).parent().find('input[type="file"], .input-color').first();
+    if(input.length > 0){
+        input.trigger('click');
+    }
 });
 $(document).on('click', ".image-container .image-input", function(e){e.stopPropagation();});
 $(document).on('click', ".toggle-container .toggle-value", toggleInputEvent);

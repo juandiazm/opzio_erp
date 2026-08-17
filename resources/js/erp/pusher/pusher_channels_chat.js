@@ -1,4 +1,4 @@
-import { appendChatMesssages } from '../chat/chat.js';
+import { appendChatMesssages } from '../chat/messages.js';
 // Enable pusher logging - don't include this in production
 //Pusher.logToConsole = true;
 var audio = new Audio('/sounds/whatsapp-apple.mp3');
