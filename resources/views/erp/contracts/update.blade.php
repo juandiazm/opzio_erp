@@ -21,6 +21,11 @@
             <div class="input-container d-flex"><label class="input-title align-self-center">Enviado</label><p id="update-contract-sent-at" class="input-value mb-0"></p></div>
         </div>
     </div>
+    <div id="update-contract-variables-section" class="contracts-form-section contracts-contract-variables-section d-none">
+        <h3>Variables del contrato</h3>
+        <p class="contracts-help">Estos valores pertenecen a este contrato y se reutilizan al regenerar el contenido.</p>
+        <div id="update-contract-variables" class="contracts-contract-variables"></div>
+    </div>
     <div class="contracts-form-section contracts-editor-section">
         <div class="d-flex justify-content-between align-items-center"><h3>Contenido</h3><label class="form-check-label"><input type="checkbox" id="update-contract-generate" class="form-check-input"> Regenerar desde plantilla</label></div>
         <textarea id="update-contract-content" class="form-control" rows="12"></textarea>

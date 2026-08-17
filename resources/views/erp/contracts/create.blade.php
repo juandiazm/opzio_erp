@@ -39,6 +39,11 @@
             </div>
         </div>
     </div>
+    <div id="create-contract-variables-section" class="contracts-form-section contracts-contract-variables-section d-none">
+        <h3>Variables del contrato</h3>
+        <p class="contracts-help">Completa los valores propios de esta plantilla. Se guardarán con el contrato para futuras regeneraciones.</p>
+        <div id="create-contract-variables" class="contracts-contract-variables"></div>
+    </div>
     <div class="contracts-form-section contracts-editor-section">
         <div class="d-flex justify-content-between align-items-center">
             <h3>Contenido</h3>

@@ -1,7 +1,7 @@
 import { contractState } from './state.js';
 import { getContractsPage, openContract, changePage, changePageSize, selectBackPage, selectNextPage } from './list.js';
 import { addContract, deleteContract, generateContract, restoreContract, sendContract, showCurrentContract, updateContract } from './form.js';
-import { loadCatalogs, setContractableOptions, setTemplateOptions } from './shared.js';
+import { loadCatalogs, renderContractVariables, setContractableOptions, setTemplateOptions } from './shared.js';
 import * as types from './types.js';
 import * as templates from './templates.js';
 import * as schedules from './schedules.js';
@@ -37,8 +37,10 @@ $(document).on('click', '.contract-page-number', changePage);
 $(document).on('click', '#contract-page-back', selectBackPage);
 $(document).on('click', '#contract-page-next', selectNextPage);
 
-$(document).on('change', '#create-contract-type', function(){ setTemplateOptions('#create-contract-type', '#create-contract-template'); });
-$(document).on('change', '#update-contract-type', function(){ setTemplateOptions('#update-contract-type', '#update-contract-template'); });
+$(document).on('change', '#create-contract-type', function(){ setTemplateOptions('#create-contract-type', '#create-contract-template'); renderContractVariables('create'); });
+$(document).on('change', '#update-contract-type', function(){ setTemplateOptions('#update-contract-type', '#update-contract-template'); renderContractVariables('update'); });
+$(document).on('change', '#create-contract-template', function(){ renderContractVariables('create'); });
+$(document).on('change', '#update-contract-template', function(){ renderContractVariables('update'); });
 $(document).on('change', '#contract-schedule-type', function(){ setTemplateOptions('#contract-schedule-type', '#contract-schedule-template'); });
 $(document).on('change', '#create-contractable-type', function(){ setContractableOptions('#create-contractable-type', '#create-contractable-id'); });
 $(document).on('change', '#update-contractable-type', function(){ setContractableOptions('#update-contractable-type', '#update-contractable-id'); });
@@ -61,12 +63,14 @@ $(document).on('click', '.contract-schedule-delete', schedules.deleteSchedule);
 $(document).on('click', '.contract-schedule-restore', schedules.restoreSchedule);
 
 $(document).ready(function(){
+    templates.initializeTemplateEditor();
     const urlParams = new URLSearchParams(window.location.search);
     contractState.urlContractId = urlParams.get('contract_id');
     if(contractState.urlContractId != null){
         window.history.replaceState({}, document.title, '/admin/contracts');
     }
     loadCatalogs(function(){
+        templates.refreshVariablePalette();
         if(contractState.urlContractId != null){
             openContract(contractState.urlContractId, showCurrentContract);
         }else{

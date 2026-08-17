@@ -14,6 +14,7 @@ class contract_template extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'variables' => 'array',
     ];
 
     public function type()

@@ -7,7 +7,10 @@ use App\Models\contract;
 use App\Models\contract_schedule;
 use App\Models\contract_template;
 use App\Models\contract_type;
+use App\Models\department;
 use App\Models\employee;
+use App\Models\income;
+use App\Models\license;
 use App\Models\provider;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -142,37 +145,533 @@ trait contracts_trait
         return $parsed === null ? (int) $value === 1 : $parsed;
     }
 
-    private function Contract_RenderTemplate($template, $contractable, $name, $subject, $startDate, $endDate)
+    private function Contract_VariableDefinitions()
+    {
+        return [
+            ['key' => 'contractable.id', 'label' => 'Titular: ID', 'group' => 'Titular', 'type' => 'number'],
+            ['key' => 'contractable.unique_id', 'label' => 'Titular: identificador', 'group' => 'Titular', 'type' => 'text'],
+            ['key' => 'contractable.name', 'label' => 'Titular: nombre', 'group' => 'Titular', 'type' => 'text'],
+            ['key' => 'contractable.email', 'label' => 'Titular: correo', 'group' => 'Titular', 'type' => 'email'],
+            ['key' => 'contractable.phone', 'label' => 'Titular: teléfono', 'group' => 'Titular', 'type' => 'text'],
+            ['key' => 'contractable.identification', 'label' => 'Titular: identificación', 'group' => 'Titular', 'type' => 'text'],
+            ['key' => 'contract.name', 'label' => 'Contrato: nombre', 'group' => 'Contrato', 'type' => 'text'],
+            ['key' => 'contract.subject', 'label' => 'Contrato: asunto', 'group' => 'Contrato', 'type' => 'text'],
+            ['key' => 'contract.start_date', 'label' => 'Contrato: fecha de inicio', 'group' => 'Contrato', 'type' => 'date'],
+            ['key' => 'contract.end_date', 'label' => 'Contrato: fecha de vencimiento', 'group' => 'Contrato', 'type' => 'date'],
+            ['key' => 'contract.type', 'label' => 'Contrato: tipo', 'group' => 'Contrato', 'type' => 'text'],
+            ['key' => 'contract.unique_id', 'label' => 'Contrato: identificador', 'group' => 'Contrato', 'type' => 'text'],
+            ['key' => 'contract.id', 'label' => 'Contrato: ID', 'group' => 'Contrato', 'type' => 'number'],
+            ['key' => 'client.id', 'label' => 'Cliente: ID', 'group' => 'Cliente', 'type' => 'number'],
+            ['key' => 'client.unique_id', 'label' => 'Cliente: identificador', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.name', 'label' => 'Cliente: nombre', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.lastname', 'label' => 'Cliente: apellido', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.identification_type', 'label' => 'Cliente: tipo de identificación', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.complete_name', 'label' => 'Cliente: nombre completo', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.email', 'label' => 'Cliente: correo', 'group' => 'Cliente', 'type' => 'email'],
+            ['key' => 'client.phone', 'label' => 'Cliente: teléfono', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.identification', 'label' => 'Cliente: identificación', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.address', 'label' => 'Cliente: dirección', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.active', 'label' => 'Cliente: activo', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.verified', 'label' => 'Cliente: verificado', 'group' => 'Cliente', 'type' => 'text'],
+            ['key' => 'client.created_date_string', 'label' => 'Cliente: fecha de alta', 'group' => 'Cliente', 'type' => 'date'],
+            ['key' => 'employee.id', 'label' => 'Empleado: ID', 'group' => 'Empleado', 'type' => 'number'],
+            ['key' => 'employee.uid', 'label' => 'Empleado: identificador', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.name', 'label' => 'Empleado: nombre', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.last_name', 'label' => 'Empleado: apellido', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.complete_name', 'label' => 'Empleado: nombre completo', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.id_type', 'label' => 'Empleado: tipo de identificación', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.id_type_string', 'label' => 'Empleado: tipo de identificación', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.identification', 'label' => 'Empleado: identificación', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.phone', 'label' => 'Empleado: teléfono', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.personal_email', 'label' => 'Empleado: correo personal', 'group' => 'Empleado', 'type' => 'email'],
+            ['key' => 'employee.work_email', 'label' => 'Empleado: correo laboral', 'group' => 'Empleado', 'type' => 'email'],
+            ['key' => 'employee.state', 'label' => 'Empleado: estado', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.state_string', 'label' => 'Empleado: estado', 'group' => 'Empleado', 'type' => 'text'],
+            ['key' => 'employee.department_id', 'label' => 'Empleado: departamento ID', 'group' => 'Empleado', 'type' => 'number'],
+            ['key' => 'provider.id', 'label' => 'Proveedor: ID', 'group' => 'Proveedor', 'type' => 'number'],
+            ['key' => 'provider.unique_id', 'label' => 'Proveedor: identificador', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.name', 'label' => 'Proveedor: nombre', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.lastname', 'label' => 'Proveedor: apellido', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.complete_name', 'label' => 'Proveedor: nombre completo', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.identification_type', 'label' => 'Proveedor: tipo de identificación', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.email', 'label' => 'Proveedor: correo', 'group' => 'Proveedor', 'type' => 'email'],
+            ['key' => 'provider.phone', 'label' => 'Proveedor: teléfono', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.identification', 'label' => 'Proveedor: identificación', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.address', 'label' => 'Proveedor: dirección', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.description', 'label' => 'Proveedor: descripción', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.active', 'label' => 'Proveedor: activo', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'provider.verified', 'label' => 'Proveedor: verificado', 'group' => 'Proveedor', 'type' => 'text'],
+            ['key' => 'department.id', 'label' => 'Departamento: ID', 'group' => 'Departamento', 'type' => 'number'],
+            ['key' => 'department.unique_id', 'label' => 'Departamento: identificador', 'group' => 'Departamento', 'type' => 'text'],
+            ['key' => 'department.name', 'label' => 'Departamento: nombre', 'group' => 'Departamento', 'type' => 'text'],
+            ['key' => 'department.budget', 'label' => 'Departamento: presupuesto', 'group' => 'Departamento', 'type' => 'number'],
+            ['key' => 'department.director_id', 'label' => 'Departamento: director ID', 'group' => 'Departamento', 'type' => 'number'],
+            ['key' => 'department.director_name', 'label' => 'Departamento: director', 'group' => 'Departamento', 'type' => 'text'],
+            ['key' => 'license.id', 'label' => 'Licencia: ID', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'license.unique_id', 'label' => 'Licencia: identificador', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.name', 'label' => 'Licencia: nombre', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.value', 'label' => 'Licencia: valor', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'license.value_string', 'label' => 'Licencia: valor formateado', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.description', 'label' => 'Licencia: descripción', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.type', 'label' => 'Licencia: tipo', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.type_string', 'label' => 'Licencia: tipo', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.active', 'label' => 'Licencia: activa', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.active_string', 'label' => 'Licencia: estado', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'license.recurrence_months', 'label' => 'Licencia: meses de recurrencia', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'license.billing_day', 'label' => 'Licencia: día de cobro', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'license.days_to_expire', 'label' => 'Licencia: días para vencer', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'license.last_billing_date', 'label' => 'Licencia: último cobro', 'group' => 'Licencias', 'type' => 'date'],
+            ['key' => 'license.next_billing_date', 'label' => 'Licencia: próximo cobro', 'group' => 'Licencias', 'type' => 'date'],
+            ['key' => 'license.last_payed_date', 'label' => 'Licencia: último pago', 'group' => 'Licencias', 'type' => 'date'],
+            ['key' => 'license.remaining_days', 'label' => 'Licencia: días restantes', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'licence.name', 'label' => 'Licencia: nombre', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'licence.value', 'label' => 'Licencia: valor', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'licence.description', 'label' => 'Licencia: descripción', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'licenses.count', 'label' => 'Licencias: cantidad', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'licenses.total_value', 'label' => 'Licencias: valor total', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'licenses.names', 'label' => 'Licencias: nombres', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'licenses.first_name', 'label' => 'Licencias: primera licencia', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'licences.count', 'label' => 'Licencias: cantidad', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'licences.total_value', 'label' => 'Licencias: valor total', 'group' => 'Licencias', 'type' => 'number'],
+            ['key' => 'licences.names', 'label' => 'Licencias: nombres', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'licences.first_name', 'label' => 'Licencias: primera licencia', 'group' => 'Licencias', 'type' => 'text'],
+            ['key' => 'income.description', 'label' => 'Ingreso: descripción', 'group' => 'Ingresos', 'type' => 'text'],
+            ['key' => 'income.total', 'label' => 'Ingreso: total', 'group' => 'Ingresos', 'type' => 'number'],
+            ['key' => 'income.total_string', 'label' => 'Ingreso: total formateado', 'group' => 'Ingresos', 'type' => 'text'],
+            ['key' => 'income.unique_id', 'label' => 'Ingreso: identificador', 'group' => 'Ingresos', 'type' => 'text'],
+            ['key' => 'income.client_name', 'label' => 'Ingreso: cliente', 'group' => 'Ingresos', 'type' => 'text'],
+            ['key' => 'income.timely_payment', 'label' => 'Ingreso: pago oportuno', 'group' => 'Ingresos', 'type' => 'date'],
+            ['key' => 'income.cutoff_date', 'label' => 'Ingreso: fecha de corte', 'group' => 'Ingresos', 'type' => 'date'],
+            ['key' => 'income.state_text', 'label' => 'Ingreso: estado', 'group' => 'Ingresos', 'type' => 'text'],
+            ['key' => 'income.payment_state_text', 'label' => 'Ingreso: estado de pago', 'group' => 'Ingresos', 'type' => 'text'],
+            ['key' => 'income.payment_date', 'label' => 'Ingreso: fecha de pago', 'group' => 'Ingresos', 'type' => 'date'],
+            ['key' => 'incomes.count', 'label' => 'Ingresos: cantidad', 'group' => 'Ingresos', 'type' => 'number'],
+            ['key' => 'incomes.total', 'label' => 'Ingresos: total acumulado', 'group' => 'Ingresos', 'type' => 'number'],
+            ['key' => 'incomes.first_description', 'label' => 'Ingresos: último detalle', 'group' => 'Ingresos', 'type' => 'text'],
+            ['key' => 'incomes.first_total', 'label' => 'Ingresos: último total', 'group' => 'Ingresos', 'type' => 'number'],
+        ];
+    }
+
+    private function Contract_ValidateVariableValue($value, $type, $label)
+    {
+        $value = trim((string) ($value ?? ''));
+        if ($value === '') {
+            return;
+        }
+        if ($type === 'number' && !is_numeric($value)) {
+            throw new \InvalidArgumentException('El valor de '.$label.' debe ser numerico');
+        }
+        if ($type === 'date') {
+            try {
+                Carbon::parse($value);
+            } catch (\Exception $exception) {
+                throw new \InvalidArgumentException('El valor de '.$label.' debe ser una fecha valida');
+            }
+        }
+        if ($type === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            throw new \InvalidArgumentException('El valor de '.$label.' debe ser un correo valido');
+        }
+    }
+
+    private function Contract_NormalizeTemplateVariables($variables)
+    {
+        if ($variables === null || $variables === '') {
+            return [];
+        }
+        if (is_string($variables)) {
+            $variables = json_decode($variables, true);
+        }
+        if (!is_array($variables)) {
+            throw new \InvalidArgumentException('La definicion de variables no es valida');
+        }
+
+        $reserved = ['contractable', 'contract', 'client', 'employee', 'provider', 'department', 'license', 'licenses', 'income', 'incomes', 'custom'];
+        $normalized = [];
+        $keys = [];
+        foreach ($variables as $variable) {
+            if (!is_array($variable)) {
+                continue;
+            }
+            $rawKey = trim((string) ($variable['key'] ?? ''));
+            $rawKey = preg_replace('/^\{\{\s*|\s*\}\}$/', '', $rawKey);
+            $rawKey = preg_replace('/^custom\./i', '', $rawKey);
+            $rawKey = strtolower(trim((string) $rawKey));
+            if ($rawKey === '') {
+                continue;
+            }
+            $rawKey = preg_replace('/[^a-z0-9_]+/', '_', $rawKey);
+            $rawKey = trim((string) $rawKey, '_');
+            if (!preg_match('/^[a-z][a-z0-9_]{0,49}$/', $rawKey)) {
+                throw new \InvalidArgumentException('El nombre de una variable personalizada no es valido');
+            }
+            if (in_array($rawKey, $reserved, true)) {
+                throw new \InvalidArgumentException('El nombre de una variable personalizada esta reservado');
+            }
+            $key = 'custom.'.$rawKey;
+            if (isset($keys[$key])) {
+                throw new \InvalidArgumentException('No se pueden repetir variables personalizadas');
+            }
+            $type = strtolower(trim((string) ($variable['type'] ?? 'text')));
+            if (!in_array($type, ['text', 'number', 'date', 'email'], true)) {
+                $type = 'text';
+            }
+            $label = trim((string) ($variable['label'] ?? ''));
+            $label = mb_substr($label !== '' ? $label : str_replace('_', ' ', $rawKey), 0, 100);
+            $default = (string) ($variable['default_value'] ?? $variable['default'] ?? '');
+            $this->Contract_ValidateVariableValue($default, $type, $label);
+            $normalized[] = [
+                'key' => $key,
+                'label' => $label,
+                'type' => $type,
+                'default_value' => mb_substr($default, 0, 2000),
+                'required' => $this->Contract_Boolean($variable['required'] ?? false),
+            ];
+            $keys[$key] = true;
+        }
+
+        return $normalized;
+    }
+
+    private function Contract_NormalizeCustomVariables($template, $values, $validateRequired = false)
+    {
+        $definitions = $this->Contract_NormalizeTemplateVariables($template->variables ?? []);
+        if ($values === null || $values === '') {
+            $values = [];
+        }
+        if (is_string($values)) {
+            $values = json_decode($values, true);
+        }
+        if (!is_array($values)) {
+            throw new \InvalidArgumentException('Los valores personalizados no son validos');
+        }
+
+        $input = [];
+        foreach ($values as $key => $value) {
+            $key = strtolower(trim((string) $key));
+            $key = preg_replace('/^custom\./', '', $key);
+            if ($key !== '') {
+                $input['custom.'.$key] = is_scalar($value) || $value === null ? (string) ($value ?? '') : '';
+            }
+        }
+
+        $normalized = [];
+        foreach ($definitions as $definition) {
+            $key = $definition['key'];
+            $value = array_key_exists($key, $input) ? $input[$key] : $definition['default_value'];
+            if ($validateRequired && $definition['required'] && trim((string) $value) === '') {
+                throw new \InvalidArgumentException('Debe ingresar la variable '.$definition['label']);
+            }
+            $this->Contract_ValidateVariableValue($value, $definition['type'], $definition['label']);
+            $normalized[$key] = mb_substr((string) $value, 0, 10000);
+        }
+
+        return $normalized;
+    }
+
+    private function Contract_SanitizeHtml($html)
+    {
+        $html = trim((string) $html);
+        if ($html === '') {
+            return '';
+        }
+
+        $allowedTags = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'div', 'span', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td'];
+        $allowedAttributes = ['style', 'href', 'target', 'rel', 'colspan', 'rowspan'];
+        if (!class_exists(\DOMDocument::class)) {
+            $html = preg_replace('/\s+on[a-z]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html);
+            $html = preg_replace('/(?:javascript|vbscript)\s*:/i', '', $html);
+            return strip_tags($html, '<'.implode('><', $allowedTags).'>');
+        }
+
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $previous = libxml_use_internal_errors(true);
+        $document->loadHTML('<?xml encoding="UTF-8"><div id="contract-html-root">'.$html.'</div>', LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING);
+        $root = (new \DOMXPath($document))->query('//*[@id="contract-html-root"]')->item(0);
+        if (!$root) {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+            return '';
+        }
+
+        $allowedStyles = ['text-align', 'font-weight', 'font-style', 'text-decoration', 'color', 'background-color', 'font-size', 'font-family', 'line-height', 'padding', 'margin'];
+        $forbiddenTags = ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'meta', 'link'];
+        $sanitizeNode = function ($node) use (&$sanitizeNode, $allowedTags, $allowedAttributes, $allowedStyles, $forbiddenTags) {
+            for ($child = $node->firstChild; $child;) {
+                $next = $child->nextSibling;
+                if ($child instanceof \DOMElement) {
+                    $tag = strtolower($child->tagName);
+                    if (in_array($tag, $forbiddenTags, true)) {
+                        $node->removeChild($child);
+                        $child = $next;
+                        continue;
+                    }
+                    if (!in_array($tag, $allowedTags, true)) {
+                        while ($child->firstChild) {
+                            $node->insertBefore($child->firstChild, $child);
+                        }
+                        $node->removeChild($child);
+                        $child = $next;
+                        continue;
+                    }
+                    for ($index = $child->attributes->length - 1; $index >= 0; $index--) {
+                        $attribute = $child->attributes->item($index);
+                        $name = strtolower($attribute->name);
+                        if (!in_array($name, $allowedAttributes, true)) {
+                            $child->removeAttribute($attribute->name);
+                            continue;
+                        }
+                        if ($name === 'style') {
+                            $styles = [];
+                            foreach (explode(';', $attribute->value) as $declaration) {
+                                $parts = explode(':', $declaration, 2);
+                                $property = strtolower(trim($parts[0] ?? ''));
+                                $value = trim($parts[1] ?? '');
+                                if ($property === '' || $value === '' || !in_array($property, $allowedStyles, true) || preg_match('/url\s*\(|expression\s*\(|javascript\s*:|vbscript\s*:|[<>]/i', $value)) {
+                                    continue;
+                                }
+                                $styles[] = $property.': '.$value;
+                            }
+                            if ($styles) {
+                                $child->setAttribute('style', implode('; ', $styles));
+                            } else {
+                                $child->removeAttribute('style');
+                            }
+                        }
+                        if ($name === 'href' && !preg_match('/^(https?:|mailto:|\/|#)/i', trim($attribute->value))) {
+                            $child->removeAttribute('href');
+                        }
+                    }
+                    $sanitizeNode($child);
+                }
+                $child = $next;
+            }
+        };
+        $sanitizeNode($root);
+
+        $result = '';
+        for ($child = $root->firstChild; $child; $child = $child->nextSibling) {
+            $result .= $document->saveHTML($child);
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        return trim($result);
+    }
+
+    private function Contract_TemplateUsesPrefix($template, $prefix)
+    {
+        $source = (string) ($template->subject ?? '')."\n".(string) ($template->content ?? '');
+        return preg_match('/\{\{\s*'.preg_quote($prefix, '/').'(?:\.|\}\})/i', $source) === 1;
+    }
+
+    private function Contract_ModelData($model, array $fields)
+    {
+        $data = [];
+        foreach ($fields as $field) {
+            $value = null;
+            if ($model) {
+                $value = method_exists($model, 'getAttribute') ? $model->getAttribute($field) : ($model->{$field} ?? null);
+            }
+            if ($value instanceof \DateTimeInterface) {
+                $value = $value->format('Y-m-d');
+            }
+            if (is_scalar($value) || $value === null) {
+                $data[$field] = $value;
+            }
+        }
+        return $data;
+    }
+
+    private function Contract_CollectionData(array $rows, $totalKey, $totalValue)
+    {
+        $context = [
+            'count' => count($rows),
+            $totalKey => $totalValue,
+        ];
+        foreach (array_values($rows) as $index => $row) {
+            $context[$index] = $row;
+        }
+        return $context;
+    }
+
+    private function Contract_BuildTemplateContext($template, $contractable, $name, $subject, $startDate, $endDate, $contract = null)
     {
         $contractableName = $this->Contract_ContractableName($contractable);
         $contractableEmail = $this->Contract_ContractableEmail($contractable);
-        $values = [
-            '{{contractable.name}}' => $this->Contract_Escape($contractableName),
-            '{{contractable.email}}' => $this->Contract_Escape($contractableEmail),
-            '{{contractable.phone}}' => $this->Contract_Escape($contractable->phone ?? ''),
-            '{{contractable.identification}}' => $this->Contract_Escape($contractable->identification ?? ''),
-            '{{contract.name}}' => $this->Contract_Escape($name),
-            '{{contract.subject}}' => $this->Contract_Escape($subject),
-            '{{contract.start_date}}' => $this->Contract_Escape($startDate ?? ''),
-            '{{contract.end_date}}' => $this->Contract_Escape($endDate ?? ''),
-            '{{contract.type}}' => $this->Contract_Escape($template->type->name ?? ''),
+        $contractableData = $this->Contract_ModelData($contractable, [
+            'id', 'unique_id', 'name', 'lastname', 'last_name', 'email', 'work_email', 'personal_email', 'phone', 'identification', 'address',
+        ]);
+        $contractableData['name'] = $contractableName;
+        $contractableData['email'] = $contractableEmail;
+
+        $typeName = $template->type->name ?? '';
+        $context = [
+            'contractable' => $contractableData,
+            'contract' => [
+                'name' => $name,
+                'subject' => $subject ?: ($template->subject ?? ''),
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'type' => $typeName,
+                'unique_id' => $contract->unique_id ?? '',
+                'id' => $contract->id ?? '',
+            ],
+            'client' => [],
+            'employee' => [],
+            'provider' => [],
+            'department' => [],
+            'license' => [],
+            'licenses' => ['count' => 0, 'total_value' => 0, 'names' => '', 'first_name' => ''],
+            'income' => [],
+            'incomes' => ['count' => 0, 'total' => 0, 'first_description' => '', 'first_total' => ''],
         ];
 
-        $renderedSubject = strtr($subject ?: $template->subject, $values);
-        $renderedContent = strtr($template->content, $values);
+        $licenseModels = [];
+        $incomeModels = [];
+        if ($contractable instanceof client) {
+            $context['client'] = $this->Contract_ModelData($contractable, [
+                'id', 'unique_id', 'name', 'lastname', 'last_name', 'complete_name', 'identification_type', 'identification', 'email', 'phone', 'address', 'active', 'verified', 'created_at_string', 'created_date_string',
+            ]);
+            $context['client']['complete_name'] = $contractableName;
+            if ($this->Contract_TemplateUsesPrefix($template, 'license') || $this->Contract_TemplateUsesPrefix($template, 'licence') || $this->Contract_TemplateUsesPrefix($template, 'licenses') || $this->Contract_TemplateUsesPrefix($template, 'licences')) {
+                $licenseModels = license::where('client_id', $contractable->id)->orderBy('name')->get();
+            }
+            if ($this->Contract_TemplateUsesPrefix($template, 'income') || $this->Contract_TemplateUsesPrefix($template, 'incomes')) {
+                $incomeModels = income::where('client_id', $contractable->id)->orderByDesc('id')->get();
+            }
+        } elseif ($contractable instanceof employee) {
+            $context['employee'] = $this->Contract_ModelData($contractable, [
+                'id', 'uid', 'name', 'last_name', 'complete_name', 'id_type', 'id_type_string', 'identification', 'phone', 'personal_email', 'work_email', 'state', 'state_string', 'department_id', 'created_at',
+            ]);
+            $context['employee']['complete_name'] = $contractableName;
+            if ($this->Contract_TemplateUsesPrefix($template, 'license') || $this->Contract_TemplateUsesPrefix($template, 'licence') || $this->Contract_TemplateUsesPrefix($template, 'licenses') || $this->Contract_TemplateUsesPrefix($template, 'licences')) {
+                $licenseModels = license::where('employee_id', $contractable->id)->orderBy('name')->get();
+            }
+            if ($this->Contract_TemplateUsesPrefix($template, 'department') && $contractable->department_id) {
+                $departmentModel = department::find($contractable->department_id);
+                if ($departmentModel) {
+                    $context['department'] = $this->Contract_ModelData($departmentModel, ['id', 'unique_id', 'name', 'budget', 'director_id']);
+                    $director = $departmentModel->director_id ? employee::find($departmentModel->director_id) : null;
+                    $context['department']['director_name'] = $this->Contract_ContractableName($director);
+                }
+            }
+        } elseif ($contractable instanceof provider) {
+            $context['provider'] = $this->Contract_ModelData($contractable, [
+                'id', 'unique_id', 'name', 'lastname', 'last_name', 'complete_name', 'email', 'phone', 'identification_type', 'identification', 'address', 'description', 'active', 'verified', 'created_at',
+            ]);
+            $context['provider']['complete_name'] = $contractableName;
+        }
 
+        $licenseRows = [];
+        foreach ($licenseModels as $licenseModel) {
+            $licenseRows[] = $this->Contract_ModelData($licenseModel, [
+                'id', 'unique_id', 'name', 'value', 'value_string', 'description', 'type', 'type_string', 'active', 'active_string', 'recurrence_months', 'billing_day', 'days_to_expire', 'last_billing_date', 'next_billing_date', 'last_payed_date', 'remaining_days', 'client_id', 'employee_id',
+            ]);
+        }
+        $firstLicense = $licenseRows[0] ?? [];
+        $context['license'] = $firstLicense;
+        $context['licenses'] = $this->Contract_CollectionData(
+            $licenseRows,
+            'total_value',
+            array_sum(array_map(function ($row) { return (float) ($row['value'] ?? 0); }, $licenseRows))
+        );
+        $context['licenses']['names'] = implode(', ', array_filter(array_map(function ($row) { return $row['name'] ?? ''; }, $licenseRows)));
+        $context['licenses']['first_name'] = $firstLicense['name'] ?? '';
+        $context['licence'] = $context['license'];
+        $context['licences'] = $context['licenses'];
+
+        $incomeRows = [];
+        foreach ($incomeModels as $incomeModel) {
+            $incomeRows[] = $this->Contract_ModelData($incomeModel, [
+                'id', 'unique_id', 'client_identification', 'client_name', 'timely_payment', 'cutoff_date', 'description', 'total', 'total_string', 'state', 'state_text', 'payment_state', 'payment_state_text', 'payment_date', 'payment_reference', 'bill_name', 'bill_final_value', 'bill_final_value_string', 'created_at', 'created_at_string',
+            ]);
+        }
+        $firstIncome = $incomeRows[0] ?? [];
+        $context['income'] = $firstIncome;
+        $context['incomes'] = $this->Contract_CollectionData(
+            $incomeRows,
+            'total',
+            array_sum(array_map(function ($row) { return (float) ($row['total'] ?? 0); }, $incomeRows))
+        );
+        $context['incomes']['first_description'] = $firstIncome['description'] ?? '';
+        $context['incomes']['first_total'] = $firstIncome['total'] ?? '';
+
+        return $context;
+    }
+
+    private function Contract_ContextValue(array $context, $path)
+    {
+        $value = $context;
+        foreach (explode('.', (string) $path) as $segment) {
+            if (is_array($value) && array_key_exists($segment, $value)) {
+                $value = $value[$segment];
+            } elseif (is_object($value) && isset($value->{$segment})) {
+                $value = $value->{$segment};
+            } else {
+                return [false, null];
+            }
+        }
+        return [true, $value];
+    }
+
+    private function Contract_StringifyVariableValue($value)
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+        if (is_array($value)) {
+            return implode(', ', array_filter(array_map(function ($item) {
+                return is_scalar($item) ? (string) $item : '';
+            }, $value)));
+        }
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+        return (string) ($value ?? '');
+    }
+
+    private function Contract_RenderTemplate($template, $contractable, $name, $subject, $startDate, $endDate, array $customVariables = [], $contract = null)
+    {
+        $contractableName = $this->Contract_ContractableName($contractable);
+        $contractableEmail = $this->Contract_ContractableEmail($contractable);
+        $customVariables = $this->Contract_NormalizeCustomVariables($template, $customVariables, true);
+        $context = $this->Contract_BuildTemplateContext($template, $contractable, $name, $subject, $startDate, $endDate, $contract);
+        $customContext = [];
+        foreach ($customVariables as $key => $value) {
+            $customContext[substr($key, strlen('custom.'))] = $value;
+        }
+        $context['custom'] = $customContext;
+
+        $knownKeys = array_fill_keys(array_map(function ($definition) { return $definition['key']; }, $this->Contract_VariableDefinitions()), true);
+        foreach ($this->Contract_NormalizeTemplateVariables($template->variables ?? []) as $definition) {
+            $knownKeys[$definition['key']] = true;
+        }
+        $render = function ($value) use ($context, $knownKeys) {
+            return preg_replace_callback('/\{\{\s*([a-zA-Z][a-zA-Z0-9_.]*)\s*\}\}/', function ($matches) use ($context, $knownKeys) {
+                $key = strtolower($matches[1]);
+                [$found, $resolved] = $this->Contract_ContextValue($context, $key);
+                if (!$found && isset($knownKeys[$key])) {
+                    $found = true;
+                    $resolved = '';
+                }
+                return $found ? $this->Contract_Escape($this->Contract_StringifyVariableValue($resolved)) : $matches[0];
+            }, (string) $value);
+        };
+
+        $templateContent = $this->Contract_SanitizeHtml($template->content ?? '');
+        $effectiveSubject = $subject ?: ($template->subject ?? '');
         return [
-            'subject' => $renderedSubject,
-            'content' => $renderedContent,
+            'subject' => $render($effectiveSubject),
+            'content' => $render($templateContent),
             'data' => [
                 'contractable_name' => $contractableName,
                 'contractable_email' => $contractableEmail,
                 'contract_name' => $name,
-                'contract_subject' => $subject ?: $template->subject,
+                'contract_subject' => $effectiveSubject,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'template_id' => $template->id,
                 'template_version' => $template->version,
+                'custom_variables' => $customVariables,
             ],
         ];
     }
@@ -226,16 +725,26 @@ trait contracts_trait
             ? $forceGenerate
             : ($template !== null && ($data['generate'] ?? '1') !== '0');
         $content = array_key_exists('content', $data) ? (string) $data['content'] : (string) ($contract->content ?? '');
-        $generationData = $contract->generation_data;
+        $generationData = is_array($contract->generation_data) ? $contract->generation_data : [];
+        $customVariables = [];
+        if ($template) {
+            $rawCustomVariables = array_key_exists('custom_variables', $data)
+                ? $data['custom_variables']
+                : data_get($generationData, 'custom_variables', []);
+            $customVariables = $this->Contract_NormalizeCustomVariables($template, $rawCustomVariables);
+            $generationData['custom_variables'] = $customVariables;
+        }
         if ($shouldGenerate) {
             if (!$template) {
                 throw new \InvalidArgumentException('Debe seleccionar una plantilla para generar el contrato');
             }
-            $rendered = $this->Contract_RenderTemplate($template, $contractable, $name, $subject, $startDate, $endDate);
+            $rendered = $this->Contract_RenderTemplate($template, $contractable, $name, $subject, $startDate, $endDate, $customVariables, $contract);
             $subject = $rendered['subject'];
             $content = $rendered['content'];
             $generationData = $rendered['data'];
             $contract->generated_at = now();
+        } else {
+            $content = $this->Contract_SanitizeHtml($content);
         }
         if (trim(strip_tags($content)) === '') {
             throw new \InvalidArgumentException('Debe ingresar el contenido del contrato');
@@ -272,9 +781,10 @@ trait contracts_trait
             $employees = employee::where('state', 1)->orderBy('name')->get(['id', 'name', 'last_name', 'work_email', 'personal_email', 'phone']);
             $providers = provider::where('active', 1)->orderBy('name')->get(['id', 'name', 'lastname', 'email', 'phone']);
             $types = contract_type::where('active', 1)->orderBy('name')->get(['id', 'name']);
-            $templates = contract_template::where('active', 1)->orderBy('name')->get(['id', 'contract_type_id', 'name', 'subject', 'version']);
+            $templates = contract_template::where('active', 1)->orderBy('name')->get(['id', 'contract_type_id', 'name', 'subject', 'version', 'variables']);
+            $variables = $this->Contract_VariableDefinitions();
 
-            return $this->Contract_Response('Catalogos obtenidos', compact('clients', 'employees', 'providers', 'types', 'templates'));
+            return $this->Contract_Response('Catalogos obtenidos', compact('clients', 'employees', 'providers', 'types', 'templates', 'variables'));
         } catch (\Exception $e) {
             info('Contract_GetCatalogs error: '.$e->getMessage());
             return $this->Contract_Response($e->getMessage(), [], 0);
@@ -603,7 +1113,7 @@ trait contracts_trait
         }
     }
 
-    public function Contract_CreateTemplate($typeId, $name, $subject, $content, $active = 1)
+    public function Contract_CreateTemplate($typeId, $name, $subject, $content, $active = 1, $variables = [])
     {
         try {
             $type = contract_type::find($typeId);
@@ -612,7 +1122,9 @@ trait contracts_trait
             }
             $name = trim((string) $name);
             $subject = trim((string) $subject);
-            if ($name === '' || $subject === '' || trim((string) $content) === '') {
+            $content = $this->Contract_SanitizeHtml($content);
+            $variables = $this->Contract_NormalizeTemplateVariables($variables);
+            if ($name === '' || $subject === '' || trim($content) === '') {
                 throw new \InvalidArgumentException('Nombre, asunto y contenido son obligatorios');
             }
             $version = ((int) contract_template::withTrashed()->where('contract_type_id', $type->id)->max('version')) + 1;
@@ -621,6 +1133,7 @@ trait contracts_trait
                 'name' => $name,
                 'subject' => $subject,
                 'content' => $content,
+                'variables' => $variables,
                 'version' => $version,
                 'active' => $this->Contract_Boolean($active, true),
             ]);
@@ -632,7 +1145,7 @@ trait contracts_trait
         }
     }
 
-    public function Contract_UpdateTemplate($id, $typeId, $name, $subject, $content, $active = 1)
+    public function Contract_UpdateTemplate($id, $typeId, $name, $subject, $content, $active = 1, $variables = [])
     {
         try {
             $template = contract_template::find($id);
@@ -642,11 +1155,16 @@ trait contracts_trait
             }
             $name = trim((string) $name);
             $subject = trim((string) $subject);
-            if ($name === '' || $subject === '' || trim((string) $content) === '') {
+            $content = $this->Contract_SanitizeHtml($content);
+            $variables = $this->Contract_NormalizeTemplateVariables($variables);
+            if ($name === '' || $subject === '' || trim($content) === '') {
                 throw new \InvalidArgumentException('Nombre, asunto y contenido son obligatorios');
             }
             $typeChanged = (int) $template->contract_type_id !== (int) $type->id;
-            $contentChanged = $template->name !== $name || $template->subject !== $subject || $template->content !== $content;
+            $contentChanged = $template->name !== $name
+                || $template->subject !== $subject
+                || $template->content !== $content
+                || json_encode($this->Contract_NormalizeTemplateVariables($template->variables ?? [])) !== json_encode($variables);
             if ($typeChanged) {
                 $template->version = ((int) contract_template::withTrashed()->where('contract_type_id', $type->id)->max('version')) + 1;
             } elseif ($contentChanged) {
@@ -656,6 +1174,7 @@ trait contracts_trait
             $template->name = $name;
             $template->subject = $subject;
             $template->content = $content;
+            $template->variables = $variables;
             $template->active = $this->Contract_Boolean($active, true);
             $template->save();
             $template->load('type');

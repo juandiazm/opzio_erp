@@ -1,5 +1,5 @@
 import { contractState } from './state.js';
-import { contractableTypeKey, formatDate, setContractableOptions, setTemplateOptions } from './shared.js';
+import { collectContractVariables, contractableTypeKey, formatDate, renderContractVariables, setContractableOptions, setTemplateOptions } from './shared.js';
 
 function formData(prefix) {
     const create = prefix === 'create';
@@ -14,6 +14,7 @@ function formData(prefix) {
         end_date: $('#'+prefix+'-contract-end-date').val(),
         content: $('#'+prefix+'-contract-content').val(),
         notes: $('#'+prefix+'-contract-notes').val(),
+        custom_variables: collectContractVariables(prefix),
     };
 }
 
@@ -24,12 +25,20 @@ function validate(data, prefix, generate) {
     if(!data.name){ $('#'+prefix+'-contract-name').addClass('is-invalid'); alertWarning('Debe ingresar el nombre del contrato'); valid = false; }
     if(!generate && !data.content){ $('#'+prefix+'-contract-content').addClass('is-invalid'); alertWarning('Debe ingresar el contenido del contrato'); valid = false; }
     if(!generate && !data.subject && !data.contract_template_id){ $('#'+prefix+'-contract-subject').addClass('is-invalid'); alertWarning('Debe ingresar el asunto del contrato'); valid = false; }
+    $('#'+prefix+'-contract-variables [data-contract-variable-key][required]').each(function() {
+        const input = $(this);
+        if(String(input.val() || '').trim() === ''){
+            input.addClass('is-invalid');
+            alertWarning('Debe completar las variables obligatorias del contrato');
+            valid = false;
+        }
+    });
     if(data.start_date && data.end_date && data.end_date < data.start_date){ alertWarning('La fecha final no puede ser anterior a la fecha inicial'); valid = false; }
     return valid;
 }
 
 function showUpdateActions(deleted) {
-    $('#update-contract-type, #update-contract-template, #update-contractable-type, #update-contractable-id, #update-contract-name, #update-contract-subject, #update-contract-status, #update-contract-start-date, #update-contract-end-date, #update-contract-content, #update-contract-notes, #update-contract-generate').prop('disabled', deleted);
+    $('#update-contract-type, #update-contract-template, #update-contractable-type, #update-contractable-id, #update-contract-name, #update-contract-subject, #update-contract-status, #update-contract-start-date, #update-contract-end-date, #update-contract-content, #update-contract-notes, #update-contract-generate, #update-contract-variables input').prop('disabled', deleted);
     $('#update-contract-button, #update-contract-generate-button, #update-contract-send-button, #update-contract-delete').toggleClass('d-none', deleted);
     $('#update-contract-restore').toggleClass('d-none', !deleted);
 }
@@ -42,6 +51,7 @@ export function showCurrentContract() {
     $('#update-contract-type').val(current.contract_type_id).trigger('change');
     setTemplateOptions('#update-contract-type', '#update-contract-template', current.contract_template_id || '');
     $('#update-contract-template').val(current.contract_template_id || '');
+    renderContractVariables('update', current.generation_data && current.generation_data.custom_variables ? current.generation_data.custom_variables : {});
     const type = contractableTypeKey(current.contractable_type);
     $('#update-contractable-type').val(type).trigger('change');
     setContractableOptions('#update-contractable-type', '#update-contractable-id', current.contractable_id);

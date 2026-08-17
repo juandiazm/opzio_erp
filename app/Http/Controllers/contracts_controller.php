@@ -96,12 +96,12 @@ class contracts_controller extends Controller
 
     public function add_template(Request $request)
     {
-        return $this->response($this->Contract_CreateTemplate($request->contract_type_id, $request->name, $request->subject, $request->content, $request->active));
+        return $this->response($this->Contract_CreateTemplate($request->contract_type_id, $request->name, $request->subject, $request->content, $request->active, $request->variables ?? []));
     }
 
     public function update_template(Request $request)
     {
-        return $this->response($this->Contract_UpdateTemplate($request->id, $request->contract_type_id, $request->name, $request->subject, $request->content, $request->active));
+        return $this->response($this->Contract_UpdateTemplate($request->id, $request->contract_type_id, $request->name, $request->subject, $request->content, $request->active, $request->variables ?? []));
     }
 
     public function delete_template(Request $request)

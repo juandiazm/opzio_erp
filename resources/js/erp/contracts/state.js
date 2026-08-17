@@ -15,6 +15,7 @@ export const contractState = {
         providers: [],
         types: [],
         templates: [],
+        variables: [],
     },
     editingTypeId: null,
     editingTemplateId: null,

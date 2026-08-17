@@ -96,6 +96,44 @@ export function setTemplateOptions(typeSelector, templateSelector, selectedValue
     setOptions(templateSelector, options, selectedValue);
 }
 
+export function renderContractVariables(prefix, selectedValues = {}) {
+    const templateId = $('#'+prefix+'-contract-template').val();
+    const template = contractState.catalogs.templates.find(function(item) {
+        return String(item.id) === String(templateId);
+    });
+    const variables = template && Array.isArray(template.variables) ? template.variables : [];
+    const section = $('#'+prefix+'-contract-variables-section');
+    const container = $('#'+prefix+'-contract-variables');
+    if(!variables.length){
+        section.addClass('d-none');
+        container.empty();
+        return;
+    }
+
+    const values = selectedValues || {};
+    let html = '';
+    variables.forEach(function(variable, index) {
+        const key = String(variable.key || '').trim();
+        if(!key) return;
+        const shortKey = key.replace(/^custom\./i, '');
+        const value = Object.prototype.hasOwnProperty.call(values, key)
+            ? values[key]
+            : (Object.prototype.hasOwnProperty.call(values, shortKey) ? values[shortKey] : (variable.default_value || ''));
+        const inputType = ['text', 'number', 'date', 'email'].includes(variable.type) ? variable.type : 'text';
+        html += '<div class="contracts-contract-variable-row"><label for="'+prefix+'-contract-variable-'+index+'"><span>'+escapeHtml(variable.label || shortKey)+'</span><code>{{'+escapeHtml(key)+'}}</code></label><input type="'+inputType+'" id="'+prefix+'-contract-variable-'+index+'" class="form-control" data-contract-variable-key="'+escapeHtml(key)+'" value="'+escapeHtml(value)+'"'+(variable.required ? ' required' : '')+'></div>';
+    });
+    container.html(html);
+    section.toggleClass('d-none', container.children().length === 0);
+}
+
+export function collectContractVariables(prefix) {
+    const values = {};
+    $('#'+prefix+'-contract-variables [data-contract-variable-key]').each(function() {
+        values[$(this).attr('data-contract-variable-key')] = $(this).val();
+    });
+    return values;
+}
+
 export function loadCatalogs(onLoaded = null) {
     PostMethodFunction('/admin/contracts/get-catalogs', {}, null, function(response) {
         contractState.catalogs.clients = response.clients || [];
@@ -103,6 +141,7 @@ export function loadCatalogs(onLoaded = null) {
         contractState.catalogs.providers = response.providers || [];
         contractState.catalogs.types = response.types || [];
         contractState.catalogs.templates = response.templates || [];
+        contractState.catalogs.variables = response.variables || [];
         setTypeOptions();
         setSourceTypeOptions('#create-contractable-type');
         setSourceTypeOptions('#update-contractable-type');

@@ -27,7 +27,9 @@ La automatizacion puede usar el scheduler existente de Laravel y `SendMail`, que
 
 3. **Plantillas**
    - CRUD de plantillas asociadas a un tipo.
-   - Asunto y contenido HTML/texto con variables seguras como `{{contractable.name}}`, `{{contractable.email}}`, `{{contract.start_date}}` y `{{contract.end_date}}`.
+   - Asunto y contenido HTML/texto con variables seguras como `{{contractable.name}}`, `{{client.name}}`, `{{employee.name}}`, `{{provider.name}}`, `{{department.name}}`, `{{licenses.count}}` y `{{incomes.total}}`.
+   - Editor enriquecido con alineacion, listas, formato de parrafo, insercion de variables y vista previa con datos de ejemplo.
+   - Variables personalizadas definidas en la plantilla y valores concretos congelados por contrato en `generation_data.custom_variables`.
    - La generacion reemplaza solo variables permitidas y conserva el resultado en `contracts.content`.
 
 4. **Programaciones**
@@ -44,8 +46,9 @@ La automatizacion puede usar el scheduler existente de Laravel y `SendMail`, que
 ## Modelo de datos propuesto
 
 - `contract_types`: `id`, `name`, `description`, `active`, timestamps y soft deletes.
-- `contract_templates`: `id`, `contract_type_id`, `name`, `subject`, `content`, `version`, `active`, timestamps y soft deletes.
+- `contract_templates`: `id`, `contract_type_id`, `name`, `subject`, `content`, `variables` como JSON con `key`, `label`, `type`, `default_value` y `required`, `version`, `active`, timestamps y soft deletes.
 - `contracts`: `id`, `unique_id`, `contract_type_id`, `contract_template_id`, `contractable_type`, `contractable_id`, `name`, `subject`, `content`, `status`, `start_date`, `end_date`, `generated_at`, `sent_at`, `signed_at`, `notes`, `generation_data`, timestamps y soft deletes.
+- `contracts.generation_data.custom_variables`: snapshot de valores personalizados usado en regeneraciones, sin guardar valores escapados.
 - `contract_schedules`: `id`, `contract_type_id`, `contract_template_id`, `contractable_type`, `contractable_id` opcional, `name`, `frequency`, `interval_value`, `next_run_at`, `ends_at`, `send_automatically`, `active`, `last_run_at`, `last_error`, timestamps y soft deletes.
 - `contracts.schedule_key`: clave hash unica para impedir que una programacion cree dos veces el mismo contrato para el mismo titular y fecha objetivo.
 - Indices en tipo, titular polimorfico, estado y proxima ejecucion. La unicidad de ejecucion se controla en la aplicacion porque el titular de una programacion puede ser una consulta de catalogo futura.
@@ -100,6 +103,15 @@ La automatizacion puede usar el scheduler existente de Laravel y `SendMail`, que
 - [x] Hacer smoke test de navegacion, formularios y asociaciones.
 - [x] Actualizar esta bitacora con resultados y pendientes residuales.
 
+### Fase 5 - Editor enriquecido y variables dinamicas
+
+- [x] Agregar `contract_templates.variables` y normalizar nombres, tipos, valores por defecto y obligatoriedad.
+- [x] Publicar catalogo seguro de variables de contrato, titular, cliente, empleado, proveedor, departamento, licencias e ingresos.
+- [x] Implementar editor `contenteditable` con formato, alineacion, listas, insercion de variables y preview.
+- [x] Capturar valores propios al crear o actualizar contratos y reutilizarlos al regenerar.
+- [x] Sanitizar HTML conservando estilos de presentacion permitidos y eliminando scripts, eventos y URLs peligrosas.
+- [x] Cubrir renderer, fuentes de cliente/licencias/ingresos y normalizacion con pruebas focalizadas.
+
 ## Criterios de terminado
 
 - El modulo carga con el permiso correcto y aparece en el sidebar.
@@ -137,3 +149,11 @@ La automatizacion puede usar el scheduler existente de Laravel y `SendMail`, que
 - `php artisan view:cache`, `php artisan route:list --path=admin/contracts`, `npm run build`, diagnosticos del editor y las pruebas focalizadas de contratos pasan.
 - `php artisan test tests/Feature/contracts_test.php` pasa con 10 assertions. La suite completa pasa 14 tests y 69 assertions, pero conserva el fallo preexistente de `tests/Feature/ExampleTest.php`, que espera 200 en `/` aunque la aplicacion redirige a `/admin` y devuelve 302.
 - El smoke test autenticado comprobo carga del modulo, sidebar, filtros, Crear, Tipos, Plantillas, Programaciones y la pestana asociada de clientes y proveedores. No se crearon registros funcionales desde el navegador.
+
+### 2026-08-17 - Fase 5
+
+- Se incorporo el editor enriquecido de plantillas con vista previa, alineacion, listas, formato de parrafo y paleta de variables.
+- Se agregaron variables de cliente, empleado, proveedor, departamento, licencias e ingresos, con resolucion mediante lista blanca y valores escapados al renderizar.
+- Se agregaron variables propias por plantilla; sus valores se guardan sin escapar en `generation_data` y se vuelven a aplicar al regenerar.
+- Se agrego sanitizacion HTML para conservar formato permitido sin ejecutar scripts, eventos ni enlaces peligrosos.
+- La suite focalizada de contratos pasa 5 tests y 19 assertions; `npm run build` compila el editor y los diagnosticos del editor no reportan errores.
