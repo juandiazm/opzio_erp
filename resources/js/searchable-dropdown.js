@@ -146,7 +146,7 @@ function handleOptionKeydown(event, instance, index){
 }
 
 function enhance(select){
-    if(!select || select.tagName !== 'SELECT' || select.multiple) return null;
+    if(!select || select.tagName !== 'SELECT' || select.multiple || select.dataset.searchableDropdown === 'false' || select.classList.contains('swal2-select') || select.closest('.swal2-container')) return null;
     const existing = instances.get(select);
     if(existing){
         syncState(existing);
@@ -292,11 +292,16 @@ function setOptions(target, options){
     return enhance(select);
 }
 
-function setValue(target, value){
+function setValue(target, value, dispatchChange = true){
     const select = resolveSelect(target);
     if(!select) return;
     select.value = value == null ? '' : value;
-    select.dispatchEvent(new Event('change', {bubbles: true}));
+    const instance = instances.get(select);
+    if(instance){
+        syncState(instance);
+        renderOptions(instance, instance.searchInput.value);
+    }
+    if(dispatchChange) select.dispatchEvent(new Event('change', {bubbles: true}));
 }
 
 function getValue(target){

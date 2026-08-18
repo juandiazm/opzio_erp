@@ -48,6 +48,9 @@ class send_queued_mails extends Command
             $Response = $this->MailLog_GetQueuedMails();
             if($Response['status'] == 1){
                 foreach($Response['data'] as $mail){
+                    $mailData = is_array($mail['mail_data']) ? $mail['mail_data'] : [];
+                    $from = $mailData['_from'] ?? null;
+                    $replyTo = $mailData['_reply_to'] ?? null;
                     $MailResponse = $this->SendMail_attach_array(
                         [
                             'subject' => $mail['subject']
@@ -57,6 +60,8 @@ class send_queued_mails extends Command
                         , $mail['mail_data']
                         , $mail['attachments']
                         , $mail['unique_id']
+                        , $from
+                        , $replyTo
                     );
                 }
             }

@@ -674,8 +674,8 @@ trait blog_trait
                         }
                         $Mails = [];
                         $Mails[] = [
-                            'address' => 'soporte@opzio.co',
-                            'name' => 'soporte@opzio.co'
+                            'address' => 'info@opzio.co',
+                            'name' => 'info@opzio.co'
                         ];
                         $ViewData = collect(
                         [

@@ -1,0 +1,420 @@
+@import '../../variables';
+
+.notifications-page {
+    padding: 0 0 2rem;
+}
+
+body.notifications-modal-open #erp-app-content {
+    z-index: 5001 !important;
+}
+
+.notifications-pane {
+    padding: 1rem 0;
+}
+
+.notifications-list-header,
+.notifications-filter-bar,
+.notifications-section-heading,
+.notifications-modal-header,
+.notifications-modal-footer,
+.notifications-sms-counter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.notifications-list-header {
+    padding: 0.5rem 1rem 1rem;
+}
+
+.notifications-list-header h2,
+.notifications-modal-header h2,
+.notifications-section-heading h3 {
+    margin: 0;
+    color: $primary;
+}
+
+.notifications-list-header h2,
+.notifications-modal-header h2 {
+    font-size: 1.15rem;
+}
+
+.notifications-list-header p {
+    margin: 0.2rem 0 0;
+    color: #6c757d;
+    font-size: 0.82rem;
+}
+
+.notifications-filter-bar {
+    justify-content: flex-start;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.85rem;
+    background: #f8f8f8;
+    box-shadow: 0 2px 8px #00000012;
+}
+
+.notifications-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notifications-filter > span,
+.notifications-field > span,
+.notifications-section-heading h3 {
+    color: $primary;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.notifications-filter .form-control {
+    min-width: 18rem;
+}
+
+.notifications-filter .form-select {
+    min-width: 9rem;
+}
+
+.notifications-refresh,
+.notifications-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    padding: 0;
+}
+
+.notifications-table {
+    margin-bottom: 0;
+}
+
+.notifications-table th {
+    color: $primary;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.notifications-table td {
+    max-width: 22rem;
+    font-size: 0.82rem;
+    vertical-align: middle;
+}
+
+.notifications-subject,
+.notifications-message-preview {
+    display: block;
+    max-width: 22rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notifications-status {
+    display: inline-block;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    background: #e9ecef;
+    color: #343a40;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.notifications-status.status-1 {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.notifications-status.status-2 {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.notifications-action {
+    margin-left: 0.55rem;
+    color: $primary;
+    cursor: pointer;
+}
+
+.notifications-empty {
+    padding: 2rem 1rem !important;
+    color: #6c757d;
+    text-align: center;
+}
+
+.notifications-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 1rem;
+}
+
+.notifications-pagination button {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.45rem;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+}
+
+.notifications-pagination button.active {
+    border-color: $primary;
+    background: $primary;
+    color: #fff;
+}
+
+.notifications-modal {
+    position: fixed;
+    z-index: 5000;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 3vh 1rem;
+    overflow-y: auto;
+    background: rgba(15, 15, 20, 0.58);
+}
+
+.notifications-modal-dialog {
+    width: min(1080px, 100%);
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.25);
+}
+
+.notifications-modal-header,
+.notifications-modal-footer {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.notifications-modal-footer {
+    justify-content: flex-end;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 0;
+}
+
+.notifications-modal-kicker {
+    display: block;
+    margin-bottom: 0.15rem;
+    color: #6c757d;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.notifications-modal-body {
+    padding: 1.25rem;
+}
+
+.notifications-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.notifications-form-grid-nested {
+    gap: 0.55rem;
+}
+
+.notifications-field {
+    display: block;
+    margin-bottom: 0.85rem;
+}
+
+.notifications-field > span {
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.notifications-recipient-section {
+    padding: 0.85rem;
+    margin-bottom: 0.9rem;
+    border: 1px solid #e5e5e5;
+    background: #fbfbfb;
+}
+
+.notifications-section-heading {
+    margin-bottom: 0.65rem;
+}
+
+.notifications-client-search {
+    margin-bottom: 0.55rem;
+}
+
+.notifications-client-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 11rem;
+    margin-bottom: 0.7rem;
+    overflow-y: auto;
+    border: 1px solid #e5e5e5;
+    background: #fff;
+}
+
+.notifications-client-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+.notifications-client-option small {
+    display: block;
+    color: #6c757d;
+}
+
+.notifications-editor-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 0.85rem;
+    margin-bottom: 0.9rem;
+}
+
+.notifications-editor-panel,
+.notifications-preview-panel {
+    min-width: 0;
+    border: 1px solid #e5e5e5;
+}
+
+.notifications-editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.45rem;
+    background: #f8f8f8;
+}
+
+.notifications-editor-toolbar .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+}
+
+.notifications-editor-toolbar > span {
+    width: 1px;
+    height: 1.4rem;
+    background: #d8d8d8;
+}
+
+.notifications-editor-toolbar .form-select {
+    width: auto;
+    min-width: 6.5rem;
+    height: 2rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 0.75rem;
+}
+
+.notifications-rich-editor {
+    min-height: 19rem;
+    padding: 0.9rem;
+    overflow-y: auto;
+    line-height: 1.55;
+}
+
+.notifications-rich-editor:focus {
+    outline: 0;
+    box-shadow: inset 0 0 0 2px rgba(34, 2, 69, 0.12);
+}
+
+.notifications-rich-editor:empty::before {
+    content: attr(data-placeholder);
+    color: #adb5bd;
+    pointer-events: none;
+}
+
+.notifications-preview-panel {
+    min-height: 19rem;
+    padding: 0.9rem;
+    background: #f8f8f8;
+}
+
+.notifications-preview-subject {
+    min-height: 2.2rem;
+    padding: 0.55rem 0.7rem;
+    margin-bottom: 0.65rem;
+    color: $primary;
+    background: #fff;
+    border-bottom: 2px solid $primary;
+    font-weight: 700;
+}
+
+.notifications-email-preview {
+    min-height: 14rem;
+    padding: 0.9rem;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.notifications-existing-files,
+.notifications-character-count {
+    display: block;
+    margin-top: 0.3rem;
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+.notifications-sms-counter {
+    justify-content: flex-end;
+    align-self: end;
+    min-height: 2.35rem;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.notifications-sms-counter strong {
+    color: $primary;
+    font-size: 1.2rem;
+}
+
+.notifications-sms-body {
+    resize: vertical;
+}
+
+@media screen and (max-width: 900px) {
+    .notifications-editor-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .notifications-list-header,
+    .notifications-filter-bar,
+    .notifications-section-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .notifications-filter {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .notifications-filter .form-control,
+    .notifications-filter .form-select {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .notifications-form-grid,
+    .notifications-client-list {
+        grid-template-columns: 1fr;
+    }
+
+    .notifications-modal {
+        padding: 0;
+    }
+
+    .notifications-modal-dialog {
+        min-height: 100%;
+    }
+}

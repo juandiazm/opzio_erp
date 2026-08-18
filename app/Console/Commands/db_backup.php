@@ -131,7 +131,7 @@ class db_backup extends Command
                 'local_file' => $localFile,
             ]);
             try {
-                $this->SendMail(['subject' => 'Opzio ERP backup failed'], [['address' => 'soporte@opzio.co', 'name' => 'Soporte Opzio']], 'emails.backup_failed', ['project' => 'Opzio ERP', 'error' => $exception->getMessage()], null);
+                $this->SendMail(['subject' => 'Opzio ERP backup failed'], [['address' => 'info@opzio.co', 'name' => 'Soporte Opzio']], 'emails.backup_failed', ['project' => 'Opzio ERP', 'error' => $exception->getMessage()], null);
             } catch (\Throwable $mailException) {
                 Log::error('ERP BACKUP: failure notification failed', ['message' => $mailException->getMessage()]);
             }

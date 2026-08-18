@@ -1,5 +1,5 @@
 import { contractState } from './state.js';
-import { escapeHtml, loadCatalogs } from './shared.js';
+import { escapeHtml, loadCatalogs, setContractsFormExpanded } from './shared.js';
 
 let templateEditor = null;
 let savedEditorRange = null;
@@ -41,7 +41,19 @@ const previewValues = {
     'department.director_name': 'Director de ejemplo',
     'license.name': 'Licencia de ejemplo',
     'license.value': '250000',
+    'license.value_string': '6.000.000',
     'license.description': 'Servicio recurrente',
+    'license.type': '1',
+    'license.type_string': 'Recurrente',
+    'license.active': '1',
+    'license.active_string': 'Activa',
+    'license.recurrence_months': '6',
+    'license.billing_day': '20',
+    'license.days_to_expire': '4',
+    'license.last_billing_date': '2026-08-01',
+    'license.next_billing_date': '2027-02-05',
+    'license.last_payed_date': '2026-08-01',
+    'license.remaining_days': '4',
     'licenses.count': '2',
     'licenses.total_value': '500000',
     'licenses.names': 'Licencia de ejemplo, Licencia adicional',
@@ -90,7 +102,7 @@ function currentPreviewValues() {
 
 const previewAllowedTags = new Set(['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'div', 'span', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td']);
 const previewAllowedAttributes = new Set(['style', 'href', 'target', 'rel', 'colspan', 'rowspan']);
-const previewAllowedStyles = new Set(['text-align', 'font-weight', 'font-style', 'text-decoration', 'color', 'background-color', 'font-size', 'font-family', 'line-height', 'padding', 'margin']);
+const previewAllowedStyles = new Set(['text-align', 'font-weight', 'font-style', 'text-decoration', 'color', 'background-color', 'font-size', 'font-family', 'line-height', 'padding', 'margin', 'width', 'height', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left', 'border-collapse', 'vertical-align', 'float', 'display', 'box-sizing', 'page-break-inside', 'page-break-before', 'page-break-after']);
 
 function sanitizePreviewFragment(value) {
     const template = document.createElement('template');
@@ -260,6 +272,7 @@ export function initializeTemplateEditor() {
     if(templateEditor) return;
     templateEditor = document.getElementById('contract-template-content-editor');
     if(!templateEditor) return;
+    setContractsFormExpanded('#contract-template-toggle', '#contract-template-form-body', '.contracts-template-form', false);
     templateEditor.addEventListener('input', syncEditor);
     templateEditor.addEventListener('keyup', rememberEditorSelection);
     templateEditor.addEventListener('mouseup', rememberEditorSelection);
@@ -289,6 +302,9 @@ export function initializeTemplateEditor() {
     });
     $(document).on('click.contractTemplateEditor', '#contract-template-add-variable', function() {
         addCustomVariableRow();
+    });
+    $(document).on('click.contractTemplateEditor', '#contract-template-toggle', function() {
+        setContractsFormExpanded('#contract-template-toggle', '#contract-template-form-body', '.contracts-template-form', $(this).attr('aria-expanded') !== 'true');
     });
     $(document).on('click.contractTemplateEditor', '[data-remove-custom-variable]', function() {
         $(this).closest('.contracts-custom-variable-row').remove();
@@ -345,6 +361,7 @@ function resetTemplateForm() {
     $('#contract-template-form-title').text('Nueva plantilla');
     $('#contract-template-save').html('<i class="fa-solid fa-plus"></i> Agregar');
     $('#contract-template-cancel').addClass('d-none');
+    setContractsFormExpanded('#contract-template-toggle', '#contract-template-form-body', '.contracts-template-form', false);
 }
 
 export function saveTemplate() {
@@ -371,6 +388,7 @@ export function editTemplate() {
 
 function fillTemplateForm(template) {
     if(!template) return;
+    setContractsFormExpanded('#contract-template-toggle', '#contract-template-form-body', '.contracts-template-form', true);
     contractState.editingTemplateId = template.id;
     $('#contract-template-type').val(template.contract_type_id);
     $('#contract-template-name').val(template.name);

@@ -1,10 +1,9 @@
 import { contractState } from './state.js';
 import { getContractsPage, openContract, changePage, changePageSize, selectBackPage, selectNextPage } from './list.js';
-import { addContract, deleteContract, generateContract, restoreContract, sendContract, showCurrentContract, updateContract } from './form.js';
-import { loadCatalogs, renderContractVariables, setContractableOptions, setTemplateOptions } from './shared.js';
+import { addContract, deleteContract, generateContract, initializeRecurrenceForms, restoreContract, sendContract, showCurrentContract, updateContract } from './form.js';
+import { addContractSource, applyLicenseToSources, loadCatalogs, refreshContractSourceRow, removeContractSource, renderContractSources, renderContractVariables, setContractableOptions, setTemplateOptions } from './shared.js';
 import * as types from './types.js';
 import * as templates from './templates.js';
-import * as schedules from './schedules.js';
 
 function changeTab() {
     contractState.currentTab = $('#nav-tab .active').attr('id');
@@ -13,7 +12,6 @@ function changeTab() {
         if(contractState.currentTab === 'nav-list-tab') getContractsPage();
         if(contractState.currentTab === 'nav-types-tab') types.getTypes();
         if(contractState.currentTab === 'nav-templates-tab') templates.getTemplates();
-        if(contractState.currentTab === 'nav-schedules-tab') schedules.getSchedules();
     }
     if(contractState.currentTab === 'nav-update-tab') showCurrentContract();
     contractState.tabsView[contractState.currentTab] = true;
@@ -36,16 +34,35 @@ $(document).on('change', '#contract-pagination-per-page', changePageSize);
 $(document).on('click', '.contract-page-number', changePage);
 $(document).on('click', '#contract-page-back', selectBackPage);
 $(document).on('click', '#contract-page-next', selectNextPage);
+$(document).on('change', '.contract-signature-status-select', function(){
+    const select = $(this);
+    const previousStatus = select.attr('data-previous-status');
+    PostMethodFunction('/admin/contracts/change-signature-status', {id: select.attr('data-contract-id'), signature_status: select.val()}, null, function(){
+        select.attr('data-previous-status', select.val());
+        alertSuccess('Estado del PDF firmado actualizado');
+        getContractsPage();
+    }, function(){
+        select.val(previousStatus);
+    });
+});
 
-$(document).on('change', '#create-contract-type', function(){ setTemplateOptions('#create-contract-type', '#create-contract-template'); renderContractVariables('create'); });
-$(document).on('change', '#update-contract-type', function(){ setTemplateOptions('#update-contract-type', '#update-contract-template'); renderContractVariables('update'); });
-$(document).on('change', '#create-contract-template', function(){ renderContractVariables('create'); });
-$(document).on('change', '#update-contract-template', function(){ renderContractVariables('update'); });
-$(document).on('change', '#contract-schedule-type', function(){ setTemplateOptions('#contract-schedule-type', '#contract-schedule-template'); });
-$(document).on('change', '#create-contractable-type', function(){ setContractableOptions('#create-contractable-type', '#create-contractable-id'); });
-$(document).on('change', '#update-contractable-type', function(){ setContractableOptions('#update-contractable-type', '#update-contractable-id'); });
-$(document).on('change', '#contract-schedule-target-type', function(){ setContractableOptions('#contract-schedule-target-type', '#contract-schedule-target-id', null, true); });
-
+$(document).on('change', '#create-contract-type', function(){ setTemplateOptions('#create-contract-type', '#create-contract-template'); renderContractVariables('create'); renderContractSources('create'); });
+$(document).on('change', '#update-contract-type', function(){ setTemplateOptions('#update-contract-type', '#update-contract-template'); renderContractVariables('update'); renderContractSources('update'); });
+$(document).on('change', '#create-contract-template', function(){ renderContractVariables('create'); renderContractSources('create'); });
+$(document).on('change', '#update-contract-template', function(){ renderContractVariables('update'); renderContractSources('update'); });
+$(document).on('click', '[data-contract-add-source]', function(){
+    addContractSource($(this).attr('data-contract-add-source'));
+});
+$(document).on('click', '.contracts-remove-source', function(){
+    removeContractSource($(this).closest('[data-contract-source-row]'));
+});
+$(document).on('change', '[data-contract-source-role="type"]', function(){
+    refreshContractSourceRow($(this).closest('[data-contract-source-row]'));
+    applyLicenseToSources($(this).attr('data-contract-source-prefix'));
+});
+$(document).on('change', '[data-contract-source-role="id"]', function(){
+    applyLicenseToSources($(this).attr('data-contract-source-prefix') || $(this).closest('[data-contract-source-row]').find('[data-contract-source-role="type"]').attr('data-contract-source-prefix'));
+});
 $(document).on('click', '#contract-type-save', types.saveType);
 $(document).on('click', '#contract-type-cancel', types.cancelType);
 $(document).on('click', '.contract-type-update', types.editType);
@@ -56,18 +73,17 @@ $(document).on('click', '#contract-template-cancel', templates.cancelTemplate);
 $(document).on('click', '.contract-template-edit', templates.editTemplate);
 $(document).on('click', '.contract-template-delete', templates.deleteTemplate);
 $(document).on('click', '.contract-template-restore', templates.restoreTemplate);
-$(document).on('click', '#contract-schedule-save', schedules.saveSchedule);
-$(document).on('click', '#contract-schedule-cancel', schedules.cancelSchedule);
-$(document).on('click', '.contract-schedule-edit', schedules.editSchedule);
-$(document).on('click', '.contract-schedule-delete', schedules.deleteSchedule);
-$(document).on('click', '.contract-schedule-restore', schedules.restoreSchedule);
 
 $(document).ready(function(){
     templates.initializeTemplateEditor();
+    types.initializeTypeForm();
+    initializeRecurrenceForms();
     const urlParams = new URLSearchParams(window.location.search);
     contractState.urlContractId = urlParams.get('contract_id');
     if(contractState.urlContractId != null){
-        window.history.replaceState({}, document.title, '/admin/contracts');
+        const url = new URL(window.location.href);
+        url.searchParams.delete('contract_id');
+        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
     }
     loadCatalogs(function(){
         templates.refreshVariablePalette();

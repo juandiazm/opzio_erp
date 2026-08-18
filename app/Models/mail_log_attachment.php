@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class mail_log_attachment extends Model
 {
     use HasFactory;
+
+    protected $guarded = [];
+
+    public function mailLog()
+    {
+        return $this->belongsTo(mail_log::class, 'mail_log_id');
+    }
 }

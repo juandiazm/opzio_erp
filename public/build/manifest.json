@@ -1,4 +1,15 @@
 {
+  "_cropper-CvTrqE0n.js": {
+    "file": "assets/cropper-CvTrqE0n.js",
+    "name": "cropper",
+    "css": [
+      "assets/cropper-Dqszr6bn.css"
+    ]
+  },
+  "_cropper-Dqszr6bn.css": {
+    "file": "assets/cropper-Dqszr6bn.css",
+    "src": "_cropper-Dqszr6bn.css"
+  },
   "_index-PewBSTf8.js": {
     "file": "assets/index-PewBSTf8.js",
     "name": "index"
@@ -26,8 +37,8 @@
     "file": "assets/post-6x08ZAR6.js",
     "name": "post"
   },
-  "_shared-C-FfQeKA.js": {
-    "file": "assets/shared-C-FfQeKA.js",
+  "_shared-RPBjrMc-.js": {
+    "file": "assets/shared-RPBjrMc-.js",
     "name": "shared"
   },
   "node_modules/@fortawesome/fontawesome-pro/webfonts/fa-brands-400.ttf": {
@@ -747,23 +758,59 @@
     "isEntry": true
   },
   "resources/js/erp/contracts/associations.js": {
-    "file": "assets/associations-DWadf3E9.js",
+    "file": "assets/associations-CUIqGlDB.js",
     "name": "associations",
     "src": "resources/js/erp/contracts/associations.js",
     "isEntry": true,
     "imports": [
-      "_shared-C-FfQeKA.js"
+      "_shared-RPBjrMc-.js"
     ]
   },
   "resources/js/erp/contracts/contracts.js": {
-    "file": "assets/contracts-D4NXsPfT.js",
+    "file": "assets/contracts-CXt5oqu7.js",
     "name": "contracts",
     "src": "resources/js/erp/contracts/contracts.js",
     "isEntry": true,
     "imports": [
-      "_shared-C-FfQeKA.js",
+      "_shared-RPBjrMc-.js",
       "_list-BVEt8OV2.js"
     ]
+  },
+  "resources/js/erp/contracts/form.js": {
+    "file": "assets/form-l0sNRNKZ.js",
+    "name": "form",
+    "src": "resources/js/erp/contracts/form.js",
+    "isEntry": true
+  },
+  "resources/js/erp/contracts/list.js": {
+    "file": "assets/list-DP2rzg_V.js",
+    "name": "list",
+    "src": "resources/js/erp/contracts/list.js",
+    "isEntry": true
+  },
+  "resources/js/erp/contracts/shared.js": {
+    "file": "assets/shared-DP2rzg_V.js",
+    "name": "shared",
+    "src": "resources/js/erp/contracts/shared.js",
+    "isEntry": true
+  },
+  "resources/js/erp/contracts/state.js": {
+    "file": "assets/state-K6Dvbx-E.js",
+    "name": "state",
+    "src": "resources/js/erp/contracts/state.js",
+    "isEntry": true
+  },
+  "resources/js/erp/contracts/templates.js": {
+    "file": "assets/templates-l0sNRNKZ.js",
+    "name": "templates",
+    "src": "resources/js/erp/contracts/templates.js",
+    "isEntry": true
+  },
+  "resources/js/erp/contracts/types.js": {
+    "file": "assets/types-l0sNRNKZ.js",
+    "name": "types",
+    "src": "resources/js/erp/contracts/types.js",
+    "isEntry": true
   },
   "resources/js/erp/dashboard/charts.js": {
     "file": "assets/charts-l0sNRNKZ.js",
@@ -784,7 +831,7 @@
     "isEntry": true
   },
   "resources/js/erp/dashboard/state.js": {
-    "file": "assets/state-K6Dvbx-E.js",
+    "file": "assets/state-C6Kfwj0f.js",
     "name": "state",
     "src": "resources/js/erp/dashboard/state.js",
     "isEntry": true
@@ -808,19 +855,19 @@
     "isEntry": true
   },
   "resources/js/erp/departments/list.js": {
-    "file": "assets/list-DP2rzg_V.js",
+    "file": "assets/list-K6Dvbx-E.js",
     "name": "list",
     "src": "resources/js/erp/departments/list.js",
     "isEntry": true
   },
   "resources/js/erp/departments/shared.js": {
-    "file": "assets/shared-DP2rzg_V.js",
+    "file": "assets/shared-K6Dvbx-E.js",
     "name": "shared",
     "src": "resources/js/erp/departments/shared.js",
     "isEntry": true
   },
   "resources/js/erp/departments/state.js": {
-    "file": "assets/state-C6Kfwj0f.js",
+    "file": "assets/state-RnTpOC5-.js",
     "name": "state",
     "src": "resources/js/erp/departments/state.js",
     "isEntry": true
@@ -856,19 +903,19 @@
     "isEntry": true
   },
   "resources/js/erp/employees/list.js": {
-    "file": "assets/list-K6Dvbx-E.js",
+    "file": "assets/list-C6Kfwj0f.js",
     "name": "list",
     "src": "resources/js/erp/employees/list.js",
     "isEntry": true
   },
   "resources/js/erp/employees/shared.js": {
-    "file": "assets/shared-K6Dvbx-E.js",
+    "file": "assets/shared-C6Kfwj0f.js",
     "name": "shared",
     "src": "resources/js/erp/employees/shared.js",
     "isEntry": true
   },
   "resources/js/erp/employees/state.js": {
-    "file": "assets/state-RnTpOC5-.js",
+    "file": "assets/state-DVN7Oi2P.js",
     "name": "state",
     "src": "resources/js/erp/employees/state.js",
     "isEntry": true
@@ -922,13 +969,13 @@
     "isEntry": true
   },
   "resources/js/erp/ia_assistant/shared.js": {
-    "file": "assets/shared-C6Kfwj0f.js",
+    "file": "assets/shared-RnTpOC5-.js",
     "name": "shared",
     "src": "resources/js/erp/ia_assistant/shared.js",
     "isEntry": true
   },
   "resources/js/erp/ia_assistant/state.js": {
-    "file": "assets/state-DVN7Oi2P.js",
+    "file": "assets/state-DdXTRxfG.js",
     "name": "state",
     "src": "resources/js/erp/ia_assistant/state.js",
     "isEntry": true
@@ -952,7 +999,7 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-CJnPum-r.js",
+    "file": "assets/incomes-D4yJYDHw.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
@@ -963,7 +1010,7 @@
     ]
   },
   "resources/js/erp/incomes/list.js": {
-    "file": "assets/list-C6Kfwj0f.js",
+    "file": "assets/list-RnTpOC5-.js",
     "name": "list",
     "src": "resources/js/erp/incomes/list.js",
     "isEntry": true
@@ -978,13 +1025,13 @@
     ]
   },
   "resources/js/erp/incomes/shared.js": {
-    "file": "assets/shared-RnTpOC5-.js",
+    "file": "assets/shared-DVN7Oi2P.js",
     "name": "shared",
     "src": "resources/js/erp/incomes/shared.js",
     "isEntry": true
   },
   "resources/js/erp/incomes/state.js": {
-    "file": "assets/state-DdXTRxfG.js",
+    "file": "assets/state-BIjMHF-b.js",
     "name": "state",
     "src": "resources/js/erp/incomes/state.js",
     "isEntry": true
@@ -1000,7 +1047,7 @@
     ]
   },
   "resources/js/erp/layouts/app.js": {
-    "file": "assets/app-C3dvbuWG.js",
+    "file": "assets/app-CTrxKD9S.js",
     "name": "app",
     "src": "resources/js/erp/layouts/app.js",
     "isEntry": true
@@ -1045,7 +1092,7 @@
     ]
   },
   "resources/js/erp/licenses/list.js": {
-    "file": "assets/list-RnTpOC5-.js",
+    "file": "assets/list-DVN7Oi2P.js",
     "name": "list",
     "src": "resources/js/erp/licenses/list.js",
     "isEntry": true
@@ -1057,13 +1104,13 @@
     "isEntry": true
   },
   "resources/js/erp/licenses/shared.js": {
-    "file": "assets/shared-DVN7Oi2P.js",
+    "file": "assets/shared-DdXTRxfG.js",
     "name": "shared",
     "src": "resources/js/erp/licenses/shared.js",
     "isEntry": true
   },
   "resources/js/erp/licenses/state.js": {
-    "file": "assets/state-BIjMHF-b.js",
+    "file": "assets/state-BQEWTaK-.js",
     "name": "state",
     "src": "resources/js/erp/licenses/state.js",
     "isEntry": true
@@ -1111,7 +1158,7 @@
     "isEntry": true
   },
   "resources/js/erp/my_profile/state.js": {
-    "file": "assets/state-BQEWTaK-.js",
+    "file": "assets/state-My_wb10K.js",
     "name": "state",
     "src": "resources/js/erp/my_profile/state.js",
     "isEntry": true
@@ -1120,6 +1167,12 @@
     "file": "assets/update-RnTpOC5-.js",
     "name": "update",
     "src": "resources/js/erp/my_profile/update.js",
+    "isEntry": true
+  },
+  "resources/js/erp/notifications/notifications.js": {
+    "file": "assets/notifications-COW5gx79.js",
+    "name": "notifications",
+    "src": "resources/js/erp/notifications/notifications.js",
     "isEntry": true
   },
   "resources/js/erp/outcomes/create.js": {
@@ -1135,7 +1188,7 @@
     "isEntry": true
   },
   "resources/js/erp/outcomes/list.js": {
-    "file": "assets/list-DVN7Oi2P.js",
+    "file": "assets/list-DdXTRxfG.js",
     "name": "list",
     "src": "resources/js/erp/outcomes/list.js",
     "isEntry": true
@@ -1147,13 +1200,13 @@
     "isEntry": true
   },
   "resources/js/erp/outcomes/shared.js": {
-    "file": "assets/shared-DdXTRxfG.js",
+    "file": "assets/shared-BIjMHF-b.js",
     "name": "shared",
     "src": "resources/js/erp/outcomes/shared.js",
     "isEntry": true
   },
   "resources/js/erp/outcomes/state.js": {
-    "file": "assets/state-My_wb10K.js",
+    "file": "assets/state-D0WdxB02.js",
     "name": "state",
     "src": "resources/js/erp/outcomes/state.js",
     "isEntry": true
@@ -1183,7 +1236,7 @@
     "isEntry": true
   },
   "resources/js/erp/providers/list.js": {
-    "file": "assets/list-DdXTRxfG.js",
+    "file": "assets/list-BIjMHF-b.js",
     "name": "list",
     "src": "resources/js/erp/providers/list.js",
     "isEntry": true
@@ -1195,13 +1248,13 @@
     "isEntry": true
   },
   "resources/js/erp/providers/shared.js": {
-    "file": "assets/shared-BIjMHF-b.js",
+    "file": "assets/shared-BQEWTaK-.js",
     "name": "shared",
     "src": "resources/js/erp/providers/shared.js",
     "isEntry": true
   },
   "resources/js/erp/providers/state.js": {
-    "file": "assets/state-D0WdxB02.js",
+    "file": "assets/state-C3LV8HgG.js",
     "name": "state",
     "src": "resources/js/erp/providers/state.js",
     "isEntry": true
@@ -1246,7 +1299,7 @@
     "isEntry": true
   },
   "resources/js/erp/reports/state.js": {
-    "file": "assets/state-C3LV8HgG.js",
+    "file": "assets/state-LjUnHRa3.js",
     "name": "state",
     "src": "resources/js/erp/reports/state.js",
     "isEntry": true
@@ -1282,7 +1335,7 @@
     "isEntry": true
   },
   "resources/js/erp/servers/state.js": {
-    "file": "assets/state-LjUnHRa3.js",
+    "file": "assets/state-B_LMHKg6.js",
     "name": "state",
     "src": "resources/js/erp/servers/state.js",
     "isEntry": true
@@ -1291,6 +1344,12 @@
     "file": "assets/view-l0sNRNKZ.js",
     "name": "view",
     "src": "resources/js/erp/servers/view.js",
+    "isEntry": true
+  },
+  "resources/js/erp/shared/list.js": {
+    "file": "assets/list-BQEWTaK-.js",
+    "name": "list",
+    "src": "resources/js/erp/shared/list.js",
     "isEntry": true
   },
   "resources/js/erp/traceability.js": {
@@ -1306,7 +1365,7 @@
     "isEntry": true
   },
   "resources/js/erp/users/list.js": {
-    "file": "assets/list-BIjMHF-b.js",
+    "file": "assets/list-My_wb10K.js",
     "name": "list",
     "src": "resources/js/erp/users/list.js",
     "isEntry": true
@@ -1318,7 +1377,7 @@
     "isEntry": true
   },
   "resources/js/erp/users/state.js": {
-    "file": "assets/state-B_LMHKg6.js",
+    "file": "assets/state-CkbblPng.js",
     "name": "state",
     "src": "resources/js/erp/users/state.js",
     "isEntry": true
@@ -1342,10 +1401,13 @@
     "isEntry": true
   },
   "resources/js/general.js": {
-    "file": "assets/general-BYGjDj0u.js",
+    "file": "assets/general-DRLhkSu6.js",
     "name": "general",
     "src": "resources/js/general.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_cropper-CvTrqE0n.js"
+    ]
   },
   "resources/js/jquery.js": {
     "file": "assets/jquery-BHTam92U.js",
@@ -1375,13 +1437,22 @@
     "isEntry": true
   },
   "resources/js/searchable-dropdown.js": {
-    "file": "assets/searchable-dropdown-C3hV4Rg4.js",
+    "file": "assets/searchable-dropdown-CmKuEQWr.js",
     "name": "searchable-dropdown",
     "src": "resources/js/searchable-dropdown.js",
     "isEntry": true
   },
+  "resources/js/shared/image-cropper.js": {
+    "file": "assets/image-cropper-0Jja53PZ.js",
+    "name": "image-cropper",
+    "src": "resources/js/shared/image-cropper.js",
+    "isEntry": true,
+    "imports": [
+      "_cropper-CvTrqE0n.js"
+    ]
+  },
   "resources/sass/app.scss": {
-    "file": "assets/app-CW-k-uYL.css",
+    "file": "assets/app-COuRRflJ.css",
     "src": "resources/sass/app.scss",
     "isEntry": true
   },
@@ -1506,7 +1577,7 @@
     "isEntry": true
   },
   "resources/sass/erp/contracts/contracts.scss": {
-    "file": "assets/contracts-BraGKTIG.css",
+    "file": "assets/contracts-92xtN1TM.css",
     "src": "resources/sass/erp/contracts/contracts.scss",
     "isEntry": true
   },
@@ -1517,7 +1588,7 @@
     "isEntry": true
   },
   "resources/sass/erp/dashboard/dashboard.scss": {
-    "file": "assets/dashboard-BrLWLAHt.css",
+    "file": "assets/dashboard-CN4GpCQB.css",
     "src": "resources/sass/erp/dashboard/dashboard.scss",
     "isEntry": true
   },
@@ -1574,6 +1645,11 @@
   "resources/sass/erp/my_profile/my_profile.scss": {
     "file": "assets/my_profile-CB1uL7bQ.css",
     "src": "resources/sass/erp/my_profile/my_profile.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/notifications/notifications.scss": {
+    "file": "assets/notifications-BCTxF7FX.css",
+    "src": "resources/sass/erp/notifications/notifications.scss",
     "isEntry": true
   },
   "resources/sass/erp/outcomes/outcomes.scss": {

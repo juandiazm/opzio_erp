@@ -83,7 +83,11 @@ window.createSiigoInvoice = list.createSiigoInvoice;
 $(document).ready(function(){
     let urlParams = new URLSearchParams(window.location.search);
     incomeState.incomeId = urlParams.get('income_uid');
-    if(incomeState.incomeId != null && incomeState.incomeId != '' && incomeState.incomeId != 0) window.history.replaceState({}, document.title, '/'+'admin/incomes');
+    if(incomeState.incomeId != null && incomeState.incomeId != '' && incomeState.incomeId != 0){
+        const url = new URL(window.location.href);
+        url.searchParams.delete('income_uid');
+        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+    }
     order.init();
     changeTab();
 });

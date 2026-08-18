@@ -56,7 +56,23 @@ class contracts_controller extends Controller
 
     public function send(Request $request)
     {
-        return $this->response($this->Contract_SendContract($request->id ?? $request->contract_id));
+        $recipients = $request->has('recipients') ? $request->input('recipients') : null;
+        return $this->response($this->Contract_SendContract($request->id ?? $request->contract_id, $recipients));
+    }
+
+    public function get_send_options(Request $request)
+    {
+        return $this->response($this->Contract_GetSendOptions($request->id ?? $request->contract_id));
+    }
+
+    public function change_signature_status(Request $request)
+    {
+        return $this->response($this->Contract_ChangeSignatureStatus($request->id, $request->signature_status));
+    }
+
+    public function signature_pdf(Request $request)
+    {
+        return $this->Contract_DownloadSignaturePdf($request->id);
     }
 
     public function get_associated(Request $request)
@@ -114,28 +130,4 @@ class contracts_controller extends Controller
         return $this->response($this->Contract_RestoreTemplate($request->id));
     }
 
-    public function get_schedules()
-    {
-        return $this->response($this->Contract_GetSchedules());
-    }
-
-    public function add_schedule(Request $request)
-    {
-        return $this->response($this->Contract_CreateSchedule($request->all()));
-    }
-
-    public function update_schedule(Request $request)
-    {
-        return $this->response($this->Contract_UpdateSchedule($request->id, $request->all()));
-    }
-
-    public function delete_schedule(Request $request)
-    {
-        return $this->response($this->Contract_DeleteSchedule($request->id));
-    }
-
-    public function restore_schedule(Request $request)
-    {
-        return $this->response($this->Contract_RestoreSchedule($request->id));
-    }
 }

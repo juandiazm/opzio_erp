@@ -73,6 +73,15 @@
                 </a>
             </li>
             @endif
+            @php($notifications_permission = collect(session('app_permissions'))->firstWhere('url', 'admin/notifications/'))
+            @if($notifications_permission && collect(session('permissions'))->firstWhere('user_permission_id', $notifications_permission->id)!=null)
+            <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/notifications')?' selected':'' }}">
+                <a href="/admin/notifications" class="sidebar-menu-item-link">
+                    <i class="fa-light fa-bell align-self-center sidebar-menu-item-icon"></i>
+                    <p class="align-self-center sidebar-menu-item-text">Notificaciones</p>
+                </a>
+            </li>
+            @endif
             @if(collect(session('permissions'))->firstWhere('user_permission_id', 7)!=null)
             <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/incomes')?' selected':'' }}">
                 <a href="/admin/incomes" class="sidebar-menu-item-link">

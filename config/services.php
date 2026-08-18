@@ -68,4 +68,13 @@ return [
         'max_payload_bytes' => (int) env('OPZIO_OBSERVER_MAX_PAYLOAD_BYTES', 10485760),
     ],
 
+    'pdf' => [
+        'chrome_path' => env(
+            'PDF_CHROME_PATH',
+            PHP_OS_FAMILY === 'Windows' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : null
+        ),
+        'node_binary' => env('PDF_NODE_BINARY', 'node'),
+        'node_module_path' => env('PDF_NODE_MODULE_PATH', base_path('node_modules')),
+    ],
+
 ];

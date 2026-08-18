@@ -17,6 +17,9 @@
         <testsuite name="Contracts Feature">
             <file>./tests/Feature/contracts_test.php</file>
         </testsuite>
+        <testsuite name="Notifications Feature">
+            <file>./tests/Feature/notifications_test.php</file>
+        </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
         <include>

@@ -1,5 +1,12 @@
 import { contractState } from './state.js';
-import { escapeHtml, loadCatalogs } from './shared.js';
+import { escapeHtml, loadCatalogs, setContractsFormExpanded } from './shared.js';
+
+export function initializeTypeForm() {
+    setContractsFormExpanded('#contract-type-toggle', '#contract-type-form-body', '.contracts-catalog-form', false);
+    $(document).on('click.contractTypeForm', '#contract-type-toggle', function() {
+        setContractsFormExpanded('#contract-type-toggle', '#contract-type-form-body', '.contracts-catalog-form', $(this).attr('aria-expanded') !== 'true');
+    });
+}
 
 export function getTypes() {
     PostMethodFunction('/admin/contracts/types/get', {}, null, renderTypes, null);
@@ -27,6 +34,7 @@ function resetTypeForm() {
     $('#contract-type-active').prop('checked', true);
     $('#contract-type-save').html('<i class="fa-solid fa-plus"></i> Agregar');
     $('#contract-type-cancel').addClass('d-none');
+    setContractsFormExpanded('#contract-type-toggle', '#contract-type-form-body', '.contracts-catalog-form', false);
 }
 
 export function saveType() {
@@ -38,6 +46,7 @@ export function saveType() {
 
 export function editType() {
     const row = $(this).closest('tr');
+    setContractsFormExpanded('#contract-type-toggle', '#contract-type-form-body', '.contracts-catalog-form', true);
     contractState.editingTypeId = row.attr('data-type-id');
     $('#contract-type-name').val(row.find('.contract-type-row-name').val());
     $('#contract-type-description').val(row.find('.contract-type-row-description').val());

@@ -55,8 +55,13 @@ function showContractsPage(response) {
         html += '<td>'+escapeHtml(contract.contractable_name || '')+'</td>';
         html += '<td><div class="erp-meta-stack"><span>Inicio: '+escapeHtml(formatDate(contract.start_date))+'</span><small>Vence: '+escapeHtml(formatDate(contract.end_date))+'</small></div></td>';
         html += '<td><span class="erp-status status-'+escapeHtml(contract.status)+'"><span class="erp-status-label">'+escapeHtml(contract.status_string)+'</span></span></td>';
-        html += '<td class="text-end action-cell">';
+        html += '<td><span class="erp-status status-'+escapeHtml(contract.send_status || 'not_sent')+'"><span class="erp-status-label">'+escapeHtml(contract.send_status_string || contract.send_status || 'No enviado')+'</span></span></td>';
+        html += '<td class="contract-signature-column"><select class="form-select form-select-sm contract-signature-status-select" data-searchable-dropdown="false" data-contract-id="'+contract.id+'" data-previous-status="'+escapeHtml(contract.signature_status || 'pending')+'" aria-label="Estado del PDF firmado"><option value="pending"'+(contract.signature_status === 'pending' ? ' selected' : '')+'>Pendiente</option><option value="uploaded"'+(contract.signature_status === 'uploaded' ? ' selected' : '')+'>Cargado</option><option value="accepted"'+(contract.signature_status === 'accepted' ? ' selected' : '')+'>Aceptado</option></select></td>';
+        html += '<td class="text-end action-cell contract-actions-column">';
         html += '<i class="fa-solid '+(deleted ? 'fa-eye' : 'fa-pen-to-square')+' contract-open-btn" data-contract-id="'+contract.id+'" title="Abrir contrato"></i>';
+        if(contract.signature_pdf_path && contract.signature_status !== 'pending'){
+            html += '<a class="contract-signature-pdf-link" href="/admin/contracts/signature-pdf/'+contract.id+'" target="_blank" rel="noopener" title="Abrir PDF firmado" aria-label="Abrir PDF firmado"><i class="fa-solid fa-file-pdf"></i></a>';
+        }
         if(!deleted){
             html += '<i class="fa-solid fa-wand-magic-sparkles contract-generate-btn" data-contract-id="'+contract.id+'" title="Generar contrato"></i>';
             html += '<i class="fa-solid fa-paper-plane contract-send-btn" data-contract-id="'+contract.id+'" title="Enviar contrato"></i>';

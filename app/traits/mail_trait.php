@@ -17,7 +17,8 @@ trait mail_trait
 		$files,
 		$unique_id = null,
 		$mailer = null,
-		$from = null
+		$from = null,
+		$replyTo = null
 	) {
 		$Response = [
 			'status' => 0,
@@ -27,30 +28,25 @@ trait mail_trait
 		try {
 			if (isset($from) === false) {
 				$from = [
-					'address' => config('app.MAIL_FROM_ADDRESS') ?? '',
-					'name' => config('app.MAIL_FROM_NAME') ?? ''
+					'address' => config('mail.from.address') ?? '',
+					'name' => config('mail.from.name') ?? ''
 				];
 			}
 			if (App::environment() === 'local') {
 				$Mails = [
 					[
-						'address' => 'soporte@opzio.co',
+						'address' => 'info@opzio.co',
 						'name' => 'Opzio Test'
 					]
 				];
 			}
-			$mail = $mailer ? Mail::mailer($mailer) : Mail::mailer('smtp');
+			$mail = Mail::mailer($mailer ?: config('mail.default', 'smtp'));
 			///////////////////////////
 			///////////////////////////
 			// Define the mailable object
-			$mailJob = $mail->to(array_column($Mails, 'address'))->queue(new CustomMail($MailData, $View, $ViewData, $files, $from));
-			//check if the mail was sent
-			if ($mailJob !== null) {
-				$Response['message'] = 'Correo en cola para envío';
-				$Response['status'] = 1;
-			} else {
-				$Response['message'] = 'Error al enviar el correo';
-			}
+			$mail->to(array_column($Mails, 'address'))->queue(new CustomMail($MailData, $View, $ViewData, $files, $from, $replyTo));
+			$Response['message'] = 'Correo en cola para envío';
+			$Response['status'] = 1;
 
 		} catch (\Exception $e) {
 			info('SendMail error: ' . $e->getMessage());
@@ -75,7 +71,7 @@ trait mail_trait
 		return $Response;
 	}
 
-	public function SendMail_attach_array($MailData, $Mails, $View, $ViewData, $file_array, $unique_id = null)
+	public function SendMail_attach_array($MailData, $Mails, $View, $ViewData, $file_array, $unique_id = null, $from = null, $replyTo = null, $mailer = null)
 	{
 		$Response = [
 			'status' => 0,
@@ -85,22 +81,24 @@ trait mail_trait
 			if (App::environment() === 'local') {
 				$Mails = [
 					[
-						'address' => 'soporte@opzio.co',
+						'address' => 'info@opzio.co',
 						'name' => 'Opzio Test'
 					]
 				];
 			}
 			
-			$from = [
-				'address' => config('app.MAIL_FROM_ADDRESS') ?? '',
-				'name' => config('app.MAIL_FROM_NAME') ?? ''
-			];
+				if ($from === null) {
+					$from = [
+						'address' => config('mail.from.address') ?? '',
+						'name' => config('mail.from.name') ?? ''
+					];
+				}
 			
-			$mail = Mail::mailer('smtp');
+				$mail = Mail::mailer($mailer ?: config('mail.default', 'smtp'));
 			///////////////////////////
 			///////////////////////////
 			// Define the mailable object
-			$mailJob = $mail->to(array_column($Mails, 'address'))->queue(new CustomMail($MailData, $View, $ViewData, $file_array, $from));
+			$mailJob = $mail->to(array_column($Mails, 'address'))->queue(new CustomMail($MailData, $View, $ViewData, $file_array, $from, $replyTo));
 			//check if the mail was sent
 			if ($mailJob !== null) {
 				$Response['message'] = 'Correo en cola para envío';

@@ -1,9 +1,13 @@
 <div class="tab-pane fade contracts-pane" id="nav-templates" role="tabpanel" aria-labelledby="nav-templates-tab">
     <div class="contracts-form-section contracts-template-form">
-        <div class="contracts-template-form-header">
+        <div class="contracts-template-form-header contracts-collapsible-form-header">
             <h3 id="contract-template-form-title">Nueva plantilla</h3>
-            <span class="contracts-help">El contenido se guarda como HTML seguro.</span>
+            <!--<span class="contracts-help">El contenido se guarda como HTML seguro.</span>-->
+            <button type="button" id="contract-template-toggle" class="contracts-collapsible-toggle" data-collapsed-label="Agregar plantilla" aria-label="Agregar plantilla" title="Agregar plantilla" aria-expanded="false" aria-controls="contract-template-form-body">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            </button>
         </div>
+        <div id="contract-template-form-body" class="contracts-template-form-body contracts-collapsible-form-body" hidden>
         <div class="contracts-form-grid">
             <div>
                 <div class="input-container d-flex">
@@ -87,6 +91,7 @@
             <label class="form-check-label"><input type="checkbox" id="contract-template-active" class="form-check-input" checked> Activa</label>
             <button class="btn btn-secondary" id="contract-template-save"><i class="fa-solid fa-plus"></i> Agregar</button>
             <button class="btn btn-link d-none" id="contract-template-cancel">Cancelar</button>
+        </div>
         </div>
     </div>
     <div class="table-responsive"><table id="contract-templates-table" class="table table-hover table-sm align-middle"><thead><tr><th>Nombre</th><th>Tipo</th><th>Versión</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="contract-templates-table-body"></tbody></table></div>

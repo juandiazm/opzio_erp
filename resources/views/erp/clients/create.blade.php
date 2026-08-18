@@ -7,7 +7,7 @@
                     <div class="d-flex justify-content-center">
                         <div class="multimedia-input-container">
                             <div id="create-client-img-container" class="image-container d-flex justify-content-center">
-                                <input type="file" name="photo" id="create-client-img" class="d-none input_image" accept="image/*">
+                                <input type="file" name="photo" id="create-client-img" class="d-none input_image" accept="image/*" data-image-crop="circle" data-image-crop-max-width="800" data-image-crop-max-height="800">
                                 <i class="fa-regular fa-image align-self-center image-icon"></i>
                             </div>
                             <i class="fa-solid fa-plus image-plus-icon"></i>

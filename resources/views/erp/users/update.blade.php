@@ -39,7 +39,7 @@
                 <div class="d-flex justify-content-center">
                     <div class="multimedia-input-container">
                         <div id="update-user-img-container" class="image-container d-flex justify-content-center">
-                            <input type="file" name="photo" id="update-user-img" class="d-none input_image" accept="image/*">
+                            <input type="file" name="photo" id="update-user-img" class="d-none input_image" accept="image/*" data-image-crop="circle" data-image-crop-max-width="800" data-image-crop-max-height="800">
                             <img class="image_preview align-self-center" alt="Foto de perfil">
                             <i class="fa-regular fa-image align-self-center image-icon"></i>
                         </div>

@@ -245,7 +245,7 @@ class ia_assistant_controller extends Controller
             $pdf      = $this->PDF_GenerarPDF('pdf.ia_marketing_report', $Data);
             $filename = 'Reporte-Marketing-' . str_replace(' ', '-', $reportJson['period'] ?? $conversation->report_period) . '.pdf';
 
-            return response($pdf->output(), 200, [
+            return response($pdf, 200, [
                 'Content-Type'        => 'application/pdf',
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             ]);
@@ -285,7 +285,7 @@ class ia_assistant_controller extends Controller
             $pdf      = $this->PDF_GenerarPDF('pdf.ia_marketing_report', $Data);
             $filename = 'Reporte-Marketing-' . str_replace(' ', '-', $reportJson['period'] ?? $conversation->report_period) . '.pdf';
 
-            return response($pdf->output(), 200, [
+            return response($pdf, 200, [
                 'Content-Type'        => 'application/pdf',
                 'Content-Disposition' => 'inline; filename="' . $filename . '"',
             ]);
@@ -414,7 +414,7 @@ class ia_assistant_controller extends Controller
             $pdf      = $this->PDF_GenerarPDF('pdf.ia_marketing_report', $Data);
             $filename = 'Reporte-Marketing-' . str_replace(' ', '-', $reportJson['period'] ?? $conversation->report_period) . '.pdf';
             $tempPdf  = storage_path('app/ia_temp_pdf_' . $conversation->id . '_' . time() . '.pdf');
-            file_put_contents($tempPdf, $pdf->output());
+            file_put_contents($tempPdf, $pdf);
 
             // Build recipients list
             $Mails = [

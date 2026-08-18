@@ -46,6 +46,10 @@ class admin_pages_controller extends Controller
     {
         return view('erp.contracts');
     }
+    public function notifications_page(Request $request)
+    {
+        return view('erp.notifications');
+    }
     public function incomes_page(Request $request)
     {
         return view('erp.incomes');

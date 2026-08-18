@@ -1,11 +1,19 @@
 
+import { handleImageCropChange } from './shared/image-cropper.js';
+
 var GeneralDateFormat = {day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'};
 $(document).on('click', '.input_image',SeleccionarImagen);
 $(document).on('click', '.input-color',function(event){event.stopPropagation()});
 $(document).on('click', '.input_image_just_click',SeleccionarImagen);
 $(document).on('click', '.image-container',AgregarFoto);
 $(document).on('click', '.color-container',AddColor);
-$(document).on('change', '.input_image',CargarFoto);
+$(document).on('change', 'input[type="file"]',function(event){
+	if(this.dataset.imageCrop){
+		handleImageCropChange(this, event);
+		return;
+	}
+	if(this.classList.contains('input_image')) CargarFoto.call(this, event);
+});
 $(document).on('change', '.input-color',loadColor);
 $(document).on('change', '.CategoryColor',DefinirRGB);
 $(document).on('click', '#RandomProductsContainer .RandomProductSubContainer .RandomProductsCenteredContainer', RandomProductOutClick);

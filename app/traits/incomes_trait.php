@@ -456,7 +456,7 @@ trait incomes_trait
         ];
         try {
             $pdf = $this->PDF_GenerarPDF('pdf.purchase_order', $Data);
-            Storage::disk('incomes_pdfs')->put($income->unique_id . '.pdf', $pdf->output());
+            Storage::disk('incomes_pdfs')->put($income->unique_id . '.pdf', $pdf);
             $Response['status'] = 1;
             $Response['message'] = 'Order purchase pdf created';
         } catch (\Exception $e) {
@@ -486,7 +486,7 @@ trait incomes_trait
         ];
         try {
             $pdf = $this->PDF_GenerarPDF('pdf.quotation_order', $Data);
-            Storage::disk('incomes_pdfs')->put($income->unique_id . '.pdf', $pdf->output());
+            Storage::disk('incomes_pdfs')->put($income->unique_id . '.pdf', $pdf);
             $Response['status'] = 1;
             $Response['message'] = 'Order quotation pdf created';
         } catch (\Exception $e) {

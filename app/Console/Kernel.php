@@ -16,13 +16,16 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('command:send_queued_mails')
-            ->cron('*/10 7-19 * * *')
+            ->cron('*/10 * * * *')
+            ->withoutOverlapping(9);
+        $schedule->command('notifications:process-sms')
+            ->cron('*/10 * * * *')
             ->withoutOverlapping(9);
         $schedule->command('command:create_month_incomes')->cron('0 8 * * *');
         $schedule->command('command:update_licenses_remaining_days')->cron('0 4 * * *');
-        $schedule->command('contracts:process-schedules')
-            ->everyMinute()
-            ->withoutOverlapping(5);
+        $schedule->command('contracts:process-recurrences')
+            ->dailyAt('00:05')
+            ->withoutOverlapping(30);
         $schedule->command('command:send_pay_remaining')
             ->cron('0 11 * * *')
             ->withoutOverlapping(60);

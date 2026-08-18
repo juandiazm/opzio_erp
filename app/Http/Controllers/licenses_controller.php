@@ -43,6 +43,12 @@ class licenses_controller extends Controller
             $request->employee_id,
             $request->value,
             $request->description,
+            $request->type,
+            $request->recurrence_months,
+            $request->billing_day,
+            $request->days_to_expire,
+            $request->next_billing_date,
+            $request->last_payed_date,
         );
         if($Response['status'] == 1){
             return $Response;

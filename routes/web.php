@@ -17,6 +17,8 @@ use App\Http\Controllers\departments_controller;
 use App\Http\Controllers\service_controller;
 use App\Http\Controllers\licenses_controller;
 use App\Http\Controllers\contracts_controller;
+use App\Http\Controllers\notifications_controller;
+use App\Http\Controllers\public_contract_signature_controller;
 use App\Http\Controllers\incomes_controller;
 use App\Http\Controllers\income_advances_controller;
 use App\Http\Controllers\outcomes_controller;
@@ -95,6 +97,12 @@ Route::get('service-worker.js', function () {
         'Cache-Control' => 'no-cache, no-store, must-revalidate',
     ]);
 });
+Route::get('public/contracts/{uniqueId}/signature/{token}', [public_contract_signature_controller::class, 'show'])
+    ->middleware('throttle:30,1')
+    ->name('public.contract.signature');
+Route::post('public/contracts/{uniqueId}/signature/{token}', [public_contract_signature_controller::class, 'upload'])
+    ->middleware('throttle:10,1')
+    ->name('public.contract.signature.upload');
 //Admin routes
 Route::get('Admin', function () {
     return redirect('/admin');
@@ -279,7 +287,10 @@ Route::prefix('admin')->group(function () {
             Route::post('delete', [contracts_controller::class, 'delete']);
             Route::post('restore', [contracts_controller::class, 'restore']);
             Route::post('generate', [contracts_controller::class, 'generate']);
+            Route::post('send-options', [contracts_controller::class, 'get_send_options']);
             Route::post('send', [contracts_controller::class, 'send']);
+            Route::post('change-signature-status', [contracts_controller::class, 'change_signature_status']);
+            Route::get('signature-pdf/{id}', [contracts_controller::class, 'signature_pdf']);
             Route::post('get-associated', [contracts_controller::class, 'get_associated']);
             Route::prefix('types')->group(function(){
                 Route::post('get', [contracts_controller::class, 'get_types']);
@@ -295,13 +306,18 @@ Route::prefix('admin')->group(function () {
                 Route::post('delete', [contracts_controller::class, 'delete_template']);
                 Route::post('restore', [contracts_controller::class, 'restore_template']);
             });
-            Route::prefix('schedules')->group(function(){
-                Route::post('get', [contracts_controller::class, 'get_schedules']);
-                Route::post('add', [contracts_controller::class, 'add_schedule']);
-                Route::post('update', [contracts_controller::class, 'update_schedule']);
-                Route::post('delete', [contracts_controller::class, 'delete_schedule']);
-                Route::post('restore', [contracts_controller::class, 'restore_schedule']);
-            });
+        });
+        Route::prefix('notifications')->group(function(){
+            Route::get('/', [admin_pages_controller::class, 'notifications_page']);
+            Route::post('clients', [notifications_controller::class, 'get_clients']);
+            Route::post('emails', [notifications_controller::class, 'get_emails']);
+            Route::post('sms', [notifications_controller::class, 'get_sms']);
+            Route::post('email', [notifications_controller::class, 'get_email']);
+            Route::post('sms-by-id', [notifications_controller::class, 'get_sms_by_id']);
+            Route::post('email/add', [notifications_controller::class, 'add_email']);
+            Route::post('sms/add', [notifications_controller::class, 'add_sms']);
+            Route::post('email/resend', [notifications_controller::class, 'resend_email']);
+            Route::post('sms/resend', [notifications_controller::class, 'resend_sms']);
         });
         Route::prefix('incomes')->group(function(){
             Route::get('/', [admin_pages_controller::class, 'incomes_page']);

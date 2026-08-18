@@ -51,13 +51,13 @@ class client_ensamble_controller extends Controller
                         'identification' => $document->identification,
                         'name' => $document->name
                     ];
-                    $pdf = $this->GenerarPDF('api.clients.ensamble.certificate', $Pdf_Data, 'landscape');
+                    $pdf = $this->PDF_GenerarPDF('api.clients.ensamble.certificate', $Pdf_Data, 'landscape');
                     $uid = strtoupper(Str::uuid()->toString());
                     $document->uid = $uid;
                     $document->created_at = \Carbon\Carbon::now();
                     $document->updated_at = \Carbon\Carbon::now();
                     $document->save();
-                    Storage::disk('public')->put($this->URL_CERTIFICATE_PATH . $uid.'.pdf', $pdf->output());
+                    Storage::disk('public')->put($this->URL_CERTIFICATE_PATH . $uid.'.pdf', $pdf);
                     $result[] = [
                         'identification' => $document->identification,
                         'name' => $document->name,
