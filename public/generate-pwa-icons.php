@@ -4,7 +4,7 @@
  * Ejecutar desde la raíz del proyecto: php public/generate-pwa-icons.php
  */
 
-$sourceImage = __DIR__ . '/images/opzio-monogram-square-cream-bg-transparent.png';
+$sourceImage = __DIR__ . '/images/opzio-monogram-square-cream-bg.jpg';
 $outputDir = __DIR__ . '/images/pwa/';
 
 // Tamaños requeridos para PWA
@@ -22,7 +22,7 @@ if (!is_dir($outputDir)) {
     mkdir($outputDir, 0755, true);
 }
 
-$source = imagecreatefrompng($sourceImage);
+$source = imagecreatefromjpeg($sourceImage);
 if (!$source) {
     die("Error: No se pudo cargar la imagen fuente\n");
 }
