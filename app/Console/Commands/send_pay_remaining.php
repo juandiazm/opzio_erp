@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -42,6 +43,11 @@ class send_pay_remaining extends Command
     public function __construct()
     {
         parent::__construct();
+    }
+
+    private function randomSendAt()
+    {
+        return Carbon::today(config('app.timezone'))->setTime(8, 0)->addMinutes(random_int(0, 180));
     }
 
     /**
@@ -213,7 +219,18 @@ class send_pay_remaining extends Command
                         'ia_message' => $ia_message,
                     ]);
                     
-                    $MailResponse = $this->SendMail_attach_array($MailData, $Mails, $View, $ViewData, $attachments);
+                    $sendAt = $this->randomSendAt();
+                    $mailLog = $this->MailLog_CreatePending(
+                        $subject,
+                        $View,
+                        config('mail.from.address') ?? '',
+                        config('mail.from.name') ?? '',
+                        $Mails,
+                        $ViewData,
+                        $attachments,
+                        $sendAt
+                    );
+                    info('command:send_pay_remaining - Email queued in mail_logs: ' . $mailLog->unique_id . ' for ' . $sendAt->format('Y-m-d H:i:s'));
                 }
             }catch(\Exception $e) {
                 info('command:send_pay_remaining email grouped: '.$e->getMessage());

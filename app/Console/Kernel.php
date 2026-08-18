@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:05')
             ->withoutOverlapping(30);
         $schedule->command('command:send_pay_remaining')
-            ->cron('0 11 * * *')
+            ->cron('0 7 * * *')
             ->withoutOverlapping(60);
         $schedule->command('db:backup')->cron('0 2 * * *');
     }

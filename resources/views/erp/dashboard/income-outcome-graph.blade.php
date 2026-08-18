@@ -1,4 +1,4 @@
-<div class="row-container">
+<div class="row-container dashboard-graph-row">
     <div class="segment-container income-outcome-graph-segment">
         <div class="segment-header">
             <h1 class="segment-title">Ingresos y Egresos<i class="tooltip-icon fa-regular fa-circle-question" title="Te mostramos los ingresos y egresos de la empresa en el mes seleccionado."></i></h1>

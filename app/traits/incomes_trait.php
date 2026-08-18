@@ -1074,6 +1074,185 @@ trait incomes_trait
         }
         return $Response;
     }
+    public function Income_StatisticGetIncomesByRecurrenceRange($start_date, $end_date)
+    {
+        $Response = [
+            'status' => 1,
+            'message' => '',
+            'data' => [
+                'date_from' => null,
+                'date_to' => null,
+                'months_count' => 0,
+                'projected_total' => 0,
+                'projected_total_string' => '0',
+                'paid_total' => 0,
+                'paid_total_string' => '0',
+                'recurrence_details' => [],
+            ],
+        ];
+
+        try {
+            $start_date = Carbon::parse($start_date)->startOfMonth();
+            $end_date = Carbon::parse($end_date)->endOfMonth();
+
+            if ($start_date->greaterThan($end_date)) {
+                return [
+                    'status' => 0,
+                    'message' => 'El inicio del rango no puede ser posterior al fin',
+                ];
+            }
+
+            $monthsCount = (($end_date->year - $start_date->year) * 12) + ($end_date->month - $start_date->month) + 1;
+            $groups = [];
+            $ensureGroup = function ($recurrenceMonths) use (&$groups) {
+                $recurrenceMonths = (int) $recurrenceMonths;
+                if (!isset($groups[$recurrenceMonths])) {
+                    $groups[$recurrenceMonths] = [
+                        'recurrence_months' => $recurrenceMonths,
+                        'active_license_count' => 0,
+                        'projected_cycle_amount' => 0,
+                        'paid_amount' => 0,
+                        'paid_income_ids' => [],
+                        'paid_license_ids' => [],
+                    ];
+                }
+
+                return $recurrenceMonths;
+            };
+
+            $activeLicenses = license::query()
+                ->where('active', 1)
+                ->where('type', 1)
+                ->where('recurrence_months', '>', 0)
+                ->where('value', '>', 0)
+                ->get(['id', 'value', 'recurrence_months']);
+
+            foreach ($activeLicenses as $license) {
+                $recurrenceMonths = $ensureGroup($license->recurrence_months);
+                $groups[$recurrenceMonths]['active_license_count']++;
+                $groups[$recurrenceMonths]['projected_cycle_amount'] += (float) $license->value;
+            }
+
+            $paidLines = income_license::query()
+                ->where('recurrence_months', '>', 0)
+                ->whereHas('income', function ($query) use ($start_date, $end_date) {
+                    $query->whereIn('state', [3, 4])
+                        ->whereDoesntHave('income_advances')
+                        ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
+                })
+                ->get(['income_id', 'license_id', 'recurrence_months', 'total']);
+
+            foreach ($paidLines as $line) {
+                $recurrenceMonths = $ensureGroup($line->recurrence_months);
+                $groups[$recurrenceMonths]['paid_amount'] += (float) $line->total;
+                $groups[$recurrenceMonths]['paid_income_ids'][$line->income_id] = true;
+                $groups[$recurrenceMonths]['paid_license_ids'][$line->license_id] = true;
+            }
+
+            $advances = income_advance::query()
+                ->with(['income.income_licenses'])
+                ->whereHas('income', function ($query) {
+                    $query->whereNotIn('state', [1])->whereNull('deleted_at');
+                })
+                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
+                ->get();
+
+            foreach ($advances as $advance) {
+                $income = $advance->income;
+                if (!$income) {
+                    continue;
+                }
+
+                $incomeLines = $income->income_licenses;
+                $incomeTotal = (float) $incomeLines->sum('total');
+                if ($incomeTotal <= 0) {
+                    continue;
+                }
+
+                foreach ($incomeLines->where('recurrence_months', '>', 0) as $line) {
+                    $recurrenceMonths = $ensureGroup($line->recurrence_months);
+                    $lineShare = (float) $advance->amount * ((float) $line->total / $incomeTotal);
+                    $groups[$recurrenceMonths]['paid_amount'] += $lineShare;
+                    $groups[$recurrenceMonths]['paid_income_ids'][$income->id] = true;
+                    $groups[$recurrenceMonths]['paid_license_ids'][$line->license_id] = true;
+                }
+            }
+
+            ksort($groups, SORT_NUMERIC);
+            $projectedTotal = 0;
+            $paidTotal = 0;
+            $details = [];
+
+            foreach ($groups as $group) {
+                $recurrenceMonths = $group['recurrence_months'];
+                $cycles = max((int) ceil($monthsCount / $recurrenceMonths), 1);
+                $projectedCycleAmount = round($group['projected_cycle_amount']);
+                $projectedAmount = $projectedCycleAmount * $cycles;
+                $paidAmount = round($group['paid_amount']);
+
+                switch ($recurrenceMonths) {
+                    case 1:
+                        $label = 'Mensual';
+                        break;
+                    case 2:
+                        $label = 'Bimestral';
+                        break;
+                    case 3:
+                        $label = 'Trimestral';
+                        break;
+                    case 6:
+                        $label = 'Semestral';
+                        break;
+                    case 12:
+                        $label = 'Anual';
+                        break;
+                    default:
+                        $label = 'Cada '.$recurrenceMonths.' meses';
+                        break;
+                }
+
+                $projectedTotal += $projectedAmount;
+                $paidTotal += $paidAmount;
+                $details[] = [
+                    'recurrence_months' => $recurrenceMonths,
+                    'label' => $label,
+                    'active_license_count' => $group['active_license_count'],
+                    'paid_license_count' => count($group['paid_license_ids']),
+                    'cycle_count' => $cycles,
+                    'projected_cycle_amount' => $projectedCycleAmount,
+                    'projected_cycle_amount_string' => number_format($projectedCycleAmount, 0, ',', '.'),
+                    'projected_amount' => $projectedAmount,
+                    'projected_amount_string' => number_format($projectedAmount, 0, ',', '.'),
+                    'paid_income_count' => count($group['paid_income_ids']),
+                    'paid_amount' => $paidAmount,
+                    'paid_amount_string' => number_format($paidAmount, 0, ',', '.'),
+                ];
+            }
+
+            foreach ($details as &$detail) {
+                $detail['paid_percentage'] = $detail['projected_amount'] > 0
+                    ? round(($detail['paid_amount'] / $detail['projected_amount']) * 100, 2)
+                    : 0;
+                $detail['paid_percentage_string'] = number_format($detail['paid_percentage'], 2, ',', '.').'%' ;
+            }
+            unset($detail);
+
+            $Response['data']['date_from'] = $start_date->format('Y-m-d');
+            $Response['data']['date_to'] = $end_date->format('Y-m-d');
+            $Response['data']['months_count'] = $monthsCount;
+            $Response['data']['projected_total'] = $projectedTotal;
+            $Response['data']['projected_total_string'] = number_format($projectedTotal, 0, ',', '.');
+            $Response['data']['paid_total'] = $paidTotal;
+            $Response['data']['paid_total_string'] = number_format($paidTotal, 0, ',', '.');
+            $Response['data']['recurrence_details'] = $details;
+        } catch (\Exception $e) {
+            info('Income_StatisticGetIncomesByRecurrenceRange error: '.$e->getMessage());
+            $Response['status'] = 0;
+            $Response['message'] = $e->getMessage();
+        }
+
+        return $Response;
+    }
     public function Income_StatisticGetSalesByMonthRange($start_date, $end_date)
     {
         $Response = [

@@ -2,6 +2,7 @@
 
 #erp-app-content{ background-color: #F7F7F7; }
 #dashboard-container{ line-height: 1.1; }
+#dashboard-container .dashboard-columns{ display: flex; width: 100%; }
 .separate-line{ border: 1px solid $border-gray; width: 100%; margin: 1vh 0; }
 #principal-logo-opzio{ background-color: transparent !important; }
 .chartjs-legend{ li.hidden{ opacity: 0.3; text-decoration: line-through; } }
@@ -10,7 +11,7 @@
     #dashboard-container{
         margin: 0;
         padding: 0;
-        display: flex;
+        display: block;
         width: 100%;
         .column-container{
             margin: 0;
@@ -45,9 +46,10 @@
         padding: 10px 12px 90px 12px !important;
         display: block;
         width: 100%;
-        max-height: calc(100vh - 64px);
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
+        height: auto;
+        max-height: none;
+        overflow: visible !important;
+        .dashboard-columns{ display: block; }
         .column-container{
             margin: 0;
             padding: 0;

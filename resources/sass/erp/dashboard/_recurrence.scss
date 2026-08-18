@@ -1,0 +1,286 @@
+@import '../../variables';
+
+#dashboard-container .dashboard-recurrence-row {
+    width: 100%;
+    margin: 0 0 16px;
+
+    .incomes-by-recurrence-segment {
+        width: 100%;
+        padding: 18px;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 2px 10px rgba(20, 16, 32, 0.08);
+    }
+
+    .incomes-by-recurrence-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+
+        .segment-title {
+            margin: 0;
+            color: $text-gray;
+            font-size: 15px;
+            font-weight: 600;
+
+            .tooltip-icon {
+                margin-left: 4px;
+                color: $text-gray;
+                font-size: 14px;
+                cursor: pointer;
+            }
+        }
+
+        .incomes-by-recurrence-subtitle {
+            margin: 5px 0 0;
+            color: #888891;
+            font-size: 11px;
+        }
+
+        .input-date-range-container {
+            display: flex;
+            flex: 0 0 auto;
+            gap: 8px;
+
+            .segment-month {
+                width: 132px;
+                padding: 4px 8px;
+                border: 1px solid #D4D4C8;
+                border-radius: 8px;
+                color: $text-gray;
+                font-size: 11px;
+                text-align: center;
+            }
+        }
+
+        .loading-icon {
+            margin-left: 4px;
+            color: $text-gray;
+        }
+    }
+
+    .incomes-by-recurrence-summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .incomes-by-recurrence-summary-item {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        background: $bg-secondary;
+        border-radius: 8px;
+
+        span {
+            color: $text-gray;
+            font-size: 11px;
+        }
+
+        strong {
+            color: $primary;
+            font-size: 15px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        &:last-child strong {
+            color: $secondary;
+        }
+    }
+
+    .incomes-by-recurrence-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .incomes-by-recurrence-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 84px;
+        color: #888891;
+        font-size: 12px;
+        grid-column: 1 / -1;
+    }
+
+    .recurrence-group-card {
+        min-width: 0;
+        padding: 12px;
+        background: #FBFBFD;
+        border: 1px solid #E7E7ED;
+        border-radius: 8px;
+    }
+
+    .recurrence-group-header,
+    .recurrence-progress-header,
+    .recurrence-group-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .recurrence-group-index {
+        display: block;
+        margin-bottom: 3px;
+        color: $secondary;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .recurrence-group-card h2 {
+        margin: 0;
+        color: $text-gray;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .recurrence-cycle-count {
+        padding: 3px 7px;
+        color: $primary;
+        background: rgba($primary, 0.08);
+        border-radius: 999px;
+        font-size: 9px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .recurrence-group-values {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin: 14px 0;
+    }
+
+    .recurrence-group-value {
+        min-width: 0;
+
+        span,
+        small {
+            display: block;
+            overflow: hidden;
+            color: #888891;
+            font-size: 9px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        strong {
+            display: block;
+            overflow: hidden;
+            margin: 4px 0 2px;
+            color: $primary;
+            font-size: 14px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &:last-child strong {
+            color: $secondary;
+        }
+    }
+
+    .recurrence-progress-header {
+        margin-bottom: 6px;
+        color: #888891;
+        font-size: 10px;
+
+        strong {
+            color: $secondary;
+            font-size: 12px;
+        }
+    }
+
+    .recurrence-progress {
+        height: 5px;
+        overflow: hidden;
+        background: #E7E7ED;
+        border-radius: 999px;
+
+        span {
+            display: block;
+            height: 100%;
+            background: $secondary;
+            border-radius: inherit;
+            transition: width 0.35s ease;
+        }
+    }
+
+    .recurrence-group-footer {
+        margin-top: 10px;
+        color: #888891;
+        font-size: 9px;
+
+        span {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        span:last-child {
+            color: $primary;
+            font-weight: 700;
+            text-align: right;
+        }
+    }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1099px) {
+    #dashboard-container .dashboard-recurrence-row .incomes-by-recurrence-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #dashboard-container .dashboard-recurrence-row {
+        margin-bottom: 16px;
+
+        .incomes-by-recurrence-segment {
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .incomes-by-recurrence-header {
+            flex-direction: column;
+            gap: 10px;
+
+            .segment-title {
+                font-size: 14px;
+            }
+
+            .incomes-by-recurrence-subtitle {
+                font-size: 10px;
+            }
+
+            .input-date-range-container {
+                width: 100%;
+
+                .segment-month {
+                    flex: 1 1 0;
+                    width: auto;
+                }
+            }
+        }
+
+        .incomes-by-recurrence-summary {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .incomes-by-recurrence-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}

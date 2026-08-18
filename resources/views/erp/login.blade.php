@@ -7,7 +7,18 @@
 @endsection
 @section('app-content')
 <section id="login-container" class="d-flex justify-content-center">
+    <div id="login-decoration" aria-hidden="true">
+        <span class="login-decoration-ring login-decoration-ring-one"></span>
+        <span class="login-decoration-ring login-decoration-ring-two"></span>
+        <span class="login-decoration-trace login-decoration-trace-one"></span>
+        <span class="login-decoration-trace login-decoration-trace-two"></span>
+        <span class="login-decoration-node login-decoration-node-one"></span>
+        <span class="login-decoration-node login-decoration-node-two"></span>
+    </div>
     <div id="login-centered" class="align-self-center d-flex justify-content-around">
+        <div id="opzio-logo-container">
+            <img src="{{ asset('images/opzio-logo-wide-purple-transparent.webp') }}" id="opzio-logo" alt="Opzio" decoding="async">
+        </div>
         <div id="login-data-container">
             <i class="fa-regular fa-circle-user" id="avatar-img"></i>
             <h1 id="login-title">Iniciar Sesión</h1>

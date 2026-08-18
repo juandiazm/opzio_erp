@@ -1,18 +1,39 @@
 @media (max-width: 768px) {
     #login-container {
-        #login-centered {
-            padding: 0;
-            gap: 0;
+        min-height: 100svh;
 
-            #opzio-logo-container { display: none; }
+        #login-centered {
+            flex-direction: column;
+            justify-content: center;
+            width: min(100%, 420px);
+            padding: 2.5rem 1rem 1.5rem;
+            gap: 1.25rem;
+
+            #opzio-logo-container {
+                display: flex;
+                justify-content: center;
+                max-width: none;
+
+                #opzio-logo { width: min(100%, 190px); }
+            }
 
             #login-data-container {
+                flex: 0 1 auto;
                 width: 100%;
-                min-height: 100vh;
-                border: none;
-                border-radius: 0;
-                padding: 4rem 1.5rem;
+                min-width: 0;
+                padding: 2rem 1.25rem;
             }
         }
+
+        #login-decoration {
+            opacity: 0.65;
+        }
+    }
+}
+
+@media (max-width: 420px) {
+    #login-container #login-centered {
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
     }
 }

@@ -7,4 +7,6 @@ export const dashboardState = {
     newClientGraph: null,
     newSalesGraph: null,
     incomesByClientGraph: null,
+    incomeGoals: [],
+    incomesByRecurrence: [],
 };

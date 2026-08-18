@@ -1,8 +1,18 @@
 import { dashboardState } from './state.js';
 
+function formatCompactCurrency(value){
+    const normalizedValue = String(value == null ? 0 : value).replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+    const amount = Number(normalizedValue);
+    if(!Number.isFinite(amount)) return '$0';
+    if(amount >= 1000000000) return '$'+Math.round(amount / 1000000000)+'B';
+    if(amount >= 1000000) return '$'+Math.round(amount / 1000000)+'M';
+    if(amount >= 1000) return '$'+Math.round(amount / 1000)+'K';
+    return '$'+amount.toLocaleString('es-CO', {maximumFractionDigits: 0});
+}
+
 export function showCollectIncomes(response){
     dashboardState.collectIncomesList = response.data.incomes;
-    $('.collect-container .receivable-value').text('$ '+response.data.total_value);
+    $('.collect-container .receivable-value').text(formatCompactCurrency(response.data.total_value));
     $('.approve-incomes-segment .approve-incomes-value').text('$ '+response.data.total_value);
     $('.approve-incomes-quantity').text(response.data.total_items);
     $('.approve-incomes-table tbody').empty();

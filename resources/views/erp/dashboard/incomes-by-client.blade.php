@@ -1,4 +1,4 @@
-<div class="row-container">
+<div class="row-container dashboard-client-income-row">
     <div class="segment-container incomes-by-client-segment">
         <div class="segment-header">
             <h1 class="segment-title">Distribución de Ingresos por Cliente<i class="tooltip-icon fa-regular fa-circle-question" title="Te mostramos la distribución de ingresos por cliente en el rango de fechas seleccionado."></i></h1>

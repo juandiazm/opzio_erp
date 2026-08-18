@@ -1,15 +1,170 @@
 #login-container {
+    position: relative;
+    isolation: isolate;
     min-height: 100vh;
+    overflow: hidden;
     background-color: $bg-secondary;
+    background-image:
+        linear-gradient(135deg, rgba($bg-primary, 0.94), rgba($bg-secondary, 0.9)),
+        linear-gradient(rgba($primary, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba($primary, 0.045) 1px, transparent 1px);
+    background-size: 100% 100%, 42px 42px, 42px 42px;
+
+    &::after {
+        position: absolute;
+        right: 10%;
+        bottom: -180px;
+        width: 360px;
+        height: 360px;
+        border: 1px solid rgba($accent, 0.12);
+        border-radius: 50%;
+        content: '';
+        pointer-events: none;
+        animation: login-drift 16s ease-in-out infinite reverse;
+    }
+
+    #login-decoration {
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+
+        .login-decoration-ring {
+            position: absolute;
+            border: 1px solid rgba($primary, 0.12);
+            border-radius: 50%;
+            animation: login-drift 14s ease-in-out infinite;
+        }
+
+        .login-decoration-ring-one {
+            top: -185px;
+            right: -95px;
+            width: 430px;
+            height: 430px;
+            box-shadow: 0 0 0 22px rgba($primary, 0.025), 0 0 0 44px rgba($primary, 0.018);
+        }
+
+        .login-decoration-ring-two {
+            bottom: -290px;
+            left: -190px;
+            width: 540px;
+            height: 540px;
+            border-color: rgba($secondary, 0.14);
+            animation-delay: -6s;
+            animation-direction: reverse;
+        }
+
+        .login-decoration-trace {
+            position: absolute;
+            width: 180px;
+            height: 58px;
+            border-top: 1px solid rgba($primary, 0.16);
+            border-right: 1px solid rgba($primary, 0.16);
+            transform: rotate(-28deg);
+            animation: login-drift 11s ease-in-out infinite;
+        }
+
+        .login-decoration-trace-one {
+            top: 22%;
+            left: 9%;
+        }
+
+        .login-decoration-trace-two {
+            right: 12%;
+            bottom: 18%;
+            border-color: rgba($secondary, 0.16);
+            transform: rotate(152deg);
+            animation-delay: -4s;
+        }
+
+        .login-decoration-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: $accent;
+            border-radius: 50%;
+            box-shadow: 0 0 0 7px rgba($accent, 0.08);
+            animation: login-pulse 4s ease-in-out infinite;
+        }
+
+        .login-decoration-node-one {
+            top: 24%;
+            right: 18%;
+        }
+
+        .login-decoration-node-two {
+            bottom: 26%;
+            left: 17%;
+            animation-delay: -2s;
+        }
+    }
 
     #login-centered {
+        position: relative;
+        z-index: 1;
+        align-items: center;
+        justify-content: space-between;
+        width: min(100%, 950px);
         padding: 2rem;
-        gap: 3rem;
+        gap: clamp(2rem, 8vw, 6rem);
 
         #opzio-logo-container {
-            max-width: 220px;
+            flex: 1 1 0;
+            max-width: 360px;
+            animation: login-reveal 0.7s ease both;
 
-            #opzio-logo { width: 100%; }
+            #opzio-logo {
+                display: block;
+                width: min(100%, 270px);
+                height: auto;
+                filter: drop-shadow(0 12px 18px rgba($primary, 0.1));
+            }
         }
+    }
+}
+
+@keyframes login-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes login-drift {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate3d(0, -12px, 0) rotate(2deg);
+    }
+}
+
+@keyframes login-pulse {
+    0%,
+    100% {
+        opacity: 0.55;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.16);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #login-container,
+    #login-container * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
     }
 }

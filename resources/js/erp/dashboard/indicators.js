@@ -1,14 +1,18 @@
 import { dashboardState } from './state.js';
 
+function formatAverageComparison(percentage){
+    return (percentage >= 0 ? '<i class="last-month-comparison-icon fa-solid fa-arrow-up"></i>' : '<i class="last-month-comparison-icon fa-solid fa-arrow-down"></i>')+' '+percentage+'% vs promedio 12 meses';
+}
+
 export function getIncomeOutcomeValuesByMonth(){
     $('.income-outcome-segment .segment-title').append('<i class="loading-icon fa-duotone fa-spinner-third fa-spin"></i>');
     PostMethodFunction('/admin/dashboard/get-income-outcome-values-by-month', {date: $('#income-outcome-month-input').val()}, null, showIncomeOutcomeValuesByMonth, null);
 }
 function showIncomeOutcomeValuesByMonth(response){
     $('.income-outcome-segment .income-number-container .income-number span').text('$ '+response.data.incomes.current_month);
-    $('.income-outcome-segment .income-number-container .last-month-comparison-message').html((response.data.incomes.difference_porcentage >= 0 ? '<i class="last-month-comparison-icon fa-solid fa-arrow-up"></i>' : '<i class="last-month-comparison-icon fa-solid fa-arrow-down"></i>')+' '+response.data.incomes.difference_porcentage+'% en comparación al promedio de los últimos 12 meses');
+    $('.income-outcome-segment .income-number-container .last-month-comparison-message').html(formatAverageComparison(response.data.incomes.difference_porcentage)).attr('title', response.data.incomes.difference_porcentage+'% en comparación al promedio de los últimos 12 meses');
     $('.income-outcome-segment .outcome-number-container .outcome-number span').text('$ '+response.data.outcomes.current_month);
-    $('.income-outcome-segment .outcome-number-container .last-month-comparison-message').html((response.data.outcomes.difference_porcentage >= 0 ? '<i class="last-month-comparison-icon fa-solid fa-arrow-up"></i>' : '<i class="last-month-comparison-icon fa-solid fa-arrow-down"></i>')+' '+response.data.outcomes.difference_porcentage+'% en comparación al promedio de los últimos 12 meses');
+    $('.income-outcome-segment .outcome-number-container .last-month-comparison-message').html(formatAverageComparison(response.data.outcomes.difference_porcentage)).attr('title', response.data.outcomes.difference_porcentage+'% en comparación al promedio de los últimos 12 meses');
     $('.income-outcome-segment .segment-title .loading-icon').remove();
 }
 

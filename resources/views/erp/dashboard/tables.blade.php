@@ -1,4 +1,4 @@
-<div class="row-container">
+<div class="row-container dashboard-tables-row">
     <div class="segment-container quotation-segment">
         <div class="segment-header">
             <h1 class="segment-title">Cotizaciones<i class="tooltip-icon fa-regular fa-circle-question" title="Te mostramos las cotizaciones pendientes."></i></h1>

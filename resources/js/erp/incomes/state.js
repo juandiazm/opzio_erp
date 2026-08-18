@@ -2,12 +2,15 @@ export const incomeState = {
     tabsView: {
         'nav-list-tab': false,
         'nav-create-tab': false,
+        'nav-goals-tab': false,
         'nav-traceability-tab': false,
         'nav-update-tab': false,
     },
     currentTab: null,
     currentContainer: null,
     incomes: [],
+    goals: [],
+    editingGoalId: null,
     currentIncome: null,
     incomeId: null,
     incomeStatesTotals: {

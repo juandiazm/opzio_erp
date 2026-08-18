@@ -2,6 +2,8 @@ import { dashboardState } from './state.js';
 import * as indicators from './indicators.js';
 import * as tables from './tables.js';
 import * as charts from './charts.js';
+import * as goals from './goals.js';
+import * as recurrence from './recurrence.js';
 
 function schedule(callback){
     if(dashboardState.timeout != null) clearTimeout(dashboardState.timeout);
@@ -14,8 +16,11 @@ $(document).on('change', '.sales-by-month-input', function(){ schedule(charts.ge
 $(document).on('click', '.due-clients-row', tables.goToLicense);
 $(document).on('change', '.sales-by-month-input', function(){ schedule(charts.getSalesByMonthRange); });
 $(document).on('change', '.incomes-by-client-input', function(){ schedule(charts.getIncomesByClientDateRange); });
+$(document).on('change', '.incomes-by-recurrence-input', function(){ schedule(recurrence.getIncomesByRecurrenceRange); });
 
 $(document).ready(function(){
+    goals.getIncomeGoalsProgress();
+    recurrence.getIncomesByRecurrenceRange();
     indicators.getIncomeOutcomeValuesByMonth();
     indicators.getIncomesByStatus(2, tables.showCollectIncomes, ['.collect-container', '.approve-incomes-segment']);
     indicators.getIncomesByStatus(0, tables.showQuotationIncomes, ['.quotation-segment']);

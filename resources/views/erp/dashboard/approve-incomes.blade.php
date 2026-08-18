@@ -1,4 +1,4 @@
-<div class="row-container">
+<div class="row-container dashboard-approve-row">
     <div class="segment-container approve-incomes-segment">
         <div class="segment-header">
             <h1 class="segment-title">Cartera<i class="tooltip-icon fa-regular fa-circle-question" title="Te mostramos los ingresos pendientes por aprobar."></i></h1>

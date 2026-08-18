@@ -20,6 +20,7 @@ use App\Http\Controllers\contracts_controller;
 use App\Http\Controllers\notifications_controller;
 use App\Http\Controllers\public_contract_signature_controller;
 use App\Http\Controllers\incomes_controller;
+use App\Http\Controllers\income_goals_controller;
 use App\Http\Controllers\income_advances_controller;
 use App\Http\Controllers\outcomes_controller;
 use App\Http\Controllers\payment_gateway_controller;
@@ -133,6 +134,8 @@ Route::prefix('admin')->group(function () {
             Route::get('', [admin_pages_controller::class, 'dashboard_page']);
             Route::post('get-income-outcome-values-by-month', [dashboard_controller::class, 'get_income_outcome_values_by_month']);
             Route::post('get-incomes-by-status', [dashboard_controller::class, 'get_incomes_by_status']);
+            Route::post('get-income-goal-progress', [dashboard_controller::class, 'get_income_goal_progress']);
+            Route::post('get-incomes-by-recurrence-range', [dashboard_controller::class, 'get_incomes_by_recurrence_range']);
             Route::post('get-active-clients-and-licenses', [dashboard_controller::class, 'get_active_clients_and_licenses']);
             Route::post('get-incomes-outcomes-by-month-range', [dashboard_controller::class, 'get_incomes_outcomes_by_month_range']);
             Route::post('get-client-licences-dues', [dashboard_controller::class, 'get_client_licences_dues']);
@@ -331,6 +334,13 @@ Route::prefix('admin')->group(function () {
             Route::post('change-state', [incomes_controller::class, 'change_state']);
             Route::post('change-state-to-pay', [incomes_controller::class, 'change_state_to_pay']);
             Route::post('create-siigo-invoice', [incomes_controller::class, 'create_siigo_invoice']);
+            Route::prefix('goals')->group(function () {
+                Route::post('get', [income_goals_controller::class, 'get']);
+                Route::post('add', [income_goals_controller::class, 'add']);
+                Route::post('update', [income_goals_controller::class, 'update']);
+                Route::post('delete', [income_goals_controller::class, 'delete']);
+                Route::post('restore', [income_goals_controller::class, 'restore']);
+            });
             Route::prefix('advances')->group(function () {
                 Route::post('create', [income_advances_controller::class, 'create']);
                 Route::get('get-by-income/{income_id}', [income_advances_controller::class, 'getByIncome']);

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\send_pay_remaining;
 use App\Models\client;
 use App\Models\license;
 use App\Models\license_notification;
@@ -163,6 +164,74 @@ class notifications_test extends TestCase
         $this->assertNotContains($future->id, $ids);
         $this->assertContains($due->id, $ids);
         $this->assertContains($immediate->id, $ids);
+    }
+
+    public function test_payment_reminder_email_is_scheduled_between_eight_and_eleven()
+    {
+        $command = new class extends send_pay_remaining {
+            public function Income_GetAllOverdueIncomes()
+            {
+                return [
+                    'status' => 1,
+                    'data' => collect([(object) [
+                        'unique_id' => 'INCOME-1234567890',
+                        'client' => (object) [
+                            'id' => 1,
+                            'name' => 'Cliente Uno',
+                            'identification' => '123',
+                            'active' => 1,
+                        ],
+                        'income_licenses' => collect([(object) [
+                            'license_id' => 1,
+                            'license' => (object) [
+                                'service' => (object) ['name' => 'Servicio'],
+                            ],
+                        ]]),
+                        'client_name' => 'Cliente Uno',
+                        'client_identification' => '123',
+                        'timely_payment' => 1,
+                        'cutoff_date' => '2026-08-17',
+                        'total' => 100000,
+                        'payment_link' => 'https://example.test/pagar',
+                        'state' => 2,
+                        'days_overdue' => 1,
+                        'siigo_invoice_url' => null,
+                    ]]),
+                ];
+            }
+
+            public function License_GetLicenseNotificationsByLicensesIds($licenseIds)
+            {
+                return [
+                    'status' => 1,
+                    'data' => [[
+                        'email' => 'cliente@example.test',
+                        'phone' => null,
+                    ]],
+                ];
+            }
+
+            public function OpenIA_MakeQuestion($message)
+            {
+                return ['status' => 1, 'data' => ['Mensaje']];
+            }
+
+            public function SendMail($MailData, $Mails, $View, $ViewData, $files, $unique_id = null, $mailer = null, $from = null, $replyTo = null)
+            {
+                return ['status' => 1];
+            }
+        };
+
+        $this->assertSame(0, $command->handle());
+
+        $mailLog = mail_log::where('view', 'mail.pay_remaining_grouped')->first();
+        $start = Carbon::today(config('app.timezone'))->setTime(8, 0);
+        $end = Carbon::today(config('app.timezone'))->setTime(11, 0);
+
+        $this->assertNotNull($mailLog);
+        $this->assertSame(0, (int) $mailLog->status);
+        $this->assertNotNull($mailLog->send_at);
+        $this->assertTrue($mailLog->send_at->betweenIncluded($start, $end));
     }
 
     public function test_sms_queue_skips_future_messages_and_processes_due_messages()

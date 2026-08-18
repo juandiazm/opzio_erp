@@ -1,16 +1,19 @@
 #login-container #login-centered #login-data-container {
-    background-color: $bg-primary;
-    border: 1px solid $border-gray;
-    border-radius: 10px;
+    flex: 0 1 360px;
+    background-color: rgba($bg-primary, 0.96);
+    border: 1px solid rgba($primary, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba($primary, 0.12), 0 5px 16px rgba($primary, 0.06);
     width: 360px;
     min-width: 300px;
     padding: 2.5rem 2rem;
+    animation: login-reveal 0.7s 0.12s ease both;
 
     #avatar-img {
         display: block;
         text-align: center;
         font-size: 3.5rem;
-        color: $border-gray;
+        color: rgba($primary, 0.72);
         margin: 0 auto 1.25rem;
     }
 
@@ -36,10 +39,11 @@
         margin-bottom: 0.75rem;
         color: $text-black;
         border-color: $border-gray;
+        background-color: rgba($bg-primary, 0.82);
 
         &:focus {
             border-color: $primary;
-            box-shadow: none;
+            box-shadow: 0 0 0 3px rgba($primary, 0.08);
         }
     }
 
@@ -50,6 +54,13 @@
         margin-top: 0.5rem;
         font-size: 0.9rem;
         letter-spacing: 0.04em;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        &:hover,
+        &:focus-visible {
+            box-shadow: 0 8px 18px rgba($primary, 0.2);
+            transform: translateY(-1px);
+        }
     }
 
     #forgot-password {

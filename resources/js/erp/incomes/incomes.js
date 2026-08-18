@@ -5,6 +5,7 @@ import * as update from './update.js';
 import * as order from './order.js';
 import * as incomeImport from './import.js';
 import * as advances from './advances.js';
+import * as goals from './goals.js';
 import { goToIncomesTraceability } from './shared.js';
 
 function changeTab(){
@@ -17,6 +18,8 @@ function changeTab(){
         list.getIncomesPage();
     }else if(incomeState.tabsView[incomeState.currentTab] == false && incomeState.currentTab == 'nav-create-tab'){
         create.getAllClients();
+    }else if(incomeState.tabsView[incomeState.currentTab] == false && incomeState.currentTab == 'nav-goals-tab'){
+        goals.getGoals();
     }else if(incomeState.currentTab == 'nav-update-tab'){
         $('#nav-update-tab').removeClass('d-none');
         create.getAllClients(update.showCurrentIncome);
@@ -78,6 +81,13 @@ $(document).on('click', '#save-advance-button', advances.saveAdvance);
 $(document).on('click', '.advance-item-edit', advances.editAdvance);
 $(document).on('click', '.advance-item-delete', advances.deleteAdvance);
 
+$(document).on('click', '#income-goal-toggle', goals.toggleForm);
+$(document).on('click', '#income-goal-save', goals.saveGoal);
+$(document).on('click', '#income-goal-cancel', goals.cancelGoal);
+$(document).on('click', '.income-goal-update', goals.editGoal);
+$(document).on('click', '.income-goal-delete', goals.deleteGoal);
+$(document).on('click', '.income-goal-restore', goals.restoreGoal);
+
 window.createSiigoInvoice = list.createSiigoInvoice;
 
 $(document).ready(function(){
@@ -89,5 +99,6 @@ $(document).ready(function(){
         window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
     }
     order.init();
+    goals.initializeGoalForm();
     changeTab();
 });

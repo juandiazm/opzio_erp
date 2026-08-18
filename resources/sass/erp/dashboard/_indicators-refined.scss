@@ -1,0 +1,196 @@
+@import '../../variables';
+
+#dashboard-container .dashboard-indicators-row {
+    .income-outcome-segment {
+        background: #FFFFFF;
+        box-shadow: 0 2px 10px rgba(20, 16, 32, 0.08);
+        border-radius: 16px;
+        padding: 15px;
+
+        .income-number-container,
+        .outcome-number-container {
+            width: 100%;
+
+            .value-container {
+                padding: 1vh 0;
+                text-align: center;
+
+                .income-number,
+                .outcome-number {
+                    margin: 0;
+                    font-size: 1.7em;
+                    font-weight: 600;
+
+                    .income-number-icon,
+                    .outcome-number-icon {
+                        padding-right: 10px;
+                    }
+                }
+
+                .income-number,
+                .income-number-icon,
+                .income-title {
+                    color: $primary;
+                }
+
+                .outcome-number,
+                .outcome-number-icon,
+                .outcome-title {
+                    color: $danger;
+                }
+
+                .income-title,
+                .outcome-title {
+                    margin: 0;
+                    font-size: 1em;
+                    font-weight: 600;
+                }
+            }
+
+            .last-month-comparison-message {
+                width: 100%;
+                margin: 0;
+                color: $text-gray;
+                font-size: 0.8em;
+                text-align: center;
+
+                i {
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+
+    .dashboard-secondary-indicators {
+        display: grid;
+        grid-template-rows: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .dashboard-stat-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+        padding: 15px;
+        border-radius: 30px;
+        box-shadow: 0 2px 10px rgba(20, 16, 32, 0.08);
+
+        .segment-title,
+        .segment-title i {
+            color: $text-white !important;
+        }
+
+        &.collect-container {
+            background-color: $secondary;
+        }
+
+        &.active-clients-container {
+            background-color: $primary;
+        }
+    }
+
+    .receivable-value {
+        width: 100%;
+        margin: 15px 0 0;
+        color: $text-white;
+        font-size: 1.7em;
+        text-align: center;
+    }
+
+    .active-clients-value {
+        width: 100%;
+        margin: 15px 0 0;
+        color: $text-white;
+        font-size: 2.5em;
+        text-align: center;
+    }
+
+    .active-clients-value-licenses {
+        width: 100%;
+        margin: 0;
+        color: $text-white;
+        font-size: 0.9em;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #dashboard-container .dashboard-indicators-row {
+        .income-outcome-segment {
+            min-height: auto;
+            padding: 18px 16px;
+            border-radius: 12px;
+
+            .income-number-container,
+            .outcome-number-container {
+                .value-container {
+                    padding: 12px 0;
+
+                    .income-number,
+                    .outcome-number {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.8em;
+                        font-weight: 700;
+
+                        .income-number-icon,
+                        .outcome-number-icon {
+                            margin-right: 8px;
+                            padding: 0;
+                            font-size: 0.85em;
+                        }
+                    }
+
+                    .income-title,
+                    .outcome-title {
+                        margin-top: 6px;
+                        font-size: 0.95em;
+                    }
+                }
+
+                .last-month-comparison-message {
+                    font-size: 0.78em;
+                    line-height: 1.4;
+                }
+            }
+        }
+
+        .dashboard-secondary-indicators {
+            gap: 16px;
+        }
+
+        .dashboard-stat-card {
+            min-height: 110px;
+            padding: 18px 16px;
+            border-radius: 24px;
+
+            .segment-title,
+            .segment-title i {
+                font-size: 13px;
+            }
+        }
+
+        .receivable-value {
+            margin-top: auto;
+            font-size: 1.9em;
+            font-weight: 700;
+        }
+
+        .active-clients-value {
+            margin-top: auto;
+            font-size: 2.6em;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .active-clients-value-licenses {
+            margin-top: 4px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.88em;
+            font-weight: 500;
+        }
+    }
+}

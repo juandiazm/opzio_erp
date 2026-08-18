@@ -819,7 +819,7 @@
     "isEntry": true
   },
   "resources/js/erp/dashboard/dashboard.js": {
-    "file": "assets/dashboard-Bz1WiGPs.js",
+    "file": "assets/dashboard-CVK3UbPz.js",
     "name": "dashboard",
     "src": "resources/js/erp/dashboard/dashboard.js",
     "isEntry": true
@@ -999,7 +999,7 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-D4yJYDHw.js",
+    "file": "assets/incomes-B9VwF6Zb.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
@@ -1588,7 +1588,7 @@
     "isEntry": true
   },
   "resources/sass/erp/dashboard/dashboard.scss": {
-    "file": "assets/dashboard-CN4GpCQB.css",
+    "file": "assets/dashboard-BMl6jR0O.css",
     "src": "resources/sass/erp/dashboard/dashboard.scss",
     "isEntry": true
   },
@@ -1613,12 +1613,12 @@
     "isEntry": true
   },
   "resources/sass/erp/incomes/incomes.scss": {
-    "file": "assets/incomes-Bs8TnKNo.css",
+    "file": "assets/incomes-pcD38aEK.css",
     "src": "resources/sass/erp/incomes/incomes.scss",
     "isEntry": true
   },
   "resources/sass/erp/layouts/app.scss": {
-    "file": "assets/app-BdYHTsh7.css",
+    "file": "assets/app-2vbLIEEQ.css",
     "src": "resources/sass/erp/layouts/app.scss",
     "isEntry": true
   },
@@ -1638,7 +1638,7 @@
     "isEntry": true
   },
   "resources/sass/erp/login/login.scss": {
-    "file": "assets/login-CfB59izP.css",
+    "file": "assets/login-DXUAhOHP.css",
     "src": "resources/sass/erp/login/login.scss",
     "isEntry": true
   },
