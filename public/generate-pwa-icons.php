@@ -4,11 +4,11 @@
  * Ejecutar desde la raíz del proyecto: php public/generate-pwa-icons.php
  */
 
-$sourceImage = __DIR__ . '/images/opzio-monogram-circle-purple-bg-transparent.png';
+$sourceImage = __DIR__ . '/images/opzio-monogram-square-cream-bg-transparent.png';
 $outputDir = __DIR__ . '/images/pwa/';
 
 // Tamaños requeridos para PWA
-$sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+$sizes = [72, 96, 128, 144, 152, 180, 192, 384, 512];
 
 if (!file_exists($sourceImage)) {
     die("Error: No se encuentra la imagen fuente en {$sourceImage}\n");
@@ -52,6 +52,11 @@ foreach ($sizes as $size) {
     
     $outputFile = $outputDir . "icon-{$size}x{$size}.png";
     imagepng($destination, $outputFile, 9);
+
+    if ($size === 180) {
+        copy($outputFile, __DIR__ . '/apple-touch-icon.png');
+    }
+
     imagedestroy($destination);
     
     echo "✓ Creado: icon-{$size}x{$size}.png\n";
