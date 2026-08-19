@@ -1,6 +1,19 @@
 import { formatBytes, formatDateTime, formatNumber } from './formatters.js';
 import { renderFilterOptions, renderOverview, renderPagination, renderRows } from './view.js';
 
+const requestJson = async (url, state, body) => {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrfToken || '' },
+        body: JSON.stringify(body)
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || payload.status === 0) {
+        throw new Error(payload.message || `HTTP ${response.status}`);
+    }
+    return payload;
+};
+
 export const loadPage = async (state) => {
     state.statusContainer.textContent = 'Consultando...';
     state.statusContainer.classList.remove('is-error');
@@ -51,4 +64,19 @@ export const exportData = (state) => {
         sort_direction: state.sortState.direction
     });
     window.location.href = `/admin/servers/export?${params.toString()}`;
+};
+
+export const loadProjectConfig = async (state, projectId) => {
+    const payload = await requestJson('/admin/servers/project-config/get', state, { project_id: projectId });
+    return payload.data || {};
+};
+
+export const loadProjectRecipients = async (state, clientId) => {
+    const payload = await requestJson('/admin/servers/project-config/recipients', state, { client_id: clientId });
+    return payload.data || {};
+};
+
+export const saveProjectConfig = async (state, config) => {
+    const payload = await requestJson('/admin/servers/project-config/update', state, config);
+    return payload.data || {};
 };

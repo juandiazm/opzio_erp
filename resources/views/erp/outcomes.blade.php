@@ -18,4 +18,5 @@
     @include('erp.outcomes.create')
     @include('erp.outcomes.update')
 </div>
+@include('erp.outcomes.import')
 @endsection

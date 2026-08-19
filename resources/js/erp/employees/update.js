@@ -2,6 +2,8 @@ import { employeeState } from './state.js';
 
 export function showCurrentEmployee(){
     let currentEmployee = employeeState.currentEmployee;
+    $('#sub-nav-outcomes').attr('data-outcome-association-id', currentEmployee.id);
+    if(window.AssociatedOutcomes) window.AssociatedOutcomes.setContext('employee_id', currentEmployee.id);
     $('#sub-nav-contracts').attr('data-contractable-id', currentEmployee.id);
     if(window.ContractAssociations) window.ContractAssociations.load('employee', currentEmployee.id);
     $('#update-employee-img-container').css('background-image','url("/storage/images/erp/employees/'+currentEmployee.photo+'")');

@@ -5,6 +5,8 @@ import { getProviderContacts } from './contacts.js';
 
 export function showCurrentProvider(){
     let currentProvider = providerState.currentProvider;
+    $('#sub-nav-outcomes').attr('data-outcome-association-id', currentProvider.id);
+    if(window.AssociatedOutcomes) window.AssociatedOutcomes.setContext('provider_id', currentProvider.id);
     $('#sub-nav-contracts').attr('data-contractable-id', currentProvider.id);
     if(window.ContractAssociations) window.ContractAssociations.load('provider', currentProvider.id);
     $('#update-provider-img-container').css('background-image','url("/storage/images/erp/providers/'+currentProvider.photo+'")');

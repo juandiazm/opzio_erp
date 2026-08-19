@@ -70,7 +70,7 @@ trait twitter_trait
             }
             /*generate image*/
             $Response = $this->OpenIA_GenerateImage(
-                'Create an image focused on the theme: "' . $content['subject'] . '". Use pastel colors with a minimalist, realistic, and volumetric style. The image should be simple and clean, with soft lighting to create depth. Use a white background. Do not include any text or letters in the image.'
+                'Create an image focused on the theme: "' . $content['subject'] . '". Use the Opzio brand palette: warm cream (#F2F2E8) as the background, deep purple (#220245) and medium violet (#885FAE) as the main colors, with restrained vivid orange (#F36803) accents. Use a minimalist, realistic, and volumetric style. The image should be simple and clean, with soft lighting to create depth. Do not include any text or letters in the image.'
             );
             if($Response['status']==1){
                 $image_url =  collect($Response['data']['data'][0])['url'];

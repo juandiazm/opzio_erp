@@ -17,7 +17,7 @@ trait ia_assistant_trait
         $this->IAClient = new Client([
             'base_uri' => 'https://api.openai.com/v1/',
             'headers'  => [
-                'Authorization' => 'Bearer ' . env('CHATGPT_API_KEY'),
+                'Authorization' => 'Bearer ' . config('services.openai.api_key'),
                 'Content-Type'  => 'application/json',
             ],
             'verify'  => false,
@@ -31,7 +31,7 @@ trait ia_assistant_trait
         try {
             $client = new Client([
                 'base_uri' => 'https://api.openai.com/v1/',
-                'headers'  => ['Authorization' => 'Bearer ' . env('CHATGPT_API_KEY')],
+                'headers'  => ['Authorization' => 'Bearer ' . config('services.openai.api_key')],
                 'verify'   => false,
                 'timeout'  => 120,
             ]);

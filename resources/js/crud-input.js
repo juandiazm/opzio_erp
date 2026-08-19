@@ -9,7 +9,7 @@ $(document).on('change', '.crud-input-container .crud-input-selected-container .
 var prefixList = [];
 $(document).ready(function(){
     $('.crud-input-container').each(function(){
-        getCRUDElements($(this), true);
+        if($(this).attr('data-load-on-ready') !== 'false') getCRUDElements($(this), true);
     });
     //key press function on .crud-item-add-input
     $('.crud-input-container .crud-list .crud-item-add-input').keypress(function(e){
@@ -27,7 +27,7 @@ function getCRUDElements(container, firstTime = false){
     if(!firstTime || prefixList.indexOf(prefix) == -1){
         prefixList.push(prefix);
         let DataSend = {
-            search : container.find('crud-current-selected-input').val()
+            search : container.find('.crud-current-selected-input').val()
         }
         //remove undefined and null values
         DataSend = JSON.parse(JSON.stringify(DataSend));
@@ -39,11 +39,13 @@ function getCRUDElements(container, firstTime = false){
             let appendContent = '';
             let items = response.data;
             $.each(items, function(index, item){
-                appendContent += '<li class="crud-item-update justify-content-between" item-id="'+item.id+'">';
+                const safeItemName = escapeCRUDAttribute(item.name);
+                const safeItemId = escapeCRUDAttribute(item.id);
+                appendContent += '<li class="crud-item-update justify-content-between" item-id="'+safeItemId+'">';
                     if(isGetter){
-                        appendContent += '<input type="text" class="crud-item-update-input align-self-center" value="'+item.name+'" readonly>';
+                        appendContent += '<input type="text" class="crud-item-update-input align-self-center" value="'+safeItemName+'" readonly>';
                     }else{
-                        appendContent += '<input type="text" class="crud-item-update-input align-self-center" placeholder="Actualizar" value="'+item.name+'">';
+                        appendContent += '<input type="text" class="crud-item-update-input align-self-center" placeholder="Actualizar" value="'+safeItemName+'">';
                         appendContent += '<i class="crud-item-update-icon fa-solid fa-pencil align-self-center"></i>';
                         appendContent += '<i class="crud-item-delete-icon fa-solid fa-trash-can align-self-center"></i>';
                     }
@@ -131,11 +133,17 @@ function deleteCRUDItem(e){
             }
             PostMethodFunction(prefix + 'delete', DataSend, null, function(){
                 $('.crud-input-container[prefix="'+prefix+'"] .crud-list .crud-item-update[item-id="'+id+'"]').remove();
+                $('.crud-input-container[prefix="'+prefix+'"] .crud-input-selected-container[item-id="'+id+'"]').removeAttr('item-id').find('.crud-current-selected-input').val('');
             }, null);
         }
         , null
         , null
     );
+}
+function escapeCRUDAttribute(value){
+    return $('<div>').text(value == null ? '' : String(value)).html()
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 function selectCRUDItem(e){
     e.preventDefault();

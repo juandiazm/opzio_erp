@@ -10,12 +10,63 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use App\traits\servers_trait;
 
 class servers_dashboard_controller extends Controller
 {
+    use servers_trait;
+
     public function page()
     {
         return view('erp.servers');
+    }
+
+    public function get_project_config(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'required|integer|min:1',
+        ]);
+
+        $response = $this->Servers_GetProjectConfig($request->project_id);
+
+        return $response['status'] == 1
+            ? $response
+            : \Response::json($response, 400);
+    }
+
+    public function get_project_recipients(Request $request)
+    {
+        $request->validate([
+            'client_id' => 'required|integer|min:1',
+        ]);
+
+        $response = $this->Servers_GetProjectRecipients($request->client_id);
+
+        return $response['status'] == 1
+            ? $response
+            : \Response::json($response, 400);
+    }
+
+    public function update_project_config(Request $request)
+    {
+        $validated = $request->validate([
+            'project_id' => 'required|integer|min:1',
+            'client_id' => 'nullable|integer|min:1',
+            'notifications_enabled' => 'required|boolean',
+            'recipient_keys' => 'nullable|array|max:500',
+            'recipient_keys.*' => 'string|max:255',
+        ]);
+
+        $response = $this->Servers_UpdateProjectConfig(
+            $validated['project_id'],
+            $validated['client_id'] ?? null,
+            $validated['notifications_enabled'],
+            $validated['recipient_keys'] ?? []
+        );
+
+        return $response['status'] == 1
+            ? $response
+            : \Response::json($response, 400);
     }
 
     public function get_page(Request $request)
@@ -275,6 +326,8 @@ class servers_dashboard_controller extends Controller
             'hostname' => $host ? $host->hostname : null,
             'path' => $project->path,
             'environment' => $project->environment,
+            'client_id' => $project->client_id ? (int) $project->client_id : null,
+            'notifications_enabled' => (bool) $project->notifications_enabled,
             'php_version' => $project->php_version,
             'fpm_pool' => $project->fpm_pool,
             'attribution_mode' => $value($sample, 'attribution_mode') ?? $project->attribution_mode,
@@ -432,6 +485,7 @@ class servers_dashboard_controller extends Controller
                     $project['hostname'],
                     $project['path'],
                     $project['environment'],
+                    $project['client_id'],
                 ])));
                 return Str::contains($haystack, Str::lower($filters['search']));
             })

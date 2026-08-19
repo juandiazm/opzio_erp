@@ -3,25 +3,103 @@
 #user-list-container{
     overflow-x: auto;
     #outcome-list-table{
-        min-width: 860px;
-        .columns-associations{ min-width: 230px; }
+        min-width: 1450px;
+        .columns-identity{ min-width: 220px; }
+        .columns-provider, .columns-employee, .columns-department, .columns-user, .columns-client{ min-width: 190px; }
+        .columns-total{ min-width: 130px; }
     }
 }
+
+#outcome-association-filters{
+    width: 90%;
+    margin: 0 auto 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(170px, 1fr));
+    gap: 0.5rem;
+    .outcome-filter-field{
+        min-width: 0;
+        label{ display: block; margin-bottom: 0.25rem; color: $primary; font-size: 0.78rem; font-weight: 600; }
+        .form-select, .searchable-dropdown{ width: 100%; }
+    }
+}
+
+#search-outcome-type{
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 0 1 190px;
+    min-width: 165px;
+    label{ color: $primary; font-size: 0.78rem; font-weight: 600; }
+    .form-select, .searchable-dropdown{ min-width: 0; width: 100%; }
+}
+
+.outcome-filter-toggle{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 0 0 auto;
+    padding: 0.35rem 0.6rem;
+    color: $primary;
+    background: transparent;
+    border: 1px solid #D9D9D9;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    .outcome-filter-toggle-icon{ font-size: 0.75rem; }
+}
+
+.outcome-association-inline{ min-width: 165px; font-size: 0.8rem; }
+
+.outcome-type-badge{
+    display: inline-block;
+    max-width: 9rem;
+    overflow: hidden;
+    padding: 0.12rem 0.4rem;
+    color: $primary;
+    background: rgba(0, 5, 123, 0.08);
+    border: 1px solid rgba(0, 5, 123, 0.18);
+    border-radius: 999px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+#outcome-total-segment{
+    width: 90%;
+    margin: 0 auto 0.5rem;
+    padding: 0.35rem 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    background: #F8F8F8;
+    border: 1px solid #E7E7E7;
+    border-radius: 4px;
+    .outcome-total-copy{ display: flex; flex-direction: row; align-items: baseline; gap: 0.45rem; }
+    .outcome-total-label{ color: $text-gray; font-size: 0.72rem; font-weight: 600; }
+    #outcome-total-amount{ color: $primary; font-size: 1rem; }
+    .outcome-total-records{ color: $text-gray; font-size: 0.72rem; }
+}
+
+.outcome-association-readonly{ display: block; padding: 0.375rem 0.5rem; color: $text-gray; font-size: 0.8rem; }
 
 @media screen and (min-width: 768px) {
     #search-list-container{
         background: #F8F8F8 0% 0% no-repeat padding-box;
         box-shadow: 0px 3px 6px #00000029;
-        padding: 2vh 0;
+        padding: 0.65rem 0.85rem;
         width: 90%;
         display: flex;
-        justify-content: space-around;
-        margin: 1vh auto;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: 0.5rem auto;
     }
-    #search-list-input-contaner{ margin: 0 5px; }
+    #search-list-input-contaner{ flex: 1 1 260px; margin: 0; }
     #search-list-title{ margin: 0 15px 0 0; padding: 0; color: $primary; font-weight: bold; }
-    #search-list-input{ background-color: transparent; border: none; border-radius: 0; border-bottom: 1px solid $text-gray; padding: 0; width: 25vw; }
+    #search-list-input{ background-color: transparent; border: none; border-radius: 0; border-bottom: 1px solid $text-gray; padding: 0; width: min(25vw, 22rem); }
     #search-date-range{
+        flex: 0 1 auto;
         .date-input{ background-color: transparent; border: none; border-bottom: 1px solid $text-gray; border-radius: 0; padding: 0; width: 10vw; }
         label{ color: #999; font-weight: bold; }
         span{ color: #999; }
@@ -29,4 +107,12 @@
 }
 
 @media screen and (max-width: 768px) {
+    #search-list-container{ flex-direction: column; align-items: stretch; gap: 0.65rem; padding: 0.75rem; }
+    #search-list-input-contaner, #search-date-range{ margin-left: 0 !important; width: 100%; }
+    #search-list-input{ width: 100%; }
+    #search-date-range{ .date-input{ flex: 1; min-width: 0; } }
+    #search-outcome-type{ width: 100%; min-width: 0; }
+    .outcome-filter-toggle{ align-self: flex-end; }
+    #outcome-association-filters{ width: 100%; grid-template-columns: 1fr; }
+    #outcome-total-segment{ width: 100%; justify-content: center; }
 }

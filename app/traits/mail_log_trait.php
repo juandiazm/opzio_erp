@@ -80,8 +80,11 @@ trait mail_log_trait
         $notification_batch = null
     ){
         try{
-            if($unique_id == null){
-                //Add new log
+            $mail_log = $unique_id === null
+                ? null
+                : mail_log::where('unique_id', $unique_id)->first();
+
+            if($mail_log === null){
                 $mail_log = new mail_log();
                 $mail_log->unique_id = strtoupper(Str::uuid()->toString());
                 $mail_log->subject = $subject;
@@ -100,16 +103,11 @@ trait mail_log_trait
                 $this->MailLog_SaveAttachments($mail_log, $attachments);
 
             }else{
-                //Update log
-                $mail_log = mail_log::where('unique_id', $unique_id)->first();
-                if($mail_log){
-                    $mail_log->attemps = $mail_log->attemps + 1;
-                    $mail_log->status = $status == 1 ? 1 : ($mail_log->attemps >= 3 ? 2 : 0);
-                    $mail_log->error_message = $error_message==''?null:($mail_log->error_message ? $mail_log->error_message."\n".$error_message : $error_message);
-                    if($status == 1)$mail_log->sent_at = Carbon::now();
-                    $mail_log->save();
-                }
-                
+                $mail_log->attemps = $mail_log->attemps + 1;
+                $mail_log->status = $status == 1 ? 1 : ($mail_log->attemps >= 3 ? 2 : 0);
+                $mail_log->error_message = $error_message==''?null:($mail_log->error_message ? $mail_log->error_message."\n".$error_message : $error_message);
+                if($status == 1)$mail_log->sent_at = Carbon::now();
+                $mail_log->save();
             }
         }catch(\Exception $e){
             info('MailLog_SetLog error: '.$e->getMessage());

@@ -11,6 +11,9 @@ class outcome extends Model
 {
     use HasFactory, SoftDeletes;
     protected $appends = ['created_at_string', 'date_string'];
+    protected $casts = [
+        'classification_confidence' => 'float',
+    ];
     public function getCreatedAtStringAttribute(){
         return Carbon::parse($this->created_at)->format('Y-m-d H:i');
     }
@@ -20,6 +23,10 @@ class outcome extends Model
 
     public function provider(){
         return $this->belongsTo(provider::class, 'provider_id');
+    }
+
+    public function outcomeType(){
+        return $this->belongsTo(outcome_type::class, 'outcome_type_id');
     }
 
     public function employee(){

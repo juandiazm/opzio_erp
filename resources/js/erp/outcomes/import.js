@@ -1,24 +1,32 @@
-export function openMassImportModal(){ $('#import-form-container').css('display', 'flex'); }
-export function closeMassImportModal(){ $('#import-form-container').css('display', 'none'); }
+import { getOutcomesPage } from './list.js';
+
+export function openMassImportModal(){
+    $('#import-form-container').addClass('is-visible').attr('aria-hidden', 'false');
+    $('#import-source').trigger('focus');
+}
+
+export function closeMassImportModal(){
+    $('#import-form-container').removeClass('is-visible').attr('aria-hidden', 'true');
+    $('#import-file-input').val('');
+}
+
 export function confirmMassImport(){
-    let flag = true;
-    let file = $('#import-file-input').prop('files')[0];
-    if(file === undefined){ alertWarning('Porfavor seleccione un archivo'); flag = false; }
-    if(flag){
-        $('#nav-create #import-confirm-btn').prop('disabled', true);
-        let dynamicForm = document.createElement('form');
-        dynamicForm.setAttribute('id', 'temporal-form');
-        dynamicForm.setAttribute('class', 'd-none');
-        dynamicForm.appendChild($('#import-file-input').clone(true)[0]);
-        dynamicForm.appendChild($('input[name="_token"]').clone(true)[0]);
-        document.body.appendChild(dynamicForm);
-        dynamicForm = $('#temporal-form');
-        dynamicForm.find('#import-file-input')[0].files = $('#import-file-input')[0].files;
-        $('#temporal-form').remove();
-        PostMethodMultimediaFunction('/admin/outcomes/import', dynamicForm, null, function(){
-            $('#nav-create #import-confirm-btn').attr('disabled', false);
-            closeMassImportModal();
-            alertSuccess('Importación exitosa');
-        }, function(){ $('#nav-create #import-confirm-btn').attr('disabled', false); });
+    const file = $('#import-file-input').prop('files')[0];
+    const source = $('#import-source').val();
+    if(!file){
+        alertWarning('Seleccione un archivo CSV.');
+        return;
     }
+    if(!source){
+        alertWarning('Seleccione una fuente.');
+        return;
+    }
+
+    $('#import-confirm-btn').prop('disabled', true);
+    PostMethodMultimediaFunction('/admin/outcomes/import', $('#import-form'), null, function(response){
+        $('#import-confirm-btn').prop('disabled', false);
+        closeMassImportModal();
+        alertSuccess(response.message || 'Importación completada.');
+        getOutcomesPage();
+    }, function(){ $('#import-confirm-btn').prop('disabled', false); });
 }

@@ -70,7 +70,7 @@ trait facebook_trait
             }
             /*generate image*/
             $Response = $this->OpenIA_GenerateImage(
-                'Create an image on the theme: "' . $content['subject'] . '". Use pastel colors focused on shades of blue and orange. The style should be minimalistic line art with only a few elements. Use a white background. Do not include any text or letters in the image.'
+                'Create an image on the theme: "' . $content['subject'] . '". Use the Opzio brand palette: warm cream (#F2F2E8) as the background, deep purple (#220245) and medium violet (#885FAE) as the main colors, with restrained vivid orange (#F36803) accents. The style should be minimalistic line art with only a few elements. Keep the composition clean and cohesive. Do not include any text or letters in the image.'
             );
             if($Response['status']==1){
                 $image_url =  collect($Response['data']['data'][0])['url'];

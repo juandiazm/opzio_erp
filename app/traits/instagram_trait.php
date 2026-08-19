@@ -65,7 +65,7 @@ trait instagram_trait
                 //not in used until test freepick image
                 //open IA image
                 $Response = $this->OpenIA_GenerateImage(
-                    'Create an image focused on: "' . $subject . '". The style should be hyper-realistic, using primarily blue and gray tones. Maintain color consistency without drastic changes or saturation. The image should be clean and simple. Do not include any text or words.'
+                    'Create an image focused on: "' . $subject . '". Use the Opzio brand palette: warm cream (#F2F2E8) as the background, deep purple (#220245) and medium violet (#885FAE) as the main colors, with restrained vivid orange (#F36803) accents. The style should be hyper-realistic, clean, and simple. Maintain color consistency without drastic changes or oversaturation. Do not include any text or words.'
                 );
                 if($Response['status']==1){
                     $image_url =  collect($Response['data']['data'][0])['url'];
@@ -83,7 +83,7 @@ trait instagram_trait
                 if($personImage == 0){
                     //generate a image prompt base on open ia prompt 
                     $IAPrompt =  $this->OpenIA_MakeQuestion(
-                        'Create a hyper-realistic image focused on the theme of "'.$subject.'". The composition should be minimalistic with only a few key elements, using a color palette dominated by shades of blue and gray. The atmosphere should feel modern, sleek, and slightly futuristic, with soft lighting and a sense of calm sophistication. Avoid including any text in the image.'    
+                        'Create a hyper-realistic image focused on the theme of "'.$subject.'". Use the Opzio brand palette: warm cream (#F2F2E8) as the background, deep purple (#220245) and medium violet (#885FAE) as the main colors, with restrained vivid orange (#F36803) accents. The composition should be minimalistic with only a few key elements. The atmosphere should feel modern, sleek, and slightly futuristic, with soft lighting and a sense of calm sophistication. Avoid including any text in the image.'
                     );
                     if($IAPrompt['status']==1){
                         $IAPrompt = $IAPrompt['data'][0];
@@ -105,7 +105,7 @@ trait instagram_trait
                         }
                     }
                 }else{
-                    $IAPrompt = 'Create a hyper-realistic image focused on the theme of "'.$subject.'". The scene should be minimalistic with only a few elements. Include a friendly-looking person in the foreground, with a warm smile and relaxed demeanor. The lighting should be soft and warm, casting gentle shadows to create a cozy atmosphere. The background should be simple and unobtrusive to keep the focus on the subject. The overall mood should feel inviting, positive, and inspiring, ideal for an Instagram post.';
+                    $IAPrompt = 'Create a hyper-realistic image focused on the theme of "'.$subject.'". Use the Opzio brand palette: warm cream (#F2F2E8) as the background, deep purple (#220245) and medium violet (#885FAE) as the main colors, with restrained vivid orange (#F36803) accents. The scene should be minimalistic with only a few elements. Include a friendly-looking person in the foreground, with a warm smile and relaxed demeanor. The lighting should be soft and warm, casting gentle shadows to create a cozy atmosphere. The background should be simple and unobtrusive to keep the focus on the subject. The overall mood should feel inviting, positive, and inspiring, ideal for an Instagram post.';
                     $FreepickImage = $this->Freepik_GenerateImage(
                         $IAPrompt
                         ,'no text'

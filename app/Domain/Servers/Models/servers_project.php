@@ -2,6 +2,7 @@
 
 namespace App\Domain\Servers\Models;
 
+use App\Models\client;
 use Illuminate\Database\Eloquent\Model;
 
 class servers_project extends Model
@@ -13,6 +14,8 @@ class servers_project extends Model
         'path',
         'environment',
         'enabled',
+        'client_id',
+        'notifications_enabled',
         'php_version',
         'fpm_pool',
         'fpm_status_url',
@@ -24,12 +27,24 @@ class servers_project extends Model
 
     protected $casts = [
         'host_id' => 'integer',
+        'client_id' => 'integer',
         'enabled' => 'boolean',
+        'notifications_enabled' => 'boolean',
         'metadata' => 'array',
     ];
 
     public function host()
     {
         return $this->belongsTo(servers_host::class, 'host_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(client::class, 'client_id');
+    }
+
+    public function notificationRecipients()
+    {
+        return $this->hasMany(servers_project_notification::class, 'project_id');
     }
 }

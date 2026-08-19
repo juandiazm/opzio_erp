@@ -1,6 +1,6 @@
 <!-- Tab Update -->
 <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab">
-    <nav><div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist"><button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button><button class="nav-link" id="sub-nav-employee-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-employee" type="button" role="tab" aria-controls="sub-nav-employee" aria-selected="false">Empleados</button></div></nav>
+    <nav><div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist"><button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button><button class="nav-link" id="sub-nav-outcomes-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-outcomes" type="button" role="tab" aria-controls="sub-nav-outcomes" aria-selected="false">Egresos</button><button class="nav-link" id="sub-nav-employee-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-employee" type="button" role="tab" aria-controls="sub-nav-employee" aria-selected="false">Empleados</button></div></nav>
     <div class="tab-content" id="sub-nav-tabContent">
         <div class="tab-pane fade show active" id="sub-nav-general" role="tabpanel" aria-labelledby="sub-nav-general-tab">
     <div id="update-inputs-container" class="row m-0 w-100 justify-content-center">
@@ -10,6 +10,7 @@
     </div>
     <button class="btn btn-secondary" id="update-department-button">Actualizar</button>
         </div>
+        @include('erp.outcomes.associated', ['association' => 'department_id'])
         @include('erp.departments.employee')
     </div>
 </div>

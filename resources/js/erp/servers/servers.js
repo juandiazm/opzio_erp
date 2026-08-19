@@ -1,4 +1,5 @@
 import { requestPage, exportData, loadPage } from './data.js';
+import { initializeProjectConfig, openProjectConfig } from './project-config.js';
 import { createServersState } from './state.js';
 import { renderSortState } from './view.js';
 
@@ -35,6 +36,7 @@ import { renderSortState } from './view.js';
             paginationContainer,
             sortableHeaders: Array.from(projectsTable.querySelectorAll('th[data-sort-key]'))
         }, csrfToken);
+        initializeProjectConfig(state);
 
         state.sortableHeaders.forEach((header) => {
             const button = header.querySelector('.servers-sort-button');
@@ -76,6 +78,11 @@ import { renderSortState } from './view.js';
             loadPage(state);
         });
         tableBody.addEventListener('click', (event) => {
+            const configButton = event.target.closest('.servers-config-button');
+            if (configButton) {
+                openProjectConfig(state, Number(configButton.dataset.projectId));
+                return;
+            }
             const button = event.target.closest('.servers-detail-button');
             if (!button) return;
             const detail = document.getElementById(button.dataset.detailId);

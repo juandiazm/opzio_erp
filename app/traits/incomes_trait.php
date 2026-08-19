@@ -575,7 +575,16 @@ trait incomes_trait
                 foreach ($receivers as $item) {
                     try {
                         if ($item['phone'] != null && $item['phone'] != '') {
-                            $Response = $this->TwilioSMS_SendMessage('+57', $item['phone'], $Message);
+                            $Response = $this->TwilioSMS_SendMessage(
+                                '+57',
+                                $item['phone'],
+                                $Message,
+                                null,
+                                [
+                                    'client_id' => $income->client_id,
+                                    'recipient_name' => $income->client_name,
+                                ]
+                            );
                         }
                     } catch (\Exception $e) {
                         $Response['message'] = 'Income_SendIncome SMS: ' . $e->getMessage();
@@ -910,7 +919,7 @@ trait incomes_trait
                 'income' => $income,
             ]);
 
-            $mailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null, $income->unique_id);
+            $mailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
             $Response['status'] = $mailResponse['status'];
             $Response['message'] = $mailResponse['message'];
             $Response['data'] = $mailResponse;

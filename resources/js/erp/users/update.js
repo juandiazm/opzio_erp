@@ -3,6 +3,8 @@ import { getUsersPage } from './list.js';
 
 export function showCurrentUser(){
     let currentUser = userState.currentUser;
+    $('#sub-nav-outcomes').attr('data-outcome-association-id', currentUser.id);
+    if(window.AssociatedOutcomes) window.AssociatedOutcomes.setContext('user_id', currentUser.id);
     $('#update-user-id').text(String(currentUser.id).padStart(5, "0"));
     $('#update-user-id-input').val(currentUser.id);
     $('#update-user-identification').val(currentUser.identification);

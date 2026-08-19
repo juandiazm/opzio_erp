@@ -23,6 +23,7 @@ use App\Http\Controllers\incomes_controller;
 use App\Http\Controllers\income_goals_controller;
 use App\Http\Controllers\income_advances_controller;
 use App\Http\Controllers\outcomes_controller;
+use App\Http\Controllers\outcome_type_controller;
 use App\Http\Controllers\payment_gateway_controller;
 use App\Http\Controllers\dashboard_controller;
 use App\Http\Controllers\pusher_controller;
@@ -123,6 +124,25 @@ Route::get('storage/incomes/pdfs/{filename}', function (string $filename) {
         'Cache-Control'       => 'private, no-store',
     ]);
 })->where('filename', '.+\.pdf');
+
+// Serve public storage files when the web server has not created the storage link.
+Route::get('storage/{path}', function (string $path) {
+    $path = str_replace('\\', '/', ltrim($path, '/'));
+    $storageRoot = realpath(storage_path('app/public'));
+    $filePath = $storageRoot
+        ? realpath($storageRoot.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $path))
+        : false;
+
+    if (!$storageRoot || !$filePath || !is_file($filePath)
+        || !str_starts_with($filePath, $storageRoot.DIRECTORY_SEPARATOR)
+        || str_contains($path, '..')) {
+        abort(404);
+    }
+
+    return response()->file($filePath, [
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->where('path', '.+');
 Route::prefix('admin')->group(function () {
     Route::get('/', [admin_pages_controller::class, 'login_page']);
     Route::post('login', [users_controller::class, 'login_user']);
@@ -148,6 +168,9 @@ Route::prefix('admin')->group(function () {
             Route::post('get-page', [servers_dashboard_controller::class, 'get_page']);
             Route::get('export', [servers_dashboard_controller::class, 'export']);
             Route::post('summary', [servers_dashboard_controller::class, 'summary']);
+            Route::post('project-config/get', [servers_dashboard_controller::class, 'get_project_config']);
+            Route::post('project-config/recipients', [servers_dashboard_controller::class, 'get_project_recipients']);
+            Route::post('project-config/update', [servers_dashboard_controller::class, 'update_project_config']);
         });
         Route::prefix('users')->group(function () {
             Route::get('', [admin_pages_controller::class, 'users_page']);
@@ -358,10 +381,17 @@ Route::prefix('admin')->group(function () {
             Route::post('form-data', [outcomes_controller::class, 'get_outcome_form_data']);
             Route::post('create', [outcomes_controller::class, 'create_outcome']);
             Route::post('update', [outcomes_controller::class, 'update_outcome']);
+            Route::post('update-association', [outcomes_controller::class, 'update_outcome_association']);
             Route::post('import', [outcomes_controller::class, 'import_outcomes']);
             Route::post('get', [outcomes_controller::class, 'get_outcomes']);
             Route::post('delete', [outcomes_controller::class, 'delete_outcome']);
             Route::post('recover', [outcomes_controller::class, 'recover_outcome']);
+        });
+        Route::prefix('outcome-type')->group(function(){
+            Route::post('get', [outcome_type_controller::class, 'get_types']);
+            Route::post('add', [outcome_type_controller::class, 'add_type']);
+            Route::post('update', [outcome_type_controller::class, 'update_type']);
+            Route::post('delete', [outcome_type_controller::class, 'delete_type']);
         });
         Route::prefix('reports')->group(function(){
             Route::get('/', [admin_pages_controller::class, 'reports_page']);

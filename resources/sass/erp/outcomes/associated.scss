@@ -1,0 +1,98 @@
+.associated-outcomes-pane {
+    padding-top: 1rem;
+}
+
+.associated-outcomes-list {
+    overflow-x: auto;
+}
+
+.associated-outcomes-toolbar {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.associated-outcomes-toolbar label {
+    flex: 0 0 auto;
+    font-weight: 600;
+}
+
+.associated-outcomes-toolbar input {
+    max-width: 24rem;
+}
+
+.associated-outcomes-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: .75rem 1rem;
+    border: 1px solid rgba(24, 38, 56, .12);
+    background: rgba(24, 38, 56, .04);
+}
+
+.associated-outcomes-total .outcome-total-copy {
+    display: flex;
+    flex-direction: column;
+}
+
+.associated-outcomes-total .outcome-total-label {
+    color: #64748b;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.associated-outcomes-total strong {
+    color: #182638;
+    font-size: 1.25rem;
+}
+
+.associated-outcomes-total .outcome-total-records {
+    color: #64748b;
+    font-size: .85rem;
+}
+
+#associated-outcomes-table {
+    min-width: 980px;
+}
+
+#associated-outcomes-table .columns-identity {
+    min-width: 230px;
+}
+
+#associated-outcomes-table .columns-provider,
+#associated-outcomes-table .columns-employee,
+#associated-outcomes-table .columns-department,
+#associated-outcomes-table .columns-user,
+#associated-outcomes-table .columns-client {
+    min-width: 150px;
+}
+
+.associated-outcomes-empty {
+    padding: 2rem 1rem !important;
+    color: #64748b;
+}
+
+#associated-outcomes-pagination {
+    margin-top: 1rem;
+}
+
+@media (max-width: 767.98px) {
+    .associated-outcomes-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .associated-outcomes-toolbar input {
+        max-width: none;
+    }
+
+    .associated-outcomes-total {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

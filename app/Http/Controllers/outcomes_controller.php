@@ -18,7 +18,7 @@ class outcomes_controller extends Controller
             'name' => 'required|string|max:100',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0.01',
-            'type' => 'required|integer',
+            'outcome_type_id' => 'required|integer|exists:outcome_types,id',
             'user_id' => 'nullable|integer|exists:users,id',
             'provider_id' => 'nullable|integer|exists:providers,id',
             'employee_id' => 'nullable|integer|exists:employees,id',
@@ -36,7 +36,7 @@ class outcomes_controller extends Controller
             $request->input('name'),
             $request->input('description') ?? '',
             $request->input('amount'),
-            $request->input('type'),
+            $request->input('outcome_type_id'),
             $userId,
             $request->input('provider_id'),
             $request->input('employee_id'),
@@ -57,7 +57,7 @@ class outcomes_controller extends Controller
             'name' => 'required|string|max:100',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0.01',
-            'type' => 'required|integer',
+            'outcome_type_id' => 'required|integer|exists:outcome_types,id',
             'user_id' => 'nullable|integer|exists:users,id',
             'provider_id' => 'nullable|integer|exists:providers,id',
             'employee_id' => 'nullable|integer|exists:employees,id',
@@ -77,7 +77,7 @@ class outcomes_controller extends Controller
             $request->input('name'),
             $request->input('description') ?? '',
             $request->input('amount'),
-            $request->input('type'),
+            $request->input('outcome_type_id'),
             $userId,
             $request->input('provider_id'),
             $request->input('employee_id'),
@@ -86,6 +86,36 @@ class outcomes_controller extends Controller
         );
         if($Response['status'] == 1){
             return $Response;
+        }
+        return response()->json($Response, 400);
+    }
+
+    public function update_outcome_association(Request $request)
+    {
+        $associationRules = [
+            'provider_id' => 'nullable|integer|exists:providers,id',
+            'employee_id' => 'nullable|integer|exists:employees,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'client_id' => 'nullable|integer|exists:clients,id',
+        ];
+        $association = $request->input('association');
+
+        if (!is_string($association) || !array_key_exists($association, $associationRules)) {
+            return response()->json(['status' => 0, 'message' => 'Asociación no válida'], 422);
+        }
+
+        $request->validate([
+            'id' => 'required|integer|exists:outcomes,id',
+            'association_id' => $associationRules[$association],
+        ]);
+
+        $Response = $this->Outcome_UpdateOutcomeAssociation(
+            (int) $request->input('id'),
+            $association,
+            $request->input('association_id')
+        );
+        if ($Response['status'] == 1) {
+            return response()->json($Response);
         }
         return response()->json($Response, 400);
     }
@@ -139,20 +169,38 @@ class outcomes_controller extends Controller
     }
     
     public function import_outcomes(Request $request){
-        if(!$request->hasFile('import-file')){
-            return response()->json([
-                'status' => 0,
-                'message' => 'No se recibió ningún archivo. Asegúrese de seleccionar un archivo antes de importar.'
-            ], 400);
-        }
+        $request->validate([
+            'source' => 'required|in:bold',
+            'import-file' => 'required|file|max:20480',
+        ]);
+
         if(!$request->file('import-file')->isValid()){
             return response()->json([
                 'status' => 0,
-                'message' => 'El archivo subido es inválido o está corrupto. Error: '.$request->file('import-file')->getErrorMessage()
-            ], 400);
+                'message' => 'El archivo subido es inválido o está corrupto.'
+            ], 422);
         }
+
+        $extension = strtolower($request->file('import-file')->getClientOriginalExtension());
+        if($extension !== 'csv'){
+            return response()->json([
+                'status' => 0,
+                'message' => 'La fuente Bold requiere un archivo CSV.'
+            ], 422);
+        }
+
+        $userId = data_get(Session::get('user'), 'id');
+        if(!$userId){
+            return response()->json([
+                'status' => 0,
+                'message' => 'No se encontró un usuario asociado a la importación.'
+            ], 422);
+        }
+
         $Response = $this->Outcome_ImportOutcomes(
-            $request->file('import-file')
+            $request->file('import-file'),
+            $request->input('source'),
+            (int) $userId
         );
         if($Response['status'] == 1){
             return $Response;

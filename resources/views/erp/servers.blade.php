@@ -136,4 +136,5 @@
         <ul id="db-pagination" class="pagination pagination-sm justify-content-end px-0 mx-0 d-flex"></ul>
     </div>
 </div>
+@include('erp.servers.project-config-modal')
 @endsection

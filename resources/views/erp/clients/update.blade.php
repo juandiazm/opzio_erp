@@ -3,6 +3,7 @@
     <nav>
         <div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist">
             <button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button>
+            <button class="nav-link" id="sub-nav-outcomes-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-outcomes" type="button" role="tab" aria-controls="sub-nav-outcomes" aria-selected="false">Egresos</button>
             <button class="nav-link" id="sub-nav-users-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-users" type="button" role="tab" aria-controls="sub-nav-users" aria-selected="false">Usuarios</button>
             <button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="false">Documentos</button>
             <button class="nav-link" id="sub-nav-licenses-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-licenses" type="button" role="tab" aria-controls="sub-nav-licenses" aria-selected="false">Licencias</button>
@@ -144,6 +145,7 @@
     </div>
     <button class="btn btn-secondary" id="update-client-button">Actualizar</button>
         </div>
+        @include('erp.outcomes.associated', ['association' => 'client_id'])
         @include('erp.clients.users')
         @include('erp.clients.documents')
         @include('erp.clients.licenses')

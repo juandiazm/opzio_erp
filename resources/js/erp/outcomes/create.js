@@ -6,7 +6,7 @@ export function collectOutcomeForm(prefix){
         name: $('#'+prefix+'-outcome-name').val().trim(),
         description: $('#'+prefix+'-outcome-description').val().trim(),
         amount: $('#'+prefix+'-outcome-amount').val(),
-        type: parseInt($('#'+prefix+'-outcome-type').val(), 10),
+        outcome_type_id: $('#'+prefix+'-outcome-type').attr('item-id') || null,
         provider_id: $('#'+prefix+'-outcome-provider').val() || null,
         employee_id: $('#'+prefix+'-outcome-employee').val() || null,
         department_id: $('#'+prefix+'-outcome-department').val() || null,
@@ -26,13 +26,18 @@ export function validateOutcomeForm(data, prefix){
         $(field.selector).toggleClass('is-invalid', !field.value);
         if(!field.value){ alertWarning(field.message); valid = false; }
     });
+    $('#'+prefix+'-outcome-type').closest('.crud-input-container').toggleClass('is-invalid', !data.outcome_type_id);
+    if(!data.outcome_type_id){
+        alertWarning('Debes seleccionar el tipo de egreso');
+        valid = false;
+    }
     return valid;
 }
 
 function resetCreateForm(){
     $('#create-outcome-date').val(new Date().toISOString().slice(0, 10));
     $('#create-outcome-name,#create-outcome-description,#create-outcome-amount').val('');
-    $('#create-outcome-type').val('-1');
+    $('#create-outcome-type').removeAttr('item-id').find('.crud-current-selected-input').val('');
     $('#create-outcome-provider,#create-outcome-employee,#create-outcome-department,#create-outcome-client').val('').trigger('change');
     $('#create-outcome-user').val(outcomeState.catalogs.current_user_id || '').trigger('change');
     $('#create-outcome-form .is-invalid').removeClass('is-invalid');

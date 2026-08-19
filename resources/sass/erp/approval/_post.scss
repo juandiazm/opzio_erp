@@ -4,9 +4,10 @@
         height: 100vh;
         margin: 0;
         padding: 0;
-        background: rgb(36,37,116);
-        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
-        background-image: url('/images/approve-post/bg.webp');
+        background-color: $bg-secondary;
+        background-image:
+            linear-gradient(135deg, rgba($primary, 0.08), rgba($secondary, 0.14)),
+            linear-gradient(45deg, rgba($accent, 0.06), transparent 45%);
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -54,9 +55,10 @@
         height: 100vh;
         margin: 0;
         padding: 0;
-        background: rgb(36,37,116);
-        background: linear-gradient(90deg, rgba(36,37,116,1) 0%, rgba(22,46,164,1) 74%, rgba(9,50,187,1) 100%);
-        background-image: url('/images/approve-post/bg.webp');
+        background-color: $bg-secondary;
+        background-image:
+            linear-gradient(135deg, rgba($primary, 0.08), rgba($secondary, 0.14)),
+            linear-gradient(45deg, rgba($accent, 0.06), transparent 45%);
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;

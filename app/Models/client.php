@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Servers\Models\servers_project;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
@@ -51,6 +52,9 @@ class client extends Model
     /*relationships*/
     public function licenses(){
         return $this->hasMany(license::class, 'client_id');
+    }
+    public function serverProjects(){
+        return $this->hasMany(servers_project::class, 'client_id');
     }
     public function incomes(){
         return $this->hasMany(income::class, 'client_id');

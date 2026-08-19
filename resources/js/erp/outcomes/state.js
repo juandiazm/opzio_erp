@@ -1,7 +1,7 @@
 export const outcomeState = {
     pagination: {
         page: 1,
-        size: 10,
+        size: 5,
         total: 0,
     },
     tabsView: {
@@ -12,7 +12,11 @@ export const outcomeState = {
     currentTab: null,
     currentContainer: null,
     currentOutcome: null,
+    catalogsReady: false,
+    totalAmount: 0,
+    outcomeTypes: [],
     catalogs: {
+        types: [],
         providers: [],
         employees: [],
         departments: [],

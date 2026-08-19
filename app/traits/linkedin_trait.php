@@ -70,7 +70,7 @@ trait linkedin_trait
             }
             /*generate image*/
             $Response = $this->OpenIA_GenerateImage(
-                'Create an image on the theme: "' . $content['subject'] . '". Focus on pastel colors with an emphasis on blue shades. The style should combine minimalistic line art with a subtle three-dimensional effect. Keep the background white, and ensure the image is clean and simple. Do not include any text or letters in the image.'
+                'Create an image on the theme: "' . $content['subject'] . '". Use the Opzio brand palette: warm cream (#F2F2E8) as the background, deep purple (#220245) and medium violet (#885FAE) as the main colors, with restrained vivid orange (#F36803) accents. The style should combine minimalistic line art with a subtle three-dimensional effect. Ensure the image is clean and simple. Do not include any text or letters in the image.'
             );
             if($Response['status']==1){
                 $image_url =  collect($Response['data']['data'][0])['url'];

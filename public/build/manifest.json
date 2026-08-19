@@ -605,7 +605,7 @@
     "isEntry": true
   },
   "resources/js/crud-input.js": {
-    "file": "assets/crud-input-AzBPKbA1.js",
+    "file": "assets/crud-input-D-H3eZnK.js",
     "name": "crud-input",
     "src": "resources/js/crud-input.js",
     "isEntry": true
@@ -692,7 +692,7 @@
     "isEntry": true
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-Cqvr4Wg_.js",
+    "file": "assets/clients-CGPnw8No.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
     "isEntry": true
@@ -849,7 +849,7 @@
     "isEntry": true
   },
   "resources/js/erp/departments/departments.js": {
-    "file": "assets/departments-BMTthSEH.js",
+    "file": "assets/departments-B4csOLNv.js",
     "name": "departments",
     "src": "resources/js/erp/departments/departments.js",
     "isEntry": true
@@ -891,7 +891,7 @@
     "isEntry": true
   },
   "resources/js/erp/employees/employees.js": {
-    "file": "assets/employees-C3OxSvdg.js",
+    "file": "assets/employees-EIz6jdMk.js",
     "name": "employees",
     "src": "resources/js/erp/employees/employees.js",
     "isEntry": true
@@ -1170,9 +1170,15 @@
     "isEntry": true
   },
   "resources/js/erp/notifications/notifications.js": {
-    "file": "assets/notifications-COW5gx79.js",
+    "file": "assets/notifications-B_4atyHv.js",
     "name": "notifications",
     "src": "resources/js/erp/notifications/notifications.js",
+    "isEntry": true
+  },
+  "resources/js/erp/outcomes/associated.js": {
+    "file": "assets/associated-aSohXS1C.js",
+    "name": "associated",
+    "src": "resources/js/erp/outcomes/associated.js",
     "isEntry": true
   },
   "resources/js/erp/outcomes/create.js": {
@@ -1194,7 +1200,7 @@
     "isEntry": true
   },
   "resources/js/erp/outcomes/outcomes.js": {
-    "file": "assets/outcomes-Quzg6y_j.js",
+    "file": "assets/outcomes-DwyxN_Yv.js",
     "name": "outcomes",
     "src": "resources/js/erp/outcomes/outcomes.js",
     "isEntry": true
@@ -1242,7 +1248,7 @@
     "isEntry": true
   },
   "resources/js/erp/providers/providers.js": {
-    "file": "assets/providers-CpnIH8sc.js",
+    "file": "assets/providers-DPSFT_RO.js",
     "name": "providers",
     "src": "resources/js/erp/providers/providers.js",
     "isEntry": true
@@ -1329,7 +1335,7 @@
     "isEntry": true
   },
   "resources/js/erp/servers/servers.js": {
-    "file": "assets/servers-CpRjXl_8.js",
+    "file": "assets/servers-DOifsQSg.js",
     "name": "servers",
     "src": "resources/js/erp/servers/servers.js",
     "isEntry": true
@@ -1389,7 +1395,7 @@
     "isEntry": true
   },
   "resources/js/erp/users/users.js": {
-    "file": "assets/users-KleN3fjE.js",
+    "file": "assets/users-U5Gl2x28.js",
     "name": "users",
     "src": "resources/js/erp/users/users.js",
     "isEntry": true
@@ -1542,22 +1548,22 @@
     "isEntry": true
   },
   "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss": {
-    "file": "assets/approve_facebook_post-DhKbjYVu.css",
+    "file": "assets/approve_facebook_post-Cq2gn3v4.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
   "resources/sass/erp/approve_instagram_post/approve_instagram_post.scss": {
-    "file": "assets/approve_facebook_post-DhKbjYVu.css",
+    "file": "assets/approve_facebook_post-Cq2gn3v4.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
   "resources/sass/erp/approve_linkedin_post/approve_linkedin_post.scss": {
-    "file": "assets/approve_facebook_post-DhKbjYVu.css",
+    "file": "assets/approve_facebook_post-Cq2gn3v4.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
   "resources/sass/erp/approve_twitter_post/approve_twitter_post.scss": {
-    "file": "assets/approve_facebook_post-DhKbjYVu.css",
+    "file": "assets/approve_facebook_post-Cq2gn3v4.css",
     "src": "resources/sass/erp/approve_facebook_post/approve_facebook_post.scss",
     "isEntry": true
   },
@@ -1652,8 +1658,13 @@
     "src": "resources/sass/erp/notifications/notifications.scss",
     "isEntry": true
   },
+  "resources/sass/erp/outcomes/associated.scss": {
+    "file": "assets/associated-B9F7AMn5.css",
+    "src": "resources/sass/erp/outcomes/associated.scss",
+    "isEntry": true
+  },
   "resources/sass/erp/outcomes/outcomes.scss": {
-    "file": "assets/outcomes-DXj4EeUj.css",
+    "file": "assets/outcomes-C6xCeX-W.css",
     "src": "resources/sass/erp/outcomes/outcomes.scss",
     "isEntry": true
   },
@@ -1673,7 +1684,7 @@
     "isEntry": true
   },
   "resources/sass/erp/servers/servers.scss": {
-    "file": "assets/servers-CXPGqeWf.css",
+    "file": "assets/servers-B_m6k5Xj.css",
     "src": "resources/sass/erp/servers/servers.scss",
     "isEntry": true
   },

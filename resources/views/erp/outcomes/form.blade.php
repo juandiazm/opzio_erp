@@ -13,10 +13,19 @@
             <input type="date" class="form-control" id="{{ $prefix }}-outcome-date" value="{{ $prefix === 'create' ? now()->format('Y-m-d') : '' }}">
         </div>
         <div class="col-12 col-md-6">
-            <label class="form-label" for="{{ $prefix }}-outcome-type">Tipo</label>
-            <select class="form-select js-searchable-dropdown" id="{{ $prefix }}-outcome-type" data-placeholder="Seleccionar tipo">
-                <option value="-1">Otro</option>
-            </select>
+            <label class="form-label" for="{{ $prefix }}-outcome-type">Tipo de egreso</label>
+            <div class="crud-input-container input-value" prefix="/admin/outcome-type/" data-load-on-ready="false">
+                <div class="crud-input-selected-container d-flex justify-content-between" id="{{ $prefix }}-outcome-type">
+                    <input type="text" class="crud-current-selected-input align-self-center" placeholder="Seleccionar tipo" autocomplete="off">
+                    <i class="crud-input-arrow fa-solid fa-chevron-down align-self-center" aria-hidden="true"></i>
+                </div>
+                <ul class="crud-list closed scrollable">
+                    <li class="crud-item-add d-flex justify-content-between">
+                        <input type="text" class="crud-item-add-input align-self-center" placeholder="Agregar">
+                        <i class="crud-item-add-icon fa-solid fa-plus align-self-center" aria-hidden="true"></i>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="col-12 col-md-6">
             <label class="form-label" for="{{ $prefix }}-outcome-name">Nombre</label>

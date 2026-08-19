@@ -36,6 +36,26 @@ return [
         'partner_id' => env('SIIGO_PARTNER_ID'),
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'verify_tls' => (bool) env('OPENAI_VERIFY_TLS', true),
+        'timeout' => (float) env('OPENAI_TIMEOUT', 240),
+        'retries' => (int) env('OPENAI_RETRIES', 2),
+        'models' => [
+            'fast' => env('OPENAI_MODEL_FAST', 'gpt-5.6-luna'),
+            'chat' => env('OPENAI_MODEL_CHAT', 'gpt-5.6-terra'),
+            'content' => env('OPENAI_MODEL_CONTENT', 'gpt-5.6-terra'),
+            'reasoning' => env('OPENAI_MODEL_REASONING', 'gpt-5.6-sol'),
+            'image' => env('OPENAI_IMAGE_MODEL', 'gpt-image-2'),
+        ],
+        'image' => [
+            'quality' => env('OPENAI_IMAGE_QUALITY', 'low'),
+            'size' => env('OPENAI_IMAGE_SIZE', '1024x1024'),
+            'format' => env('OPENAI_IMAGE_FORMAT', 'webp'),
+            'compression' => (int) env('OPENAI_IMAGE_COMPRESSION', 90),
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Nini Integration

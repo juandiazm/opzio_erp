@@ -166,6 +166,29 @@ class notifications_test extends TestCase
         $this->assertContains($immediate->id, $ids);
     }
 
+    public function test_email_history_includes_legacy_mail_logs()
+    {
+        $this->MailLog_SetLog(
+            'INCOME-UUID',
+            'Orden de compra #123',
+            'mail.purchase_order',
+            'erp@example.test',
+            'ERP',
+            [['address' => 'cliente@example.test', 'name' => 'Cliente']],
+            null,
+            ['income_id' => 123],
+            1,
+            null
+        );
+
+        $response = $this->Notification_GetEmails();
+        $legacyMail = collect($response['emails'])->firstWhere('view', 'mail.purchase_order');
+
+        $this->assertSame(1, $response['status']);
+        $this->assertNotNull($legacyMail);
+        $this->assertFalse($legacyMail->can_resend);
+    }
+
     public function test_payment_reminder_email_is_scheduled_between_eight_and_eleven()
     {
         $command = new class extends send_pay_remaining {
@@ -261,6 +284,25 @@ class notifications_test extends TestCase
         $this->assertSame(0, sms_log::find($future->id)->status);
         $this->assertSame(1, sms_log::find($due->id)->status);
         $this->assertSame(1, sms_log::find($immediate->id)->status);
+    }
+
+    public function test_direct_sms_send_creates_delivery_log()
+    {
+        $response = $this->TwilioSMS_SendMessage(
+            '+57',
+            '3000000004',
+            'Mensaje directo',
+            null,
+            ['client_id' => 7, 'recipient_name' => 'Cliente Uno']
+        );
+        $sms = sms_log::where('to', '+573000000004')->first();
+
+        $this->assertSame(1, $response['status']);
+        $this->assertNotNull($sms);
+        $this->assertSame(1, (int) $sms->status);
+        $this->assertSame(1, (int) $sms->attempts);
+        $this->assertSame(7, (int) $sms->client_id);
+        $this->assertNotNull($sms->sent_at);
     }
 
     public function test_email_resend_replaces_recipients_and_keeps_original()

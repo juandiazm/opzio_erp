@@ -3,7 +3,6 @@ namespace App\traits;
 
 use Carbon\Carbon;
 use Session;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\outcomes_import;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,6 +12,7 @@ use App\Models\employee;
 use App\Models\department;
 use App\Models\user;
 use App\Models\client;
+use App\Models\outcome_type;
 
 trait outcomes_trait
 {
@@ -22,7 +22,7 @@ trait outcomes_trait
         ,$name
         ,$description
         ,$amount
-        ,$type
+        ,$outcome_type_id
         ,$user_id
         ,$provider_id = null
         ,$employee_id = null
@@ -40,14 +40,14 @@ trait outcomes_trait
             $outcome->name = $name;
             $outcome->description = $description;
             $outcome->amount = $amount;
-            $outcome->type = $type;
+            $outcome->outcome_type_id = $outcome_type_id;
             $outcome->user_id = $user_id;
             $outcome->provider_id = $provider_id;
             $outcome->employee_id = $employee_id;
             $outcome->department_id = $department_id;
             $outcome->client_id = $client_id;
             $outcome->save();
-            $outcome->load(['provider', 'employee', 'department', 'user', 'client']);
+            $outcome->load(['provider', 'employee', 'department', 'user', 'client', 'outcomeType']);
             $Response = [
                 'status' => 1,
                 'message' => 'Egreso creado correctamente',
@@ -65,7 +65,7 @@ trait outcomes_trait
         ,$name
         ,$description
         ,$amount
-        ,$type
+        ,$outcome_type_id
         ,$user_id
         ,$provider_id = null
         ,$employee_id = null
@@ -86,14 +86,14 @@ trait outcomes_trait
             $outcome->name = $name;
             $outcome->description = $description;
             $outcome->amount = $amount;
-            $outcome->type = $type;
+            $outcome->outcome_type_id = $outcome_type_id;
             $outcome->user_id = $user_id;
             $outcome->provider_id = $provider_id;
             $outcome->employee_id = $employee_id;
             $outcome->department_id = $department_id;
             $outcome->client_id = $client_id;
             $outcome->save();
-            $outcome->load(['provider', 'employee', 'department', 'user', 'client']);
+            $outcome->load(['provider', 'employee', 'department', 'user', 'client', 'outcomeType']);
             $Response = [
                 'status' => 1,
                 'message' => 'Egreso actualizado correctamente',
@@ -104,6 +104,46 @@ trait outcomes_trait
             $Response['message'] = 'Error al actualizar el egreso: '.$e->getMessage();
         }
         return $Response;
+    }
+
+    public function Outcome_UpdateOutcomeAssociation(int $id, string $association, $associationId = null)
+    {
+        $allowedAssociations = ['provider_id', 'employee_id', 'department_id', 'client_id'];
+        if (!in_array($association, $allowedAssociations, true)) {
+            return [
+                'status' => 0,
+                'message' => 'Asociación no válida',
+            ];
+        }
+
+        try {
+            $outcome = outcome::find($id);
+            if (!$outcome) {
+                return [
+                    'status' => 0,
+                    'message' => 'El egreso no existe o está eliminado',
+                ];
+            }
+
+            $outcome->{$association} = $associationId === null || $associationId === ''
+                ? null
+                : (int) $associationId;
+            $outcome->save();
+            $outcome->load(['provider', 'employee', 'department', 'user', 'client', 'outcomeType']);
+
+            return [
+                'status' => 1,
+                'message' => 'Asociación actualizada correctamente',
+                'data' => $outcome,
+            ];
+        } catch (\Exception $e) {
+            info('Outcome_UpdateOutcomeAssociation error: '.$e->getMessage());
+
+            return [
+                'status' => 0,
+                'message' => 'Error al actualizar la asociación',
+            ];
+        }
     }
 
     public function Outcome_GetOutcomeFormData(){
@@ -121,14 +161,17 @@ trait outcomes_trait
                 'status' => 1,
                 'message' => 'Catálogos de egresos obtenidos',
                 'data' => [
-                    'providers' => provider::orderBy('name')->get(['id', 'name', 'lastname'])->map(function($item){
-                        return ['id' => $item->id, 'label' => trim($item->name.' '.$item->lastname)];
-                    })->values(),
-                    'employees' => $formatPeople(employee::orderBy('name')->get(['id', 'name', 'last_name'])),
-                    'departments' => department::orderBy('name')->get(['id', 'name'])->map(function($item){
+                    'types' => outcome_type::orderBy('name')->get(['id', 'name'])->map(function($item){
                         return ['id' => $item->id, 'label' => $item->name];
                     })->values(),
-                    'users' => $formatPeople(user::orderBy('name')->get(['id', 'name', 'lastname'])),
+                    'providers' => provider::withTrashed()->orderBy('name')->get(['id', 'name', 'lastname'])->map(function($item){
+                        return ['id' => $item->id, 'label' => trim($item->name.' '.$item->lastname)];
+                    })->values(),
+                    'employees' => $formatPeople(employee::withTrashed()->orderBy('name')->get(['id', 'name', 'last_name'])),
+                    'departments' => department::withTrashed()->orderBy('name')->get(['id', 'name'])->map(function($item){
+                        return ['id' => $item->id, 'label' => $item->name];
+                    })->values(),
+                    'users' => $formatPeople(user::withTrashed()->orderBy('name')->get(['id', 'name', 'lastname'])),
                     'clients' => $formatPeople(client::orderBy('name')->get(['id', 'name', 'lastname'])),
                     'current_user_id' => data_get($sessionUser, 'id'),
                 ]
@@ -143,7 +186,7 @@ trait outcomes_trait
     }
 
     //IMPORT
-    public function Outcome_ImportOutcomes($file){
+    public function Outcome_ImportOutcomes($file, $source = 'bold', $userId = null){
         $Response = [
             'status' => 0,
             'message' => 'Error al importar los datos'
@@ -153,29 +196,23 @@ trait outcomes_trait
                 $Response['message'] = 'No se recibió ningún archivo. Verifique que haya seleccionado un archivo válido.';
                 return $Response;
             }
-            $allowedExtensions = ['xlsx', 'xls', 'csv'];
+            $allowedExtensions = ['csv'];
             $extension = strtolower($file->getClientOriginalExtension());
             if(!in_array($extension, $allowedExtensions)){
-                $Response['message'] = "Formato de archivo no soportado: .{$extension}. Use archivos .xlsx, .xls o .csv";
+                $Response['message'] = "Formato de archivo no soportado: .{$extension}. Use un archivo .csv";
                 return $Response;
             }
-            $outcomes_import = new outcomes_import();
-            Excel::import($outcomes_import, $file);
-            $Response = $outcomes_import->Result;
-        }catch(\Maatwebsite\Excel\Validators\ValidationException $e){
-            $failures = $e->failures();
-            $errorMessages = [];
-            foreach ($failures as $failure) {
-                $errorMessages[] = "Fila {$failure->row()}: {$failure->errors()[0]}";
+            $userId = $userId ?: data_get(Session::get('user'), 'id');
+            if(!$userId){
+                $Response['message'] = 'No se encontró un usuario asociado a la importación.';
+                return $Response;
             }
-            $Response['message'] = 'Errores de validación: ' . implode(' | ', array_slice($errorMessages, 0, 5));
-            info('Outcome_ImportOutcomes validation error: '.json_encode($errorMessages));
-        }catch(\PhpOffice\PhpSpreadsheet\Reader\Exception $e){
-            $Response['message'] = 'Error al leer el archivo Excel: '.$e->getMessage();
-            info('Outcome_ImportOutcomes reader error: '.$e->getMessage());
+            $path = $file->getRealPath() ?: $file->getPathname();
+            $outcomes_import = new outcomes_import();
+            $Response = $outcomes_import->import($path, $source, (int) $userId);
         }catch(\Exception $e){
             $Response['message'] = 'Error al importar: '.$e->getMessage();
-            info('Outcome_ImportOutcomes error: '.$e->getMessage().' - Trace: '.$e->getTraceAsString());
+            info('Outcome_ImportOutcomes error: '.$e->getMessage());
         }
         return $Response;
     }
@@ -389,8 +426,8 @@ trait outcomes_trait
         ,$date_to
     ){
         try{
-            $outcomes = outcome::
-            whereDate('date', '>=', $date_from)
+            $outcomes = outcome::with('outcomeType')
+            ->whereDate('date', '>=', $date_from)
             ->whereDate('date', '<=', $date_to)
             ->orderBy('date', 'asc')
             ->get();
@@ -410,8 +447,8 @@ trait outcomes_trait
 
     public function Outcome_GetOutcomes($request)
     {
-        $page   = (int) $request->input('page', 1);
-        $size   = (int) $request->input('size', 10);
+        $page   = max(1, (int) $request->input('page', 1));
+        $size   = max(1, (int) $request->input('size', 5));
         $from   = $request->input('from');
         $to     = $request->input('to');
         $search = $request->input('search');
@@ -421,10 +458,11 @@ trait outcomes_trait
             'message'    => 'Error al obtener outcomes',
             'data'       => null,
             'pagination' => null,
+            'totals'     => null,
         ];
 
         try {
-            $query = outcome::query()->withTrashed();
+            $query = outcome::query()->withTrashed()->with(['provider', 'employee', 'department', 'user', 'client', 'outcomeType']);
 
             // filtro de fechas
             if ($from) {
@@ -432,6 +470,30 @@ trait outcomes_trait
             }
             if ($to) {
                 $query->where('date', '<=', Carbon::parse($to)->endOfDay());
+            }
+
+            $associationFilters = [
+                'outcome_type_id' => 'outcome_type_id',
+                'provider_id' => 'provider_id',
+                'employee_id' => 'employee_id',
+                'department_id' => 'department_id',
+                'user_id' => 'user_id',
+                'client_id' => 'client_id',
+            ];
+            foreach ($associationFilters as $input => $column) {
+                $filterValue = $request->input($input);
+                if ($filterValue === 'none' || $filterValue === 'null') {
+                    $query->whereNull($column);
+                    continue;
+                }
+                if (!is_scalar($filterValue)) {
+                    continue;
+                }
+
+                $filterId = filter_var($filterValue, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($filterId !== false) {
+                    $query->where($column, $filterId);
+                }
             }
 
             // filtro de búsqueda en name o description
@@ -445,11 +507,12 @@ trait outcomes_trait
             }
 
             // conteo y paginado
-            $total = $query->count();
+            $total = (clone $query)->count();
+            $totalAmount = round((float) (clone $query)->sum('amount'), 2);
             $totalPages = (int) ceil($total / $size);
 
             $data = $query
-                ->select(['id','unique_id','date','type','name','description','amount', 'deleted_at'])
+                ->select(['id','unique_id','date','outcome_type_id','name','description','amount','provider_id','employee_id','department_id','client_id','user_id','source','source_identifier','deleted_at'])
                 ->orderBy('date','desc')
                 ->skip($size * ($page - 1))
                 ->take($size)
@@ -463,6 +526,10 @@ trait outcomes_trait
                 'size'       => $size,
                 'total'      => $total,
                 'totalPages' => $totalPages,
+            ];
+            $Response['totals'] = [
+                'amount'  => $totalAmount,
+                'records' => $total,
             ];
         } catch (\Exception $e) {
             $Response['message'] = 'Excepción: '.$e->getMessage();

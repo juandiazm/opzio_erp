@@ -2,9 +2,11 @@
 @section('component_title', 'DEPARTAMENTOS')
 @section('erp-app-header')
 @vite('resources/js/erp/departments/departments.js')
+@vite('resources/js/erp/outcomes/associated.js')
 @vite('resources/js/erp/traceability.js')
 <!-- Styles -->
 @vite('resources/sass/erp/departments/departments.scss')
+@vite('resources/sass/erp/outcomes/associated.scss')
 @vite('resources/sass/erp/traceability.scss')
 @endsection
 @section('erp-app-content')

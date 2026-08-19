@@ -533,7 +533,6 @@ trait notifications_trait
         try {
             $pagination = $this->Notification_Pagination($pagination);
             $query = mail_log::with('attachments')
-                ->where('view', 'mail.notification')
                 ->orderByDesc('id');
             if (trim((string) $search) !== '') {
                 $query->where(function ($builder) use ($search) {
@@ -549,6 +548,7 @@ trait notifications_trait
                 $mail->status_string = $this->Notification_StatusLabel($mail->status);
                 $mail->recipient_count = count(is_array($mail->to) ? $mail->to : []);
                 $mail->attachments_count = $mail->attachments->count();
+                $mail->can_resend = $mail->view === 'mail.notification';
                 unset($mail->mail_data);
                 return $mail;
             });
@@ -764,7 +764,7 @@ trait notifications_trait
         $result = ['processed' => 0, 'sent' => 0, 'failed' => 0];
         foreach ($logs as $sms) {
             try {
-                $response = $this->TwilioSMS_SendMessage('+57', $sms->to, $sms->body);
+                $response = $this->TwilioSMS_SendMessage('+57', $sms->to, $sms->body, $sms->id);
                 $sms->attempts = (int) $sms->attempts + 1;
                 $result['processed']++;
                 if (($response['status'] ?? 0) == 1) {

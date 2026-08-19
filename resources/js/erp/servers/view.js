@@ -124,7 +124,10 @@ export const renderRows = (state, projects) => {
                 <td><strong>${formatNumber(project.cpu_percent, '%')}</strong><small>${formatBytes(project.memory_rss_bytes)} RSS</small></td>
                 <td><strong>${formatNumber(project.fpm_listen_queue)} / ${formatNumber(project.fpm_max_listen_queue)}</strong><small>${formatNumber(project.fpm_utilization_percent, '%')} utilización</small></td>
                 <td><strong>${formatBytes(project.storage_total_bytes)}</strong><small>${formatSignedBytes(project.storage_growth_bytes)}</small></td>
-                <td class="text-end"><button type="button" class="servers-detail-button" data-detail-id="${escapeHtml(detailId)}" aria-label="Ver detalle de ${escapeHtml(project.name)}" title="Ver detalle"><i class="fa-light fa-eye"></i></button></td>
+                <td class="text-end">
+                    <button type="button" class="servers-config-button${project.notifications_enabled ? ' is-enabled' : ''}" data-project-id="${escapeHtml(project.id)}" aria-label="Configurar notificaciones de ${escapeHtml(project.name)}" title="Configurar notificaciones"><i class="fa-light fa-bell"></i></button>
+                    <button type="button" class="servers-detail-button" data-detail-id="${escapeHtml(detailId)}" aria-label="Ver detalle de ${escapeHtml(project.name)}" title="Ver detalle"><i class="fa-light fa-eye"></i></button>
+                </td>
             </tr>
             <tr id="${escapeHtml(detailId)}" class="servers-detail-row" hidden>
                 <td colspan="11">${renderProjectDetails(project)}</td>

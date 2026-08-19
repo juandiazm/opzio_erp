@@ -9,7 +9,8 @@ export function showCurrentOutcome(){
     $('#update-outcome-name').val(currentOutcome.name || '');
     $('#update-outcome-description').val(currentOutcome.description || '');
     $('#update-outcome-amount').val(currentOutcome.amount || '');
-    $('#update-outcome-type').val(currentOutcome.type == null ? -1 : currentOutcome.type);
+    $('#update-outcome-type').attr('item-id', currentOutcome.outcome_type_id || '');
+    $('#update-outcome-type .crud-current-selected-input').val(currentOutcome.outcome_type?.name || '');
     $('#update-outcome-provider').val(currentOutcome.provider_id || '').trigger('change');
     $('#update-outcome-employee').val(currentOutcome.employee_id || '').trigger('change');
     $('#update-outcome-department').val(currentOutcome.department_id || '').trigger('change');

@@ -119,7 +119,7 @@ function renderEmails(response) {
             html += '<td><span class="notifications-status status-'+email.status+'">'+escapeHtml(email.status_string)+'</span></td>';
             html += '<td>'+escapeHtml(formatDate(email.send_at))+'</td>';
             html += '<td>'+escapeHtml(formatDate(email.sent_at))+'</td>';
-            html += '<td><button type="button" class="btn btn-link notifications-action notifications-resend-email" data-id="'+email.id+'" title="Reenviar" aria-label="Reenviar correo"><i class="fa-solid fa-reply"></i></button></td>';
+            html += '<td>'+(email.can_resend ? '<button type="button" class="btn btn-link notifications-action notifications-resend-email" data-id="'+email.id+'" title="Reenviar" aria-label="Reenviar correo"><i class="fa-solid fa-reply"></i></button>' : '')+'</td>';
             html += '</tr>';
         });
         $('#notifications-email-list').html(html);

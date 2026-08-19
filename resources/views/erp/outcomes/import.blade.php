@@ -1,15 +1,34 @@
-<div id="import-btn-container">
-    <i class="fa-solid fa-file-excel"></i>
-    <span id="import-title">Importación Masiva</span>
+<button type="button" id="import-btn-container" title="Importar egresos" aria-label="Importar egresos">
+    <i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i>
+</button>
+<div id="import-form-container" aria-hidden="true">
+    <form id="import-form" enctype="multipart/form-data">
+        @csrf
+        <div class="outcome-import-modal" role="dialog" aria-modal="true" aria-labelledby="import-form-title">
+            <div class="outcome-import-header">
+                <h2 id="import-form-title">Importar egresos</h2>
+                <button type="button" id="import-cancel-btn" class="outcome-import-close" title="Cerrar" aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="outcome-import-fields">
+                <div>
+                    <label class="form-label" for="import-source">Fuente</label>
+                    <select id="import-source" name="source" class="form-select" required>
+                        <option value="bold">Bold</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="import-file-input">Archivo CSV</label>
+                    <input type="file" id="import-file-input" name="import-file" accept=".csv,text/csv" class="form-control" required>
+                </div>
+            </div>
+            <div id="import-btns-container">
+                <button type="button" id="import-cancel-action" class="btn btn-light">Cancelar</button>
+                <button type="button" id="import-confirm-btn" class="btn btn-primary">Importar</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div id="import-form-container">
-    <i class="fa-thin fa-file-excel import-form-icon"></i>
-    <h3 id="import-form-title">¿desea iniciar la importación masiva de egresos desde el extracto bancario?</h3>
-    <h5 id="import-form-subtitle">Recuerde que esta acción tendrá como consecuencia la actualización automática del balance en el sistema.</h5>
-    <p id="import-form-description">Por favor, asegúrese de tener el archivo del extracto bancario listo y verificado para garantizar la precisión de los datos importados. Una vez confirmada la importación, las transacciones del extracto bancario se integrarán en el sistema y reflejarán cambios en el balance.</p>
-    <input type="file" id="import-file-input" name="import-file" accept=".xlsx, .xls" class="form-control" required>
-    <div id="import-btns-container">
-        <button id="import-cancel-btn" class="btn">Cancelar</button>
-        <button id="import-confirm-btn" class="btn">Confirmar</button>
     </div>
 </div>
