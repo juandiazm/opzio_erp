@@ -29,6 +29,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:send_pay_remaining')
             ->cron('0 7 * * *')
             ->withoutOverlapping(60);
+        $schedule->command('servers:send-monthly-report')
+            ->cron('0 7 1 * *')
+            ->withoutOverlapping(120);
         $schedule->command('db:backup')->cron('0 2 * * *');
     }
 

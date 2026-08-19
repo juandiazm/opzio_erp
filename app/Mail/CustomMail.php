@@ -53,9 +53,7 @@ class CustomMail extends Mailable
             $email->bcc('info@opzio.co');
         }
 
-        if ($this->replyToDetails && !empty($this->replyToDetails['address'])) {
-            $email->replyTo($this->replyToDetails['address'], $this->replyToDetails['name'] ?? null);
-        }
+        $email->replyTo('info@opzio.co', 'OPZIO SAS - Información');
 
         // Attach the files if provided
         if (isset($this->files) && $this->files != null) {

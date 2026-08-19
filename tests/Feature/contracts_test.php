@@ -719,7 +719,7 @@ class contracts_test extends TestCase
         Mail::assertQueued(CustomMail::class, 2);
         Mail::assertQueued(CustomMail::class, function ($mail) {
             return ($mail->fromDetails['address'] ?? null) === 'legal@opzio.co'
-                && ($mail->replyToDetails['address'] ?? null) === 'legal@opzio.co'
+                && ($mail->replyToDetails['address'] ?? null) === 'info@opzio.co'
                 && $mail->View === 'mail.contract'
                 && ($mail->ViewData['contract']['holder'] ?? null) === 'Cliente'
                 && ($mail->ViewData['contract']['name'] ?? null) === 'Contrato personalizado'

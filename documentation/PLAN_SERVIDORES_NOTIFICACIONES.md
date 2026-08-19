@@ -10,11 +10,15 @@ El observer seguirá siendo ajeno a estos datos comerciales. El ERP conserva la 
 
 1. `servers_projects.client_id` relaciona el proyecto con un cliente activo.
 2. `servers_projects.notifications_enabled` controla si el proyecto está habilitado para notificar.
-3. `servers_project_notifications` guarda cada destinatario del proyecto, su canal y su origen inicial (`client`, `license_notification` o `project`). Después de la importación, estos registros son propiedad del módulo de servidores.
+3. `servers_project_notifications` guarda cada destinatario como `source_type = project`, independientemente de si fue importado o agregado manualmente. Cliente/licencia solo sirven como ayuda para la primera selección.
 4. `app/traits/servers_trait.php` concentra la consulta y validación de configuración para mantener liviano el controlador del dashboard.
 5. `notification_recipients_initialized` marca que la importación inicial ya ocurrió y evita volver a consultar licencias al abrir el modal.
 6. El endpoint inicial solo devuelve el correo/teléfono directo del cliente y los contactos activos de sus licencias activas, deduplicados por canal y dato.
 7. El CRUD del módulo permite agregar, editar y eliminar contactos propios, sin validar que sigan existiendo en las licencias.
+8. La migración `2026_08_19_000007_backfill_initialized_server_project_notifications` marca como inicializados los proyectos que ya tenían destinatarios guardados antes de incorporar la bandera.
+9. La migración `2026_08_19_000008_normalize_server_project_notification_sources` convierte registros históricos de cliente/licencia a registros propios del proyecto.
+10. El listado muestra una bolita `$secondary` (`#885FAE`) sobre la campana cuando `notifications_enabled` está activo.
+11. El filtro `Notificaciones` permite consultar `Todos`, `Activas` o `Inactivas` y se conserva al exportar a Excel.
 
 ## Flujo de usuario
 

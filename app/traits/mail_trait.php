@@ -8,6 +8,7 @@ use App\Mail\CustomMail;
 trait mail_trait
 {
 	use mail_log_trait;
+	use mail_senders_trait;
 
 	public function SendMail(
 		$MailData,
@@ -26,12 +27,8 @@ trait mail_trait
 		];
 
 		try {
-			if (isset($from) === false) {
-				$from = [
-					'address' => config('mail.from.address') ?? '',
-					'name' => config('mail.from.name') ?? ''
-				];
-			}
+			$from = $this->Mail_GetSenderForView($View, $from);
+			$replyTo = $this->Mail_GetReplyTo();
 			if (App::environment() === 'local') {
 				$Mails = [
 					[
@@ -62,7 +59,7 @@ trait mail_trait
 			$from['name'],
 			$Mails,
 			null,
-			$ViewData,
+			$this->Mail_AddEnvelopeMetadata($ViewData, $from, $replyTo),
 			$Response['status'],
 			$files,
 			$Response['message']
@@ -87,12 +84,8 @@ trait mail_trait
 				];
 			}
 			
-				if ($from === null) {
-					$from = [
-						'address' => config('mail.from.address') ?? '',
-						'name' => config('mail.from.name') ?? ''
-					];
-				}
+					$from = $this->Mail_GetSenderForView($View, $from);
+					$replyTo = $this->Mail_GetReplyTo();
 			
 				$mail = Mail::mailer($mailer ?: config('mail.default', 'smtp'));
 			///////////////////////////
@@ -120,7 +113,7 @@ trait mail_trait
 			$from['name'],
 			$Mails,
 			null,
-			$ViewData,
+			$this->Mail_AddEnvelopeMetadata($ViewData, $from, $replyTo),
 			$Response['status'],
 			$file_array,
 			$Response['message']

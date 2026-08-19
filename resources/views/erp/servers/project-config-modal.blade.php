@@ -16,6 +16,11 @@
                 <label for="servers-project-config-client-select">Cliente asociado</label>
                 <select id="servers-project-config-client-select" class="form-select" data-search-placeholder="Buscar cliente..."></select>
             </div>
+            <div class="servers-project-config-field">
+                <label for="servers-project-config-notification-name">Nombre en notificaciones</label>
+                <input type="text" id="servers-project-config-notification-name" class="form-control" maxlength="255" autocomplete="off" placeholder="Opcional; usa el nombre técnico si queda vacío">
+                <small>Este nombre aparecerá en el asunto, el correo y el PDF del reporte mensual.</small>
+            </div>
             <section class="servers-project-config-recipients" aria-labelledby="servers-project-config-recipients-title">
                 <div class="servers-project-config-section-heading">
                     <div>

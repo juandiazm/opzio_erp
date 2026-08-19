@@ -89,7 +89,8 @@ const renderStoredRecipients = (config) => {
 };
 
 const renderRecipients = (config) => {
-    config.elements.crud.hidden = !config.initialized;
+    const canManageRecipients = config.initialized || Boolean(config.clientId);
+    config.elements.crud.hidden = !canManageRecipients;
     config.elements.recipientDescription.textContent = config.initialized
         ? 'Registros propios de este proyecto. Los cambios en las licencias no modifican esta lista.'
         : 'Estos contactos se consultan una sola vez desde el cliente y sus licencias activas.';
@@ -189,6 +190,7 @@ const loadClients = (config, clients, selectedClientId) => {
 const applyConfigData = (config, data) => {
     const project = data.project || {};
     config.clientId = project.client_id || null;
+    config.elements.notificationName.value = project.notification_name || '';
     config.initialized = Boolean(data.notification_recipients_initialized);
     config.initialImportRequired = Boolean(data.needs_initial_import);
     config.availableRecipients = data.available_recipients || [];
@@ -202,7 +204,9 @@ const applyConfigData = (config, data) => {
 const save = async (state, event) => {
     event.preventDefault();
     const config = state.projectConfig;
-    const recipientKeys = config.initialized ? [] : getSelectedKeys(config);
+    const recipientKeys = config.initialized
+        ? config.selectedRecipients.map((recipient) => recipient.key)
+        : getSelectedKeys(config);
     const notificationsEnabled = config.elements.notificationsEnabled.checked;
     if (notificationsEnabled && recipientKeys.length === 0) {
         setStatus(config, 'Selecciona al menos un destinatario para activar las notificaciones.', true);
@@ -216,6 +220,7 @@ const save = async (state, event) => {
             project_id: config.projectId,
             client_id: config.elements.clientSelect.value || null,
             notifications_enabled: notificationsEnabled,
+            notification_name: config.elements.notificationName.value.trim() || null,
             recipient_keys: recipientKeys,
         });
         applyConfigData(config, data);
@@ -233,7 +238,7 @@ const resetNotificationForm = (config) => {
     config.editingNotificationId = null;
     setSelectValue(config.elements.notificationChannel, 'email');
     config.elements.notificationValue.value = '';
-    config.elements.notificationName.value = '';
+    config.elements.recipientName.value = '';
     config.elements.notificationFormTitle.textContent = 'Agregar destinatario';
     config.elements.notificationSubmitLabel.textContent = 'Agregar';
     config.elements.notificationSubmit.querySelector('i').className = 'fa-light fa-plus';
@@ -246,7 +251,7 @@ const editNotification = (config, notificationId) => {
     config.editingNotificationId = recipient.id;
     setSelectValue(config.elements.notificationChannel, recipient.channel);
     config.elements.notificationValue.value = recipient.value || '';
-    config.elements.notificationName.value = recipient.name || '';
+    config.elements.recipientName.value = recipient.name || '';
     config.elements.notificationFormTitle.textContent = 'Editar destinatario';
     config.elements.notificationSubmitLabel.textContent = 'Actualizar';
     config.elements.notificationSubmit.querySelector('i').className = 'fa-light fa-pen';
@@ -284,7 +289,7 @@ const submitNotification = async (state) => {
         project_id: config.projectId,
         channel: config.elements.notificationChannel.value,
         value,
-        recipient_name: config.elements.notificationName.value.trim() || null,
+        recipient_name: config.elements.recipientName.value.trim() || null,
     };
     const isEditing = Boolean(config.editingNotificationId);
     if (isEditing) payload.notification_id = config.editingNotificationId;
@@ -336,6 +341,7 @@ export const initializeProjectConfig = (state) => {
             status: document.getElementById('servers-project-config-status'),
             project: document.getElementById('servers-project-config-project'),
             clientSelect: document.getElementById('servers-project-config-client-select'),
+            notificationName: document.getElementById('servers-project-config-notification-name'),
             recipientList: document.getElementById('servers-project-config-recipient-list'),
             recipientEmpty: document.getElementById('servers-project-config-recipient-empty'),
             recipientDescription: document.getElementById('servers-project-config-recipient-description'),
@@ -343,7 +349,7 @@ export const initializeProjectConfig = (state) => {
             crud: document.getElementById('servers-project-notification-crud'),
             notificationChannel: document.getElementById('servers-project-notification-channel'),
             notificationValue: document.getElementById('servers-project-notification-value'),
-            notificationName: document.getElementById('servers-project-notification-name'),
+            recipientName: document.getElementById('servers-project-notification-name'),
             notificationFormTitle: document.getElementById('servers-project-notification-form-title'),
             notificationSubmit: document.getElementById('servers-project-notification-submit'),
             notificationSubmitLabel: document.getElementById('servers-project-notification-submit-label'),
@@ -402,6 +408,7 @@ export const openProjectConfig = async (state, projectId) => {
     config.selectedRecipients = [];
     config.selectedKeys = new Set();
     config.elements.clientSelect.disabled = true;
+    config.elements.notificationName.disabled = true;
     config.elements.notificationsEnabled.disabled = true;
     config.elements.notificationsEnabled.checked = false;
     config.elements.project.textContent = 'Cargando proyecto...';
@@ -416,11 +423,13 @@ export const openProjectConfig = async (state, projectId) => {
         applyConfigData(config, data);
         config.elements.project.textContent = `${project.name || 'Proyecto'} · ${project.key || ''}`;
         config.elements.clientSelect.disabled = false;
+        config.elements.notificationName.disabled = false;
         setStatus(config, '');
         const clientName = data.client?.complete_name || '';
         await promptForRecipients(config, clientName);
     } catch (error) {
         setStatus(config, error.message || 'No fue posible cargar la configuración.', true);
         config.elements.clientSelect.disabled = false;
+        config.elements.notificationName.disabled = false;
     }
 };

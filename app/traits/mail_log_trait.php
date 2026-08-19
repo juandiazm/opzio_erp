@@ -45,6 +45,14 @@ trait mail_log_trait
         $send_at = null,
         $notification_batch = null
     ) {
+        if (method_exists($this, 'Mail_GetSenderForView')) {
+            $sender = $this->Mail_GetSenderForView($view, $from);
+            $replyTo = $this->Mail_GetReplyTo();
+            $from = $sender['address'];
+            $as = $sender['name'];
+            $mail_data = $this->Mail_AddEnvelopeMetadata($mail_data, $sender, $replyTo);
+        }
+
         $mail_log = new mail_log();
         $mail_log->unique_id = strtoupper(Str::uuid()->toString());
         $mail_log->subject = $subject;

@@ -70,7 +70,7 @@ trait servers_trait
         }
     }
 
-    public function Servers_UpdateProjectConfig($projectId, $clientId, $notificationsEnabled, $recipientKeys)
+    public function Servers_UpdateProjectConfig($projectId, $clientId, $notificationsEnabled, $recipientKeys, $notificationName = null)
     {
         try {
             $project = servers_project::with('notificationRecipients')->find($projectId);
@@ -92,7 +92,9 @@ trait servers_trait
                 ];
             }
 
-            $initialImport = ! (bool) $project->notification_recipients_initialized;
+            $hasStoredRecipients = $project->notificationRecipients->isNotEmpty();
+            $initialImport = ! (bool) $project->notification_recipients_initialized && ! $hasStoredRecipients;
+            $legacyConfiguration = ! (bool) $project->notification_recipients_initialized && $hasStoredRecipients;
             $selected = collect();
             if ($initialImport && $client) {
                 $client = $this->Servers_GetActiveClientWithRecipients($clientId);
@@ -131,16 +133,19 @@ trait servers_trait
                 ];
             }
 
-            DB::transaction(function () use ($project, $clientId, $notificationsEnabled, $selected, $initialImport, $recipientCount) {
+            DB::transaction(function () use ($project, $clientId, $notificationsEnabled, $selected, $initialImport, $legacyConfiguration, $recipientCount, $notificationName) {
                 $project->client_id = $clientId;
                 $project->notifications_enabled = $notificationsEnabled && $recipientCount > 0;
+                $project->notification_name = trim((string) $notificationName) ?: null;
+                if ($initialImport || $legacyConfiguration) {
+                    $project->notification_recipients_initialized = true;
+                }
                 if ($initialImport) {
-                    $project->notification_recipients_initialized = $clientId !== null;
                     foreach ($selected as $recipient) {
                         $project->notificationRecipients()->create([
-                            'source_type' => $recipient['source_type'],
-                            'source_id' => $recipient['source_id'],
-                            'source_key' => $recipient['key'],
+                            'source_type' => 'project',
+                            'source_id' => null,
+                            'source_key' => 'project:'.Str::uuid()->toString(),
                             'channel' => $recipient['channel'],
                             'value' => $recipient['value'],
                             'recipient_name' => $recipient['name'],
@@ -325,7 +330,15 @@ trait servers_trait
 
     private function Servers_ProjectConfigurationData($project)
     {
-        $initialImportRequired = ! (bool) $project->notification_recipients_initialized;
+        $this->Servers_NormalizeStoredRecipients($project);
+        $hasStoredRecipients = $project->notificationRecipients->isNotEmpty();
+        $initialized = (bool) $project->notification_recipients_initialized || $hasStoredRecipients;
+        if ($hasStoredRecipients && ! $project->notification_recipients_initialized) {
+            $project->forceFill([
+                'notification_recipients_initialized' => true,
+            ])->saveQuietly();
+        }
+        $initialImportRequired = ! $initialized;
         if ($initialImportRequired && $project->client_id) {
             $initialClient = $this->Servers_GetActiveClientWithRecipients($project->client_id);
             $project->setRelation('client', $initialClient);
@@ -349,6 +362,7 @@ trait servers_trait
                 'environment' => $project->environment,
                 'client_id' => $project->client_id ? (int) $project->client_id : null,
                 'notifications_enabled' => (bool) $project->notifications_enabled,
+                'notification_name' => $project->notification_name,
             ],
             'clients' => client::where('active', 1)
                 ->orderBy('name')
@@ -363,7 +377,7 @@ trait servers_trait
             'selected_recipients' => $selected,
             'has_recipients' => $selected->isNotEmpty(),
             'recipients_count' => $selected->count(),
-            'notification_recipients_initialized' => (bool) $project->notification_recipients_initialized,
+            'notification_recipients_initialized' => $initialized,
             'needs_initial_import' => $initialImportRequired && $project->client_id !== null,
         ];
     }
@@ -381,6 +395,23 @@ trait servers_trait
             'message' => $message,
             'data' => $this->Servers_ProjectConfigurationData($project),
         ];
+    }
+
+    private function Servers_NormalizeStoredRecipients($project)
+    {
+        foreach ($project->notificationRecipients as $recipient) {
+            if ($recipient->source_type === 'project' && $recipient->source_id === null) {
+                continue;
+            }
+
+            $recipient->forceFill([
+                'source_type' => 'project',
+                'source_id' => null,
+                'source_key' => 'project:'.Str::uuid()->toString(),
+            ])->saveQuietly();
+            $recipient->source_type = 'project';
+            $recipient->source_id = null;
+        }
     }
 
     private function Servers_GetActiveClientWithRecipients($clientId)
@@ -470,9 +501,7 @@ trait servers_trait
             'channel' => $recipient->channel,
             'value' => $recipient->value,
             'name' => $recipient->recipient_name ?: '',
-            'source_label' => $recipient->source_type === 'project'
-                ? 'Propio del proyecto'
-                : 'Importado inicialmente',
+            'source_label' => 'Propio del proyecto',
             'selected' => true,
             'available' => false,
         ];

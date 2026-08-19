@@ -27,6 +27,7 @@ export const loadPage = async (state) => {
                 host_key: state.hostSelect.value,
                 environment: state.environmentSelect.value,
                 health: state.healthSelect.value,
+                notifications: state.notificationsSelect.value,
                 sort_by: state.sortState.key,
                 sort_direction: state.sortState.direction,
                 pagination: state.pagination
@@ -60,6 +61,7 @@ export const exportData = (state) => {
         host_key: state.hostSelect.value,
         environment: state.environmentSelect.value,
         health: state.healthSelect.value,
+        notifications: state.notificationsSelect.value,
         sort_by: state.sortState.key,
         sort_direction: state.sortState.direction
     });

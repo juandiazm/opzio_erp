@@ -4,7 +4,7 @@
     border: 1px solid var(--servers-line);
     display: grid;
     gap: 12px;
-    grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(110px, 1fr)) auto;
+    grid-template-columns: minmax(220px, 2fr) repeat(5, minmax(110px, 1fr)) auto;
     padding: 14px;
 }
 

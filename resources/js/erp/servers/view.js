@@ -112,6 +112,10 @@ export const renderRows = (state, projects) => {
     state.tableBody.innerHTML = projects.map((project) => {
         const detailId = `servers-detail-${project.id}`;
         const healthClass = project.health === 'reporting' ? 'is-healthy' : (project.health === 'stale' ? 'is-warn' : 'is-neutral');
+        const notificationsActive = Boolean(project.notifications_enabled);
+        const notificationButtonLabel = notificationsActive
+            ? `Configurar notificaciones activas de ${project.name}`
+            : `Configurar notificaciones de ${project.name}`;
         return `
             <tr class="servers-project-row">
                 <td><strong>${escapeHtml(project.name)}</strong><small>${escapeHtml(project.key)} · ${escapeHtml(project.attribution_mode || '-')}</small></td>
@@ -125,7 +129,7 @@ export const renderRows = (state, projects) => {
                 <td><strong>${formatNumber(project.fpm_listen_queue)} / ${formatNumber(project.fpm_max_listen_queue)}</strong><small>${formatNumber(project.fpm_utilization_percent, '%')} utilización</small></td>
                 <td><strong>${formatBytes(project.storage_total_bytes)}</strong><small>${formatSignedBytes(project.storage_growth_bytes)}</small></td>
                 <td class="text-end">
-                    <button type="button" class="servers-config-button${project.notifications_enabled ? ' is-enabled' : ''}" data-project-id="${escapeHtml(project.id)}" aria-label="Configurar notificaciones de ${escapeHtml(project.name)}" title="Configurar notificaciones"><i class="fa-light fa-bell"></i></button>
+                    <button type="button" class="servers-config-button${notificationsActive ? ' is-enabled is-notifications-enabled' : ''}" data-project-id="${escapeHtml(project.id)}" aria-label="${escapeHtml(notificationButtonLabel)}" title="${escapeHtml(notificationButtonLabel)}"><i class="fa-light fa-bell"></i></button>
                     <button type="button" class="servers-detail-button" data-detail-id="${escapeHtml(detailId)}" aria-label="Ver detalle de ${escapeHtml(project.name)}" title="Ver detalle"><i class="fa-light fa-eye"></i></button>
                 </td>
             </tr>

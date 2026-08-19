@@ -10,6 +10,7 @@ import { renderSortState } from './view.js';
         const hostSelect = document.getElementById('servers-host-select');
         const environmentSelect = document.getElementById('servers-environment-select');
         const healthSelect = document.getElementById('servers-health-select');
+        const notificationsSelect = document.getElementById('servers-notifications-select');
         const queryButton = document.getElementById('servers-query-button');
         const exportButton = document.getElementById('servers-export-button');
         const statusContainer = document.getElementById('servers-status');
@@ -27,6 +28,7 @@ import { renderSortState } from './view.js';
             hostSelect,
             environmentSelect,
             healthSelect,
+            notificationsSelect,
             queryButton,
             exportButton,
             statusContainer,
@@ -54,7 +56,7 @@ import { renderSortState } from './view.js';
             });
         });
 
-        [rangeSelect, hostSelect, environmentSelect, healthSelect].forEach((input) => input.addEventListener('change', () => requestPage(state)));
+        [rangeSelect, hostSelect, environmentSelect, healthSelect, notificationsSelect].forEach((input) => input.addEventListener('change', () => requestPage(state)));
         searchInput.addEventListener('change', () => requestPage(state));
         searchInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') requestPage(state);

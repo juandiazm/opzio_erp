@@ -49,7 +49,10 @@ class send_queued_mails extends Command
             if($Response['status'] == 1){
                 foreach($Response['data'] as $mail){
                     $mailData = is_array($mail['mail_data']) ? $mail['mail_data'] : [];
-                    $from = $mailData['_from'] ?? null;
+                    $from = $mailData['_from'] ?? [
+                        'address' => $mail['from'] ?? null,
+                        'name' => $mail['as'] ?? null,
+                    ];
                     $replyTo = $mailData['_reply_to'] ?? null;
                     $MailResponse = $this->SendMail_attach_array(
                         [

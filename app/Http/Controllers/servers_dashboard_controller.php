@@ -53,6 +53,7 @@ class servers_dashboard_controller extends Controller
             'project_id' => 'required|integer|min:1',
             'client_id' => 'nullable|integer|min:1',
             'notifications_enabled' => 'required|boolean',
+            'notification_name' => 'nullable|string|max:255',
             'recipient_keys' => 'nullable|array|max:500',
             'recipient_keys.*' => 'string|max:255',
         ]);
@@ -61,7 +62,8 @@ class servers_dashboard_controller extends Controller
             $validated['project_id'],
             $validated['client_id'] ?? null,
             $validated['notifications_enabled'],
-            $validated['recipient_keys'] ?? []
+            $validated['recipient_keys'] ?? [],
+            $validated['notification_name'] ?? null
         );
 
         return $response['status'] == 1
@@ -494,6 +496,9 @@ class servers_dashboard_controller extends Controller
             'health' => in_array($request->input('health'), ['reporting', 'stale', 'no_data'], true)
                 ? $request->input('health')
                 : '',
+            'notifications' => in_array($request->input('notifications'), ['active', 'inactive'], true)
+                ? $request->input('notifications')
+                : '',
             'sort_by' => in_array($request->input('sort_by'), [
                 'name',
                 'host',
@@ -525,6 +530,12 @@ class servers_dashboard_controller extends Controller
 
         if ($filters['environment'] !== '') {
             $projects->where('environment', $filters['environment']);
+        }
+
+        if ($filters['notifications'] === 'active') {
+            $projects->where('notifications_enabled', true);
+        } elseif ($filters['notifications'] === 'inactive') {
+            $projects->where('notifications_enabled', false);
         }
 
         return $projects->get()

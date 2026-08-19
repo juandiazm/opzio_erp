@@ -17,6 +17,9 @@
         <testsuite name="Servers Notifications Feature">
             <file>./tests/Feature/servers_notifications_test.php</file>
         </testsuite>
+        <testsuite name="Servers Monthly Report Feature">
+            <file>./tests/Feature/servers_monthly_report_test.php</file>
+        </testsuite>
         <testsuite name="Contracts Feature">
             <file>./tests/Feature/contracts_test.php</file>
         </testsuite>

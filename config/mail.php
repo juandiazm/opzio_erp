@@ -112,8 +112,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS'),
-        'name' => env('MAIL_FROM_NAME'),
+        'address' => env('MAIL_FROM_ADDRESS', 'info@opzio.co'),
+        'name' => env('MAIL_FROM_NAME', 'OPZIO SAS - Información'),
     ],
 
     /*

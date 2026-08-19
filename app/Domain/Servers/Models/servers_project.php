@@ -17,6 +17,7 @@ class servers_project extends Model
         'client_id',
         'notifications_enabled',
         'notification_recipients_initialized',
+        'notification_name',
         'php_version',
         'fpm_pool',
         'fpm_status_url',

@@ -16,6 +16,7 @@ use App\Models\sms_log;
 trait notifications_trait
 {
     use mail_log_trait;
+    use mail_senders_trait;
     use twilio_sms_trait;
 
     private function Notification_Response($message, $data = [], $status = 1)
@@ -347,23 +348,8 @@ trait notifications_trait
             throw new \InvalidArgumentException('Debe ingresar contenido para el correo');
         }
 
-        $fromAddress = trim((string) ($input['from'] ?? config('mail.from.address')));
-        $replyTo = trim((string) ($input['reply_to'] ?? ''));
-        if (!filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException('El remitente no es valido');
-        }
-        if ($replyTo !== '' && !filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException('El Reply-To no es valido');
-        }
-
-        $from = [
-            'address' => $fromAddress,
-            'name' => trim((string) ($input['from_name'] ?? config('mail.from.name', ''))),
-        ];
-        $replyToData = $replyTo === '' ? null : [
-            'address' => $replyTo,
-            'name' => trim((string) ($input['reply_to_name'] ?? '')),
-        ];
+        $from = $this->Mail_GetSenderForView('mail.notification', $input['from'] ?? null);
+        $replyToData = $this->Mail_GetReplyTo();
 
         return [
             'subject' => $subject,

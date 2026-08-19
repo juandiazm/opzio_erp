@@ -33,6 +33,13 @@ trait pdf_trait
                 ->footerHtml($this->PDF_ContractFooterHtml());
         }
 
+            if ($view === 'pdf.servers.monthly_report') {
+                $browsershot
+                    ->showBrowserHeaderAndFooter()
+                    ->headerHtml($this->PDF_ServersMonthlyHeaderHtml($Data))
+                    ->footerHtml($this->PDF_ServersMonthlyFooterHtml());
+            }
+
         return $browsershot->pdf();
     }
 
@@ -72,6 +79,26 @@ trait pdf_trait
                 ? $matches[0]
                 : 'url('.$matches[1].$dataUri.$matches[1].')';
         }, $html) ?? $html;
+    }
+
+    private function PDF_ServersMonthlyHeaderHtml($Data = [])
+    {
+        $report = is_array($Data['report'] ?? null) ? $Data['report'] : [];
+        $project = is_array($report['project'] ?? null) ? $report['project'] : [];
+        $logo = $this->PDF_AssetDataUri(public_path('images/opzio-logo-wide-purple-transparent.png'));
+        $logo = $logo ? htmlspecialchars($logo, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : null;
+        $projectName = htmlspecialchars((string) ($project['display_name'] ?? $project['name'] ?? 'Proyecto'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $period = htmlspecialchars((string) ($report['period']['label'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $logoHtml = $logo
+            ? '<img src="'.$logo.'" alt="Opzio" style="display: inline-block; width: 118px; height: auto;">'
+            : '<span style="color: #220245; font-size: 16px; font-weight: bold;">OPZIO</span>';
+
+        return '<div style="box-sizing: border-box; width: 100%; margin: 0; padding: 0 8px;"><div style="box-sizing: border-box; width: 100%; margin: 0; padding: 0 0 7px; border-bottom: 2px solid #220245; font-family: Arial, sans-serif;"><table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tr><td style="width: 33%; color: #220245; font-size: 10px; font-weight: bold; text-align: left; vertical-align: middle;">'.$projectName.'</td><td style="width: 34%; text-align: center; vertical-align: middle;">'.$logoHtml.'</td><td style="width: 33%; color: #220245; font-size: 10px; font-weight: bold; text-align: right; vertical-align: middle;">'.$period.'</td></tr></table></div></div>';
+    }
+
+    private function PDF_ServersMonthlyFooterHtml()
+    {
+        return '<div style="box-sizing: border-box; width: 100%; margin: 0; padding: 5px 8px 0; border-top: 1px solid #d9d9d9; color: #777; font-family: Arial, sans-serif; font-size: 8px; white-space: nowrap;"><table style="width: 100%; border-collapse: collapse;"><tr><td style="width: 33%; padding-top: 5px; text-align: left;">soporte@opzio.co</td><td style="width: 34%; padding-top: 5px; text-align: center;">Página <span class="pageNumber"></span> de <span class="totalPages"></span></td><td style="width: 33%; padding-top: 5px; text-align: right;">opzio.co</td></tr></table></div>';
     }
 
     private function PDF_AssetDataUri($source)

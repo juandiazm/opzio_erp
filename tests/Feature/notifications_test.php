@@ -136,7 +136,9 @@ class notifications_test extends TestCase
         $this->assertSame(3, mail_log::where('view', 'mail.notification')->count());
         $this->assertSame(3, mail_log_attachment::count());
         $this->assertStringNotContainsString('<script>', mail_log::first()->mail_data['content']);
-        $this->assertSame('respuestas@example.test', mail_log::first()->mail_data['_reply_to']['address']);
+        $this->assertSame('info@opzio.co', mail_log::first()->from);
+        $this->assertSame('OPZIO SAS - Información', mail_log::first()->as);
+        $this->assertSame('info@opzio.co', mail_log::first()->mail_data['_reply_to']['address']);
 
         $massive = $this->Notification_CreateEmail([
             'recipients' => ['uno@example.test', 'dos@example.test'],
@@ -234,7 +236,7 @@ class notifications_test extends TestCase
                 ];
             }
 
-            public function OpenIA_MakeQuestion($message)
+            public function OpenIA_MakeQuestion($message, $model = null, $options = [])
             {
                 return ['status' => 1, 'data' => ['Mensaje']];
             }

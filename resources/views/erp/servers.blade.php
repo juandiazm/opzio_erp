@@ -39,6 +39,14 @@
                         <option value="no_data">Sin datos</option>
                     </select>
                 </label>
+                <label class="servers-filter" for="servers-notifications-select">
+                    <span>Notificaciones</span>
+                    <select id="servers-notifications-select" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="active">Activas</option>
+                        <option value="inactive">Inactivas</option>
+                    </select>
+                </label>
                 <label class="servers-filter" for="servers-range-select">
                     <span>Rango</span>
                     <select id="servers-range-select" class="form-select">

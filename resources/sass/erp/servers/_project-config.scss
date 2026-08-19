@@ -10,6 +10,7 @@
     cursor: pointer;
     font-size: 16px;
     padding: 5px 7px;
+    position: relative;
 }
 
 .servers-config-button:hover,
@@ -19,6 +20,18 @@
 .servers-detail-button:focus-visible,
 .servers-detail-button.is-open {
     color: var(--servers-teal);
+}
+
+.servers-config-button.is-notifications-enabled::after {
+    background-color: $secondary;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    content: '';
+    height: 8px;
+    position: absolute;
+    right: 3px;
+    top: 2px;
+    width: 8px;
 }
 
 .servers-config-button:focus-visible,
@@ -144,6 +157,13 @@
     display: block;
     font-size: 12px;
     margin-bottom: 7px;
+}
+
+.servers-project-config-field > small {
+    color: var(--servers-muted);
+    display: block;
+    font-size: 11px;
+    margin-top: 5px;
 }
 
 .servers-project-config-recipients {
@@ -310,11 +330,30 @@
 
 .servers-project-notification-form > button {
     align-items: center;
+    background-color: $primary;
+    border-color: $primary;
+    color: $text-white;
     display: inline-flex;
     gap: 6px;
     justify-content: center;
     min-height: 36px;
     white-space: nowrap;
+}
+
+.servers-project-notification-form > button:hover,
+.servers-project-notification-form > button:focus-visible,
+.servers-project-config-actions .btn-primary:hover,
+.servers-project-config-actions .btn-primary:focus-visible {
+    background-color: $primary;
+    border-color: $primary;
+    color: $text-white;
+    filter: brightness(1.16);
+}
+
+.servers-project-config-actions .btn-primary {
+    background-color: $primary;
+    border-color: $primary;
+    color: $text-white;
 }
 
 .servers-project-notification-row {
@@ -419,7 +458,7 @@
 }
 
 .servers-project-config-toggle input:checked + .servers-toggle-track {
-    background: var(--servers-teal);
+    background: $primary;
 }
 
 .servers-project-config-toggle input:checked + .servers-toggle-track::after {

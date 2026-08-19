@@ -71,6 +71,18 @@ class servers_notifications_test extends TestCase
             '--path' => database_path('migrations/2026_08_18_000006_add_notification_initialization_to_servers_projects_table.php'),
             '--realpath' => true,
         ]);
+        Artisan::call('migrate', [
+            '--path' => database_path('migrations/2026_08_19_000007_backfill_initialized_server_project_notifications.php'),
+            '--realpath' => true,
+        ]);
+        Artisan::call('migrate', [
+            '--path' => database_path('migrations/2026_08_19_000008_normalize_server_project_notification_sources.php'),
+            '--realpath' => true,
+        ]);
+        Artisan::call('migrate', [
+            '--path' => database_path('migrations/2026_08_19_000009_add_notification_name_to_servers_projects_table.php'),
+            '--realpath' => true,
+        ]);
 
         $host = servers_host::create([
             'key' => 'test-host',
@@ -181,6 +193,7 @@ class servers_notifications_test extends TestCase
             'project_id' => $this->project->id,
             'client_id' => $client->id,
             'notifications_enabled' => true,
+            'notification_name' => 'Portal de Clientes',
             'recipient_keys' => $selectedKeys,
         ]);
 
@@ -188,12 +201,14 @@ class servers_notifications_test extends TestCase
             ->assertOk()
             ->assertJsonPath('data.project.client_id', $client->id)
             ->assertJsonPath('data.project.notifications_enabled', true)
+            ->assertJsonPath('data.project.notification_name', 'Portal de Clientes')
             ->assertJsonPath('data.has_recipients', true)
             ->assertJsonCount(2, 'data.selected_recipients');
         $this->assertDatabaseCount('servers_project_notifications', 2, 'sqlite');
         $this->assertDatabaseHas('servers_project_notifications', [
             'project_id' => $this->project->id,
-            'source_type' => 'client',
+            'source_type' => 'project',
+            'source_id' => null,
             'channel' => 'email',
             'value' => 'cliente-dos@example.test',
         ], 'sqlite');
@@ -201,6 +216,7 @@ class servers_notifications_test extends TestCase
             'id' => $this->project->id,
             'client_id' => $client->id,
             'notifications_enabled' => 1,
+            'notification_name' => 'Portal de Clientes',
         ], 'sqlite');
     }
 
@@ -300,7 +316,7 @@ class servers_notifications_test extends TestCase
             'name' => 'Licencia CRUD',
             'active' => true,
         ]);
-        $initialNotification = license_notification::forceCreate([
+        license_notification::forceCreate([
             'license_id' => $license->id,
             'email' => 'inicial@example.test',
             'active' => true,
@@ -353,12 +369,14 @@ class servers_notifications_test extends TestCase
             'value' => '3001234567',
             'recipient_name' => 'Contacto propio actualizado',
         ]);
-        $updateResponse
-            ->assertOk()
-            ->assertJsonPath('data.selected_recipients.1.value', '3001234567');
+        $updateResponse->assertOk();
+        $this->assertSame(
+            '3001234567',
+            collect($updateResponse->json('data.selected_recipients'))->firstWhere('value', '3001234567')['value']
+        );
 
         $initialStoredNotification = collect($updateResponse->json('data.selected_recipients'))
-            ->firstWhere('source_id', $initialNotification->id);
+            ->firstWhere('value', 'inicial@example.test');
         $deleteResponse = $this->withoutMiddleware()->postJson('/admin/servers/project-config/notifications/delete', [
             'project_id' => $this->project->id,
             'notification_id' => $initialStoredNotification['id'],
@@ -369,5 +387,83 @@ class servers_notifications_test extends TestCase
         $this->assertDatabaseMissing('servers_project_notifications', [
             'id' => $initialStoredNotification['id'],
         ], 'sqlite');
+    }
+
+    public function test_legacy_project_recipients_are_marked_initialized_and_do_not_reload_licenses()
+    {
+        $client = client::create([
+            'name' => 'Cliente legado',
+            'email' => 'cliente-legado@example.test',
+            'active' => true,
+        ]);
+        $this->project->update([
+            'client_id' => $client->id,
+            'notifications_enabled' => true,
+            'notification_recipients_initialized' => false,
+        ]);
+        DB::table('servers_project_notifications')->insert([
+            'project_id' => $this->project->id,
+            'source_type' => 'license_notification',
+            'source_id' => 901,
+            'source_key' => 'license_notification:901:email',
+            'channel' => 'email',
+            'value' => 'legacy@example.test',
+            'recipient_name' => 'Contacto legado',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->withoutMiddleware()->postJson('/admin/servers/project-config/get', [
+            'project_id' => $this->project->id,
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data.notification_recipients_initialized', true)
+            ->assertJsonPath('data.needs_initial_import', false)
+            ->assertJsonCount(0, 'data.available_recipients')
+            ->assertJsonPath('data.selected_recipients.0.value', 'legacy@example.test')
+            ->assertJsonPath('data.selected_recipients.0.source_type', 'project')
+            ->assertJsonPath('data.selected_recipients.0.source_id', null);
+        $this->assertDatabaseHas('servers_projects', [
+            'id' => $this->project->id,
+            'notification_recipients_initialized' => 1,
+        ], 'sqlite');
+    }
+
+    public function test_dashboard_filters_projects_by_notification_status()
+    {
+        $this->project->update([
+            'notifications_enabled' => true,
+        ]);
+        servers_project::create([
+            'host_id' => $this->project->host_id,
+            'key' => 'inactive-notification-project',
+            'name' => 'Inactive notification project',
+            'path' => '/var/www/inactive-notification-project',
+            'environment' => 'testing',
+            'enabled' => true,
+            'notifications_enabled' => false,
+        ]);
+
+        $activeResponse = $this->withoutMiddleware()->postJson('/admin/servers/get-page', [
+            'notifications' => 'active',
+            'pagination' => ['page' => 1, 'per_page' => 10],
+        ]);
+        $activeResponse
+            ->assertOk()
+            ->assertJsonPath('pagination.total', 1)
+            ->assertJsonPath('data.0.key', 'test-project')
+            ->assertJsonPath('data.0.notifications_enabled', true);
+
+        $inactiveResponse = $this->withoutMiddleware()->postJson('/admin/servers/get-page', [
+            'notifications' => 'inactive',
+            'pagination' => ['page' => 1, 'per_page' => 10],
+        ]);
+        $inactiveResponse
+            ->assertOk()
+            ->assertJsonPath('pagination.total', 1)
+            ->assertJsonPath('data.0.key', 'inactive-notification-project')
+            ->assertJsonPath('data.0.notifications_enabled', false);
     }
 }
