@@ -1,6 +1,8 @@
 <!-- Purchase Order Viewer -->
-<div id="order-viewer-container">
-    <i class="fa-solid fa-times" id="close-order-viewer"></i>
+<div id="order-viewer-container" role="dialog" aria-modal="true" aria-labelledby="order-viewer-title" aria-hidden="true">
+    <button type="button" id="close-order-viewer" class="pdf-viewer-close" title="Cerrar visualizador" aria-label="Cerrar visualizador">
+        <i class="fa-solid fa-times" aria-hidden="true"></i>
+    </button>
     <div id="order-viewer-sub-container">
         <h1 id="order-viewer-title">Documento</h1>
         <div id="order-viewer">
@@ -18,6 +20,7 @@
                     <button id="pdf-download" class="btn btn-sm" title="Descargar"><i class="fa-solid fa-download"></i></button>
                     <button id="pdf-share" class="btn btn-sm" title="Compartir"><i class="fa-solid fa-share-nodes"></i></button>
                     <button id="pdf-fullscreen" class="btn btn-sm" title="Pantalla completa"><i class="fa-solid fa-expand"></i></button>
+                    <button type="button" class="btn btn-sm pdf-viewer-close-button" data-close-order-viewer title="Cerrar visualizador" aria-label="Cerrar visualizador"><i class="fa-solid fa-times" aria-hidden="true"></i></button>
                 </div>
             </div>
             <div id="pdf-canvas-container">

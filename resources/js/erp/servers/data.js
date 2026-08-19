@@ -80,3 +80,18 @@ export const saveProjectConfig = async (state, config) => {
     const payload = await requestJson('/admin/servers/project-config/update', state, config);
     return payload.data || {};
 };
+
+export const addProjectNotification = async (state, notification) => {
+    const payload = await requestJson('/admin/servers/project-config/notifications/add', state, notification);
+    return payload.data || {};
+};
+
+export const updateProjectNotification = async (state, notification) => {
+    const payload = await requestJson('/admin/servers/project-config/notifications/update', state, notification);
+    return payload.data || {};
+};
+
+export const deleteProjectNotification = async (state, notification) => {
+    const payload = await requestJson('/admin/servers/project-config/notifications/delete', state, notification);
+    return payload.data || {};
+};

@@ -2,9 +2,31 @@ import { loadPdfViewer, pdfPrevPage, pdfNextPage, pdfZoomIn, pdfZoomOut, printPd
 import { incomeState } from './state.js';
 
 export {pdfPrevPage, pdfNextPage, pdfZoomIn, pdfZoomOut, printPdf, downloadPdf, fullscreenPdf};
-export function init(){ initPdfViewer(); }
-export function showIncomeOrder(openWindow = true){ if(incomeState.currentIncome != null){ loadPdfViewer('/storage/incomes/pdfs/'+incomeState.currentIncome.unique_id+'.pdf?'+Date.now()); if(openWindow){ $('#order-viewer-container').css('display', 'flex'); $('#erp-app-sidebar').css('visibility', 'hidden'); } } }
-export function closeOrderViewer(){ destroyPdfViewer(); $('#order-viewer-container').fadeOut(100); $('#erp-app-sidebar').css('visibility', 'visible'); cancelSendOrder(); }
+export function init(){
+    initPdfViewer();
+    $(document).on('keydown.incomesOrderViewer', function(event){
+        if(event.key === 'Escape' && $('#order-viewer-container').is(':visible')) closeOrderViewer();
+    });
+}
+export function showIncomeOrder(openWindow = true){
+    if(incomeState.currentIncome != null){
+        loadPdfViewer('/storage/incomes/pdfs/'+incomeState.currentIncome.unique_id+'.pdf?'+Date.now());
+        if(openWindow){
+            $('#order-viewer-container').attr('aria-hidden', 'false').css('display', 'flex');
+            $('#erp-app-sidebar').css('visibility', 'hidden');
+            const closeButton = document.getElementById('close-order-viewer');
+            if(closeButton) closeButton.focus();
+        }
+    }
+}
+export function closeOrderViewer(){
+    const viewer = document.getElementById('order-viewer');
+    if(document.fullscreenElement === viewer && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    destroyPdfViewer();
+    $('#order-viewer-container').stop(true, true).attr('aria-hidden', 'true').fadeOut(100);
+    $('#erp-app-sidebar').css('visibility', 'visible');
+    cancelSendOrder();
+}
 export function shareIncomePdf(){
     if(!incomeState.currentIncome || !incomeState.currentIncome.unique_id) return;
     const payUrl = window.location.origin + '/client/payments/pay/' + incomeState.currentIncome.unique_id;

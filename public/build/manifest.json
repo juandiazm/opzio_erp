@@ -999,7 +999,7 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-CvNyc3Le.js",
+    "file": "assets/incomes-CqhuQBsm.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
@@ -1335,7 +1335,7 @@
     "isEntry": true
   },
   "resources/js/erp/servers/servers.js": {
-    "file": "assets/servers-DOifsQSg.js",
+    "file": "assets/servers-CqHAK9D-.js",
     "name": "servers",
     "src": "resources/js/erp/servers/servers.js",
     "isEntry": true
@@ -1619,7 +1619,7 @@
     "isEntry": true
   },
   "resources/sass/erp/incomes/incomes.scss": {
-    "file": "assets/incomes-pcD38aEK.css",
+    "file": "assets/incomes-D8OuC16a.css",
     "src": "resources/sass/erp/incomes/incomes.scss",
     "isEntry": true
   },
@@ -1684,7 +1684,7 @@
     "isEntry": true
   },
   "resources/sass/erp/servers/servers.scss": {
-    "file": "assets/servers-B_m6k5Xj.css",
+    "file": "assets/servers-BOIXDm4Z.css",
     "src": "resources/sass/erp/servers/servers.scss",
     "isEntry": true
   },

@@ -16,6 +16,7 @@ class servers_project extends Model
         'enabled',
         'client_id',
         'notifications_enabled',
+        'notification_recipients_initialized',
         'php_version',
         'fpm_pool',
         'fpm_status_url',
@@ -30,6 +31,7 @@ class servers_project extends Model
         'client_id' => 'integer',
         'enabled' => 'boolean',
         'notifications_enabled' => 'boolean',
+        'notification_recipients_initialized' => 'boolean',
         'metadata' => 'array',
     ];
 

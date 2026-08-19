@@ -171,6 +171,9 @@ Route::prefix('admin')->group(function () {
             Route::post('project-config/get', [servers_dashboard_controller::class, 'get_project_config']);
             Route::post('project-config/recipients', [servers_dashboard_controller::class, 'get_project_recipients']);
             Route::post('project-config/update', [servers_dashboard_controller::class, 'update_project_config']);
+            Route::post('project-config/notifications/add', [servers_dashboard_controller::class, 'add_project_notification']);
+            Route::post('project-config/notifications/update', [servers_dashboard_controller::class, 'update_project_notification']);
+            Route::post('project-config/notifications/delete', [servers_dashboard_controller::class, 'delete_project_notification']);
         });
         Route::prefix('users')->group(function () {
             Route::get('', [admin_pages_controller::class, 'users_page']);

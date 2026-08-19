@@ -69,6 +69,67 @@ class servers_dashboard_controller extends Controller
             : \Response::json($response, 400);
     }
 
+    public function add_project_notification(Request $request)
+    {
+        $validated = $request->validate([
+            'project_id' => 'required|integer|min:1',
+            'channel' => 'required|in:email,phone',
+            'value' => 'required|string|max:255',
+            'recipient_name' => 'nullable|string|max:255',
+        ]);
+
+        $response = $this->Servers_AddProjectNotification(
+            $validated['project_id'],
+            $validated['channel'],
+            $validated['value'],
+            $validated['recipient_name'] ?? null
+        );
+
+        return $response['status'] == 1
+            ? $response
+            : \Response::json($response, 400);
+    }
+
+    public function update_project_notification(Request $request)
+    {
+        $validated = $request->validate([
+            'project_id' => 'required|integer|min:1',
+            'notification_id' => 'required|integer|min:1',
+            'channel' => 'required|in:email,phone',
+            'value' => 'required|string|max:255',
+            'recipient_name' => 'nullable|string|max:255',
+        ]);
+
+        $response = $this->Servers_UpdateProjectNotification(
+            $validated['project_id'],
+            $validated['notification_id'],
+            $validated['channel'],
+            $validated['value'],
+            $validated['recipient_name'] ?? null
+        );
+
+        return $response['status'] == 1
+            ? $response
+            : \Response::json($response, 400);
+    }
+
+    public function delete_project_notification(Request $request)
+    {
+        $validated = $request->validate([
+            'project_id' => 'required|integer|min:1',
+            'notification_id' => 'required|integer|min:1',
+        ]);
+
+        $response = $this->Servers_DeleteProjectNotification(
+            $validated['project_id'],
+            $validated['notification_id']
+        );
+
+        return $response['status'] == 1
+            ? $response
+            : \Response::json($response, 400);
+    }
+
     public function get_page(Request $request)
     {
         $filters = $this->dashboardFilters($request);

@@ -20,12 +20,39 @@
                 <div class="servers-project-config-section-heading">
                     <div>
                         <h3 id="servers-project-config-recipients-title">Destinatarios del proyecto</h3>
-                        <p>Contactos directos y notificadores activos de las licencias del cliente.</p>
+                        <p id="servers-project-config-recipient-description">Contactos directos y notificadores activos de las licencias del cliente.</p>
                     </div>
                     <span id="servers-project-config-recipient-count" class="servers-project-config-count">0 seleccionados</span>
                 </div>
                 <div id="servers-project-config-recipient-list" class="servers-recipient-list" role="group" aria-label="Destinatarios disponibles"></div>
                 <p id="servers-project-config-recipient-empty" class="servers-project-config-empty" hidden>Selecciona un cliente para consultar sus notificadores.</p>
+                <div id="servers-project-notification-crud" class="servers-project-notification-crud" hidden>
+                    <div class="servers-project-notification-form-heading">
+                        <h4 id="servers-project-notification-form-title">Agregar destinatario</h4>
+                        <button type="button" id="servers-project-notification-cancel-edit" class="servers-notification-cancel" hidden>Cancelar edición</button>
+                    </div>
+                    <div id="servers-project-notification-form" class="servers-project-notification-form">
+                        <label class="servers-notification-field" for="servers-project-notification-channel">
+                            <span>Canal</span>
+                            <select id="servers-project-notification-channel" data-searchable-dropdown="false">
+                                <option value="email">Correo</option>
+                                <option value="phone">Teléfono</option>
+                            </select>
+                        </label>
+                        <label class="servers-notification-field" for="servers-project-notification-value">
+                            <span>Contacto</span>
+                            <input type="text" id="servers-project-notification-value" class="form-control" maxlength="255" autocomplete="off">
+                        </label>
+                        <label class="servers-notification-field" for="servers-project-notification-name">
+                            <span>Nombre</span>
+                            <input type="text" id="servers-project-notification-name" class="form-control" maxlength="255" autocomplete="off" placeholder="Opcional">
+                        </label>
+                        <button type="button" id="servers-project-notification-submit" class="btn btn-secondary">
+                            <i class="fa-light fa-plus" aria-hidden="true"></i>
+                            <span id="servers-project-notification-submit-label">Agregar</span>
+                        </button>
+                    </div>
+                </div>
             </section>
             <label class="servers-project-config-toggle" for="servers-project-config-notifications-enabled">
                 <span>

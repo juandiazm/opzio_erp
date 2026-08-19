@@ -30,8 +30,15 @@
 }
 
 .servers-project-config-modal {
+    --servers-ink: #1f2933;
+    --servers-muted: #6b7785;
+    --servers-line: #dce3e8;
+    --servers-surface: #ffffff;
+    --servers-teal: #0f766e;
+    --servers-red: #b42318;
     align-items: center;
     background: rgba(31, 41, 51, .54);
+    color: var(--servers-ink);
     display: grid;
     inset: 0;
     justify-items: center;
@@ -45,13 +52,14 @@
 }
 
 .servers-project-config-dialog {
-    background: var(--servers-surface);
+    background-color: var(--servers-surface, #ffffff);
     border: 1px solid var(--servers-line);
     box-shadow: 0 20px 60px rgba(31, 41, 51, .22);
     max-height: min(760px, calc(100vh - 48px));
     max-width: 720px;
     overflow-y: auto;
     padding: 24px;
+    opacity: 1;
     width: min(100%, 720px);
 }
 
@@ -227,6 +235,139 @@
     padding: 16px;
 }
 
+.servers-project-notification-crud {
+    margin-top: 14px;
+}
+
+.servers-project-notification-form-heading {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.servers-project-notification-form-heading h4 {
+    color: var(--servers-ink);
+    font-size: 12px;
+    margin: 0;
+}
+
+.servers-notification-cancel {
+    background: transparent;
+    border: 0;
+    color: var(--servers-muted);
+    cursor: pointer;
+    font-size: 11px;
+    padding: 3px 0;
+    text-decoration: underline;
+}
+
+.servers-notification-cancel:hover {
+    color: var(--servers-teal);
+}
+
+.servers-project-notification-form {
+    align-items: end;
+    background: #f8fafb;
+    border: 1px solid var(--servers-line);
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(110px, .55fr) minmax(170px, 1.3fr) minmax(130px, 1fr) auto;
+    padding: 12px;
+}
+
+.servers-notification-field {
+    display: grid;
+    gap: 5px;
+    margin: 0;
+}
+
+.servers-notification-field > span {
+    color: var(--servers-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.servers-notification-field select,
+.servers-notification-field input {
+    background: #fff;
+    border: 1px solid var(--servers-line);
+    color: var(--servers-ink);
+    font-size: 12px;
+    min-height: 36px;
+    padding: 7px 9px;
+    width: 100%;
+}
+
+.servers-notification-field select:focus,
+.servers-notification-field input:focus {
+    border-color: var(--servers-teal);
+    box-shadow: 0 0 0 2px rgba(15, 118, 110, .12);
+    outline: 0;
+}
+
+.servers-project-notification-form > button {
+    align-items: center;
+    display: inline-flex;
+    gap: 6px;
+    justify-content: center;
+    min-height: 36px;
+    white-space: nowrap;
+}
+
+.servers-project-notification-row {
+    align-items: center;
+    background: #f8fafb;
+    border: 1px solid var(--servers-line);
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    min-height: 54px;
+    padding: 10px 12px;
+}
+
+.servers-project-notification-row + .servers-project-notification-row {
+    margin-top: 8px;
+}
+
+.servers-project-notification-actions {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 4px;
+}
+
+.servers-notification-action {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: var(--servers-muted);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 15px;
+    height: 30px;
+    justify-content: center;
+    width: 30px;
+}
+
+.servers-notification-action:hover,
+.servers-notification-action:focus-visible {
+    color: var(--servers-teal);
+}
+
+.servers-notification-action.is-danger:hover,
+.servers-notification-action.is-danger:focus-visible {
+    color: var(--servers-red);
+}
+
+.servers-notification-action:focus-visible,
+.servers-notification-cancel:focus-visible {
+    outline: 2px solid var(--servers-teal);
+    outline-offset: 2px;
+}
+
 .servers-project-config-toggle {
     align-items: center;
     border-top: 1px solid var(--servers-line);
@@ -325,6 +466,14 @@
 
     .servers-project-config-actions .btn {
         justify-content: center;
+        width: 100%;
+    }
+
+    .servers-project-notification-form {
+        grid-template-columns: 1fr;
+    }
+
+    .servers-project-notification-form > button {
         width: 100%;
     }
 }

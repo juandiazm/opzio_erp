@@ -5,6 +5,7 @@ namespace App\traits;
 use App\Domain\Servers\Models\servers_project;
 use App\Models\client;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 trait servers_trait
 {
@@ -82,7 +83,7 @@ trait servers_trait
             }
 
             $clientId = $clientId === null || $clientId === '' ? null : (int) $clientId;
-            $client = $clientId ? $this->Servers_GetActiveClientWithRecipients($clientId) : null;
+            $client = $clientId ? client::where('active', 1)->whereKey($clientId)->first() : null;
 
             if ($clientId && ! $client) {
                 return [
@@ -91,66 +92,62 @@ trait servers_trait
                 ];
             }
 
-            $requestedKeys = collect((array) $recipientKeys)
-                ->map(function ($key) {
-                    return trim((string) $key);
-                })
-                ->filter()
-                ->unique()
-                ->values();
-            $available = $client ? $this->Servers_BuildRecipientsForClient($client) : collect();
-            $allowed = $available->keyBy('key');
+            $initialImport = ! (bool) $project->notification_recipients_initialized;
+            $selected = collect();
+            if ($initialImport && $client) {
+                $client = $this->Servers_GetActiveClientWithRecipients($clientId);
+                $available = $this->Servers_BuildRecipientsForClient($client);
+                $allowed = $available->keyBy('key');
+                $requestedKeys = collect((array) $recipientKeys)
+                    ->map(function ($key) {
+                        return trim((string) $key);
+                    })
+                    ->filter()
+                    ->unique()
+                    ->values();
+                $invalidKeys = $requestedKeys->reject(function ($key) use ($allowed) {
+                    return $allowed->has($key);
+                })->values();
 
-            if ($clientId !== null && (int) $project->client_id === $clientId) {
-                foreach ($project->notificationRecipients as $storedRecipient) {
-                    if (! $allowed->has($storedRecipient->source_key)) {
-                        $allowed->put(
-                            $storedRecipient->source_key,
-                            $this->Servers_StoredRecipient($storedRecipient)
-                        );
-                    }
+                if ($invalidKeys->isNotEmpty()) {
+                    return [
+                        'status' => 0,
+                        'message' => 'Uno o más notificadores no pertenecen al cliente seleccionado',
+                    ];
                 }
+
+                $selected = $requestedKeys->map(function ($key) use ($allowed) {
+                    return $allowed->get($key);
+                })->filter()->values();
             }
 
-            $invalidKeys = $requestedKeys->reject(function ($key) use ($allowed) {
-                return $allowed->has($key);
-            })->values();
-
-            if ($invalidKeys->isNotEmpty()) {
-                return [
-                    'status' => 0,
-                    'message' => 'Uno o más notificadores no pertenecen al cliente seleccionado',
-                ];
-            }
-
-            $selected = $requestedKeys->map(function ($key) use ($allowed) {
-                return $allowed->get($key);
-            })->filter()->values();
             $notificationsEnabled = filter_var($notificationsEnabled, FILTER_VALIDATE_BOOLEAN);
+            $recipientCount = $project->notificationRecipients->count() + $selected->count();
 
-            if ($notificationsEnabled && $selected->isEmpty()) {
+            if ($notificationsEnabled && $recipientCount === 0) {
                 return [
                     'status' => 0,
                     'message' => 'Debe seleccionar al menos un notificador para encender las notificaciones',
                 ];
             }
 
-            DB::transaction(function () use ($project, $clientId, $notificationsEnabled, $selected) {
+            DB::transaction(function () use ($project, $clientId, $notificationsEnabled, $selected, $initialImport, $recipientCount) {
                 $project->client_id = $clientId;
-                $project->notifications_enabled = $notificationsEnabled && $selected->isNotEmpty();
-                $project->save();
-                $project->notificationRecipients()->delete();
-
-                foreach ($selected as $recipient) {
-                    $project->notificationRecipients()->create([
-                        'source_type' => $recipient['source_type'],
-                        'source_id' => $recipient['source_id'],
-                        'source_key' => $recipient['key'],
-                        'channel' => $recipient['channel'],
-                        'value' => $recipient['value'],
-                        'recipient_name' => $recipient['name'],
-                    ]);
+                $project->notifications_enabled = $notificationsEnabled && $recipientCount > 0;
+                if ($initialImport) {
+                    $project->notification_recipients_initialized = $clientId !== null;
+                    foreach ($selected as $recipient) {
+                        $project->notificationRecipients()->create([
+                            'source_type' => $recipient['source_type'],
+                            'source_id' => $recipient['source_id'],
+                            'source_key' => $recipient['key'],
+                            'channel' => $recipient['channel'],
+                            'value' => $recipient['value'],
+                            'recipient_name' => $recipient['name'],
+                        ]);
+                    }
                 }
+                $project->save();
             });
 
             $project->load([
@@ -174,20 +171,172 @@ trait servers_trait
         }
     }
 
+    public function Servers_AddProjectNotification($projectId, $channel, $value, $recipientName = null)
+    {
+        try {
+            $project = servers_project::find($projectId);
+            if (! $project) {
+                return [
+                    'status' => 0,
+                    'message' => 'El proyecto no existe',
+                ];
+            }
+
+            $notificationData = $this->Servers_ValidateProjectNotification($channel, $value);
+            $duplicate = $project->notificationRecipients()
+                ->where('channel', $notificationData['channel'])
+                ->where('value', $notificationData['value'])
+                ->exists();
+            if ($duplicate) {
+                return [
+                    'status' => 0,
+                    'message' => 'Este destinatario ya está registrado en el proyecto',
+                ];
+            }
+
+            DB::transaction(function () use ($project, $notificationData, $recipientName) {
+                $project->notificationRecipients()->create([
+                    'source_type' => 'project',
+                    'source_id' => null,
+                    'source_key' => 'project:'.Str::uuid()->toString(),
+                    'channel' => $notificationData['channel'],
+                    'value' => $notificationData['value'],
+                    'recipient_name' => trim((string) $recipientName) ?: null,
+                ]);
+                $project->notification_recipients_initialized = true;
+                $project->save();
+            });
+
+            return $this->Servers_ProjectNotificationResponse($project, 'Destinatario agregado');
+        } catch (\InvalidArgumentException $exception) {
+            return [
+                'status' => 0,
+                'message' => $exception->getMessage(),
+            ];
+        } catch (\Throwable $exception) {
+            info('Servers_AddProjectNotification error: '.$exception->getMessage());
+
+            return [
+                'status' => 0,
+                'message' => 'No fue posible agregar el destinatario',
+            ];
+        }
+    }
+
+    public function Servers_UpdateProjectNotification($projectId, $notificationId, $channel, $value, $recipientName = null)
+    {
+        try {
+            $project = servers_project::find($projectId);
+            if (! $project) {
+                return [
+                    'status' => 0,
+                    'message' => 'El proyecto no existe',
+                ];
+            }
+
+            $notification = $project->notificationRecipients()->whereKey($notificationId)->first();
+            if (! $notification) {
+                return [
+                    'status' => 0,
+                    'message' => 'El destinatario no existe en este proyecto',
+                ];
+            }
+
+            $notificationData = $this->Servers_ValidateProjectNotification($channel, $value);
+            $duplicate = $project->notificationRecipients()
+                ->whereKeyNot($notification->id)
+                ->where('channel', $notificationData['channel'])
+                ->where('value', $notificationData['value'])
+                ->exists();
+            if ($duplicate) {
+                return [
+                    'status' => 0,
+                    'message' => 'Este destinatario ya está registrado en el proyecto',
+                ];
+            }
+
+            $notification->update([
+                'source_type' => 'project',
+                'source_id' => null,
+                'source_key' => $notification->source_type === 'project'
+                    ? $notification->source_key
+                    : 'project:'.Str::uuid()->toString(),
+                'channel' => $notificationData['channel'],
+                'value' => $notificationData['value'],
+                'recipient_name' => trim((string) $recipientName) ?: null,
+            ]);
+            $project->notification_recipients_initialized = true;
+            $project->save();
+
+            return $this->Servers_ProjectNotificationResponse($project, 'Destinatario actualizado');
+        } catch (\InvalidArgumentException $exception) {
+            return [
+                'status' => 0,
+                'message' => $exception->getMessage(),
+            ];
+        } catch (\Throwable $exception) {
+            info('Servers_UpdateProjectNotification error: '.$exception->getMessage());
+
+            return [
+                'status' => 0,
+                'message' => 'No fue posible actualizar el destinatario',
+            ];
+        }
+    }
+
+    public function Servers_DeleteProjectNotification($projectId, $notificationId)
+    {
+        try {
+            $project = servers_project::find($projectId);
+            if (! $project) {
+                return [
+                    'status' => 0,
+                    'message' => 'El proyecto no existe',
+                ];
+            }
+
+            $notification = $project->notificationRecipients()->whereKey($notificationId)->first();
+            if (! $notification) {
+                return [
+                    'status' => 0,
+                    'message' => 'El destinatario no existe en este proyecto',
+                ];
+            }
+
+            DB::transaction(function () use ($project, $notification) {
+                $notification->delete();
+                $project->notification_recipients_initialized = true;
+                if (! $project->notificationRecipients()->exists()) {
+                    $project->notifications_enabled = false;
+                }
+                $project->save();
+            });
+
+            return $this->Servers_ProjectNotificationResponse($project, 'Destinatario eliminado');
+        } catch (\Throwable $exception) {
+            info('Servers_DeleteProjectNotification error: '.$exception->getMessage());
+
+            return [
+                'status' => 0,
+                'message' => 'No fue posible eliminar el destinatario',
+            ];
+        }
+    }
+
     private function Servers_ProjectConfigurationData($project)
     {
+        $initialImportRequired = ! (bool) $project->notification_recipients_initialized;
+        if ($initialImportRequired && $project->client_id) {
+            $initialClient = $this->Servers_GetActiveClientWithRecipients($project->client_id);
+            $project->setRelation('client', $initialClient);
+        }
         $selected = $project->notificationRecipients
             ->map(function ($recipient) {
                 return $this->Servers_StoredRecipient($recipient);
             })
             ->values();
-        $selectedKeys = $selected->pluck('key')->all();
-        $available = $project->client
+        $available = $initialImportRequired && $project->client
             ? $this->Servers_BuildRecipientsForClient($project->client)
-                ->map(function ($recipient) use ($selectedKeys) {
-                    $recipient['selected'] = in_array($recipient['key'], $selectedKeys, true);
-                    return $recipient;
-                })
                 ->values()
             : collect();
 
@@ -214,6 +363,23 @@ trait servers_trait
             'selected_recipients' => $selected,
             'has_recipients' => $selected->isNotEmpty(),
             'recipients_count' => $selected->count(),
+            'notification_recipients_initialized' => (bool) $project->notification_recipients_initialized,
+            'needs_initial_import' => $initialImportRequired && $project->client_id !== null,
+        ];
+    }
+
+    private function Servers_ProjectNotificationResponse($project, $message)
+    {
+        $project->load([
+            'host',
+            'client',
+            'notificationRecipients',
+        ]);
+
+        return [
+            'status' => 1,
+            'message' => $message,
+            'data' => $this->Servers_ProjectConfigurationData($project),
         ];
     }
 
@@ -297,15 +463,40 @@ trait servers_trait
     private function Servers_StoredRecipient($recipient)
     {
         return [
+            'id' => (int) $recipient->id,
             'key' => $recipient->source_key,
             'source_type' => $recipient->source_type,
             'source_id' => $recipient->source_id ? (int) $recipient->source_id : null,
             'channel' => $recipient->channel,
             'value' => $recipient->value,
-            'name' => $recipient->recipient_name,
-            'source_label' => 'Configurado anteriormente',
+            'name' => $recipient->recipient_name ?: '',
+            'source_label' => $recipient->source_type === 'project'
+                ? 'Propio del proyecto'
+                : 'Importado inicialmente',
             'selected' => true,
             'available' => false,
+        ];
+    }
+
+    private function Servers_ValidateProjectNotification($channel, $value)
+    {
+        $channel = strtolower(trim((string) $channel));
+        $value = trim((string) $value);
+
+        if ($channel === 'email' && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            throw new \InvalidArgumentException('El correo del destinatario no es válido');
+        }
+
+        if ($channel === 'phone') {
+            $digits = preg_replace('/\D+/', '', $value);
+            if ($digits === '' || strlen($digits) < 7 || strlen($digits) > 15) {
+                throw new \InvalidArgumentException('El teléfono del destinatario no es válido');
+            }
+        }
+
+        return [
+            'channel' => $channel,
+            'value' => $value,
         ];
     }
 

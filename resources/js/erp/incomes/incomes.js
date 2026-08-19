@@ -54,7 +54,8 @@ $(document).on('click', '#print-income-button', order.printPdf);
 $(document).on('click', '#pay-state-btn', update.changePayState);
 $(document).on('click', '.update-state', update.changeInputState);
 
-$(document).on('click', '#close-order-viewer', order.closeOrderViewer);
+$(document).on('click', '#close-order-viewer, [data-close-order-viewer]', order.closeOrderViewer);
+$(document).on('click', '#order-viewer-container', function(event){ if(event.target === this) order.closeOrderViewer(); });
 $(document).on('click', '#pdf-prev-page', order.pdfPrevPage);
 $(document).on('click', '#pdf-next-page', order.pdfNextPage);
 $(document).on('click', '#pdf-zoom-in', order.pdfZoomIn);

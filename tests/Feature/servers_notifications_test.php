@@ -67,6 +67,10 @@ class servers_notifications_test extends TestCase
             '--path' => database_path('migrations/2026_08_18_000005_add_notifications_to_servers_projects_table.php'),
             '--realpath' => true,
         ]);
+        Artisan::call('migrate', [
+            '--path' => database_path('migrations/2026_08_18_000006_add_notification_initialization_to_servers_projects_table.php'),
+            '--realpath' => true,
+        ]);
 
         $host = servers_host::create([
             'key' => 'test-host',
@@ -282,5 +286,88 @@ class servers_notifications_test extends TestCase
             'path' => '/var/www/updated-test-project',
         ], 'sqlite');
         $this->assertDatabaseCount('servers_project_notifications', 1, 'sqlite');
+    }
+
+    public function test_project_notifications_become_independent_after_initial_import_and_support_crud()
+    {
+        $client = client::create([
+            'name' => 'Cliente CRUD',
+            'email' => 'cliente-crud@example.test',
+            'active' => true,
+        ]);
+        $license = license::forceCreate([
+            'client_id' => $client->id,
+            'name' => 'Licencia CRUD',
+            'active' => true,
+        ]);
+        $initialNotification = license_notification::forceCreate([
+            'license_id' => $license->id,
+            'email' => 'inicial@example.test',
+            'active' => true,
+        ]);
+
+        $available = $this->withoutMiddleware()->postJson('/admin/servers/project-config/recipients', [
+            'client_id' => $client->id,
+        ])->json('data.recipients');
+        $initialKey = collect($available)->firstWhere('value', 'inicial@example.test')['key'];
+        $this->withoutMiddleware()->postJson('/admin/servers/project-config/update', [
+            'project_id' => $this->project->id,
+            'client_id' => $client->id,
+            'notifications_enabled' => true,
+            'recipient_keys' => [$initialKey],
+        ])->assertOk();
+
+        license_notification::forceCreate([
+            'license_id' => $license->id,
+            'email' => 'posterior@example.test',
+            'active' => true,
+        ]);
+        $config = $this->withoutMiddleware()->postJson('/admin/servers/project-config/get', [
+            'project_id' => $this->project->id,
+        ]);
+        $config
+            ->assertOk()
+            ->assertJsonPath('data.needs_initial_import', false)
+            ->assertJsonCount(0, 'data.available_recipients');
+        $this->assertSame(
+            [],
+            collect($config->json('data.selected_recipients'))->filter(function ($recipient) {
+                return $recipient['value'] === 'posterior@example.test';
+            })->all()
+        );
+
+        $addResponse = $this->withoutMiddleware()->postJson('/admin/servers/project-config/notifications/add', [
+            'project_id' => $this->project->id,
+            'channel' => 'email',
+            'value' => 'propio@example.test',
+            'recipient_name' => 'Contacto propio',
+        ]);
+        $addResponse->assertOk();
+        $ownNotification = collect($addResponse->json('data.selected_recipients'))
+            ->firstWhere('value', 'propio@example.test');
+
+        $updateResponse = $this->withoutMiddleware()->postJson('/admin/servers/project-config/notifications/update', [
+            'project_id' => $this->project->id,
+            'notification_id' => $ownNotification['id'],
+            'channel' => 'phone',
+            'value' => '3001234567',
+            'recipient_name' => 'Contacto propio actualizado',
+        ]);
+        $updateResponse
+            ->assertOk()
+            ->assertJsonPath('data.selected_recipients.1.value', '3001234567');
+
+        $initialStoredNotification = collect($updateResponse->json('data.selected_recipients'))
+            ->firstWhere('source_id', $initialNotification->id);
+        $deleteResponse = $this->withoutMiddleware()->postJson('/admin/servers/project-config/notifications/delete', [
+            'project_id' => $this->project->id,
+            'notification_id' => $initialStoredNotification['id'],
+        ]);
+        $deleteResponse
+            ->assertOk()
+            ->assertJsonCount(1, 'data.selected_recipients');
+        $this->assertDatabaseMissing('servers_project_notifications', [
+            'id' => $initialStoredNotification['id'],
+        ], 'sqlite');
     }
 }
