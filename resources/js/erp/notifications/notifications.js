@@ -26,7 +26,7 @@ $(document).on('click', '#notifications-close-email-view', email.closeEmailView)
 $(document).on('click', '#notifications-edit-email-view', email.editEmailFromView);
 $(document).on('click', '#notifications-email-refresh', email.loadEmails);
 $(document).on('click', '#notifications-sms-refresh', sms.loadSms);
-$(document).on('change', '#notifications-email-status, #notifications-sms-status', function() {
+$(document).on('change', '#notifications-email-status, #notifications-sms-status, #notifications-email-date-from, #notifications-email-date-to, #notifications-sms-date-from, #notifications-sms-date-to', function() {
     const channel = $(this).attr('id').includes('email') ? 'email' : 'sms';
     notificationState[channel+'Pagination'].page = 1;
     channel === 'email' ? email.loadEmails() : sms.loadSms();

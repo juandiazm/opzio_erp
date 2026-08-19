@@ -32,6 +32,8 @@ export function loadSms() {
         pagination: JSON.stringify(notificationState.smsPagination),
         search: $('#notifications-sms-search').val() || '',
         status: $('#notifications-sms-status').val() || '',
+        date_from: $('#notifications-sms-date-from').val() || '',
+        date_to: $('#notifications-sms-date-to').val() || '',
     }, null, renderSms, null);
 }
 

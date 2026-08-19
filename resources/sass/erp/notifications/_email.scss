@@ -73,6 +73,48 @@ body.notifications-modal-open #erp-app-content {
     min-width: 9rem;
 }
 
+.notifications-date-range {
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    gap: 0.5rem;
+}
+
+.notifications-date-label {
+    margin-right: 0.2rem;
+    color: $primary;
+    font-weight: 700;
+}
+
+.notifications-date-field {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+}
+
+.notifications-date-field > span {
+    color: #999;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.notifications-date-input {
+    width: min(10vw, 8rem);
+    min-width: 7.5rem;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid #6c757d;
+    border-radius: 0;
+    background-color: transparent;
+    color: inherit;
+}
+
+.notifications-date-separator {
+    color: #999;
+    font-size: 1.25rem;
+}
+
 .notifications-refresh,
 .notifications-icon-button {
     display: inline-flex;

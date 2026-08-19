@@ -45,6 +45,8 @@ export function loadEmails() {
         pagination: JSON.stringify(notificationState.emailPagination),
         search: $('#notifications-email-search').val() || '',
         status: $('#notifications-email-status').val() || '',
+        date_from: $('#notifications-email-date-from').val() || '',
+        date_to: $('#notifications-email-date-to').val() || '',
     }, null, renderEmails, null);
 }
 

@@ -9,6 +9,12 @@
     <div class="notifications-filter-bar">
         <label class="notifications-filter"><span>Buscar</span><input type="search" id="notifications-email-search" class="form-control" placeholder="Asunto o destinatario" aria-label="Buscar correos"></label>
         <label class="notifications-filter"><span>Estado</span><select id="notifications-email-status" class="form-select"><option value="">Todos</option><option value="0">Pendiente</option><option value="1">Enviado</option><option value="2">Fallido</option></select></label>
+        <div class="notifications-date-range" id="notifications-email-date-range">
+            <span class="notifications-date-label">Fecha</span>
+            <label class="notifications-date-field"><span>Desde</span><input type="date" id="notifications-email-date-from" class="notifications-date-input" value="{{ now()->format('Y-m-d') }}" aria-label="Fecha desde"></label>
+            <span class="notifications-date-separator">/</span>
+            <label class="notifications-date-field"><span>Hasta</span><input type="date" id="notifications-email-date-to" class="notifications-date-input" value="{{ now()->format('Y-m-d') }}" aria-label="Fecha hasta"></label>
+        </div>
         <button type="button" class="btn btn-light notifications-refresh" id="notifications-email-refresh" title="Actualizar correos" aria-label="Actualizar correos"><i class="fa-solid fa-rotate"></i></button>
     </div>
     <div class="table-responsive">

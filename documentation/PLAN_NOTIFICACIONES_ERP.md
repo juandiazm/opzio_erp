@@ -87,8 +87,9 @@ Para SMS se repetira la comprobacion con el simulador local de Twilio.
 ## Superficie funcional
 
 1. Ruta `/admin/notifications`, visible solo con `admin/notifications/`.
-2. Dos pestañas: `Email` y `SMS`, cada una con listado, filtros basicos y
-   boton de nueva notificacion.
+2. Dos pestañas: `Email` y `SMS`, cada una con listado, filtros de búsqueda,
+  estado y rango de fechas desde/hasta, además del boton de nueva
+  notificacion. El rango inicia con el día actual.
 3. Modal de alta con destinatarios por clientes seleccionados, opcion de todos
    los clientes activos y destinatarios manuales.
 4. Email: modo masivo (un correo a todos) o individual (un registro por
@@ -220,6 +221,9 @@ Para SMS se repetira la comprobacion con el simulador local de Twilio.
 - El detalle renderiza el cuerpo de historicos legacy desde la plantilla guardada
   y permite reenviar cualquier correo cuya vista pueda renderizarse; el reenvio
   crea un nuevo registro editable y conserva el original.
+- Email y SMS incorporan filtros inclusivos por `created_at` con fechas `Desde`
+  y `Hasta`; ambos valores se inicializan con el día actual y se adaptan al
+  layout responsive de Outcomes.
 - Verificado con `php artisan view:cache`, `npm run build`, `php artisan
-  route:list --path=admin/notifications`, `notifications_test.php` (8 tests) y
+  route:list --path=admin/notifications`, `notifications_test.php` (11 tests) y
   diagnosticos del editor.

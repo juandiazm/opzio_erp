@@ -28,12 +28,12 @@ class notifications_controller extends Controller
 
     public function get_emails(Request $request)
     {
-        return $this->response($this->Notification_GetEmails($request->pagination, $request->search, $request->status));
+        return $this->response($this->Notification_GetEmails($request->pagination, $request->search, $request->status, $request->date_from, $request->date_to));
     }
 
     public function get_sms(Request $request)
     {
-        return $this->response($this->Notification_GetSms($request->pagination, $request->search, $request->status));
+        return $this->response($this->Notification_GetSms($request->pagination, $request->search, $request->status, $request->date_from, $request->date_to));
     }
 
     public function get_email(Request $request)

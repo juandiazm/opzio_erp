@@ -242,6 +242,21 @@
         width: 100%;
     }
 
+    .notifications-date-range {
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .notifications-date-field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notifications-date-input {
+        width: 100%;
+        min-width: 0;
+    }
+
     .notifications-form-grid,
     .notifications-client-list {
         grid-template-columns: 1fr;

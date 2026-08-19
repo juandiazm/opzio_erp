@@ -226,6 +226,60 @@ class notifications_test extends TestCase
         $this->assertSame('2026-08-19T11:20', $sms->sent_at_local);
     }
 
+    public function test_notification_histories_filter_by_inclusive_created_date_range()
+    {
+        $oldMail = mail_log::create([
+            'unique_id' => 'FILTER-OLD-EMAIL',
+            'subject' => 'Correo anterior',
+            'view' => 'mail.notification',
+            'from' => 'info@opzio.co',
+            'as' => 'OPZIO SAS - Información',
+            'to' => [['address' => 'old@example.test']],
+            'mail_data' => ['content' => '<p>Anterior</p>'],
+            'status' => 1,
+            'created_at' => '2026-08-18 23:59:59',
+            'updated_at' => '2026-08-18 23:59:59',
+        ]);
+        $todayMail = mail_log::create([
+            'unique_id' => 'FILTER-TODAY-EMAIL',
+            'subject' => 'Correo de hoy',
+            'view' => 'mail.notification',
+            'from' => 'info@opzio.co',
+            'as' => 'OPZIO SAS - Información',
+            'to' => [['address' => 'today@example.test']],
+            'mail_data' => ['content' => '<p>Hoy</p>'],
+            'status' => 1,
+            'created_at' => '2026-08-19 12:00:00',
+            'updated_at' => '2026-08-19 12:00:00',
+        ]);
+        $oldSms = sms_log::create([
+            'unique_id' => 'FILTER-OLD-SMS',
+            'to' => '+573000000001',
+            'body' => 'SMS anterior',
+            'status' => 1,
+            'created_at' => '2026-08-18 23:59:59',
+            'updated_at' => '2026-08-18 23:59:59',
+        ]);
+        $todaySms = sms_log::create([
+            'unique_id' => 'FILTER-TODAY-SMS',
+            'to' => '+573000000002',
+            'body' => 'SMS de hoy',
+            'status' => 1,
+            'created_at' => '2026-08-19 12:00:00',
+            'updated_at' => '2026-08-19 12:00:00',
+        ]);
+
+        $emailResponse = $this->Notification_GetEmails(['size' => 100], null, null, '2026-08-19', '2026-08-19');
+        $smsResponse = $this->Notification_GetSms(['size' => 100], null, null, '2026-08-19', '2026-08-19');
+
+        $emailIds = collect($emailResponse['emails'])->pluck('id')->all();
+        $smsIds = collect($smsResponse['sms'])->pluck('id')->all();
+        $this->assertContains($todayMail->id, $emailIds);
+        $this->assertNotContains($oldMail->id, $emailIds);
+        $this->assertContains($todaySms->id, $smsIds);
+        $this->assertNotContains($oldSms->id, $smsIds);
+    }
+
     public function test_legacy_email_detail_renders_body_and_supports_resend()
     {
         $this->MailLog_SetLog(

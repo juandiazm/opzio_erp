@@ -514,6 +514,41 @@ trait notifications_trait
         };
     }
 
+    private function Notification_NormalizeDateFilter($value)
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            $date = Carbon::createFromFormat('!Y-m-d', $value);
+            if ($date->format('Y-m-d') !== $value) {
+                throw new \InvalidArgumentException('La fecha de filtro no es valida');
+            }
+            return $date->format('Y-m-d');
+        } catch (\Throwable $exception) {
+            throw new \InvalidArgumentException('La fecha de filtro no es valida');
+        }
+    }
+
+    private function Notification_ApplyDateRange($query, $dateFrom = null, $dateTo = null)
+    {
+        $dateFrom = $this->Notification_NormalizeDateFilter($dateFrom);
+        $dateTo = $this->Notification_NormalizeDateFilter($dateTo);
+        if ($dateFrom && $dateTo && $dateFrom > $dateTo) {
+            throw new \InvalidArgumentException('El rango de fechas no es valido');
+        }
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        return $query;
+    }
+
     private function Notification_RenderEmailContent($mail, array $data)
     {
         $content = trim((string) ($data['content'] ?? ''));
@@ -543,11 +578,11 @@ trait notifications_trait
         }
     }
 
-    public function Notification_GetEmails($pagination = [], $search = null, $status = null)
+    public function Notification_GetEmails($pagination = [], $search = null, $status = null, $dateFrom = null, $dateTo = null)
     {
         try {
             $pagination = $this->Notification_Pagination($pagination);
-            $query = mail_log::with('attachments')
+            $query = $this->Notification_ApplyDateRange(mail_log::with('attachments'), $dateFrom, $dateTo)
                 ->orderByDesc('id');
             if (trim((string) $search) !== '') {
                 $query->where(function ($builder) use ($search) {
@@ -585,11 +620,11 @@ trait notifications_trait
         }
     }
 
-    public function Notification_GetSms($pagination = [], $search = null, $status = null)
+    public function Notification_GetSms($pagination = [], $search = null, $status = null, $dateFrom = null, $dateTo = null)
     {
         try {
             $pagination = $this->Notification_Pagination($pagination);
-            $query = sms_log::with('client')->orderByDesc('id');
+            $query = $this->Notification_ApplyDateRange(sms_log::with('client'), $dateFrom, $dateTo)->orderByDesc('id');
             if (trim((string) $search) !== '') {
                 $term = trim($search);
                 $query->where(function ($builder) use ($term) {

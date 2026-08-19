@@ -9,6 +9,12 @@
     <div class="notifications-filter-bar">
         <label class="notifications-filter"><span>Buscar</span><input type="search" id="notifications-sms-search" class="form-control" placeholder="Mensaje, nombre o telefono" aria-label="Buscar SMS"></label>
         <label class="notifications-filter"><span>Estado</span><select id="notifications-sms-status" class="form-select"><option value="">Todos</option><option value="0">Pendiente</option><option value="1">Enviado</option><option value="2">Fallido</option></select></label>
+        <div class="notifications-date-range" id="notifications-sms-date-range">
+            <span class="notifications-date-label">Fecha</span>
+            <label class="notifications-date-field"><span>Desde</span><input type="date" id="notifications-sms-date-from" class="notifications-date-input" value="{{ now()->format('Y-m-d') }}" aria-label="Fecha desde"></label>
+            <span class="notifications-date-separator">/</span>
+            <label class="notifications-date-field"><span>Hasta</span><input type="date" id="notifications-sms-date-to" class="notifications-date-input" value="{{ now()->format('Y-m-d') }}" aria-label="Fecha hasta"></label>
+        </div>
         <button type="button" class="btn btn-light notifications-refresh" id="notifications-sms-refresh" title="Actualizar SMS" aria-label="Actualizar SMS"><i class="fa-solid fa-rotate"></i></button>
     </div>
     <div class="table-responsive">
