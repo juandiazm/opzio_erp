@@ -180,7 +180,7 @@ function showTraceability(response, functionData){
             appendContent += '<td class="text-center traceability-col-id"><p>'+String(value.id).padStart(5, '0')+'</p></td>';
             appendContent += '<td class="text-center">';
                 appendContent += '<div class="d-flex justify-content-center">';
-                    appendContent += '<div class="traceability-usr-img" style="background-image:url(\'/images/erp/users/'+value.user.photo+'\');border-color:'+value.user.color+';"></div>';
+                    appendContent += '<div class="traceability-usr-img" style="background-image:url(\'/storage/images/erp/users/'+value.user.photo+'\');border-color:'+value.user.color+';"></div>';
                     appendContent += '<p class="traceability-usr-username align-self-center ms-2">'+value.user.username+'</p>';
                 appendContent += '</div>';
             appendContent += '</td>';

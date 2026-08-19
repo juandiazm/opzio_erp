@@ -115,7 +115,7 @@ function showEmployeesPage(response){
         appendContent += '<tr employee-id='+value.id+' class="employee-row-info'+(value.deleted_at==null?'':' deleted')+'">';
             appendContent += '<td class="columns-identity text-start erp-identity-cell">';
                 appendContent += '<div class="erp-identity">';
-                    appendContent += '<div class="image-column-container erp-avatar" style="background-image:url(\'/images/erp/employees/'+value.photo+'\');"></div>';
+                    appendContent += '<div class="image-column-container erp-avatar" style="background-image:url(\'/storage/images/erp/employees/'+value.photo+'\');"></div>';
                     appendContent += '<div class="erp-identity-copy">';
                         appendContent += '<p class="erp-identity-name" title="'+fullName+'">'+fullName+'</p>';
                         appendContent += '<span class="erp-identity-meta" title="'+value.uid+'"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.uid+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.uid.substr(value.uid.length - 5)+'</span></span>';

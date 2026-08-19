@@ -16,7 +16,7 @@
                 <div class="col-4">
                     <div class="d-flex justify-content-center">
                         <div class="multimedia-input-container">
-                            <div id="update-client-img-container" class="image-container d-flex justify-content-center" style="background-image: url('{{ asset('images/erp/clients/'.session('client_user')['active_client']['photo']) }}')">
+                            <div id="update-client-img-container" class="image-container d-flex justify-content-center" style="background-image: url('{{ asset('storage/images/erp/clients/'.session('client_user')['active_client']['photo']) }}')">
                                 <input type="file" name="photo" id="update-client-img" class="d-none input_image" accept="image/*" data-image-crop="circle" data-image-crop-max-width="800" data-image-crop-max-height="800">
                             </div>
                             <i class="fa-solid fa-plus image-plus-icon"></i>

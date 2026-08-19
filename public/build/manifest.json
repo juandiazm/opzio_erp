@@ -14,8 +14,8 @@
     "file": "assets/index-PewBSTf8.js",
     "name": "index"
   },
-  "_list-BVEt8OV2.js": {
-    "file": "assets/list-BVEt8OV2.js",
+  "_list-ClzTmGL1.js": {
+    "file": "assets/list-ClzTmGL1.js",
     "name": "list"
   },
   "_lodash-Q-ipqAF7.js": {
@@ -692,7 +692,7 @@
     "isEntry": true
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-DtegvhhA.js",
+    "file": "assets/clients-Cqvr4Wg_.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
     "isEntry": true
@@ -767,13 +767,13 @@
     ]
   },
   "resources/js/erp/contracts/contracts.js": {
-    "file": "assets/contracts-CXt5oqu7.js",
+    "file": "assets/contracts-o24tEs2x.js",
     "name": "contracts",
     "src": "resources/js/erp/contracts/contracts.js",
     "isEntry": true,
     "imports": [
       "_shared-RPBjrMc-.js",
-      "_list-BVEt8OV2.js"
+      "_list-ClzTmGL1.js"
     ]
   },
   "resources/js/erp/contracts/form.js": {
@@ -891,7 +891,7 @@
     "isEntry": true
   },
   "resources/js/erp/employees/employees.js": {
-    "file": "assets/employees-9Newd5-a.js",
+    "file": "assets/employees-C3OxSvdg.js",
     "name": "employees",
     "src": "resources/js/erp/employees/employees.js",
     "isEntry": true
@@ -999,12 +999,12 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-B9VwF6Zb.js",
+    "file": "assets/incomes-CvNyc3Le.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
     "imports": [
-      "_list-BVEt8OV2.js",
+      "_list-ClzTmGL1.js",
       "resources/js/erp/incomes/order.js",
       "_pdf.worker.min-B-tS55GQ.js"
     ]
@@ -1083,12 +1083,12 @@
     "isEntry": true
   },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-CRlQllQl.js",
+    "file": "assets/licenses-D7Pkbi27.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
     "isEntry": true,
     "imports": [
-      "_list-BVEt8OV2.js"
+      "_list-ClzTmGL1.js"
     ]
   },
   "resources/js/erp/licenses/list.js": {
@@ -1140,7 +1140,7 @@
     "isEntry": true
   },
   "resources/js/erp/my_profile/my_profile.js": {
-    "file": "assets/my_profile-BwYJfNYV.js",
+    "file": "assets/my_profile-C8tIs6HA.js",
     "name": "my_profile",
     "src": "resources/js/erp/my_profile/my_profile.js",
     "isEntry": true
@@ -1242,7 +1242,7 @@
     "isEntry": true
   },
   "resources/js/erp/providers/providers.js": {
-    "file": "assets/providers-CQlYxPal.js",
+    "file": "assets/providers-CpnIH8sc.js",
     "name": "providers",
     "src": "resources/js/erp/providers/providers.js",
     "isEntry": true
@@ -1353,7 +1353,7 @@
     "isEntry": true
   },
   "resources/js/erp/traceability.js": {
-    "file": "assets/traceability-BbN0QTi7.js",
+    "file": "assets/traceability-CM8C_EBg.js",
     "name": "traceability",
     "src": "resources/js/erp/traceability.js",
     "isEntry": true
@@ -1389,7 +1389,7 @@
     "isEntry": true
   },
   "resources/js/erp/users/users.js": {
-    "file": "assets/users-D2Zu0HWu.js",
+    "file": "assets/users-KleN3fjE.js",
     "name": "users",
     "src": "resources/js/erp/users/users.js",
     "isEntry": true
@@ -1618,17 +1618,17 @@
     "isEntry": true
   },
   "resources/sass/erp/layouts/app.scss": {
-    "file": "assets/app-2vbLIEEQ.css",
+    "file": "assets/app-DXItzBNO.css",
     "src": "resources/sass/erp/layouts/app.scss",
     "isEntry": true
   },
   "resources/sass/erp/layouts/header.scss": {
-    "file": "assets/header-BbN6gDZt.css",
+    "file": "assets/header-CGrP5Jv_.css",
     "src": "resources/sass/erp/layouts/header.scss",
     "isEntry": true
   },
   "resources/sass/erp/layouts/sidebar.scss": {
-    "file": "assets/sidebar-kDuzELLN.css",
+    "file": "assets/sidebar-D4nS_fr2.css",
     "src": "resources/sass/erp/layouts/sidebar.scss",
     "isEntry": true
   },

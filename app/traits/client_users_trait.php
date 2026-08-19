@@ -26,7 +26,6 @@ trait client_users_trait
     mail_trait
     , twilio_sms_trait
     ;
-    private $URL_USERS_PATH = 'images/erp/client_users/';
     //ClientUsers
     public function ClientUser_GetAllClientUsers(){
         try{

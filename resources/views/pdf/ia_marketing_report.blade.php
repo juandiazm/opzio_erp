@@ -313,7 +313,7 @@
         $period      = $Data['period'];
 
         $clientName  = trim($client->name . ' ' . ($client->lastname ?? ''));
-        $clientPhotoPath = $client->photo ? public_path('images/erp/clients/' . $client->photo) : null;
+        $clientPhotoPath = $client->photo ? \Illuminate\Support\Facades\Storage::disk('erp_media')->path('clients/' . $client->photo) : null;
         $clientPhoto = null;
         if ($clientPhotoPath && file_exists($clientPhotoPath)) {
             $mime = mime_content_type($clientPhotoPath);

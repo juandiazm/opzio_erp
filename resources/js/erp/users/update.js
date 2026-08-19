@@ -10,7 +10,7 @@ export function showCurrentUser(){
     $('#update-user-lastname').val(currentUser.lastname);
     $('#update-user-username').val(currentUser.username);
     $('#update-user-email').val(currentUser.email);
-    $('#update-user-img-container .image_preview').attr('src', '/images/erp/users/'+currentUser.photo).css('display','block');
+    $('#update-user-img-container .image_preview').attr('src', '/storage/images/erp/users/'+currentUser.photo).css('display','block');
     $('#update-user-img-container .image-icon').css('display','none');
     $('#update-user-color').val(currentUser.color);
     $('#update-user-color').change();

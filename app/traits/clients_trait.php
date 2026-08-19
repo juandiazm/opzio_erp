@@ -4,8 +4,6 @@ namespace App\traits;
 use \Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use ImageOptimizer;
-use Intervention\Image\Facades\Image as Image;
 use Illuminate\Support\Str;
 
 use App\Models\client;
@@ -25,6 +23,7 @@ trait clients_trait
     client_users_trait
     ,mail_trait,
     siigo_new_trait
+    ,multimedia_trait
     ;
 
     private function Client_FormatSiigoSyncError($clientId, $siigoResponse){
@@ -46,7 +45,7 @@ trait clients_trait
         return $base.': '.$message;
     }
 
-    public $URL_CLIENTS_PATH = 'images/erp/clients/';
+    private $MULTIMEDIA_DIRECTORY = 'clients';
     public function Client_AddClient(
         $verified
         ,$active
@@ -76,10 +75,8 @@ trait clients_trait
             $client = new client();
             $client->unique_id = strtoupper(Str::uuid()->toString());
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
                 $client->photo = $client->unique_id.'.webp';
-                $photo->save($this->URL_CLIENTS_PATH . $client->photo);
-                ImageOptimizer::optimize($this->URL_CLIENTS_PATH . $client->photo);
+                $this->Multimedia_StoreImage($photo, $this->MULTIMEDIA_DIRECTORY, $client->photo);
             }
             $client->name = $name;
             $client->lastname = $lastname;
@@ -299,10 +296,9 @@ trait clients_trait
             $client->verified = $verified;
             $client->active = $active;
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
+                $oldPhoto = $client->photo;
                 $client->photo = $client->unique_id.'.webp';
-                $photo->save($this->URL_CLIENTS_PATH . $client->photo);
-                ImageOptimizer::optimize($this->URL_CLIENTS_PATH . $client->photo);
+                $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $client->photo, $oldPhoto);
             }
             $client->save();
             return [
@@ -342,10 +338,9 @@ trait clients_trait
             $client->phone = $phone;
             $client->sector_id = $sector_id;
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
+                $oldPhoto = $client->photo;
                 $client->photo = $client->unique_id.'.webp';
-                $photo->save($this->URL_CLIENTS_PATH . $client->photo);
-                ImageOptimizer::optimize($this->URL_CLIENTS_PATH . $client->photo);
+                $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $client->photo, $oldPhoto);
             }
             $client->save();
             Session::forget('client_user');

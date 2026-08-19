@@ -63,7 +63,7 @@ function showProvidersPage(response){
         appendContent += '<tr provider-id='+value.id+' class="provider-row-info'+(value.deleted_at==null?'':' deleted')+'">';
             appendContent += '<td class="columns-identity text-start erp-identity-cell">';
                 appendContent += '<div class="erp-identity">';
-                    appendContent += '<div class="image-column-container erp-avatar erp-logo" style="background-image:url(\'/images/erp/providers/'+value.photo+'\');"></div>';
+                    appendContent += '<div class="image-column-container erp-avatar erp-logo" style="background-image:url(\'/storage/images/erp/providers/'+value.photo+'\');"></div>';
                     appendContent += '<div class="erp-identity-copy">';
                         appendContent += '<p class="erp-identity-name" title="'+fullName+'">'+fullName+'</p>';
                         appendContent += '<span class="erp-identity-meta" title="'+value.unique_id+'"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.unique_id+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.unique_id.substr(value.unique_id.length - 5)+'</span></span>';

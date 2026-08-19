@@ -4,10 +4,7 @@ namespace App\traits;
 use \Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use ImageOptimizer;
-use Intervention\Image\Facades\Image as Image;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
 
 use App\Models\employee;
 use App\Models\employee_document;
@@ -24,7 +21,9 @@ use Session;
 
 trait employees_trait
 {
-    private $URL_EMPLOYEES_PATH = 'images/erp/employees/';
+    use multimedia_trait;
+
+    private $MULTIMEDIA_DIRECTORY = 'employees';
     public function Employee_AddEmployee(
         $name,
         $last_name,
@@ -48,10 +47,8 @@ trait employees_trait
             $employee = new employee();
             $employee->uid = strtoupper(Str::uuid()->toString());
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
                 $employee->photo = strtoupper(Str::uuid()->toString()).'.webp';
-                $photo->save($this->URL_EMPLOYEES_PATH . $employee->photo);
-                ImageOptimizer::optimize($this->URL_EMPLOYEES_PATH . $employee->photo);
+                $this->Multimedia_StoreImage($photo, $this->MULTIMEDIA_DIRECTORY, $employee->photo);
             }
             $employee->name = $name;
             $employee->last_name = $last_name;
@@ -109,14 +106,8 @@ trait employees_trait
             $employee->work_email = $work_email;
             $employee->state = $state;
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
                 $photo_uid = strtoupper(Str::uuid()->toString()).'.webp';
-                $photo->save($this->URL_EMPLOYEES_PATH . $photo_uid);
-                ImageOptimizer::optimize($this->URL_EMPLOYEES_PATH . $photo_uid);
-                //Delete image
-                if($employee->photo != null){
-                    File::delete(public_path($this->URL_EMPLOYEES_PATH . $employee->photo));
-                }
+                $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $photo_uid, $employee->photo);
                 $employee->photo = $photo_uid;
             }
             $employee->save();

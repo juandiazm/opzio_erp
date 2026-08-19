@@ -2,7 +2,7 @@
     <div id="erp-profile-container">
         <button id="erp-profile-toggle" type="button" aria-expanded="false" aria-controls="erp-profile-dropdown" aria-haspopup="true">
             <span id="my-profile-image-container">
-                <img src="/images/erp/users/{{ session('user')['photo'] }}?v={{ optional(data_get(session('user'), 'updated_at'))->timestamp ?? 0 }}" alt="Foto de {{ session('user')['name'] }}" id="my-profile-image" style="border-color:{{ session('user')['color'] }};">
+                <img src="/storage/images/erp/users/{{ session('user')['photo'] }}?v={{ optional(data_get(session('user'), 'updated_at'))->timestamp ?? 0 }}" alt="Foto de {{ session('user')['name'] }}" id="my-profile-image" style="border-color:{{ session('user')['color'] }};">
             </span>
             <span id="my-profile-name-container">
                 <span id="my-profile-name">{{ session('user')['name'].' '.session('user')['lastname'] }}</span>

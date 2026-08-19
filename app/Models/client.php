@@ -12,7 +12,7 @@ class client extends Model
     protected $guarded = [];
     protected $appends = ['photo_path', 'complete_name', 'identification_type_string','active_string', 'verified_string', 'created_at_string', 'created_date_string'];
     public function getPhotoPathAttribute(){
-        return ($this->photo==null?'images/no-image.jpg':('images/erp/clients/'.$this->photo));
+        return ($this->photo==null?'images/no-image.jpg':('storage/images/erp/clients/'.$this->photo));
     }
     public function getCompleteNameAttribute(){
         return $this->name.(($this->last_name!=null)?' '.$this->last_name:'');

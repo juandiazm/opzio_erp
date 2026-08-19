@@ -21,7 +21,7 @@ export function loadUpdateImageBorder(){
 }
 
 export function getCurrentUserPhotoUrl(){
-    return '/images/erp/users/' + profileState.currentUser.photo + '?v=' + Date.now();
+    return '/storage/images/erp/users/' + profileState.currentUser.photo + '?v=' + Date.now();
 }
 
 export function updateHeaderProfile(){

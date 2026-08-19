@@ -21,8 +21,10 @@ trait blog_trait
     ,string_helper_trait
     ,freepik_trait
     ,mail_trait
+    ,multimedia_trait
     ;
-    private $URL_BLOG_SEGMENTS_PATH = 'images/blog/segment/';
+    private $MULTIMEDIA_DIRECTORY = '';
+    private $MULTIMEDIA_DISK = 'blog_principal_segment_images';
     private $THREAD_SUBJECTS_BLOG_ID = 'thread_WUzfwPWIbz45DrsKQz5XgjeD';
     public function Blog_AddBlog(
         $title
@@ -459,8 +461,7 @@ trait blog_trait
                                 $constraint->aspectRatio();
                             });
                         }*/
-                        $img->save($this->URL_BLOG_SEGMENTS_PATH . $uid);
-                        ImageOptimizer::optimize($this->URL_BLOG_SEGMENTS_PATH . $uid);
+                        $this->Multimedia_Store($img->stream(), $this->MULTIMEDIA_DIRECTORY, $uid, $this->MULTIMEDIA_DISK);
                         $BlogSegment->img = $uid;
                     }else{
                         $Response['message'] = 'Formato de imagen no permitido';
@@ -486,7 +487,7 @@ trait blog_trait
         try{
             $BlogSegment = blog_segment::where('blog_id', $blog_id)->orderBy('position', 'asc')->get();
             foreach($BlogSegment as $key => $value){
-                $value->path = $this->URL_BLOG_SEGMENTS_PATH.$value->img;
+                $value->path = $this->Multimedia_Url($this->MULTIMEDIA_DIRECTORY, $value->img, $this->MULTIMEDIA_DISK);
             }
             $Response['status'] = 1;
             $Response['message'] = 'Segmentos obtenidos correctamente';
@@ -556,7 +557,7 @@ trait blog_trait
         try{
             $BlogSegment = blog_segment::find($id);
             if($BlogSegment){
-                \File::delete($this->URL_BLOG_SEGMENTS_PATH . $BlogSegment->img);
+                $this->Multimedia_Delete($this->MULTIMEDIA_DIRECTORY, $BlogSegment->img, $this->MULTIMEDIA_DISK);
                 $BlogSegment->delete();
                 $Response['status'] = 1;
                 $Response['message'] = 'Segmento eliminado correctamente';
@@ -590,8 +591,7 @@ trait blog_trait
                 if($img){
                     $file_format = strtolower($img->getClientOriginalExtension());
                     if(($file_format == 'png' || $file_format == 'gif' || $file_format == 'jpg' || $file_format == 'webp' || $file_format == 'jpeg')){
-                        $delete_file = $this->URL_BLOG_SEGMENTS_PATH . $BlogSegment->img;
-                        \File::delete($delete_file);
+                        $oldImage = $BlogSegment->img;
                         $file_format = 'webp';
                         $uid = str_replace('-','_',Str::uuid()->toString()).'.'.$file_format;
                         $img = Image::make($img)->encode('webp', 90);
@@ -600,8 +600,8 @@ trait blog_trait
                                 $constraint->aspectRatio();
                             });
                         }*/
-                        $img->save($this->URL_BLOG_SEGMENTS_PATH . $uid);
-                        ImageOptimizer::optimize($this->URL_BLOG_SEGMENTS_PATH . $uid);
+                        $this->Multimedia_Store($img->stream(), $this->MULTIMEDIA_DIRECTORY, $uid, $this->MULTIMEDIA_DISK);
+                        $this->Multimedia_Delete($this->MULTIMEDIA_DIRECTORY, $oldImage, $this->MULTIMEDIA_DISK);
                         $BlogSegment->img = $uid;
                     }else{
                         $Response['message'] = 'Formato de imagen no permitido';

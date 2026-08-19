@@ -246,15 +246,7 @@
     }
 
     #erp-app-container > #erp-app-sidebar > #sidebar-brand{
-        display: flex !important;
-        flex: 0 0 48px !important;
-        align-items: center;
-        justify-content: center;
-        width: 48px !important;
-        min-width: 48px !important;
-        height: 56px;
-        padding: 0;
-        border: 0;
+        display: none !important;
     }
 
     #sidebar-brand-link{
@@ -283,6 +275,7 @@
     #sidebar-navigation{
         display: flex;
         flex: 1 1 auto;
+        width: 100%;
         min-width: 0;
         height: 100%;
         margin: 0 !important;
@@ -339,10 +332,13 @@
             }
 
             &.selected{
-                background: rgba($primary, 0.09);
+                background: $primary;
 
-                .sidebar-menu-item-link .sidebar-menu-item-icon{
-                    color: $primary;
+                .sidebar-menu-item-link{
+                    .sidebar-menu-item-icon,
+                    .sidebar-menu-item-text{
+                        color: $text-white;
+                    }
                 }
             }
         }

@@ -40,6 +40,12 @@ return [
             'url' => env('APP_URL').'storage',
             'visibility' => 'public',
         ],
+        'erp_media' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/images/erp'),
+            'url' => rtrim(env('APP_URL'), '/').'/storage/images/erp',
+            'visibility' => 'public',
+        ],
 
         's3' => [
             'driver' => 's3',
@@ -107,7 +113,7 @@ return [
         'blog_principal_segment_images' => [
             'driver' => 'local',
             'root' => storage_path('app/public/blog/segment'),
-            'url' => env('APP_URL').'storage/blog/segment',
+            'url' => rtrim(env('APP_URL'), '/').'/storage/blog/segment',
             'visibility' => 'public',
         ],
         'instagram_post_images' => [

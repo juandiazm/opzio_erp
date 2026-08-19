@@ -1537,16 +1537,17 @@
                     }
 
                     &.selected{
-                        background-color: transparent !important;
+                        background-color: $primary !important;
 
                         .sidebar-menu-item-link{
                             .sidebar-menu-item-img{
                                 path{
-                                    fill: $primary !important;
+                                    fill: $text-white !important;
                                 }
                             }
-                            .sidebar-menu-item-icon{
-                                color: $primary !important;
+                            .sidebar-menu-item-icon,
+                            .sidebar-menu-item-text{
+                                color: $text-white !important;
                             }
                         }
                     }

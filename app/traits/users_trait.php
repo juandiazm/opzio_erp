@@ -4,8 +4,6 @@ namespace App\traits;
 use \Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use ImageOptimizer;
-use Intervention\Image\Facades\Image as Image;
 use Illuminate\Support\Str;
 
 use App\Models\user;
@@ -22,7 +20,9 @@ trait users_trait
     mail_trait
     , twilio_sms_trait
     ;
-    private $URL_USERS_PATH = 'images/erp/users/';
+    use multimedia_trait;
+
+    private $MULTIMEDIA_DIRECTORY = 'users';
     //Users
     public function User_GetAllUsers(){
         try{
@@ -79,10 +79,8 @@ trait users_trait
             $user = new user();
             $user->unique_id = strtoupper(Str::uuid()->toString());
             if($photo){
-                $photo = Image::make($photo)->orientate()->encode('webp', 90);
                 $user->photo = $user->unique_id.'.webp';
-                $photo->save($this->URL_USERS_PATH . $user->photo);
-                ImageOptimizer::optimize($this->URL_USERS_PATH . $user->photo);
+                $this->Multimedia_StoreImage($photo, $this->MULTIMEDIA_DIRECTORY, $user->photo, true);
             }
             $user->name = $name;
             $user->lastname = $lastname;
@@ -139,10 +137,9 @@ trait users_trait
             $user->email = $email;
             $user->identification = $identification;
             if($photo){
-                $photo = Image::make($photo)->orientate()->encode('webp', 90);
+                $oldPhoto = $user->photo;
                 $user->photo = $user->unique_id.'.webp';
-                $photo->save($this->URL_USERS_PATH . $user->photo);
-                ImageOptimizer::optimize($this->URL_USERS_PATH . $user->photo);
+                $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $user->photo, $oldPhoto, true);
             }
             $user->color = $color;
             $user->save();

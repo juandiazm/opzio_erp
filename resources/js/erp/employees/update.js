@@ -4,7 +4,7 @@ export function showCurrentEmployee(){
     let currentEmployee = employeeState.currentEmployee;
     $('#sub-nav-contracts').attr('data-contractable-id', currentEmployee.id);
     if(window.ContractAssociations) window.ContractAssociations.load('employee', currentEmployee.id);
-    $('#update-employee-img-container').css('background-image','url("/images/erp/employees/'+currentEmployee.photo+'")');
+    $('#update-employee-img-container').css('background-image','url("/storage/images/erp/employees/'+currentEmployee.photo+'")');
     $('#update-employee-img-container .image-icon').css('display','none');
     $('#update-employee-uid').text(currentEmployee.uid);
     $('#update-employee-name').val(currentEmployee.name);

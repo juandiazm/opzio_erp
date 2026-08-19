@@ -8,7 +8,7 @@ export function renderEntityAvatar(entity, imageFolder, isLogo = true) {
     const photo = String(entity && entity.photo ? entity.photo : '').trim();
     const photoPath = entity && entity.photo_path && photo
         ? String(entity.photo_path).trim()
-        : (photo && imageFolder ? 'images/erp/'+imageFolder+'/'+photo : '');
+        : (photo && imageFolder ? 'storage/images/erp/'+imageFolder+'/'+photo : '');
     const avatarClass = isLogo ? 'erp-avatar erp-logo' : 'erp-avatar';
 
     if(!photo || !photoPath || photoPath === 'images/no-image.jpg'){

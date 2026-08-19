@@ -4,8 +4,6 @@ namespace App\traits;
 use \Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use ImageOptimizer;
-use Intervention\Image\Facades\Image as Image;
 use Illuminate\Support\Str;
 
 use App\Models\provider;
@@ -20,7 +18,9 @@ use Session;
 
 trait providers_trait
 {
-    private $URL_CLIENTS_PATH = 'images/erp/providers/';
+    use multimedia_trait;
+
+    private $MULTIMEDIA_DIRECTORY = 'providers';
     public function Provider_AddProvider(
         $verified
         ,$active
@@ -47,10 +47,8 @@ trait providers_trait
             $provider = new provider();
             $provider->unique_id = strtoupper(Str::uuid()->toString());
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
                 $provider->photo = $provider->unique_id.'.webp';
-                $photo->save($this->URL_CLIENTS_PATH . $provider->photo);
-                ImageOptimizer::optimize($this->URL_CLIENTS_PATH . $provider->photo);
+                $this->Multimedia_StoreImage($photo, $this->MULTIMEDIA_DIRECTORY, $provider->photo);
             }
             $provider->name = $name;
             $provider->lastname = $lastname;
@@ -118,10 +116,9 @@ trait providers_trait
             $provider->verified = true;
             $provider->active = $active;
             if($photo){
-                $photo = Image::make($photo)->encode('webp', 90);
+                $oldPhoto = $provider->photo;
                 $provider->photo = $provider->unique_id.'.webp';
-                $photo->save($this->URL_CLIENTS_PATH . $provider->photo);
-                ImageOptimizer::optimize($this->URL_CLIENTS_PATH . $provider->photo);
+                $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $provider->photo, $oldPhoto);
             }
             $provider->save();
             return [
