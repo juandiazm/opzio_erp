@@ -514,6 +514,35 @@ trait notifications_trait
         };
     }
 
+    private function Notification_RenderEmailContent($mail, array $data)
+    {
+        $content = trim((string) ($data['content'] ?? ''));
+        if ($content === '' && is_string($mail->view) && view()->exists($mail->view)) {
+            try {
+                $content = view($mail->view, ['Data' => $data])->render();
+            } catch (\Throwable $exception) {
+                info('Notification_RenderEmailContent error for mail log '.$mail->id.': '.$exception->getMessage());
+            }
+        }
+
+        return $this->Notification_SanitizeHtml($content);
+    }
+
+    private function Notification_FormatDateForClient($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value)
+                ->setTimezone(config('app.timezone', 'America/Bogota'))
+                ->format('Y-m-d\\TH:i');
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+
     public function Notification_GetEmails($pagination = [], $search = null, $status = null)
     {
         try {
@@ -531,10 +560,13 @@ trait notifications_trait
             }
             $result = $query->paginate($pagination['size'], ['*'], 'page', $pagination['page']);
             $result->getCollection()->transform(function ($mail) {
+                $data = $this->Notification_AsArray($mail->mail_data);
                 $mail->status_string = $this->Notification_StatusLabel($mail->status);
                 $mail->recipient_count = count(is_array($mail->to) ? $mail->to : []);
                 $mail->attachments_count = $mail->attachments->count();
-                $mail->can_resend = $mail->view === 'mail.notification';
+                $mail->can_resend = $this->Notification_RenderEmailContent($mail, $data) !== '';
+                $mail->send_at_local = $this->Notification_FormatDateForClient($mail->send_at);
+                $mail->sent_at_local = $this->Notification_FormatDateForClient($mail->sent_at);
                 unset($mail->mail_data);
                 return $mail;
             });
@@ -573,6 +605,8 @@ trait notifications_trait
             $result->getCollection()->transform(function ($sms) {
                 $sms->status_string = $this->Notification_StatusLabel($sms->status);
                 $sms->client_name = $sms->client?->complete_name;
+                $sms->send_at_local = $this->Notification_FormatDateForClient($sms->send_at);
+                $sms->sent_at_local = $this->Notification_FormatDateForClient($sms->sent_at);
                 unset($sms->client);
                 return $sms;
             });
@@ -594,22 +628,29 @@ trait notifications_trait
     public function Notification_GetEmail($id)
     {
         try {
-            $mail = mail_log::with('attachments')->where('view', 'mail.notification')->find($id);
+            $mail = mail_log::with('attachments')->find($id);
             if (!$mail) {
                 return $this->Notification_Response('El correo no existe', [], 0);
             }
-            $data = is_array($mail->mail_data) ? $mail->mail_data : [];
+            $data = $this->Notification_AsArray($mail->mail_data);
+            $content = $this->Notification_RenderEmailContent($mail, $data);
             return $this->Notification_Response('Correo obtenido', [
                 'email' => [
                     'id' => $mail->id,
                     'subject' => $mail->subject,
-                    'content' => $data['content'] ?? '',
+                    'content' => $content,
                     'from' => data_get($data, '_from.address', $mail->from),
                     'from_name' => data_get($data, '_from.name', $mail->as),
                     'reply_to' => data_get($data, '_reply_to.address', ''),
                     'reply_to_name' => data_get($data, '_reply_to.name', ''),
                     'recipients' => is_array($mail->to) ? $mail->to : [],
-                    'send_at' => $mail->send_at?->format('Y-m-d\\TH:i'),
+                    'status' => (int) $mail->status,
+                    'status_string' => $this->Notification_StatusLabel($mail->status),
+                    'send_at' => $this->Notification_FormatDateForClient($mail->send_at),
+                    'sent_at' => $this->Notification_FormatDateForClient($mail->sent_at),
+                    'send_at_local' => $this->Notification_FormatDateForClient($mail->send_at),
+                    'sent_at_local' => $this->Notification_FormatDateForClient($mail->sent_at),
+                    'can_resend' => $content !== '',
                     'attachments' => $mail->attachments->map(fn ($attachment) => ['name' => $attachment->name])->values()->all(),
                 ],
             ]);
@@ -626,6 +667,8 @@ trait notifications_trait
             if (!$sms) {
                 return $this->Notification_Response('El SMS no existe', [], 0);
             }
+            $sms->send_at_local = $this->Notification_FormatDateForClient($sms->send_at);
+            $sms->sent_at_local = $this->Notification_FormatDateForClient($sms->sent_at);
             return $this->Notification_Response('SMS obtenido', ['sms' => $sms]);
         } catch (\Throwable $exception) {
             info('Notification_GetSmsById error: '.$exception->getMessage());
@@ -636,15 +679,19 @@ trait notifications_trait
     public function Notification_ResendEmail($id, array $input, $files = [], $createdBy = null)
     {
         try {
-            $original = mail_log::with('attachments')->where('view', 'mail.notification')->find($id);
+            $original = mail_log::with('attachments')->find($id);
             if (!$original) {
                 return $this->Notification_Response('El correo original no existe', [], 0);
             }
             $originalData = is_array($original->mail_data) ? $original->mail_data : [];
+            $originalContent = $this->Notification_RenderEmailContent($original, $originalData);
+            if ($originalContent === '') {
+                return $this->Notification_Response('El correo original no tiene un contenido reenviable', [], 0);
+            }
             $hasRequestedRecipients = array_key_exists('recipients', $input) || array_key_exists('client_ids', $input) || array_key_exists('all_clients', $input);
             $input = array_merge([
                 'subject' => $original->subject,
-                'content' => $originalData['content'] ?? '',
+                'content' => $originalContent,
                 'from' => data_get($originalData, '_from.address', $original->from),
                 'from_name' => data_get($originalData, '_from.name', $original->as),
                 'reply_to' => data_get($originalData, '_reply_to.address', ''),

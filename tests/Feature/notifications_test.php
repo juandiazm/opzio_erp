@@ -191,6 +191,99 @@ class notifications_test extends TestCase
         $this->assertFalse($legacyMail->can_resend);
     }
 
+    public function test_notification_list_exposes_dates_in_bogota_time()
+    {
+        $mail = mail_log::create([
+            'unique_id' => 'BOGOTA-DATE-EMAIL',
+            'subject' => 'Fecha Bogotá',
+            'view' => 'mail.notification',
+            'from' => 'info@opzio.co',
+            'as' => 'OPZIO SAS - Información',
+            'to' => [['address' => 'cliente@example.test']],
+            'mail_data' => ['content' => '<p>Contenido</p>'],
+            'status' => 1,
+            'send_at' => '2026-08-19 09:30:00',
+            'sent_at' => '2026-08-19 10:00:00',
+        ]);
+        $sms_log = sms_log::create([
+            'unique_id' => 'BOGOTA-DATE-SMS',
+            'recipient_name' => 'Cliente',
+            'to' => '+573000000000',
+            'body' => 'Mensaje',
+            'status' => 1,
+            'send_at' => '2026-08-19 11:15:00',
+            'sent_at' => '2026-08-19 11:20:00',
+        ]);
+
+        $emailResponse = $this->Notification_GetEmails();
+        $smsResponse = $this->Notification_GetSms();
+        $email = collect($emailResponse['emails'])->firstWhere('id', $mail->id);
+        $sms = collect($smsResponse['sms'])->firstWhere('id', $sms_log->id);
+
+        $this->assertSame('2026-08-19T09:30', $email->send_at_local);
+        $this->assertSame('2026-08-19T10:00', $email->sent_at_local);
+        $this->assertSame('2026-08-19T11:15', $sms->send_at_local);
+        $this->assertSame('2026-08-19T11:20', $sms->sent_at_local);
+    }
+
+    public function test_legacy_email_detail_renders_body_and_supports_resend()
+    {
+        $this->MailLog_SetLog(
+            'PAYMENT-REPORT-UUID',
+            'Reporte de pagos',
+            'mail.pay_remaining_report',
+            'erp@example.test',
+            'ERP',
+            [['address' => 'cliente@example.test', 'name' => 'Cliente']],
+            null,
+            [
+                'report_message' => [[
+                    'order_id' => 'ORDER-123',
+                    'client' => 'Cliente Uno',
+                    'identification' => '123',
+                    'total' => 100000,
+                ]],
+            ],
+            1,
+            []
+        );
+        $original = mail_log::where('subject', 'Reporte de pagos')->first();
+
+        $detail = $this->Notification_GetEmail($original->id);
+        $resend = $this->Notification_ResendEmail($original->id, [
+            'recipients' => 'nuevo@example.test',
+            'subject' => 'Reporte reenviado',
+            'from' => 'erp@example.test',
+        ]);
+
+        $this->assertSame(1, $detail['status']);
+        $this->assertStringContainsString('Reporte de Recordatorios de Pago', $detail['email']['content']);
+        $this->assertTrue($detail['email']['can_resend']);
+        $this->assertSame(1, $resend['status']);
+        $this->assertSame('nuevo@example.test', mail_log::where('subject', 'Reporte reenviado')->first()->to[0]['address']);
+    }
+
+    public function test_email_detail_returns_body_status_and_resend_contract()
+    {
+        $this->Notification_CreateEmail([
+            'recipients' => 'cliente@example.test',
+            'recipient_mode' => 'massive',
+            'subject' => 'Detalle',
+            'content' => '<p>Contenido visible</p>',
+            'from' => 'erp@example.test',
+        ]);
+        $mail = mail_log::where('subject', 'Detalle')->first();
+
+        $response = $this->Notification_GetEmail($mail->id);
+        $email = $response['email'];
+
+        $this->assertSame(1, $response['status']);
+        $this->assertSame('<p>Contenido visible</p>', $email['content']);
+        $this->assertSame('cliente@example.test', $email['recipients'][0]['address']);
+        $this->assertSame('Pendiente', $email['status_string']);
+        $this->assertTrue($email['can_resend']);
+    }
+
     public function test_payment_reminder_email_is_scheduled_between_eight_and_eleven()
     {
         $command = new class extends send_pay_remaining {

@@ -37,6 +37,7 @@ Los módulos sin tabs se dividirán por sección funcional solo cuando eso reduz
 | 16 | Login y reset password | Autenticación y recuperación | Medio | Completado |
 | 17 | Approval flows | Aprobación de blog, Facebook, Instagram, LinkedIn y Twitter | Medio | Completado |
 | 18 | Layouts y tiempo real | Layout ERP, sidebar, header, Pusher y canales | Transversal | Completado |
+| 19 | Notifications | Email y SMS, composición, detalle y reenvío | Alto | Completado |
 
 ## Método por módulo
 
@@ -199,3 +200,12 @@ Separar lista y administración de páginas; conservar editor, filtros, acciones
 - `erp.layouts.app` carga `layouts/app.js` como único coordinador de sidebar y header; Pusher y el canal Chat se mantienen separados.
 - Se conservaron los parciales Blade, estilos segmentados de layout y el contrato de `appendChatMesssages` para eventos en tiempo real.
 - Validado con `npm run build`, `php artisan view:cache`, diagnósticos del editor y `git diff --check`.
+
+### Notifications
+
+- Blade dividido en `email`, `sms`, `compose`, `email-compose`, `sms-compose` y `email-view`; `notifications.blade.php` conserva únicamente la composición de tabs y superficies.
+- JS dividido en estado, utilidades compartidas, email y SMS; `notifications.js` conserva la orquestación única de tabs y listeners.
+- SCSS dividido en `_email.scss`, `_sms.scss`, `_compose.scss` y `_view.scss`; `notifications.scss` conserva el orden de composición.
+- El historial de correo incorpora acciones independientes de visualizar y reenviar; visualizar muestra cuerpo, destinatarios, estado, fechas y adjuntos, y permite modificar destinatarios, contenido, asunto, reply-to, fecha y archivos antes del reenvío.
+- El endpoint de detalle renderiza plantillas históricas y permite reenviar correos renderizables como nuevas notificaciones, sin alterar las rutas existentes.
+- Validado con `php artisan view:cache`, `npm run build`, `php artisan route:list --path=admin/notifications`, pruebas focalizadas de notificaciones, diagnósticos del editor y `git diff --check`.

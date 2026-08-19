@@ -283,4 +283,18 @@ class servers_monthly_report_test extends TestCase
         $this->assertStringContainsString('soporte@opzio.co (alerta)', Artisan::output());
         $this->assertStringNotContainsString('1 destinatario(s)', Artisan::output());
     }
+
+    public function test_monthly_report_random_send_time_stays_between_seven_and_twelve()
+    {
+        $command = app(\App\Console\Commands\send_servers_monthly_report::class);
+        $method = new \ReflectionMethod($command, 'randomSendAt');
+        $method->setAccessible(true);
+
+        for ($attempt = 0; $attempt < 20; $attempt++) {
+            $sendAt = $method->invoke($command);
+            $minutes = ((int) $sendAt->format('H') * 60) + (int) $sendAt->format('i');
+            $this->assertGreaterThanOrEqual(7 * 60, $minutes);
+            $this->assertLessThanOrEqual(12 * 60, $minutes);
+        }
+    }
 }

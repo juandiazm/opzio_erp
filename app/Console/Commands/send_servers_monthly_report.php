@@ -26,6 +26,13 @@ class send_servers_monthly_report extends Command
 
     protected $description = 'Encola el reporte mensual de estado de los proyectos de servidores';
 
+    private function randomSendAt(): Carbon
+    {
+        return Carbon::today(config('app.timezone'))
+            ->setTime(7, 0)
+            ->addMinutes(random_int(0, 300));
+    }
+
     public function handle(server_monthly_report_service $reportService): int
     {
         try {
@@ -164,6 +171,7 @@ class send_servers_monthly_report extends Command
             'report' => $report,
             '_from' => $fromDetails,
         ];
+        $sendAt = $this->randomSendAt();
         $this->MailLog_CreatePending(
             $subject,
             'mail.servers.monthly_report',
@@ -175,11 +183,11 @@ class send_servers_monthly_report extends Command
                 'path' => Storage::disk('local')->path($pdfPath),
                 'name' => 'Reporte-servidor-'.$project->key.'-'.$periodKey.'.pdf',
             ]],
-            now(),
+            $sendAt,
             $batch
         );
 
-        $this->line('Encolado '.$project->name.' para '.count($recipients).' destinatario(s).');
+        $this->line('Encolado '.$project->name.' para '.count($recipients).' destinatario(s), programado a las '.$sendAt->format('H:i').'.');
         return 'queued';
     }
 

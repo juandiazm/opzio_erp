@@ -205,3 +205,21 @@ Para SMS se repetira la comprobacion con el simulador local de Twilio.
   `php artisan notifications:process-sms`, `npm run build`, diagnosticos del
   editor y `git diff --check` fueron ejecutados. El ultimo solo reporta
   advertencias LF/CRLF de Git en assets generados.
+
+### 2026-08-19 - Homologacion de superficies y detalle de email
+
+- `notifications.blade.php` quedo como vista principal compositora, con parciales
+  separados para las pestañas Email y SMS, composicion, formularios y detalle.
+- JavaScript quedo dividido en estado, utilidades compartidas, email y SMS;
+  SCSS quedo dividido por pestaña y superficie, conservando IDs, clases,
+  endpoints y payloads existentes.
+- El historial de email ahora ofrece visualizar y reenviar como acciones
+  independientes. La visualizacion muestra el cuerpo sanitizado, destinatarios,
+  estado, fechas y adjuntos; el reenvio permite editar destinatarios y el resto
+  de los datos antes de crear nuevos registros.
+- El detalle renderiza el cuerpo de historicos legacy desde la plantilla guardada
+  y permite reenviar cualquier correo cuya vista pueda renderizarse; el reenvio
+  crea un nuevo registro editable y conserva el original.
+- Verificado con `php artisan view:cache`, `npm run build`, `php artisan
+  route:list --path=admin/notifications`, `notifications_test.php` (8 tests) y
+  diagnosticos del editor.

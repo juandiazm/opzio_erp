@@ -44,4 +44,6 @@ php artisan servers:send-monthly-report --date=2026-08 --project=36 --force
 
 `--force` reconstruye el PDF y encola un nuevo correo aunque el proyecto y período ya tengan un reporte registrado. Si existía un correo pendiente del mismo lote, queda marcado como reemplazado para evitar un envío duplicado.
 
+Cada correo mensual se programa con una hora aleatoria entre las 07:00 y las 12:00 del día en que se ejecuta el comando. En la ejecución automática ese día es el primero del mes; el worker de correos lo entrega cuando alcanza su `send_at`.
+
 El `--dry-run` calcula los proyectos y destinatarios sin generar PDF ni crear correos. El comando normal es idempotente para el mismo proyecto y período.

@@ -1,0 +1,214 @@
+.notifications-page {
+    padding: 0 0 2rem;
+}
+
+body.notifications-modal-open #erp-app-content {
+    z-index: 5001 !important;
+}
+
+.notifications-pane {
+    padding: 1rem 0;
+}
+
+.notifications-list-header,
+.notifications-filter-bar,
+.notifications-section-heading,
+.notifications-modal-header,
+.notifications-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.notifications-list-header {
+    padding: 0.5rem 1rem 1rem;
+}
+
+.notifications-list-header h2,
+.notifications-modal-header h2,
+.notifications-section-heading h3 {
+    margin: 0;
+    color: $primary;
+}
+
+.notifications-list-header h2,
+.notifications-modal-header h2 {
+    font-size: 1.15rem;
+}
+
+.notifications-list-header p {
+    margin: 0.2rem 0 0;
+    color: #6c757d;
+    font-size: 0.82rem;
+}
+
+.notifications-filter-bar {
+    justify-content: flex-start;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.85rem;
+    background: #f8f8f8;
+    box-shadow: 0 2px 8px #00000012;
+}
+
+.notifications-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notifications-filter > span,
+.notifications-field > span,
+.notifications-section-heading h3 {
+    color: $primary;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.notifications-filter .form-control {
+    min-width: 18rem;
+}
+
+.notifications-filter .form-select {
+    min-width: 9rem;
+}
+
+.notifications-refresh,
+.notifications-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    padding: 0;
+}
+
+.notifications-icon-button {
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fff;
+    color: $primary;
+    cursor: pointer;
+}
+
+.notifications-icon-button:hover,
+.notifications-icon-button:focus {
+    border-color: $primary;
+    background: #f8f8f8;
+    color: $primary;
+}
+
+.notifications-table {
+    margin-bottom: 0;
+}
+
+.notifications-table th {
+    color: $primary;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.notifications-table td {
+    max-width: 22rem;
+    font-size: 0.82rem;
+    vertical-align: middle;
+}
+
+.notifications-subject {
+    display: block;
+    max-width: 22rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notifications-recipient-cell {
+    width: min(24rem, 32vw);
+    max-height: 4.8rem;
+    overflow: auto;
+    overflow-wrap: anywhere;
+    color: #343a40;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    white-space: normal;
+}
+
+.notifications-recipient-cell::-webkit-scrollbar {
+    width: 0.35rem;
+}
+
+.notifications-recipient-cell::-webkit-scrollbar-thumb {
+    background: #c7c7c7;
+}
+
+.notifications-status {
+    display: inline-block;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    background: #e9ecef;
+    color: #343a40;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.notifications-status.status-1 {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.notifications-status.status-2 {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.notifications-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0.2rem 0.35rem;
+    color: #6c757d;
+    cursor: pointer;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.notifications-action:hover,
+.notifications-action:focus {
+    color: $primary;
+    text-decoration: none;
+}
+
+.notifications-action-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.1rem;
+}
+
+.notifications-empty {
+    padding: 2rem 1rem !important;
+    color: #6c757d;
+    text-align: center;
+}
+
+.notifications-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 1rem;
+}
+
+.notifications-pagination button {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.45rem;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+}
+
+.notifications-pagination button.active {
+    border-color: $primary;
+    background: $primary;
+    color: #fff;
+}
