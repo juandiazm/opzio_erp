@@ -17,6 +17,7 @@ trait departments_trait
         $director_id
     ){
         try{
+            $director_id = $director_id ?: null;
             $department = department::where('name', $name)->first();
             if($department){
                 return [
@@ -24,7 +25,6 @@ trait departments_trait
                     'message' => 'El departamento ya existe'
                 ];
             }
-            $this->Department_RemoveDirectorForAnotherDepartment($director_id);
             $department = new department();
             $department->unique_id = strtoupper(Str::uuid()->toString());
             $department->name = $name;
@@ -32,13 +32,13 @@ trait departments_trait
             $department->director_id = $director_id;
             $department->save();
             //get employee by id
-            $employee = employee::where('id', $director_id)->first();
+            $employee = $director_id ? employee::where('id', $director_id)->first() : null;
             if($employee){
                 $employee->department_id = $department->id;
                 $employee->save();
             }
             $department->director = $employee;
-            $department->employees = [$employee];
+            $department->employees = $employee ? [$employee] : [];
             return [
                 'status' => 1,
                 'message' => 'Departamento agregado',
@@ -79,7 +79,6 @@ trait departments_trait
         $director_id
     ){
         try{
-            $this->Department_RemoveDirectorForAnotherDepartment($director_id);
             $department = department::where('id', $id)->first();
             if(!$department){
                 return [
@@ -87,12 +86,13 @@ trait departments_trait
                     'message' => 'El departamento no existe'
                 ];
             }
+            $director_id = $director_id ?: null;
             $department->name = $name;
             $department->budget = $budget;
+            $department->director_id = $director_id;
             //get employee by id
-            $employee = employee::where('id', $director_id)->first();
+            $employee = $director_id ? employee::where('id', $director_id)->first() : null;
             if($employee){
-                $department->director_id = $employee->id;
                 $employee->department_id = $department->id;
                 $employee->save();
             }

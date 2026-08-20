@@ -5,12 +5,14 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 use App\traits\licenses_trait;
 use App\traits\open_ia_trait;
 use App\traits\mail_trait;
 use App\traits\twilio_sms_trait;
 use App\traits\incomes_trait;
+use App\Models\sms_log;
 
 class send_pay_remaining extends Command
 {
@@ -147,6 +149,7 @@ class send_pay_remaining extends Command
         // Send one email per client with all their incomes
         foreach($groupedByClient as $client_id => $clientData) {
             info('command:send_pay_remaining - Processing client: ' . $clientData['client']['name'] . ' with ' . count($clientData['incomes']) . ' income(s)');
+            $sendAt = $this->randomSendAt();
             
             try{
                 // Generate IA message using the first service name
@@ -219,7 +222,6 @@ class send_pay_remaining extends Command
                         'ia_message' => $ia_message,
                     ]);
                     
-                    $sendAt = $this->randomSendAt();
                     $mailLog = $this->MailLog_CreatePending(
                         $subject,
                         $View,
@@ -257,7 +259,16 @@ class send_pay_remaining extends Command
                         $documentType = $hasElectronicInvoice ? 'Factura' : 'Orden de compra';
                         $MessageValue = 'Hola '.$clientData['client']['name'].', generamos la '.$documentType.' #'.$order_id.' por un valor de COP $'.number_format($income['total'], 0,',','.').'. Paga antes del '.$income['cutoff_date'].' en '.$income['payment_link'];
                     }
-                    $Response = $this->TwilioSMS_SendMessage('+57', $phone, $MessageValue);
+                    sms_log::create([
+                        'unique_id' => strtoupper(Str::uuid()->toString()),
+                        'client_id' => $clientData['client']['id'],
+                        'recipient_name' => $clientData['client']['name'],
+                        'to' => $this->TwilioSMS_NormalizePhone($phone),
+                        'body' => $MessageValue,
+                        'attempts' => 0,
+                        'status' => 0,
+                        'send_at' => $sendAt,
+                    ]);
                 }
             }catch(\Exception $e) {
                 info('command:send_pay_remaining sms grouped: '.$e->getMessage());

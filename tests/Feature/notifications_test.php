@@ -338,7 +338,7 @@ class notifications_test extends TestCase
         $this->assertTrue($email['can_resend']);
     }
 
-    public function test_payment_reminder_email_is_scheduled_between_eight_and_eleven()
+    public function test_payment_reminder_email_and_sms_share_random_schedule_between_eight_and_eleven()
     {
         $command = new class extends send_pay_remaining {
             public function Income_GetAllOverdueIncomes()
@@ -378,7 +378,7 @@ class notifications_test extends TestCase
                     'status' => 1,
                     'data' => [[
                         'email' => 'cliente@example.test',
-                        'phone' => null,
+                        'phone' => '3000000001',
                     ]],
                 ];
             }
@@ -404,6 +404,12 @@ class notifications_test extends TestCase
         $this->assertSame(0, (int) $mailLog->status);
         $this->assertNotNull($mailLog->send_at);
         $this->assertTrue($mailLog->send_at->betweenIncluded($start, $end));
+
+        $smsLog = sms_log::where('to', '+573000000001')->first();
+
+        $this->assertNotNull($smsLog);
+        $this->assertSame(0, (int) $smsLog->status);
+        $this->assertTrue($smsLog->send_at->equalTo($mailLog->send_at));
     }
 
     public function test_sms_queue_skips_future_messages_and_processes_due_messages()

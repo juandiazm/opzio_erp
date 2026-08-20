@@ -12,7 +12,7 @@ export function getAllEmployees(){
     PostMethodFunction('/admin/employees/get-all',{department_id: null},null,function(response){
         departmentState.notAssignedEmployees = response.data;
         const options = [
-            {value: '0', label: 'Seleccione un director', disabled: true},
+            {value: '0', label: 'Sin director'},
             ...departmentState.notAssignedEmployees.map(function(value){ return {value: value.id, label: value.name+' '+(value.last_name ? value.last_name : '')}; }),
         ];
         ['#add-department-director', '#update-department-director'].forEach(function(selector){
@@ -23,7 +23,7 @@ export function getAllEmployees(){
                 select.selectedIndex = 0;
                 window.SearchableDropdown.init(select);
             }else{
-                $(select).empty().append(options.map(function(option){ return '<option value="'+option.value+'"'+(option.disabled ? ' selected disabled' : '')+'>'+option.label+'</option>'; }).join(''));
+                $(select).empty().append(options.map(function(option, index){ return '<option value="'+option.value+'"'+(index === 0 ? ' selected' : '')+'>'+option.label+'</option>'; }).join(''));
             }
         });
     },null);

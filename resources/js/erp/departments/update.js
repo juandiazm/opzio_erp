@@ -17,9 +17,9 @@ export function showCurrentDepartment(){
 }
 export function updateDepartment(){
     let name = $('#update-department-name').val(); let budget = $('#update-department-budget').val(); let directorId = $('#update-department-director').val(); let flag = true;
+    directorId = directorId == null || directorId == 0 ? null : directorId;
     if(name == null || name == ''){ $('#update-department-name').addClass('is-invalid'); alertWarning('Debe ingresar el nombre del departamento'); flag = false; }else $('#update-department-name').removeClass('is-invalid');
     if(budget == null || budget == ''){ $('#update-department-budget').addClass('is-invalid'); alertWarning('Debe ingresar el presupuesto del departamento'); flag = false; }else $('#update-department-budget').removeClass('is-invalid');
-    if(directorId == null || directorId == 0){ $('#update-department-director').addClass('is-invalid'); alertWarning('Debe seleccionar un director'); flag = false; }else $('#update-department-director').removeClass('is-invalid');
     if(flag){ $('#update-department-button').prop('disabled', true); PostMethodFunction('/admin/departments/update',{id:departmentState.currentDepartment.id,name,budget,director_id:directorId},null,function(){ $('#update-department-button').prop('disabled', false); swallMessage('Exito','Departamento actualizado','success',null,null,3000,null,null); departmentState.tabsView['nav-list-tab'] = false; },function(){$('#update-department-button').attr('disabled', false);}); }
 }
 export function deleteDepartment(departmentId){
