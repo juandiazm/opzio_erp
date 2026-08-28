@@ -11,6 +11,7 @@ use App\Models\license_notification;
 use Carbon\Carbon;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 trait income_payments_trait
 {
@@ -116,49 +117,52 @@ trait income_payments_trait
                     $verified = true;
                 }
             }
-            $income_payment = income_payment::where('unique_id', $unique_id)->first();
+            $payment_state = 2;
+            $payment_message = 'Security error';
+            if($verified == true){
+                switch ($transaction['status']) {
+                    case 'APPROVED':
+                        $payment_state = 1;
+                        break;
+                    case 'DECLINED':
+                        $payment_state = 2;
+                        break;
+                    case 'VOIDED':
+                        $payment_state = 0;
+                        break;
+                    case 'ERROR':
+                        $payment_state = 2;
+                        break;
+                    default:
+                        $payment_state = 0;
+                        break;
+                }
+                $payment_message = $transaction['status_message'];
+            }
+
+            $paymentUpdate = $this->IncomePayment_ApplyGatewayState(
+                $unique_id,
+                $payment_state,
+                $transaction['id'],
+                $payment_message,
+                $transaction['status'],
+                $transaction
+            );
+            $income_payment = $paymentUpdate[0];
+            $payment_state_changed = $paymentUpdate[1];
+
             if($income_payment){
                 //Required data for process
                 $income = income::find($income_payment->income_id);
                 $client = client::find($income->client_id);
                 $income_licenses = income_license::where('income_id', $income->id)->get();
                 $licenses_notifications = license_notification::whereIn('license_id', $income_licenses->pluck('license_id'))->get();
-                //Update payment data
-                $income_payment->transaction_id = $transaction['id'];
-                if($verified == true){
-                    switch ($transaction['status']) {
-                        case 'APPROVED':
-                            $income_payment->payment_state = 1;
-                            break;
-                        case 'DECLINED':
-                            $income_payment->payment_state = 2;
-                            break;
-                        case 'VOIDED':
-                            $income_payment->payment_state = 0;
-                            break;
-                        case 'ERROR':
-                            $income_payment->payment_state = 2;
-                            break;
-                        default:
-                            $income_payment->payment_state = 0;
-                            break;
-                    }
-                    $income_payment->payment_message = $transaction['status_message'];
-                }else{
-                    $income_payment->payment_state = 2;
-                    $income_payment->payment_message = 'Security error';
-                }
-                $income_payment->payment_reference =  $transaction['id'];
-                $income_payment->payment_status = $transaction['status'];
-                $income_payment->payment_response = json_encode($transaction);
-                $income_payment->payment_date = Carbon::now();
-                $income_payment->save();
 
                 // Determinar etiqueta de estado del pago
                 $payment_state_labels = [0 => 'Pendiente', 1 => 'Aprobado', 2 => 'Rechazado'];
                 $payment_state_label = $payment_state_labels[$income_payment->payment_state] ?? 'Desconocido';
                 
-                if($income_payment->payment_state == 1){
+                if($payment_state_changed && $income_payment->payment_state == 1){
                     //Update income
                     $IncomeResponse = $this->Income_UpdateIncomePaymentData(
                         $income_payment->income_id,
@@ -176,7 +180,7 @@ trait income_payments_trait
                         'address' => 'info@opzio.co',
                         'name' => 'Opzio S.A.S'
                     ];
-                    $MailData = 
+                    $MailData =
                     [
                         'subject' => 'Nuevo pago '.$payment_state_label.' #'.substr($income_payment->unique_id, -10)
                     ];
@@ -201,29 +205,30 @@ trait income_payments_trait
                         }
                     }
                 }
-                //Send email to licenses_notifications
-                //get distinct licenses_notifications by email
-                $licenses_notifications = $licenses_notifications->unique('email');
-                $Mails = [];
-                foreach ($licenses_notifications as $notification) {
-                    $Mails[] = [
-                        'address' => $notification->email,
-                        'name' => $client->name
+                if($payment_state_changed){
+                    //Send email to licenses_notifications
+                    //get distinct licenses_notifications by email
+                    $licenses_notifications = $licenses_notifications->unique('email');
+                    $Mails = [];
+                    foreach ($licenses_notifications as $notification) {
+                        $Mails[] = [
+                            'address' => $notification->email,
+                            'name' => $client->name
+                        ];
+                    }
+                    $MailData = [
+                        'subject' => 'Pago '.$payment_state_label.' #'.substr($income_payment->unique_id, -10)
                     ];
+                    $View = 'mail.client_income_payment_finished';
+                    $ViewData = collect(
+                    [
+                        "income_payment" => $income_payment,
+                        "income" => $income,
+                        "client" => $client,
+                    ]
+                    );
+                    $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                 }
-                $MailData = 
-                [
-                    'subject' => 'Pago '.$payment_state_label.' #'.substr($income_payment->unique_id, -10)
-                ];
-                $View = 'mail.client_income_payment_finished';
-                $ViewData = collect(
-                [
-                    "income_payment" => $income_payment,
-                    "income" => $income,
-                    "client" => $client,
-                ]
-                );
-                $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                 /////////////////////
                 $Response['status'] = 1;
                 $Response['message'] = 'Wompi payment finished';
@@ -367,7 +372,19 @@ trait income_payments_trait
                 }
             }
             
-            $income_payment = income_payment::where('unique_id', $unique_id)->first();
+            $event_type = $webhook_data['type'] ?? 'UNKNOWN';
+            $payment_state = $this->Bold_MapEventToPaymentState($event_type);
+            $paymentUpdate = $this->IncomePayment_ApplyGatewayState(
+                $unique_id,
+                $payment_state,
+                $webhook_data['data']['payment_id'] ?? null,
+                $event_type,
+                $event_type,
+                $webhook_data
+            );
+            $income_payment = $paymentUpdate[0];
+            $payment_state_changed = $paymentUpdate[1];
+
             
             if($income_payment){
                 // Required data for process
@@ -376,25 +393,11 @@ trait income_payments_trait
                 $income_licenses = income_license::where('income_id', $income->id)->get();
                 $licenses_notifications = license_notification::whereIn('license_id', $income_licenses->pluck('license_id'))->get();
                 
-                // Mapear evento a estado de pago
-                $event_type = $webhook_data['type'] ?? 'UNKNOWN';
-                $payment_state = $this->Bold_MapEventToPaymentState($event_type);
-                
-                // Update payment data
-                $income_payment->transaction_id = $webhook_data['data']['payment_id'] ?? null;
-                $income_payment->payment_state = $payment_state;
-                $income_payment->payment_message = $event_type;
-                $income_payment->payment_reference = $webhook_data['data']['payment_id'] ?? null;
-                $income_payment->payment_status = $event_type;
-                $income_payment->payment_response = json_encode($webhook_data);
-                $income_payment->payment_date = Carbon::now();
-                $income_payment->save();
-
                 // Determinar etiqueta de estado del pago
                 $payment_state_labels = [0 => 'Pendiente', 1 => 'Aprobado', 2 => 'Rechazado'];
                 $payment_state_label = $payment_state_labels[$income_payment->payment_state] ?? 'Desconocido';
                 
-                if($income_payment->payment_state == 1){
+                if($payment_state_changed && $income_payment->payment_state == 1){
                     // Update income
                     $IncomeResponse = $this->Income_UpdateIncomePaymentData(
                         $income_payment->income_id,
@@ -434,25 +437,27 @@ trait income_payments_trait
                         }
                     }
                 }
-                // Send email to licenses_notifications
-                $licenses_notifications = $licenses_notifications->unique('email');
-                $Mails = [];
-                foreach ($licenses_notifications as $notification) {
-                    $Mails[] = [
-                        'address' => $notification->email,
-                        'name' => $client->name
+                if($payment_state_changed){
+                    // Send email to licenses_notifications
+                    $licenses_notifications = $licenses_notifications->unique('email');
+                    $Mails = [];
+                    foreach ($licenses_notifications as $notification) {
+                        $Mails[] = [
+                            'address' => $notification->email,
+                            'name' => $client->name
+                        ];
+                    }
+                    $MailData = [
+                        'subject' => 'Pago '.$payment_state_label.' #'.substr($income_payment->unique_id, -10)
                     ];
+                    $View = 'mail.client_income_payment_finished';
+                    $ViewData = collect([
+                        "income_payment" => $income_payment,
+                        "income" => $income,
+                        "client" => $client,
+                    ]);
+                    $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                 }
-                $MailData = [
-                    'subject' => 'Pago '.$payment_state_label.' #'.substr($income_payment->unique_id, -10)
-                ];
-                $View = 'mail.client_income_payment_finished';
-                $ViewData = collect([
-                    "income_payment" => $income_payment,
-                    "income" => $income,
-                    "client" => $client,
-                ]);
-                $OpzioEmailResponse = $this->SendMail($MailData, $Mails, $View, $ViewData, null);
                 
                 $Response['status'] = 1;
                 $Response['message'] = 'Bold payment finished';
@@ -465,6 +470,48 @@ trait income_payments_trait
             $Response['message'] = 'IncomePayment_FinishedBoldPayment: '.$e->getMessage();
         }
         return $Response;
+    }
+
+    private function IncomePayment_ApplyGatewayState(
+        $unique_id,
+        $payment_state,
+        $transaction_id,
+        $payment_message,
+        $payment_status,
+        $payment_response
+    ) {
+        return DB::transaction(function () use (
+            $unique_id,
+            $payment_state,
+            $transaction_id,
+            $payment_message,
+            $payment_status,
+            $payment_response
+        ) {
+            $income_payment = income_payment::where('unique_id', $unique_id)
+                ->lockForUpdate()
+                ->first();
+
+            if(!$income_payment){
+                return [null, false];
+            }
+
+            $payment_state_changed = (int) $income_payment->payment_state !== (int) $payment_state;
+            $transaction_changed = $income_payment->transaction_id !== $transaction_id;
+
+            if($payment_state_changed || !$income_payment->transaction_id || $transaction_changed){
+                $income_payment->transaction_id = $transaction_id;
+                $income_payment->payment_state = $payment_state;
+                $income_payment->payment_message = $payment_message;
+                $income_payment->payment_reference = $transaction_id;
+                $income_payment->payment_status = $payment_status;
+                $income_payment->payment_response = json_encode($payment_response);
+                $income_payment->payment_date = Carbon::now();
+                $income_payment->save();
+            }
+
+            return [$income_payment, $payment_state_changed];
+        });
     }
 
     // Fallback: Consultar estado de transacción Bold por API

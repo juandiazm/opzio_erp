@@ -20,6 +20,7 @@ use Carbon\Carbon;
 
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 trait incomes_trait
 {
@@ -843,24 +844,46 @@ trait incomes_trait
             'data' => null
         );
         try {
-            $income = income::find($income_id);
+            $paymentUpdate = DB::transaction(function () use (
+                $income_id,
+                $payment_state,
+                $payment_date,
+                $payment_reference,
+                $bill_name,
+                $bill_final_value
+            ) {
+                $income = income::where('id', $income_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($income == null) {
+                    return [null, false];
+                }
+
+                $was_paid = (int) $income->payment_state === 1;
+                $income->state = 3;
+                $income->payment_state = $payment_state;
+                $income->payment_date = $payment_date;
+                $income->payment_reference = $payment_reference;
+                $income->bill_name = $bill_name;
+                $income->bill_final_value = $bill_final_value;
+                $income->save();
+
+                return [$income, $was_paid];
+            });
+            $income = $paymentUpdate[0];
+            $was_paid = $paymentUpdate[1];
+
             if ($income == null) {
                 $Response['message'] = 'Income not found';
                 return $Response;
             }
-            $income->state = 3;
-            $income->payment_state = $payment_state;
-            $income->payment_date = $payment_date;
-            $income->payment_reference = $payment_reference;
-            $income->bill_name = $bill_name;
-            $income->bill_final_value = $bill_final_value;
-            $income->save();
 
             if ($income->siigo_invoice_id == null && ($income->bill_name == null || $income->bill_name == '')) {
                 $this->Income_CreateSiigoInvoice($income);
             }
 
-            if ($notify_client) {
+            if ($notify_client && !$was_paid && (int) $payment_state === 1) {
                 $notifyResponse = $this->Income_SendClientPaymentThanksEmail($income);
                 if ($notifyResponse['status'] == 0) {
                     info('Income_UpdateIncomePaymentData notify warning: ' . $notifyResponse['message']);
