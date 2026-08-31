@@ -110,10 +110,15 @@ Route::get('Admin', function () {
     return redirect('/admin');
 });
 
-// Serve storage PDFs when the web server cannot follow the public storage link.
-Route::get('storage/incomes/pdfs/{filename}', [incomes_controller::class, 'show_pdf'])
+// Serve income PDFs through Laravel so delivery does not depend on the storage link.
+Route::get('income-pdfs/{filename}', [incomes_controller::class, 'show_pdf'])
     ->where('filename', '[A-Za-z0-9-]+\.pdf')
     ->name('incomes.pdf');
+
+// Keep the legacy public URL available for existing shared links.
+Route::get('storage/incomes/pdfs/{filename}', [incomes_controller::class, 'show_pdf'])
+    ->where('filename', '[A-Za-z0-9-]+\.pdf')
+    ->name('incomes.storage_pdf');
 
 // Serve public storage files when the web server has not created the storage link.
 Route::get('storage/{path}', function (string $path) {

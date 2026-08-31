@@ -10,7 +10,8 @@ export function init(){
 }
 export function showIncomeOrder(openWindow = true){
     if(incomeState.currentIncome != null){
-        loadPdfViewer('/storage/incomes/pdfs/'+incomeState.currentIncome.unique_id+'.pdf?'+Date.now());
+        const filename = encodeURIComponent(incomeState.currentIncome.unique_id + '.pdf');
+        loadPdfViewer('/income-pdfs/' + filename + '?' + Date.now());
         if(openWindow){
             $('#order-viewer-container').attr('aria-hidden', 'false').css('display', 'flex');
             $('#erp-app-sidebar').css('visibility', 'hidden');

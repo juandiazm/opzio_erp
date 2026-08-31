@@ -243,7 +243,8 @@ function goToPay(unique_id){
 let receiversList = [];
 function showIncomeOrder(openWindow = true){
     if(current_income != null){
-        let pdfUrl = '/storage/incomes/pdfs/'+current_income.unique_id+'.pdf?'+Date.now();
+        let filename = encodeURIComponent(current_income.unique_id + '.pdf');
+        let pdfUrl = '/income-pdfs/' + filename + '?' + Date.now();
         loadPdfViewer(pdfUrl);
         if(openWindow){
             $('#order-viewer-container').css('display','flex');
