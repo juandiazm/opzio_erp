@@ -70,7 +70,8 @@ class send_queued_mails extends Command
             }
         }catch(\Exception $e){
             info('send_queued_mails error: '.$e->getMessage());
+            return 1;
         }
-        return 1;
+        return 0;
     }
 }

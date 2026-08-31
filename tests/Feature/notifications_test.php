@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\send_queued_mails;
 use App\Console\Commands\send_pay_remaining;
 use App\Models\client;
 use App\Models\license;
@@ -166,6 +167,13 @@ class notifications_test extends TestCase
         $this->assertNotContains($future->id, $ids);
         $this->assertContains($due->id, $ids);
         $this->assertContains($immediate->id, $ids);
+    }
+
+    public function test_queued_mail_command_returns_success_when_queue_is_empty()
+    {
+        $command = new send_queued_mails();
+
+        $this->assertSame(0, $command->handle());
     }
 
     public function test_email_history_includes_legacy_mail_logs()
