@@ -46,6 +46,25 @@ class incomes_controller extends Controller
         return Storage::disk('incomes')->download('income_template.xlsx');
     }
 
+    public function show_pdf(string $filename){
+        $filename = basename($filename);
+        if (!preg_match('/^[A-Za-z0-9-]+\.pdf$/', $filename)) {
+            abort(404);
+        }
+
+        $disk = Storage::disk('incomes_pdfs');
+        if (!$disk->exists($filename)) {
+            abort(404);
+        }
+
+        return response()->file($disk->path($filename), [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Cache-Control' => 'private, no-store',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     //Get incomes page
     public function get_page(Request $request){
         $Response = $this->Income_GetPage(

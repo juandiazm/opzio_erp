@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Storage;
 
 use \Carbon\Carbon;
 
@@ -46,7 +45,7 @@ class income extends Model
         return number_format($this->total, 0,',','.');
     }
     public function getDocUrlAttribute(){
-        return Storage::disk('incomes_pdfs')->url($this->unique_id.'.pdf');
+        return route('incomes.pdf', ['filename' => $this->unique_id.'.pdf']);
     }
     public function getBillFinalValueStringAttribute(){
         return $this->bill_final_value==null?number_format($this->total, 0,',','.'):number_format($this->bill_final_value, 0,',','.');

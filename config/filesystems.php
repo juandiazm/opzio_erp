@@ -101,7 +101,7 @@ return [
         'incomes_pdfs' => [
             'driver' => 'local',
             'root' => storage_path('app/public/incomes/pdfs'),
-            'url' => env('APP_URL').'storage/incomes/pdfs',
+            'url' => rtrim(env('APP_URL'), '/').'/storage/incomes/pdfs',
             'visibility' => 'public',
         ],
         'blog_principal_images' => [
