@@ -13,6 +13,10 @@ trait pdf_trait
         $browsershot = Browsershot::html($html)
             ->setNodeBinary(config('services.pdf.node_binary', 'node'))
             ->setNodeModulePath(config('services.pdf.node_module_path', base_path('node_modules')))
+            ->addChromiumArguments([
+                'no-sandbox',
+                'disable-setuid-sandbox',
+            ])
             ->format('A4')
             ->landscape(strtolower($orientation) === 'landscape')
             ->showBackground()
