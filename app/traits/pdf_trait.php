@@ -25,6 +25,19 @@ trait pdf_trait
             ->writeOptionsToFile()
             ->setOption('preferCSSPageSize', true);
 
+        $puppeteerCacheDir = getenv('PUPPETEER_CACHE_DIR') ?: null;
+        if (!$puppeteerCacheDir) {
+            $defaultPuppeteerCacheDir = base_path('.runtime/puppeteer-cache');
+            if (is_dir($defaultPuppeteerCacheDir)) {
+                $puppeteerCacheDir = $defaultPuppeteerCacheDir;
+            }
+        }
+        if ($puppeteerCacheDir) {
+            $browsershot->setNodeEnv([
+                'PUPPETEER_CACHE_DIR' => $puppeteerCacheDir,
+            ]);
+        }
+
         $chromePath = config('services.pdf.chrome_path');
         if ($chromePath) {
             $browsershot->setChromePath($chromePath);

@@ -5,6 +5,10 @@ on:
     branches:
       - qa  # Replace 'qa' with the branch to deploy.
 
+concurrency:
+  group: opzio-erp-qa
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -67,7 +71,7 @@ jobs:
     
     - name: Package build for deployment
       run: |
-        tar -czf build.tar.gz app bootstrap config database public/build public/images public/.htaccess resources composer.json composer.lock artisan routes \
+        tar -czf build.tar.gz app bootstrap/app.php config database public/build public/images public/.htaccess resources composer.json composer.lock package.json package-lock.json scripts/install_production_node_dependencies.sh artisan routes \
           public/manifest.json public/service-worker.js public/favicon.ico public/apple-touch-icon.png public/offline.html
 
     - name: Set up SSH
@@ -124,11 +128,34 @@ jobs:
         fi
 
     - name: Deploy to server
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
+        if [ -z "${NPM_TOKEN}" ]; then
+          echo "NPM_TOKEN is required to install QA Node dependencies."
+          exit 1
+        fi
         scp build.tar.gz git@35.239.181.103:/var/www/html/opzio_erp_qa
+        printf '%s\n' \
+          '@fortawesome:registry=https://npm.fontawesome.com/' \
+          "//npm.fontawesome.com/:_authToken=${NPM_TOKEN}" | \
+          ssh -o StrictHostKeyChecking=no git@35.239.181.103 'umask 077; cat > /tmp/opzio-erp-qa-npmrc'
         ssh git@35.239.181.103 << 'EOF'
+        set -e
+        cleanup() {
+          sudo rm -f /tmp/opzio-erp-qa-npmrc
+          rm -f build.tar.gz composer.phar
+        }
+        trap cleanup EXIT
+        sudo chown www-data:www-data /tmp/opzio-erp-qa-npmrc
         cd /var/www/html/opzio_erp_qa
         tar --no-same-owner --no-same-permissions --no-overwrite-dir -xzf build.tar.gz
+        if [ -f vendor/autoload.php ]; then
+          php8.2 artisan optimize:clear
+        else
+          rm -f bootstrap/cache/*.php
+        fi
+        sudo -u www-data -H env HOME=/var/www NPM_CONFIG_USERCONFIG=/tmp/opzio-erp-qa-npmrc bash scripts/install_production_node_dependencies.sh /var/www/html/opzio_erp_qa
         curl -sS https://getcomposer.org/installer | php8.2
         php8.2 composer.phar install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
         php8.2 artisan migrate --force
@@ -136,7 +163,6 @@ jobs:
         php8.2 artisan config:clear
         php8.2 artisan route:cache
         php8.2 artisan view:cache
-        rm build.tar.gz composer.phar
         EOF
 
     - name: Setting ownership
