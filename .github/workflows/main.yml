@@ -149,7 +149,7 @@ jobs:
         trap cleanup EXIT
         sudo chown www-data:www-data /tmp/opzio-erp-npmrc
         cd /var/www/html/opzio_erp
-        tar --no-same-owner --no-same-permissions --no-overwrite-dir -xzf build.tar.gz
+        sudo tar --no-same-owner --no-same-permissions --no-overwrite-dir -xzf build.tar.gz
         if [ -f vendor/autoload.php ]; then
           php8.2 artisan optimize:clear
         else
