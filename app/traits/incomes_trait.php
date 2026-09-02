@@ -1026,7 +1026,7 @@ trait incomes_trait
     {
         try {
             //Ordenar por días vencidos (de mayor a menor) y luego por fecha de corte
-            $incomes = income::where('state', $status)->orderBy('cutoff_date', 'asc')->get();
+            $incomes = income::with('client')->where('state', $status)->orderBy('cutoff_date', 'asc')->get();
             
             // Ordenar la colección por días vencidos de mayor a menor
             $incomes = $incomes->sortByDesc(function($income) {
@@ -1835,7 +1835,7 @@ trait incomes_trait
             // Calculate days overdue for each income
             $incomes->each(function($income) use ($today) {
                 $cutoffDate = Carbon::parse($income->cutoff_date)->startOfDay();
-                $income->days_overdue = $today->diffInDays($cutoffDate);
+                $income->days_overdue = (int) $cutoffDate->diffInDays($today);
             });
             
             $Response['status'] = 1;

@@ -65,7 +65,7 @@ class income extends Model
         
         // Si la fecha de corte ya pasó, calcular los días vencidos
         if ($today->greaterThan($cutoffDate)) {
-            return $today->diffInDays($cutoffDate);
+            return (int) $cutoffDate->diffInDays($today);
         }
         
         return 0;

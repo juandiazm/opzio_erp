@@ -1,4 +1,5 @@
 import { dashboardState } from './state.js';
+import { renderEntityAvatar } from '../shared/list.js';
 
 function formatCompactCurrency(value){
     const normalizedValue = String(value == null ? 0 : value).replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
@@ -18,7 +19,7 @@ export function showCollectIncomes(response){
     $('.approve-incomes-table tbody').empty();
     let html = '';
     $.each(dashboardState.collectIncomesList, function(i, income){
-        html += '<tr><td class="approve-incomes-link"><p class="approve-incomes-a copy-action" data-clipboard-text="'+income.payment_link+'"><i class="approve-incomes-link-icon fa-solid fa-link"></i></p></td><td class="approve-incomes-client"><p class="approve-incomes-value">'+income.client_name+'</p></td><td class="approve-incomes-amount"><p class="approve-incomes-value">$ '+income.total_string+'</p></td><td class="approve-incomes-cutoff"><p class="approve-incomes-value">'+income.cutoff_date_string+'</p></td><td class="approve-incomes-overdue"><p class="approve-incomes-value'+(income.days_overdue > 0 ? ' overdue-text' : '')+'">'+income.days_overdue+'</p></td><td class="approve-incomes-action"><a href="/admin/incomes?income_uid='+income.unique_id+'" class="approve-incomes-action-link"><i class="approve-incomes-action-icon fa-solid fa-pen-to-square"></i></a></td></tr>';
+        html += '<tr><td class="approve-incomes-link"><p class="approve-incomes-a copy-action" data-clipboard-text="'+income.payment_link+'"><i class="approve-incomes-link-icon fa-solid fa-link"></i></p></td><td class="approve-incomes-client"><div class="dashboard-client-identity">'+renderEntityAvatar(income.client || null, 'clients')+'<p class="approve-incomes-value dashboard-client-name">'+income.client_name+'</p></div></td><td class="approve-incomes-amount"><p class="approve-incomes-value">$ '+income.total_string+'</p></td><td class="approve-incomes-cutoff"><p class="approve-incomes-value">'+income.cutoff_date_string+'</p></td><td class="approve-incomes-overdue"><p class="approve-incomes-value'+(income.days_overdue > 0 ? ' overdue-text' : '')+'">'+income.days_overdue+'</p></td><td class="approve-incomes-action"><a href="/admin/incomes?income_uid='+income.unique_id+'" class="approve-incomes-action-link"><i class="approve-incomes-action-icon fa-solid fa-pen-to-square"></i></a></td></tr>';
     });
     $('.approve-incomes-table tbody').append(html);
     $('.collect-container .segment-title .loading-icon').remove();
@@ -31,7 +32,7 @@ export function showQuotationIncomes(response){
     $('.quotation-segment .quotation-quantity').text(response.data.total_items);
     $('.quotation-table tbody').empty();
     let html = '';
-    $.each(dashboardState.quotationIncomesList, function(i, income){ html += '<tr><td class="quotation-client"><p class="quotation-value">'+income.client_name+'</p></td><td class="quotation-amount"><p class="quotation-value">$ '+income.total_string+'</p></td><td class="quotation-action"><a href="/admin/incomes?income_uid='+income.unique_id+'" class="quotation-action-link"><i class="quotation-action-icon fa-solid fa-pen-to-square"></i></a></td></tr>'; });
+    $.each(dashboardState.quotationIncomesList, function(i, income){ html += '<tr><td class="quotation-client"><div class="dashboard-client-identity">'+renderEntityAvatar(income.client || null, 'clients')+'<p class="quotation-value dashboard-client-name">'+income.client_name+'</p></div></td><td class="quotation-amount"><p class="quotation-value">$ '+income.total_string+'</p></td><td class="quotation-action"><a href="/admin/incomes?income_uid='+income.unique_id+'" class="quotation-action-link"><i class="quotation-action-icon fa-solid fa-pen-to-square"></i></a></td></tr>'; });
     $('.quotation-table tbody').append(html);
     $('.quotation-segment .segment-title .loading-icon').remove();
 }

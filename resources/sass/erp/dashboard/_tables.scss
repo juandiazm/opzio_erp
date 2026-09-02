@@ -32,3 +32,38 @@
     object-fit: contain;
     object-position: center;
 }
+
+#dashboard-container .dashboard-client-identity {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    min-width: 0;
+}
+
+#dashboard-container .dashboard-client-identity .erp-avatar {
+    align-items: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: 1px solid rgba(100, 116, 139, 0.2);
+    border-radius: 50%;
+    color: $text-gray;
+    display: inline-flex;
+    flex: 0 0 24px;
+    height: 24px;
+    justify-content: center;
+    overflow: hidden;
+    width: 24px;
+}
+
+#dashboard-container .dashboard-client-identity .erp-avatar-empty {
+    background: rgba($brand-cream, 0.65);
+    font-size: 11px;
+}
+
+#dashboard-container .dashboard-client-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

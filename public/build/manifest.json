@@ -819,10 +819,13 @@
     "isEntry": true
   },
   "resources/js/erp/dashboard/dashboard.js": {
-    "file": "assets/dashboard-CVK3UbPz.js",
+    "file": "assets/dashboard-DwhmLfHY.js",
     "name": "dashboard",
     "src": "resources/js/erp/dashboard/dashboard.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_list-ClzTmGL1.js"
+    ]
   },
   "resources/js/erp/dashboard/indicators.js": {
     "file": "assets/indicators-l0sNRNKZ.js",
@@ -849,7 +852,7 @@
     "isEntry": true
   },
   "resources/js/erp/departments/departments.js": {
-    "file": "assets/departments-B4csOLNv.js",
+    "file": "assets/departments-Tn80o8Ir.js",
     "name": "departments",
     "src": "resources/js/erp/departments/departments.js",
     "isEntry": true
@@ -1594,7 +1597,7 @@
     "isEntry": true
   },
   "resources/sass/erp/dashboard/dashboard.scss": {
-    "file": "assets/dashboard-BMl6jR0O.css",
+    "file": "assets/dashboard-BfElNDgZ.css",
     "src": "resources/sass/erp/dashboard/dashboard.scss",
     "isEntry": true
   },
