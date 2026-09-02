@@ -297,4 +297,16 @@ class servers_monthly_report_test extends TestCase
             $this->assertLessThanOrEqual(12 * 60, $minutes);
         }
     }
+
+    public function test_monthly_report_schedule_retries_through_the_first_day()
+    {
+        $event = collect(app(\Illuminate\Console\Scheduling\Schedule::class)->events())
+            ->first(function ($event) {
+                return str_contains($event->command, 'servers:send-monthly-report');
+            });
+
+        $this->assertNotNull($event);
+        $this->assertSame('0 7-23 1 * *', $event->expression);
+        $this->assertSame('America/Bogota', $event->timezone);
+    }
 }
