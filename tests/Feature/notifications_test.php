@@ -159,6 +159,9 @@ class notifications_test extends TestCase
         $future = $this->MailLog_CreatePending('Futuro', 'mail.notification', 'erp@example.test', 'ERP', [['address' => 'future@example.test']], ['content' => '<p>futuro</p>'], null, Carbon::now()->addHour());
         $due = $this->MailLog_CreatePending('Vencido', 'mail.notification', 'erp@example.test', 'ERP', [['address' => 'due@example.test']], ['content' => '<p>vencido</p>'], null, Carbon::now()->subMinute());
         $immediate = $this->MailLog_CreatePending('Inmediato', 'mail.notification', 'erp@example.test', 'ERP', [['address' => 'now@example.test']], ['content' => '<p>ahora</p>']);
+        $failed = $this->MailLog_CreatePending('Fallido', 'mail.notification', 'erp@example.test', 'ERP', [['address' => 'failed@example.test']], ['content' => '<p>fallido</p>']);
+        $failed->status = 2;
+        $failed->save();
 
         $response = $this->MailLog_GetQueuedMails();
         $ids = collect($response['data'])->pluck('id')->all();
@@ -167,6 +170,45 @@ class notifications_test extends TestCase
         $this->assertNotContains($future->id, $ids);
         $this->assertContains($due->id, $ids);
         $this->assertContains($immediate->id, $ids);
+        $this->assertNotContains($failed->id, $ids);
+    }
+
+    public function test_email_status_can_be_marked_failed_and_requeued()
+    {
+        $mail = $this->MailLog_CreatePending('Estado', 'mail.notification', 'erp@example.test', 'ERP', [['address' => 'estado@example.test']], ['content' => '<p>estado</p>']);
+        $mail->attemps = 2;
+        $mail->save();
+
+        $failed = $this->Notification_ChangeEmailStatus($mail->id, 2);
+
+        $this->assertSame(1, $failed['status']);
+        $mail->refresh();
+        $this->assertSame(2, (int) $mail->status);
+        $this->assertSame('Marcado como fallido manualmente', $mail->error_message);
+        $this->assertNotContains($mail->id, collect($this->MailLog_GetQueuedMails()['data'])->pluck('id')->all());
+
+        $queued = $this->Notification_ChangeEmailStatus($mail->id, 0);
+
+        $this->assertSame(1, $queued['status']);
+        $mail->refresh();
+        $this->assertSame(0, (int) $mail->status);
+        $this->assertSame(0, (int) $mail->attemps);
+        $this->assertNull($mail->error_message);
+        $this->assertTrue($mail->send_at->lessThanOrEqualTo(Carbon::now()));
+        $this->assertContains($mail->id, collect($this->MailLog_GetQueuedMails()['data'])->pluck('id')->all());
+    }
+
+    public function test_sent_email_status_cannot_be_changed_manually()
+    {
+        $mail = $this->MailLog_CreatePending('Enviado', 'mail.notification', 'erp@example.test', 'ERP', [['address' => 'enviado@example.test']], ['content' => '<p>enviado</p>']);
+        $mail->status = 1;
+        $mail->sent_at = Carbon::now();
+        $mail->save();
+
+        $response = $this->Notification_ChangeEmailStatus($mail->id, 0);
+
+        $this->assertSame(0, $response['status']);
+        $this->assertSame(1, (int) $mail->fresh()->status);
     }
 
     public function test_queued_mail_command_returns_success_when_queue_is_empty()

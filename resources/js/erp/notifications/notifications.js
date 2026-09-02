@@ -21,6 +21,7 @@ $(document).on('click', '#notifications-save-modal', function() {
 });
 $(document).on('click', '.notifications-view-email', email.viewEmail);
 $(document).on('click', '.notifications-resend-email', email.resendEmail);
+$(document).on('click', '.notifications-change-email-status', email.changeEmailStatus);
 $(document).on('click', '.notifications-resend-sms', sms.resendSms);
 $(document).on('click', '#notifications-close-email-view', email.closeEmailView);
 $(document).on('click', '#notifications-edit-email-view', email.editEmailFromView);

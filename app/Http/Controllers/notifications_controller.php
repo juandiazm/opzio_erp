@@ -61,6 +61,11 @@ class notifications_controller extends Controller
         return $this->response($this->Notification_ResendEmail($request->id, $request->all(), $request->file('attachments', []), $this->actorId()));
     }
 
+    public function change_email_status(Request $request)
+    {
+        return $this->response($this->Notification_ChangeEmailStatus($request->id, $request->status));
+    }
+
     public function resend_sms(Request $request)
     {
         return $this->response($this->Notification_ResendSms($request->id, $request->all(), $this->actorId()));

@@ -341,6 +341,7 @@ Route::prefix('admin')->group(function () {
             Route::post('email/add', [notifications_controller::class, 'add_email']);
             Route::post('sms/add', [notifications_controller::class, 'add_sms']);
             Route::post('email/resend', [notifications_controller::class, 'resend_email']);
+            Route::post('email/change-status', [notifications_controller::class, 'change_email_status']);
             Route::post('sms/resend', [notifications_controller::class, 'resend_sms']);
         });
         Route::prefix('incomes')->group(function(){

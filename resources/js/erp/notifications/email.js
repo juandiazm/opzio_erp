@@ -28,6 +28,8 @@ export function renderEmails(response) {
             html += '<td>'+escapeHtml(formatDate(email.sent_at_local || email.sent_at))+'</td>';
             html += '<td class="notifications-actions text-end"><div class="notifications-action-group">';
             html += '<button type="button" class="btn btn-link notifications-action notifications-view-email" data-id="'+escapeHtml(email.id)+'" title="Visualizar" aria-label="Visualizar correo"><i class="fa-solid fa-eye"></i></button>';
+            if (Number(email.status) === 0) html += '<button type="button" class="btn btn-link notifications-action notifications-change-email-status" data-id="'+escapeHtml(email.id)+'" data-status="2" title="Marcar como fallido" aria-label="Marcar correo como fallido"><i class="fa-solid fa-ban"></i></button>';
+            if (Number(email.status) === 2) html += '<button type="button" class="btn btn-link notifications-action notifications-change-email-status" data-id="'+escapeHtml(email.id)+'" data-status="0" title="Poner en cola" aria-label="Poner correo en cola"><i class="fa-solid fa-rotate-right"></i></button>';
             if (email.can_resend !== false) html += '<button type="button" class="btn btn-link notifications-action notifications-resend-email" data-id="'+escapeHtml(email.id)+'" title="Reenviar" aria-label="Reenviar correo"><i class="fa-solid fa-reply"></i></button>';
             html += '</div></td></tr>';
         });
@@ -194,6 +196,25 @@ export function editEmailFromView() {
 export function resendEmail() {
     const id = $(this).attr('data-id');
     PostMethodFunction('/admin/notifications/email', {id: id}, null, function(response) { fillEmailForResend(response.email); }, null);
+}
+
+export function changeEmailStatus() {
+    const button = $(this);
+    const id = button.attr('data-id');
+    const status = Number(button.attr('data-status'));
+    const queueAgain = status === 0;
+    const message = queueAgain
+        ? '¿Desea poner este correo en cola nuevamente?'
+        : '¿Desea marcar este correo como fallido? No será enviado mientras permanezca en este estado.';
+    if (!window.confirm(message)) return;
+
+    button.prop('disabled', true);
+    PostMethodFunction('/admin/notifications/email/change-status', {id: id, status: status}, null, function(response) {
+        alertSuccess(response.message || (queueAgain ? 'Correo puesto en cola' : 'Correo marcado como fallido'));
+        loadEmails();
+    }, function() {
+        button.prop('disabled', false);
+    });
 }
 
 export function initializeEditor() {

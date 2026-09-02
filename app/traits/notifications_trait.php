@@ -695,6 +695,48 @@ trait notifications_trait
         }
     }
 
+    public function Notification_ChangeEmailStatus($id, $status)
+    {
+        try {
+            $status = filter_var($status, FILTER_VALIDATE_INT, ['options' => ['default' => null]]);
+            if (!in_array($status, [0, 2], true)) {
+                return $this->Notification_Response('El estado solicitado no es valido', [], 0);
+            }
+
+            $mail = mail_log::find($id);
+            if (!$mail) {
+                return $this->Notification_Response('El correo no existe', [], 0);
+            }
+            if ((int) $mail->status === 1) {
+                return $this->Notification_Response('Los correos enviados no pueden cambiar de estado', [], 0);
+            }
+
+            $mail->status = $status;
+            $mail->sent_at = null;
+            if ($status === 0) {
+                $mail->attemps = 0;
+                $mail->error_message = null;
+                $mail->send_at = Carbon::now();
+                $message = 'Correo puesto en cola';
+            } else {
+                $mail->error_message = 'Marcado como fallido manualmente';
+                $message = 'Correo marcado como fallido';
+            }
+            $mail->save();
+
+            return $this->Notification_Response($message, [
+                'email' => [
+                    'id' => $mail->id,
+                    'status' => (int) $mail->status,
+                    'status_string' => $this->Notification_StatusLabel($mail->status),
+                ],
+            ]);
+        } catch (\Throwable $exception) {
+            info('Notification_ChangeEmailStatus error: '.$exception->getMessage());
+            return $this->Notification_Response($exception->getMessage(), [], 0);
+        }
+    }
+
     public function Notification_GetSmsById($id)
     {
         try {
