@@ -30,7 +30,8 @@ class admin_middleware
         $hasServersPermission = $app_permissions->firstWhere('url', 'admin/servers/') !== null;
         $hasContractsPermission = $app_permissions->firstWhere('url', 'admin/contracts/') !== null;
         $hasNotificationsPermission = $app_permissions->firstWhere('url', 'admin/notifications/') !== null;
-        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission || !$hasContractsPermission || !$hasNotificationsPermission){
+        $hasLicitacionesPermission = $app_permissions->firstWhere('url', 'admin/tenders/') !== null;
+        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission || !$hasContractsPermission || !$hasNotificationsPermission || !$hasLicitacionesPermission){
             $app_permissions = collect(user_permission::get());
             Session::put('app_permissions', $app_permissions);
             if (Session::has('user')) {

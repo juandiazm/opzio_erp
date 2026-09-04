@@ -1,0 +1,609 @@
+@import '../../variables';
+
+#licitaciones-container {
+    --licitaciones-ink: #24323d;
+    --licitaciones-muted: #687681;
+    --licitaciones-line: #dce4e8;
+    --licitaciones-surface: #ffffff;
+    --licitaciones-canvas: #f4f7f8;
+    --licitaciones-accent: #0f766e;
+    --licitaciones-amber: #b45309;
+    --licitaciones-red: #b42318;
+    background: var(--licitaciones-canvas);
+    color: var(--licitaciones-ink);
+    min-height: 100%;
+    padding: 18px 24px 24px;
+}
+
+#tenders-context-container {
+    --tenders-context-ink: #24323d;
+    --tenders-context-muted: #687681;
+    --tenders-context-line: #dce4e8;
+    --tenders-context-surface: #ffffff;
+    --tenders-context-canvas: #f4f7f8;
+    --tenders-context-accent: #0f766e;
+    background: var(--tenders-context-canvas);
+    color: var(--tenders-context-ink);
+    min-height: 100%;
+    padding: 18px 24px 24px;
+}
+
+.tenders-context-form {
+    background: var(--tenders-context-surface);
+    border: 1px solid var(--tenders-context-line);
+    padding: 18px;
+}
+
+.tenders-context-header {
+    align-items: center;
+    border-bottom: 1px solid var(--tenders-context-line);
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+}
+
+.tenders-context-header h2 {
+    font-size: 20px;
+    font-weight: 650;
+    margin: 0;
+}
+
+.tenders-context-status {
+    color: var(--tenders-context-muted);
+    font-size: 13px;
+    min-height: 20px;
+    margin-bottom: 10px;
+}
+
+.tenders-context-status.is-error {
+    color: var(--licitaciones-red);
+}
+
+.tenders-context-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tenders-context-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.tenders-context-field-wide {
+    grid-column: 1 / -1;
+}
+
+.tenders-context-field label {
+    color: var(--tenders-context-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.tenders-context-field .form-control {
+    border: 0;
+    border-bottom: 1px solid var(--tenders-context-line);
+    border-radius: 0;
+    color: var(--tenders-context-ink);
+    font-size: 13px;
+    padding: 8px 4px;
+}
+
+.tenders-context-field .form-control:focus {
+    border-bottom-color: var(--tenders-context-accent);
+    box-shadow: none;
+}
+
+.licitaciones-filter-container {
+    align-items: end;
+    background: var(--licitaciones-surface);
+    border: 1px solid var(--licitaciones-line);
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(130px, 1fr)) auto;
+    padding: 14px;
+}
+
+.licitaciones-filter {
+    color: var(--licitaciones-muted);
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    gap: 5px;
+}
+
+.licitaciones-filter > span {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.licitaciones-filter .form-control,
+.licitaciones-filter .form-select {
+    border: 0;
+    border-bottom: 1px solid var(--licitaciones-line);
+    border-radius: 0;
+    color: var(--licitaciones-ink);
+    font-size: 13px;
+    min-height: 34px;
+    padding: 5px 4px;
+}
+
+.licitaciones-filter .form-control:focus,
+.licitaciones-filter .form-select:focus {
+    border-bottom-color: var(--licitaciones-accent);
+    box-shadow: none;
+}
+
+.licitaciones-filter-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.licitaciones-filter-actions .btn {
+    align-items: center;
+    display: inline-flex;
+    gap: 6px;
+    min-height: 34px;
+    white-space: nowrap;
+}
+
+.licitaciones-source {
+    color: var(--licitaciones-accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.licitaciones-summary {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    justify-content: flex-end;
+    min-height: 24px;
+    padding: 5px 0 2px;
+}
+
+.licitaciones-status,
+.licitaciones-sync-status,
+.licitaciones-overview {
+    color: var(--licitaciones-muted);
+    font-size: 12px;
+    min-height: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.licitaciones-summary > div:empty {
+    display: none;
+}
+
+.licitaciones-status.is-error {
+    color: var(--licitaciones-red);
+}
+
+.licitaciones-list {
+    display: grid;
+    gap: 12px;
+}
+
+.licitaciones-opportunity {
+    background: var(--licitaciones-surface);
+    border: 1px solid var(--licitaciones-line);
+    padding: 16px 18px;
+}
+
+.licitaciones-opportunity-heading,
+.licitaciones-metadata,
+.licitaciones-states,
+.licitaciones-actions {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+}
+
+.licitaciones-opportunity-heading {
+    justify-content: space-between;
+}
+
+.licitaciones-opportunity h3 {
+    font-size: 17px;
+    font-weight: 650;
+    line-height: 1.3;
+    margin: 5px 0 0;
+}
+
+.licitaciones-score {
+    color: var(--licitaciones-accent);
+    min-width: 74px;
+    text-align: right;
+}
+
+.licitaciones-score strong {
+    display: block;
+    font-size: 26px;
+    line-height: 1;
+}
+
+.licitaciones-score span {
+    color: var(--licitaciones-muted);
+    font-size: 11px;
+}
+
+.licitaciones-metadata {
+    border-bottom: 1px solid var(--licitaciones-line);
+    color: var(--licitaciones-muted);
+    flex-wrap: wrap;
+    font-size: 13px;
+    margin-top: 13px;
+    padding-bottom: 12px;
+}
+
+.licitaciones-metadata span:not(:last-child)::after {
+    color: var(--licitaciones-line);
+    content: '|';
+    margin-left: 12px;
+}
+
+.licitaciones-states {
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.licitaciones-state,
+.licitaciones-confidence {
+    border: 1px solid currentColor;
+    font-size: 11px;
+    padding: 3px 8px;
+}
+
+.licitaciones-state-probably_fit {
+    color: var(--licitaciones-accent);
+}
+
+.licitaciones-state-requires_validation,
+.licitaciones-confidence-medium {
+    color: var(--licitaciones-amber);
+}
+
+.licitaciones-state-high_risk,
+.licitaciones-confidence-low {
+    color: var(--licitaciones-red);
+}
+
+.licitaciones-state-unknown {
+    color: var(--licitaciones-muted);
+}
+
+.licitaciones-detail {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 14px;
+}
+
+.licitaciones-detail h4 {
+    font-size: 12px;
+    margin: 0 0 5px;
+}
+
+.licitaciones-detail ul {
+    color: var(--licitaciones-muted);
+    font-size: 13px;
+    margin: 0;
+    padding-left: 18px;
+}
+
+.licitaciones-actions {
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.tenders-icon-action {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: var(--licitaciones-muted);
+    cursor: pointer;
+    display: inline-flex;
+    height: 32px;
+    justify-content: center;
+    padding: 0;
+    width: 32px;
+}
+
+.tenders-icon-action:hover,
+.tenders-icon-action:focus-visible {
+    color: var(--licitaciones-accent);
+}
+
+.tenders-icon-action:disabled {
+    cursor: wait;
+    opacity: .5;
+}
+
+.tenders-extended-detail {
+    border-top: 1px solid var(--licitaciones-line);
+    color: var(--licitaciones-muted);
+    font-size: 13px;
+    line-height: 1.45;
+    margin-top: 14px;
+    padding-top: 14px;
+}
+
+.tenders-detail-description {
+    margin-bottom: 14px !important;
+}
+
+.tenders-detail-grid,
+.tenders-source-data-grid {
+    display: grid;
+    gap: 10px 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+}
+
+.tenders-detail-field {
+    border-top: 1px solid var(--licitaciones-line);
+    min-width: 0;
+    padding-top: 8px;
+}
+
+.tenders-detail-field dt {
+    color: var(--licitaciones-muted);
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.tenders-detail-field dd {
+    margin: 3px 0 0;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.tenders-detail-documents {
+    border-top: 1px solid var(--licitaciones-line);
+    margin-top: 14px;
+    padding-top: 12px;
+}
+
+.tenders-detail-documents h4,
+.tenders-source-data h4 {
+    font-size: 12px;
+    margin: 0 0 7px;
+}
+
+.tenders-detail-documents ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.tenders-detail-documents li {
+    overflow-wrap: anywhere;
+}
+
+.tenders-source-data {
+    border-top: 1px solid var(--licitaciones-line);
+    margin-top: 14px;
+    padding-top: 12px;
+}
+
+.tenders-extended-detail > p {
+    margin: 0;
+    white-space: pre-line;
+}
+
+.tenders-extended-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.tenders-evidence-list {
+    margin: 10px 0 0;
+    padding-left: 18px;
+}
+
+#licitaciones-pagination {
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.licitaciones-page-size {
+    align-items: center;
+    display: inline-flex;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.licitaciones-page-size select {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: inherit;
+}
+
+#tenders-pipeline-container {
+    --tenders-pipeline-ink: #24323d;
+    --tenders-pipeline-muted: #687681;
+    --tenders-pipeline-line: #dce4e8;
+    --tenders-pipeline-surface: #ffffff;
+    --tenders-pipeline-canvas: #f4f7f8;
+    background: var(--tenders-pipeline-canvas);
+    color: var(--tenders-pipeline-ink);
+    min-height: 100%;
+    padding: 18px 24px 24px;
+}
+
+.tenders-pipeline-toolbar {
+    align-items: end;
+    background: var(--tenders-pipeline-surface);
+    border: 1px solid var(--tenders-pipeline-line);
+    display: grid;
+    grid-template-columns: minmax(160px, 240px);
+    padding: 14px;
+}
+
+.tenders-pipeline-status {
+    color: var(--tenders-pipeline-muted);
+    font-size: 13px;
+    min-height: 22px;
+    padding: 10px 0 4px;
+}
+
+.tenders-pipeline-status.is-error {
+    color: var(--licitaciones-red);
+}
+
+.tenders-pipeline-list {
+    display: grid;
+    gap: 12px;
+}
+
+.tenders-pipeline-item {
+    background: var(--tenders-pipeline-surface);
+    border: 1px solid var(--tenders-pipeline-line);
+    padding: 16px 18px;
+}
+
+.tenders-pipeline-stage {
+    color: var(--licitaciones-accent);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.tenders-pipeline-item h3 {
+    font-size: 17px;
+    font-weight: 650;
+    line-height: 1.3;
+    margin: 5px 0;
+}
+
+.tenders-pipeline-entity,
+.tenders-pipeline-notes {
+    color: var(--tenders-pipeline-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+.tenders-pipeline-metadata {
+    border-top: 1px solid var(--tenders-pipeline-line);
+    color: var(--tenders-pipeline-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 12px;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 10px;
+}
+
+.tenders-pipeline-empty {
+    background: var(--tenders-pipeline-surface);
+    border: 1px dashed var(--tenders-pipeline-line);
+    color: var(--tenders-pipeline-muted);
+    padding: 30px;
+    text-align: center;
+}
+
+.tenders-pipeline-empty strong {
+    color: var(--tenders-pipeline-ink);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.tenders-pipeline-empty p {
+    margin: 0;
+}
+
+.licitaciones-empty {
+    background: var(--licitaciones-surface);
+    border: 1px dashed var(--licitaciones-line);
+    color: var(--licitaciones-muted);
+    padding: 30px;
+    text-align: center;
+}
+
+.licitaciones-empty strong {
+    color: var(--licitaciones-ink);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.licitaciones-empty p {
+    margin: 0;
+}
+
+@media (max-width: 720px) {
+    #licitaciones-container {
+        padding: 14px;
+    }
+
+    #tenders-context-container {
+        padding: 14px;
+    }
+
+    #tenders-pipeline-container {
+        padding: 14px;
+    }
+
+    .licitaciones-filter-container {
+        grid-template-columns: 1fr;
+    }
+
+    .licitaciones-filter-actions .btn {
+        align-self: flex-start;
+    }
+
+    .licitaciones-status,
+    .licitaciones-sync-status,
+    .licitaciones-overview {
+        text-align: left;
+    }
+
+    .licitaciones-summary {
+        justify-content: flex-start;
+    }
+
+    .licitaciones-detail {
+        grid-template-columns: 1fr;
+    }
+
+    .tenders-detail-grid,
+    .tenders-source-data-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tenders-context-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tenders-context-field-wide {
+        grid-column: auto;
+    }
+
+    .tenders-pipeline-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .licitaciones-metadata span:not(:last-child)::after {
+        content: '';
+        margin-left: 0;
+    }
+}
+
+.licitaciones-sync-status {
+    color: var(--licitaciones-accent);
+    font-size: 11px;
+    min-height: 16px;
+    padding-bottom: 2px;
+    text-align: right;
+}

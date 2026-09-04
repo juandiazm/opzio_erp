@@ -42,6 +42,7 @@ use App\Http\Controllers\income_payment_controller;
 use App\Http\Controllers\payment_gateway_wompi_controller;
 use App\Http\Controllers\payment_gateway_bold_controller;
 use App\Http\Controllers\servers_dashboard_controller;
+use App\Http\Controllers\tenders_controller;
 //Opzio
 use App\Http\Controllers\old_opzio_controller;
 use App\Http\Controllers\client_chat_controller;
@@ -169,6 +170,17 @@ Route::prefix('admin')->group(function () {
             Route::post('project-config/notifications/add', [servers_dashboard_controller::class, 'add_project_notification']);
             Route::post('project-config/notifications/update', [servers_dashboard_controller::class, 'update_project_notification']);
             Route::post('project-config/notifications/delete', [servers_dashboard_controller::class, 'delete_project_notification']);
+        });
+        Route::prefix('tenders')->group(function () {
+            Route::get('', [tenders_controller::class, 'page']);
+            Route::post('discovery', [tenders_controller::class, 'discovery']);
+            Route::post('sync', [tenders_controller::class, 'sync']);
+            Route::post('context', [tenders_controller::class, 'update_context']);
+            Route::get('opportunities/{opportunityId}', [tenders_controller::class, 'opportunity']);
+            Route::post('feedback', [tenders_controller::class, 'feedback']);
+            Route::post('pipeline', [tenders_controller::class, 'pipeline']);
+            Route::get('applications', [tenders_controller::class, 'applications']);
+            Route::get('sync-status', [tenders_controller::class, 'sync_status']);
         });
         Route::prefix('users')->group(function () {
             Route::get('', [admin_pages_controller::class, 'users_page']);

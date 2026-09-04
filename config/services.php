@@ -88,6 +88,13 @@ return [
         'max_payload_bytes' => (int) env('OPZIO_OBSERVER_MAX_PAYLOAD_BYTES', 10485760),
     ],
 
+    'tenders_ai' => [
+        'base_url' => env('OPZIO_TENDERS_AI_URL', 'http://127.0.0.1:9081'),
+        'token' => env('OPZIO_TENDERS_AI_TOKEN', ''),
+        'tenant_id' => env('OPZIO_TENDERS_AI_TENANT_ID', 'opzio'),
+        'timeout' => (float) env('OPZIO_TENDERS_AI_TIMEOUT', 10),
+    ],
+
     'pdf' => [
         'chrome_path' => env(
             'PDF_CHROME_PATH',

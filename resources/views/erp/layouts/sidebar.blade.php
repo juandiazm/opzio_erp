@@ -82,6 +82,15 @@
                 </a>
             </li>
             @endif
+            @php($licitaciones_permission = collect(session('app_permissions'))->firstWhere('url', 'admin/tenders/'))
+            @if($licitaciones_permission && collect(session('permissions'))->firstWhere('user_permission_id', $licitaciones_permission->id)!=null)
+            <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/tenders')?' selected':'' }}">
+                <a href="/admin/tenders" class="sidebar-menu-item-link">
+                    <i class="fa-light fa-gavel align-self-center sidebar-menu-item-icon"></i>
+                    <p class="align-self-center sidebar-menu-item-text">Licitaciones</p>
+                </a>
+            </li>
+            @endif
             @if(collect(session('permissions'))->firstWhere('user_permission_id', 7)!=null)
             <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/incomes')?' selected':'' }}">
                 <a href="/admin/incomes" class="sidebar-menu-item-link">

@@ -1361,6 +1361,24 @@
     "src": "resources/js/erp/shared/list.js",
     "isEntry": true
   },
+  "resources/js/erp/tenders/context.js": {
+    "file": "assets/context-l0sNRNKZ.js",
+    "name": "context",
+    "src": "resources/js/erp/tenders/context.js",
+    "isEntry": true
+  },
+  "resources/js/erp/tenders/pipeline.js": {
+    "file": "assets/pipeline-l0sNRNKZ.js",
+    "name": "pipeline",
+    "src": "resources/js/erp/tenders/pipeline.js",
+    "isEntry": true
+  },
+  "resources/js/erp/tenders/tenders.js": {
+    "file": "assets/tenders-CZCaqFS1.js",
+    "name": "tenders",
+    "src": "resources/js/erp/tenders/tenders.js",
+    "isEntry": true
+  },
   "resources/js/erp/traceability.js": {
     "file": "assets/traceability-CM8C_EBg.js",
     "name": "traceability",
@@ -1689,6 +1707,11 @@
   "resources/sass/erp/servers/servers.scss": {
     "file": "assets/servers-DQuOULzp.css",
     "src": "resources/sass/erp/servers/servers.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/tenders/tenders.scss": {
+    "file": "assets/tenders-DWiiCbbs.css",
+    "src": "resources/sass/erp/tenders/tenders.scss",
     "isEntry": true
   },
   "resources/sass/erp/traceability.scss": {

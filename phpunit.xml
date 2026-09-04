@@ -26,6 +26,10 @@
         <testsuite name="Notifications Feature">
             <file>./tests/Feature/notifications_test.php</file>
         </testsuite>
+        <testsuite name="Tenders Feature">
+            <file>./tests/Feature/tenders_module_test.php</file>
+            <file>./tests/Feature/tenders_context_test.php</file>
+        </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
         <include>
