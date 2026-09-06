@@ -122,21 +122,22 @@ trait mail_log_trait
         }
     }
     //Get queued mails
-    public function MailLog_GetQueuedMails(){
+    public function MailLog_GetQueuedMails($limit = 100, $afterId = null){
         $Response = [
             'status' => 0,
             'message' => '',
             'data' => []
         ];
         try{
-            $mail_logs = mail_log::where('status', 0)
+            $query = mail_log::where('status', 0)
                 ->where('attemps', '<', 3)
                 ->where(function ($query) {
                     $query->whereNull('send_at')->orWhere('send_at', '<=', Carbon::now());
-                })
-                ->orderBy('id')
-                ->limit(100)
-                ->get();
+                });
+            if ($afterId !== null) {
+                $query->where('id', '>', $afterId);
+            }
+            $mail_logs = $query->orderBy('id')->limit($limit)->get();
             foreach($mail_logs as $mail_log){
                 $mail_log->mail_data = is_array($mail_log->mail_data)
                     ? $mail_log->mail_data

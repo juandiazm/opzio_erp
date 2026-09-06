@@ -179,7 +179,11 @@ class send_pay_remaining extends Command
                     ];
                 }
                 
-                if(count($Mails) > 0){
+                $deferEmailOnSunday = $this->Mail_ShouldDeferExternalOnSunday(
+                    ['_defer_external_on_sunday' => true],
+                    $Mails
+                );
+                if(count($Mails) > 0 && !$deferEmailOnSunday){
                     // Prepare attachments - all PDFs for this client
                     $attachments = [];
                     foreach($clientData['incomes'] as $income){
@@ -220,6 +224,7 @@ class send_pay_remaining extends Command
                         'client' => $clientData['client'],
                         'incomes' => $clientData['incomes'],
                         'ia_message' => $ia_message,
+                        '_defer_external_on_sunday' => true,
                     ]);
                     
                     $mailLog = $this->MailLog_CreatePending(

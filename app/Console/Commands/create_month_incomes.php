@@ -171,7 +171,8 @@ class create_month_incomes extends Command
                                     $Receptors = $NotificationResponse['data'];
                                     $EmailResponse = $this->Income_SendIncome(
                                         $IncomeResponse['data']['income']['id']
-                                        ,$Receptors
+                                        ,$Receptors,
+                                        true
                                     );
                                 }
                             }

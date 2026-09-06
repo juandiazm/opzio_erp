@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 use App\traits\mail_log_trait;
@@ -45,9 +46,22 @@ class send_queued_mails extends Command
     public function handle()
     {
         try{
-            $Response = $this->MailLog_GetQueuedMails();
-            if($Response['status'] == 1){
-                foreach($Response['data'] as $mail){
+            $isSunday = Carbon::now(config('app.timezone'))->isSunday();
+            $afterId = null;
+            do {
+                $Response = $afterId === null
+                    ? $this->MailLog_GetQueuedMails()
+                    : $this->MailLog_GetQueuedMails(100, $afterId);
+                if($Response['status'] != 1){
+                    break;
+                }
+
+                $queuedMails = $Response['data'];
+                foreach($queuedMails as $mail){
+                    if ($this->Mail_ShouldDeferExternalOnSunday($mail['mail_data'], $mail['to'])) {
+                        continue;
+                    }
+
                     $mailData = is_array($mail['mail_data']) ? $mail['mail_data'] : [];
                     $from = $mailData['_from'] ?? [
                         'address' => $mail['from'] ?? null,
@@ -67,7 +81,13 @@ class send_queued_mails extends Command
                         , $replyTo
                     );
                 }
-            }
+
+                if (!$isSunday || count($queuedMails) < 100) {
+                    break;
+                }
+                $lastMail = collect($queuedMails)->last();
+                $afterId = $lastMail ? $lastMail->id : null;
+            } while ($afterId !== null);
         }catch(\Exception $e){
             info('send_queued_mails error: '.$e->getMessage());
             return 1;

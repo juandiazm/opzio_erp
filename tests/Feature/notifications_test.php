@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Console\Commands\send_queued_mails;
 use App\Console\Commands\send_pay_remaining;
+use App\Mail\CustomMail;
 use App\Models\client;
 use App\Models\license;
 use App\Models\license_notification;
@@ -14,6 +15,7 @@ use App\traits\notifications_trait;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -218,6 +220,52 @@ class notifications_test extends TestCase
         $this->assertSame(0, $command->handle());
     }
 
+    public function test_queued_mail_command_defers_external_automated_mail_on_sunday_but_sends_internal_mail()
+    {
+        config(['app.env' => 'testing']);
+        Carbon::setTestNow(Carbon::parse('2026-08-23 10:00:00', config('app.timezone')));
+        Mail::fake();
+
+        $external = mail_log::create([
+            'unique_id' => 'EXTERNAL-SUNDAY',
+            'subject' => 'Cliente',
+            'view' => 'mail.notification',
+            'from' => 'info@opzio.co',
+            'as' => 'Opzio',
+            'to' => [['address' => 'cliente@example.test', 'name' => 'Cliente']],
+            'mail_data' => [
+                '_defer_external_on_sunday' => true,
+                '_from' => ['address' => 'info@opzio.co', 'name' => 'Opzio'],
+                '_reply_to' => ['address' => 'info@opzio.co', 'name' => 'Opzio'],
+            ],
+            'status' => 0,
+        ]);
+        $internal = mail_log::create([
+            'unique_id' => 'INTERNAL-SUNDAY',
+            'subject' => 'Interno',
+            'view' => 'mail.notification',
+            'from' => 'info@opzio.co',
+            'as' => 'Opzio',
+            'to' => [['address' => 'equipo@opzio.co', 'name' => 'Equipo']],
+            'mail_data' => [
+                '_defer_external_on_sunday' => true,
+                '_from' => ['address' => 'info@opzio.co', 'name' => 'Opzio'],
+                '_reply_to' => ['address' => 'info@opzio.co', 'name' => 'Opzio'],
+            ],
+            'status' => 0,
+        ]);
+
+        try {
+            $this->assertSame(0, (new send_queued_mails())->handle());
+        } finally {
+            Carbon::setTestNow();
+            config(['app.env' => 'local']);
+        }
+
+        Mail::assertQueued(CustomMail::class, 1);
+        $this->assertSame(0, (int) $external->fresh()->status);
+    }
+
     public function test_email_history_includes_legacy_mail_logs()
     {
         $this->MailLog_SetLog(
@@ -390,6 +438,7 @@ class notifications_test extends TestCase
 
     public function test_payment_reminder_email_and_sms_share_random_schedule_between_eight_and_eleven()
     {
+        Carbon::setTestNow(Carbon::parse('2026-08-17 07:00:00', config('app.timezone')));
         $command = new class extends send_pay_remaining {
             public function Income_GetAllOverdueIncomes()
             {
@@ -460,6 +509,12 @@ class notifications_test extends TestCase
         $this->assertNotNull($smsLog);
         $this->assertSame(0, (int) $smsLog->status);
         $this->assertTrue($smsLog->send_at->equalTo($mailLog->send_at));
+
+        $clientMailCount = mail_log::where('view', 'mail.pay_remaining_grouped')->count();
+        Carbon::setTestNow(Carbon::parse('2026-08-23 07:00:00', config('app.timezone')));
+        $this->assertSame(0, $command->handle());
+        $this->assertSame($clientMailCount, mail_log::where('view', 'mail.pay_remaining_grouped')->count());
+        Carbon::setTestNow();
     }
 
     public function test_sms_queue_skips_future_messages_and_processes_due_messages()

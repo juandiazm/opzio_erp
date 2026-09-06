@@ -1276,7 +1276,7 @@ trait contracts_trait
         $result['created']++;
 
         if ($contract->recurrence_send_automatically) {
-            $sendResponse = $this->Contract_SendContract($createResponse['contract']->id);
+            $sendResponse = $this->Contract_SendContract($createResponse['contract']->id, null, true);
             if (($sendResponse['status'] ?? 0) == 1) {
                 $result['sent']++;
             } else {
@@ -1844,10 +1844,10 @@ trait contracts_trait
         ]);
     }
 
-    public function Contract_SendContract($id, $requestedRecipients = null)
+    public function Contract_SendContract($id, $requestedRecipients = null, $deferExternalOnSunday = false)
     {
         try {
-            return DB::transaction(function () use ($id, $requestedRecipients) {
+            return DB::transaction(function () use ($id, $requestedRecipients, $deferExternalOnSunday) {
                 $contract = contract::with([
                     'type',
                     'template',
@@ -1894,6 +1894,7 @@ trait contracts_trait
                             'end_date' => $contract->end_date ? $contract->end_date->format('d/m/Y') : '',
                             'signature_url' => $signatureUrl,
                         ],
+                        '_defer_external_on_sunday' => $deferExternalOnSunday,
                     ],
                     [[
                         'path' => $pdfPath,
@@ -2223,7 +2224,7 @@ trait contracts_trait
 
             $result['created']++;
             if ($schedule->send_automatically) {
-                $sendResponse = $this->Contract_SendContract($createResponse['contract']->id);
+                $sendResponse = $this->Contract_SendContract($createResponse['contract']->id, null, true);
                 if ($sendResponse['status'] == 1) {
                     $result['sent']++;
                 } else {

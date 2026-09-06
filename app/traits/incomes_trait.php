@@ -501,7 +501,8 @@ trait incomes_trait
     public function Income_SendIncome(
         $income_id
         ,
-        $receivers
+        $receivers,
+        $deferExternalOnSunday = false
     ) {
         $Response = array(
             'status' => 0,
@@ -559,7 +560,8 @@ trait incomes_trait
                         'income' => $income,
                         'client' => $client,
                         'ia_message' => $ia_message,
-                        'income_url' => $income_url
+                        'income_url' => $income_url,
+                        '_defer_external_on_sunday' => $deferExternalOnSunday,
                     ]
                 );
                 //get the last 10 characters of string
