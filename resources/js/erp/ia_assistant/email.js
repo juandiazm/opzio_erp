@@ -46,17 +46,26 @@ export function initSendBtn(){
                     setTimeout(closeModal, 1200);
                 }else{
                     resetConfirmButton();
-                    alert('Error: ' + (typeof response.message === 'string' ? response.message : JSON.stringify(response.message)));
+                    showEmailError(response.message);
                 }
             })
             .catch(function(error){
                 resetConfirmButton();
-                alert('Error de conexión: ' + error.message);
+                showEmailError('Error de conexión: ' + error.message);
             });
     });
 
     function resetConfirmButton(){
         confirmButton.disabled = false;
         confirmButton.querySelector('span').textContent = 'Enviar';
+    }
+
+    function showEmailError(message){
+        const text = typeof message === 'string' ? message : JSON.stringify(message);
+        if(typeof window.Swal?.fire === 'function'){
+            window.Swal.fire({title: 'No fue posible enviar el correo', text, icon: 'error'});
+            return;
+        }
+        window.alertWarning?.(text);
     }
 }

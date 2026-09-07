@@ -28,6 +28,7 @@ class tenders_controller extends Controller
             'status' => 'nullable|in:open,updated,closed',
             'eligibility_state' => 'nullable|in:probably_fit,requires_validation,high_risk,unknown',
             'data_confidence' => 'nullable|in:high,medium,low',
+            'feedback_state' => 'nullable|in:interested,not_interested,undefined',
         ]);
 
         $context = $contextService->get($this->tenantId());
@@ -168,12 +169,74 @@ class tenders_controller extends Controller
         return response()->json($response, $httpStatus);
     }
 
+    public function save_opportunity(string $opportunityId, tenders_ai_client $client)
+    {
+        $response = $client->save_opportunity($opportunityId);
+        $httpStatus = $response['http_status'] ?? 200;
+        unset($response['http_status']);
+
+        return response()->json($response, $httpStatus);
+    }
+
+    public function pipeline_history(string $opportunityId, Request $request, tenders_ai_client $client)
+    {
+        $validated = $request->validate([
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ]);
+        $response = $client->pipeline_history(
+            $opportunityId,
+            (int) ($validated['page'] ?? 1),
+            (int) ($validated['per_page'] ?? 25)
+        );
+        $httpStatus = $response['http_status'] ?? 200;
+        unset($response['http_status']);
+
+        return response()->json($response, $httpStatus);
+    }
+
+    public function update_pipeline_entry(
+        string $opportunityId,
+        int $entryId,
+        Request $request,
+        tenders_ai_client $client
+    ) {
+        $validated = $request->validate([
+            'stage' => 'required|in:saved,reviewing,preparing,submitted,won,lost,archived',
+            'due_at' => 'nullable|date',
+            'outcome' => 'nullable|string|max:100',
+            'notes' => 'nullable|string|max:5000',
+        ]);
+        $response = $client->update_pipeline_entry($opportunityId, $entryId, $validated);
+        $httpStatus = $response['http_status'] ?? 200;
+        unset($response['http_status']);
+
+        return response()->json($response, $httpStatus);
+    }
+
+    public function delete_pipeline_entry(string $opportunityId, int $entryId, tenders_ai_client $client)
+    {
+        $response = $client->delete_pipeline_entry($opportunityId, $entryId);
+        $httpStatus = $response['http_status'] ?? 200;
+        unset($response['http_status']);
+
+        return response()->json($response, $httpStatus);
+    }
+
     public function applications(Request $request, tenders_ai_client $client)
     {
         $validated = $request->validate([
-            'stage' => 'nullable|string|max:50',
+            'stage' => 'nullable|in:saved,reviewing,preparing,submitted,won,lost,archived',
+            'search' => 'nullable|string|max:100',
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:1|max:50',
         ]);
-        $response = $client->applications($validated['stage'] ?? null);
+        $response = $client->applications(
+            $validated['stage'] ?? null,
+            $validated['search'] ?? null,
+            (int) ($validated['page'] ?? 1),
+            (int) ($validated['per_page'] ?? 10)
+        );
         $httpStatus = $response['http_status'] ?? 200;
         unset($response['http_status']);
 

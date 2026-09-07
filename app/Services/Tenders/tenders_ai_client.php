@@ -44,12 +44,80 @@ class tenders_ai_client
         );
     }
 
-    public function applications(?string $stage = null): array
+    public function save_opportunity(string $opportunityId): array
     {
         $requestId = request()->header('X-Request-Id') ?: Str::uuid()->toString();
         return $this->safeResponse(
             fn () => $this->authenticatedRequest($requestId)
-                ?->get('/v1/applications', array_filter(['stage' => $stage])),
+                ?->post('/v1/opportunities/'.rawurlencode($opportunityId).'/save'),
+            $requestId,
+            'No fue posible guardar la oportunidad.'
+        );
+    }
+
+    public function pipeline_history(
+        string $opportunityId,
+        int $page = 1,
+        int $perPage = 25
+    ): array
+    {
+        $requestId = request()->header('X-Request-Id') ?: Str::uuid()->toString();
+        return $this->safeResponse(
+            fn () => $this->authenticatedRequest($requestId)
+                ?->get('/v1/opportunities/'.rawurlencode($opportunityId).'/pipeline', [
+                    'page' => $page,
+                    'per_page' => $perPage,
+                ]),
+            $requestId,
+            'No fue posible consultar el historial de seguimiento.'
+        );
+    }
+
+    public function update_pipeline_entry(
+        string $opportunityId,
+        int $entryId,
+        array $payload
+    ): array
+    {
+        $requestId = request()->header('X-Request-Id') ?: Str::uuid()->toString();
+        return $this->safeResponse(
+            fn () => $this->authenticatedRequest($requestId)
+                ?->patch(
+                    '/v1/opportunities/'.rawurlencode($opportunityId).'/pipeline/'.$entryId,
+                    $payload
+                ),
+            $requestId,
+            'No fue posible editar el registro de seguimiento.'
+        );
+    }
+
+    public function delete_pipeline_entry(string $opportunityId, int $entryId): array
+    {
+        $requestId = request()->header('X-Request-Id') ?: Str::uuid()->toString();
+        return $this->safeResponse(
+            fn () => $this->authenticatedRequest($requestId)
+                ?->delete('/v1/opportunities/'.rawurlencode($opportunityId).'/pipeline/'.$entryId),
+            $requestId,
+            'No fue posible eliminar el registro de seguimiento.'
+        );
+    }
+
+    public function applications(
+        ?string $stage = null,
+        ?string $search = null,
+        int $page = 1,
+        int $perPage = 10
+    ): array
+    {
+        $requestId = request()->header('X-Request-Id') ?: Str::uuid()->toString();
+        return $this->safeResponse(
+            fn () => $this->authenticatedRequest($requestId)
+                ?->get('/v1/applications', array_filter([
+                    'stage' => $stage,
+                    'search' => $search,
+                    'page' => $page,
+                    'per_page' => $perPage,
+                ], fn ($value) => $value !== null && $value !== '')),
             $requestId,
             'No fue posible consultar el seguimiento.'
         );
@@ -93,7 +161,7 @@ class tenders_ai_client
                     'X-Opzio-Actor-Id' => $actorId,
                     'X-Request-Id' => $requestId,
                 ])
-                ->timeout((float) config('services.tenders_ai.timeout', 10))
+                ->timeout((float) config('services.tenders_ai.timeout', 30))
                 ->put('/v1/profiles/'.rawurlencode($tenantId), $context);
         } catch (ConnectionException $exception) {
             report($exception);
@@ -161,7 +229,7 @@ class tenders_ai_client
                     'X-Opzio-Actor-Id' => $actorId,
                     'X-Request-Id' => $requestId,
                 ])
-                ->timeout((float) config('services.tenders_ai.timeout', 10))
+                ->timeout((float) config('services.tenders_ai.timeout', 30))
                 ->get('/v1/discovery', array_filter(
                     $filters,
                     fn ($value) => $value !== null && $value !== ''
@@ -231,7 +299,7 @@ class tenders_ai_client
         return Http::baseUrl($baseUrl)
             ->acceptJson()
             ->withHeaders($headers)
-            ->timeout((float) config('services.tenders_ai.timeout', 10));
+            ->timeout((float) config('services.tenders_ai.timeout', 30));
     }
 
     private function responsePayload($response, string $requestId, string $fallbackMessage): array

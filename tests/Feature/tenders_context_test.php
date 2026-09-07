@@ -88,9 +88,51 @@ class tenders_context_test extends TestCase
 
         $response
             ->assertOk()
+            ->assertSee('id="nav-tab"', false)
             ->assertSee('Discovery')
             ->assertSee('Contexto')
+            ->assertSee('Seguimiento')
             ->assertSee('OPZIO S.A.S.');
+    }
+
+    public function test_pipeline_route_forwards_filters_and_returns_applications()
+    {
+        Http::fake([
+            'http://127.0.0.1:9081/*' => Http::response([
+                'request_id' => 'pipeline-request-004',
+                'data' => [[
+                    'opportunity_id' => 'secop2:fixture-001',
+                    'title' => 'Proceso de prueba',
+                    'stage' => 'saved',
+                ]],
+                'meta' => [
+                    'page' => 2,
+                    'per_page' => 5,
+                    'total' => 1,
+                    'total_pages' => 1,
+                ],
+            ]),
+        ]);
+
+        $response = $this->withoutMiddleware()
+            ->withSession(['user' => ['id' => 7]])
+            ->getJson('/admin/tenders/applications?stage=saved&search=prueba&page=2&per_page=5');
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('status', 1)
+            ->assertJsonPath('data.0.opportunity_id', 'secop2:fixture-001')
+            ->assertJsonPath('meta.page', 2)
+            ->assertJsonPath('meta.total', 1);
+        Http::assertSent(function ($request) {
+            parse_str((string) parse_url($request->url(), PHP_URL_QUERY), $query);
+
+            return $request->method() === 'GET'
+                && $query['stage'] === 'saved'
+                && $query['search'] === 'prueba'
+                && $query['page'] === '2'
+                && $query['per_page'] === '5';
+        });
     }
 
     public function test_context_route_persists_and_syncs_the_company_context()

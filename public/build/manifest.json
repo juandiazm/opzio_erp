@@ -960,7 +960,7 @@
     "isEntry": true
   },
   "resources/js/erp/ia_assistant/ia_marketing_report.js": {
-    "file": "assets/ia_marketing_report-CqfEVvGs.js",
+    "file": "assets/ia_marketing_report-C88mWIc5.js",
     "name": "ia_marketing_report",
     "src": "resources/js/erp/ia_assistant/ia_marketing_report.js",
     "isEntry": true
@@ -1173,7 +1173,7 @@
     "isEntry": true
   },
   "resources/js/erp/notifications/notifications.js": {
-    "file": "assets/notifications-cvcFE7KD.js",
+    "file": "assets/notifications-Y7YKUX7b.js",
     "name": "notifications",
     "src": "resources/js/erp/notifications/notifications.js",
     "isEntry": true
@@ -1338,7 +1338,7 @@
     "isEntry": true
   },
   "resources/js/erp/servers/servers.js": {
-    "file": "assets/servers-DlGbvMuZ.js",
+    "file": "assets/servers-Ba0etFWw.js",
     "name": "servers",
     "src": "resources/js/erp/servers/servers.js",
     "isEntry": true
@@ -1368,13 +1368,13 @@
     "isEntry": true
   },
   "resources/js/erp/tenders/pipeline.js": {
-    "file": "assets/pipeline-l0sNRNKZ.js",
+    "file": "assets/pipeline-B7cLVVc3.js",
     "name": "pipeline",
     "src": "resources/js/erp/tenders/pipeline.js",
     "isEntry": true
   },
   "resources/js/erp/tenders/tenders.js": {
-    "file": "assets/tenders-CZCaqFS1.js",
+    "file": "assets/tenders-Dgozm3vi.js",
     "name": "tenders",
     "src": "resources/js/erp/tenders/tenders.js",
     "isEntry": true
@@ -1464,7 +1464,7 @@
     "isEntry": true
   },
   "resources/js/searchable-dropdown.js": {
-    "file": "assets/searchable-dropdown-CmKuEQWr.js",
+    "file": "assets/searchable-dropdown-B0S3SZWZ.js",
     "name": "searchable-dropdown",
     "src": "resources/js/searchable-dropdown.js",
     "isEntry": true
@@ -1710,7 +1710,7 @@
     "isEntry": true
   },
   "resources/sass/erp/tenders/tenders.scss": {
-    "file": "assets/tenders-DWiiCbbs.css",
+    "file": "assets/tenders-Bxqv4GXT.css",
     "src": "resources/sass/erp/tenders/tenders.scss",
     "isEntry": true
   },
@@ -1730,7 +1730,7 @@
     "isEntry": true
   },
   "resources/sass/searchable-dropdown.scss": {
-    "file": "assets/searchable-dropdown-DElSquev.css",
+    "file": "assets/searchable-dropdown-Zh2e3XYb.css",
     "src": "resources/sass/searchable-dropdown.scss",
     "isEntry": true
   }

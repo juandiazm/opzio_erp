@@ -1,5 +1,5 @@
 import { initializeTendersContext } from './context.js';
-import { initializeTendersPipeline } from './pipeline.js';
+import { initializeTendersPipeline, openTendersOpportunity } from './pipeline.js';
 
 const formatCurrency = (amount) => {
     if (amount === null || amount === undefined) return 'Valor no publicado';
@@ -8,6 +8,17 @@ const formatCurrency = (amount) => {
         currency: 'COP',
         maximumFractionDigits: 0
     }).format(amount);
+};
+
+const scrollDiscoveryToTop = (elements) => {
+    [elements.container, elements.pageContent].forEach((scrollTarget) => {
+        if (!scrollTarget) return;
+        if (typeof scrollTarget.scrollTo === 'function') {
+            scrollTarget.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+        scrollTarget.scrollTop = 0;
+    });
 };
 
 const formatDate = (value) => {
@@ -51,6 +62,17 @@ const hasValue = (value) => {
     return true;
 };
 
+const deduplicateItems = (items) => {
+    const seen = new Set();
+    return items.filter((item) => {
+        const processId = item.source_process_id || item.opportunity_id || `${item.reference || ''}:${item.title || ''}`;
+        const key = `${item.source || ''}:${processId}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+};
+
 const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 
 const eligibilityLabels = {
@@ -66,12 +88,52 @@ const confidenceLabels = {
     low: 'baja'
 };
 
+const eligibilityIcons = {
+    probably_fit: 'fa-circle-check',
+    requires_validation: 'fa-circle-exclamation',
+    high_risk: 'fa-triangle-exclamation',
+    unknown: 'fa-circle-question'
+};
+
+const confidenceIcons = {
+    high: 'fa-shield-check',
+    medium: 'fa-shield-exclamation',
+    low: 'fa-shield-question'
+};
+
 const appendText = (parent, tagName, className, text) => {
     const element = document.createElement(tagName);
     element.className = className;
     element.textContent = text;
     parent.append(element);
     return element;
+};
+
+const appendBadge = (parent, className, iconClass, label, title) => {
+    const badge = document.createElement('span');
+    badge.className = className;
+    badge.title = title;
+    badge.setAttribute('aria-label', title);
+    const icon = document.createElement('i');
+    icon.className = `fa-light ${iconClass}`;
+    icon.setAttribute('aria-hidden', 'true');
+    const labelElement = document.createElement('span');
+    labelElement.className = 'licitaciones-badge-label';
+    labelElement.textContent = label;
+    badge.append(icon, labelElement);
+    parent.append(badge);
+    return badge;
+};
+
+const setFeedbackState = (card, feedbackState) => {
+    if (!card) return;
+    card.querySelectorAll('[data-tenders-feedback]').forEach((button) => {
+        const selected = button.dataset.eventType === feedbackState;
+        button.classList.toggle('is-selected', selected);
+        button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        button.title = selected ? button.dataset.selectedTitle : button.dataset.defaultTitle;
+    });
+    card.dataset.feedbackState = feedbackState || '';
 };
 
 const appendDetailField = (parent, label, value) => {
@@ -139,9 +201,10 @@ const renderSourceData = (container, sourceData) => {
 };
 
 const renderList = (container, items) => {
+    const uniqueItems = deduplicateItems(items);
     container.replaceChildren();
 
-    if (!items.length) {
+    if (!uniqueItems.length) {
         const emptyState = document.createElement('div');
         emptyState.className = 'licitaciones-empty';
         appendText(emptyState, 'strong', '', 'No hay oportunidades para mostrar');
@@ -150,7 +213,7 @@ const renderList = (container, items) => {
         return;
     }
 
-    items.forEach((item) => {
+    uniqueItems.forEach((item) => {
         const card = document.createElement('article');
         card.className = 'licitaciones-opportunity';
         card.setAttribute('role', 'listitem');
@@ -180,14 +243,6 @@ const renderList = (container, items) => {
         if (item.last_published_at) appendText(metadata, 'span', '', `Actualizada: ${formatDate(item.last_published_at)}`);
         card.append(metadata);
 
-        const states = document.createElement('div');
-        states.className = 'licitaciones-states';
-        const eligibilityState = item.eligibility_state || 'unknown';
-        const dataConfidence = item.data_confidence || 'low';
-        appendText(states, 'span', `licitaciones-state licitaciones-state-${eligibilityState}`, eligibilityLabels[eligibilityState] || 'Sin informacion');
-        appendText(states, 'span', `licitaciones-confidence licitaciones-confidence-${dataConfidence}`, `Confianza ${confidenceLabels[dataConfidence] || 'baja'}`);
-        card.append(states);
-
         const detail = document.createElement('div');
         detail.className = 'licitaciones-detail';
         const reasons = document.createElement('div');
@@ -214,21 +269,46 @@ const renderList = (container, items) => {
         sourceLink.rel = 'noopener noreferrer';
         sourceLink.textContent = 'Ver fuente';
         actions.append(sourceLink);
+        const states = document.createElement('div');
+        states.className = 'licitaciones-states';
+        const eligibilityState = item.eligibility_state || 'unknown';
+        const dataConfidence = item.data_confidence || 'low';
+        appendBadge(
+            states,
+            `licitaciones-state licitaciones-state-${eligibilityState}`,
+            eligibilityIcons[eligibilityState] || eligibilityIcons.unknown,
+            eligibilityLabels[eligibilityState] || 'Sin informacion',
+            `Aptitud: ${eligibilityLabels[eligibilityState] || 'Sin informacion'}`
+        );
+        appendBadge(
+            states,
+            `licitaciones-confidence licitaciones-confidence-${dataConfidence}`,
+            confidenceIcons[dataConfidence] || confidenceIcons.low,
+            `Confianza ${confidenceLabels[dataConfidence] || 'baja'}`,
+            `Confianza de los datos: ${confidenceLabels[dataConfidence] || 'baja'}`
+        );
+        actions.append(states);
         const interestedButton = document.createElement('button');
-        interestedButton.className = 'tenders-icon-action';
+        interestedButton.className = 'tenders-icon-action licitaciones-feedback-action licitaciones-feedback-interested';
         interestedButton.type = 'button';
         interestedButton.dataset.tendersFeedback = item.opportunity_id;
         interestedButton.dataset.eventType = 'interested';
-        interestedButton.title = 'Marcar como interesada';
+        interestedButton.dataset.defaultTitle = 'Marcar como interesada';
+        interestedButton.dataset.selectedTitle = 'Interés registrado';
+        interestedButton.title = interestedButton.dataset.defaultTitle;
+        interestedButton.setAttribute('aria-pressed', 'false');
         interestedButton.setAttribute('aria-label', 'Marcar como interesada');
         interestedButton.innerHTML = '<i class="fa-light fa-thumbs-up" aria-hidden="true"></i>';
         actions.append(interestedButton);
         const dismissButton = document.createElement('button');
-        dismissButton.className = 'tenders-icon-action';
+        dismissButton.className = 'tenders-icon-action licitaciones-feedback-action licitaciones-feedback-not_interested';
         dismissButton.type = 'button';
         dismissButton.dataset.tendersFeedback = item.opportunity_id;
         dismissButton.dataset.eventType = 'not_interested';
-        dismissButton.title = 'Marcar como no interesada';
+        dismissButton.dataset.defaultTitle = 'Marcar como no interesada';
+        dismissButton.dataset.selectedTitle = 'Marcada como no interesada';
+        dismissButton.title = dismissButton.dataset.defaultTitle;
+        dismissButton.setAttribute('aria-pressed', 'false');
         dismissButton.setAttribute('aria-label', 'Marcar como no interesada');
         dismissButton.innerHTML = '<i class="fa-light fa-thumbs-down" aria-hidden="true"></i>';
         actions.append(dismissButton);
@@ -236,8 +316,8 @@ const renderList = (container, items) => {
         saveButton.className = 'tenders-icon-action';
         saveButton.type = 'button';
         saveButton.dataset.tendersPipeline = item.opportunity_id;
-        saveButton.title = 'Guardar en seguimiento';
-        saveButton.setAttribute('aria-label', 'Guardar en seguimiento');
+        saveButton.title = 'Guardar oportunidad';
+        saveButton.setAttribute('aria-label', 'Guardar oportunidad');
         saveButton.innerHTML = '<i class="fa-light fa-bookmark" aria-hidden="true"></i>';
         actions.append(saveButton);
         const detailButton = document.createElement('button');
@@ -255,6 +335,7 @@ const renderList = (container, items) => {
         extendedDetail.hidden = true;
         extendedDetail.dataset.detailFor = item.opportunity_id;
         card.append(extendedDetail);
+        setFeedbackState(card, item.feedback_state || null);
 
         container.append(card);
     });
@@ -340,6 +421,9 @@ const renderPagination = (elements, state) => {
 
 const loadDiscovery = async (elements, state, resetPage = false) => {
     if (resetPage) state.page = 1;
+    const requestVersion = (state.discoveryRequestVersion || 0) + 1;
+    state.discoveryRequestVersion = requestVersion;
+    const isLatestRequest = () => state.discoveryRequestVersion === requestVersion;
     elements.status.textContent = 'Consultando resultados...';
     elements.status.classList.remove('is-error');
     elements.query.disabled = true;
@@ -357,13 +441,15 @@ const loadDiscovery = async (elements, state, resetPage = false) => {
                 search: elements.search.value.trim() || null,
                 status: elements.statusFilter.value || null,
                 eligibility_state: elements.eligibilityFilter.value || null,
-                data_confidence: elements.confidenceFilter.value || null
+                data_confidence: elements.confidenceFilter.value || null,
+                feedback_state: elements.feedbackFilter.value || null
             })
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || payload.status === 0) {
             throw new Error(payload.message || `HTTP ${response.status}`);
         }
+        if (!isLatestRequest()) return;
 
         const items = Array.isArray(payload.data) ? payload.data : [];
         const meta = payload.meta || {};
@@ -378,13 +464,14 @@ const loadDiscovery = async (elements, state, resetPage = false) => {
         renderPagination(elements, state);
         loadSyncStatus(elements);
     } catch (error) {
+        if (!isLatestRequest()) return;
         elements.status.textContent = error.message || 'No fue posible consultar Licitaciones.';
         elements.status.classList.add('is-error');
         elements.overview.textContent = '';
         renderList(elements.list, []);
         elements.pagination.replaceChildren();
     } finally {
-        elements.query.disabled = false;
+        if (isLatestRequest()) elements.query.disabled = false;
     }
 };
 
@@ -462,8 +549,10 @@ const syncFromSecop = async (elements, state) => {
     }
 };
 
-const requestTendersAction = async (elements, button, url, body, idempotencyKey = null) => {
+const requestTendersAction = async (elements, button, url, body, idempotencyKey = null, onSuccess = null) => {
+    if (!button || button.dataset.pending === 'true') return false;
     button.disabled = true;
+    button.dataset.pending = 'true';
     elements.status.classList.remove('is-error');
     const headers = {
         'Content-Type': 'application/json',
@@ -481,11 +570,15 @@ const requestTendersAction = async (elements, button, url, body, idempotencyKey 
             throw new Error(payload.message || `HTTP ${response.status}`);
         }
         elements.status.textContent = payload.message || 'Acción guardada.';
+        if (onSuccess) await onSuccess(payload);
+        return true;
     } catch (error) {
         elements.status.textContent = error.message || 'No fue posible guardar la acción.';
         elements.status.classList.add('is-error');
+        return false;
     } finally {
         button.disabled = false;
+        delete button.dataset.pending;
     }
 };
 
@@ -617,6 +710,9 @@ const init = () => {
         statusFilter: document.getElementById('licitaciones-status-filter'),
         eligibilityFilter: document.getElementById('licitaciones-eligibility-filter'),
         confidenceFilter: document.getElementById('licitaciones-confidence-filter'),
+        feedbackFilter: document.getElementById('licitaciones-feedback-filter'),
+        container: document.getElementById('licitaciones-container'),
+        pageContent: document.getElementById('erp-app-content'),
         status: document.getElementById('licitaciones-status'),
         syncStatus: document.getElementById('licitaciones-sync-status'),
         overview: document.getElementById('licitaciones-overview'),
@@ -627,11 +723,15 @@ const init = () => {
         page: 1,
         perPage: 10,
         total: 0,
-        totalPages: 0
+        totalPages: 0,
+        discoveryRequestVersion: 0
     };
 
-    if (!elements.query || !elements.sync || !elements.search || !elements.statusFilter || !elements.eligibilityFilter || !elements.confidenceFilter || !elements.status || !elements.syncStatus || !elements.list || !elements.pagination) return;
-    const requestPage = () => loadDiscovery(elements, state, true);
+    if (!elements.query || !elements.sync || !elements.search || !elements.statusFilter || !elements.eligibilityFilter || !elements.confidenceFilter || !elements.feedbackFilter || !elements.container || !elements.pageContent || !elements.status || !elements.syncStatus || !elements.list || !elements.pagination) return;
+    const requestPage = () => {
+        scrollDiscoveryToTop(elements);
+        loadDiscovery(elements, state, true);
+    };
     elements.query.addEventListener('click', requestPage);
     elements.sync.addEventListener('click', () => syncFromSecop(elements, state));
     elements.list.addEventListener('click', (event) => {
@@ -643,16 +743,21 @@ const init = () => {
         const feedbackButton = event.target.closest('[data-tenders-feedback]');
         if (feedbackButton) {
             const key = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+            const eventType = feedbackButton.dataset.eventType;
             requestTendersAction(
                 elements,
                 feedbackButton,
                 '/admin/tenders/feedback',
                 {
                     opportunity_id: feedbackButton.dataset.tendersFeedback,
-                    event_type: feedbackButton.dataset.eventType,
-                    reason_code: feedbackButton.dataset.eventType === 'not_interested' ? 'manual_dismissal' : null
+                    event_type: eventType,
+                    reason_code: eventType === 'not_interested' ? 'manual_dismissal' : null
                 },
-                key
+                key,
+                (payload) => setFeedbackState(
+                    feedbackButton.closest('.licitaciones-opportunity'),
+                    payload.data?.feedback_state || eventType
+                )
             );
             return;
         }
@@ -661,15 +766,14 @@ const init = () => {
             requestTendersAction(
                 elements,
                 pipelineButton,
-                '/admin/tenders/pipeline',
-                {
-                    opportunity_id: pipelineButton.dataset.tendersPipeline,
-                    stage: 'saved'
-                }
+                `/admin/tenders/opportunities/${encodeURIComponent(pipelineButton.dataset.tendersPipeline)}/save`,
+                {},
+                null,
+                () => openTendersOpportunity(pipelineButton.dataset.tendersPipeline)
             );
         }
     });
-    [elements.statusFilter, elements.eligibilityFilter, elements.confidenceFilter].forEach((filter) => {
+    [elements.statusFilter, elements.eligibilityFilter, elements.confidenceFilter, elements.feedbackFilter].forEach((filter) => {
         filter.addEventListener('change', requestPage);
     });
     elements.search.addEventListener('change', requestPage);
@@ -682,12 +786,14 @@ const init = () => {
         const page = Number(button.dataset.page);
         if (!Number.isInteger(page) || page < 1 || page === state.page) return;
         state.page = page;
+        scrollDiscoveryToTop(elements);
         loadDiscovery(elements, state);
     });
     elements.pagination.addEventListener('change', (event) => {
         if (event.target.id !== 'licitaciones-per-page') return;
         state.perPage = Number(event.target.value);
         state.page = 1;
+        scrollDiscoveryToTop(elements);
         loadDiscovery(elements, state);
     });
     loadDiscovery(elements, state);

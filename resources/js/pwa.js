@@ -32,9 +32,21 @@ if ('serviceWorker' in navigator && !sessionStorage.getItem('__pwaRegistered')) 
 
 // Mostrar notificación de actualización
 function showUpdateNotification() {
-    if (confirm('Hay una nueva versión disponible. ¿Deseas actualizar ahora?')) {
-        window.location.reload();
+    if (typeof window.Swal?.fire !== 'function') {
+        window.alertWarning?.('Hay una nueva versión disponible. Recarga la página para actualizar.');
+        return;
     }
+    window.Swal.fire({
+        title: 'Nueva versión disponible',
+        text: '¿Deseas actualizar ahora?',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Actualizar',
+        cancelButtonText: 'Más tarde',
+        reverseButtons: true,
+    }).then((result) => {
+        if (result.isConfirmed) window.location.reload();
+    });
 }
 
 // Detectar cuando la app se instala

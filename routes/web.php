@@ -178,7 +178,11 @@ Route::prefix('admin')->group(function () {
             Route::post('context', [tenders_controller::class, 'update_context']);
             Route::get('opportunities/{opportunityId}', [tenders_controller::class, 'opportunity']);
             Route::post('feedback', [tenders_controller::class, 'feedback']);
+            Route::post('opportunities/{opportunityId}/save', [tenders_controller::class, 'save_opportunity']);
             Route::post('pipeline', [tenders_controller::class, 'pipeline']);
+            Route::get('opportunities/{opportunityId}/pipeline', [tenders_controller::class, 'pipeline_history']);
+            Route::patch('opportunities/{opportunityId}/pipeline/{entryId}', [tenders_controller::class, 'update_pipeline_entry']);
+            Route::delete('opportunities/{opportunityId}/pipeline/{entryId}', [tenders_controller::class, 'delete_pipeline_entry']);
             Route::get('applications', [tenders_controller::class, 'applications']);
             Route::get('sync-status', [tenders_controller::class, 'sync_status']);
         });

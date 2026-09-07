@@ -33,6 +33,15 @@
                     <option value="low">Baja</option>
                 </select>
             </label>
+            <label class="licitaciones-filter" for="licitaciones-feedback-filter">
+                <span>Interes</span>
+                <select id="licitaciones-feedback-filter" class="form-select">
+                    <option value="">Todas</option>
+                    <option value="interested">Me gustan</option>
+                    <option value="not_interested">No me gustan</option>
+                    <option value="undefined">Sin definir</option>
+                </select>
+            </label>
             <div class="licitaciones-filter-actions">
                 <button type="button" id="licitaciones-query-button" class="btn btn-primary" title="Consultar resultados">
                     <i class="fa-light fa-filter" aria-hidden="true"></i>

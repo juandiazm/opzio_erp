@@ -92,7 +92,7 @@ return [
         'base_url' => env('OPZIO_TENDERS_AI_URL', 'http://127.0.0.1:9081'),
         'token' => env('OPZIO_TENDERS_AI_TOKEN', ''),
         'tenant_id' => env('OPZIO_TENDERS_AI_TENANT_ID', 'opzio'),
-        'timeout' => (float) env('OPZIO_TENDERS_AI_TIMEOUT', 10),
+        'timeout' => (float) env('OPZIO_TENDERS_AI_TIMEOUT', 30),
     ],
 
     'pdf' => [

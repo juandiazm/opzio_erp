@@ -1,6 +1,9 @@
 const instances = new WeakMap();
 let openInstance = null;
 let generatedId = 0;
+const portalBaseZIndex = 2000;
+const portalViewportPadding = 8;
+const portalGap = 4;
 
 function resolveSelect(target){
     if(target instanceof HTMLSelectElement) return target;
@@ -19,6 +22,80 @@ function normalizeSearchText(value){
 
 function getSearchText(option){
     return normalizeSearchText((option.textContent+' '+option.value).trim());
+}
+
+function getPortalZIndex(element){
+    let maxZIndex = 0;
+    let node = element.parentElement;
+    while(node && node !== document.body){
+        const zIndex = Number.parseInt(window.getComputedStyle(node).zIndex, 10);
+        if(Number.isFinite(zIndex)) maxZIndex = Math.max(maxZIndex, zIndex);
+        node = node.parentElement;
+    }
+    return Math.max(portalBaseZIndex, maxZIndex + 1);
+}
+
+function removePortalListeners(instance){
+    if(!instance.portalListeners) return;
+    window.removeEventListener('resize', instance.portalListeners.reposition);
+    window.removeEventListener('scroll', instance.portalListeners.reposition, true);
+    instance.portalListeners = null;
+}
+
+function positionPortal(instance){
+    if(!instance.panel.classList.contains('is-portal')) return;
+    const triggerRect = instance.trigger.getBoundingClientRect();
+    if(triggerRect.width <= 0 || triggerRect.height <= 0) return;
+
+    const spaceBelow = Math.max(0, window.innerHeight - triggerRect.bottom - portalViewportPadding - portalGap);
+    const spaceAbove = Math.max(0, triggerRect.top - portalViewportPadding - portalGap);
+    const currentHeight = instance.panel.getBoundingClientRect().height;
+    const opensAbove = spaceBelow < currentHeight && spaceAbove > spaceBelow;
+    const availableSpace = Math.max(80, opensAbove ? spaceAbove : spaceBelow);
+    const panelMaxHeight = Math.min(availableSpace, window.innerHeight - portalViewportPadding * 2);
+    const searchHeight = instance.searchWrapper.getBoundingClientRect().height;
+
+    instance.panel.style.maxHeight = `${panelMaxHeight}px`;
+    instance.optionsList.style.maxHeight = `${Math.max(40, panelMaxHeight - searchHeight - 2)}px`;
+
+    const panelRect = instance.panel.getBoundingClientRect();
+    const width = Math.min(triggerRect.width, window.innerWidth - portalViewportPadding * 2);
+    const left = Math.min(
+        Math.max(portalViewportPadding, triggerRect.left),
+        Math.max(portalViewportPadding, window.innerWidth - width - portalViewportPadding)
+    );
+    const top = opensAbove
+        ? triggerRect.top - panelRect.height - portalGap
+        : triggerRect.bottom + portalGap;
+    const boundedTop = Math.min(
+        Math.max(portalViewportPadding, top),
+        Math.max(portalViewportPadding, window.innerHeight - panelRect.height - portalViewportPadding)
+    );
+
+    instance.panel.style.left = `${left}px`;
+    instance.panel.style.top = `${boundedTop}px`;
+    instance.panel.style.width = `${width}px`;
+}
+
+function openPortal(instance){
+    instance.panel.classList.add('is-portal');
+    instance.panel.style.zIndex = String(getPortalZIndex(instance.wrapper));
+    document.body.appendChild(instance.panel);
+
+    const reposition = function(){ positionPortal(instance); };
+    instance.portalListeners = {reposition};
+    window.addEventListener('resize', reposition);
+    window.addEventListener('scroll', reposition, true);
+    window.requestAnimationFrame(reposition);
+}
+
+function closePortal(instance){
+    removePortalListeners(instance);
+    if(!instance.panel.classList.contains('is-portal')) return;
+    instance.panel.classList.remove('is-portal');
+    instance.panel.removeAttribute('style');
+    instance.optionsList.style.maxHeight = '';
+    instance.wrapper.appendChild(instance.panel);
 }
 
 function getBaseId(select){
@@ -89,6 +166,7 @@ function open(instance){
     instance.trigger.setAttribute('aria-expanded', 'true');
     instance.searchInput.value = '';
     renderOptions(instance);
+    openPortal(instance);
     window.requestAnimationFrame(function(){ instance.searchInput.focus(); });
 }
 
@@ -98,6 +176,7 @@ function close(instance){
     instance.panel.hidden = true;
     instance.trigger.setAttribute('aria-expanded', 'false');
     instance.searchInput.value = '';
+    closePortal(instance);
     if(openInstance === instance) openInstance = null;
 }
 
@@ -216,6 +295,7 @@ function enhance(select){
         trigger,
         triggerText,
         panel,
+        searchWrapper,
         searchInput,
         optionsList,
         options: [],
@@ -251,6 +331,12 @@ function enhance(select){
     });
     selectObserver.observe(select, {attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'disabled', 'selected']});
     instance.selectObserver = selectObserver;
+    const parentModal = select.closest('.modal');
+    if(parentModal){
+        const closeOnModalHidden = function(){ close(instance); };
+        parentModal.addEventListener('hidden.bs.modal', closeOnModalHidden);
+        instance.removeModalListener = function(){ parentModal.removeEventListener('hidden.bs.modal', closeOnModalHidden); };
+    }
     syncState(instance);
     renderOptions(instance);
     return instance;
@@ -314,6 +400,7 @@ function destroy(target){
     const instance = select ? instances.get(select) : null;
     if(!instance) return;
     close(instance);
+    instance.removeModalListener?.();
     instance.selectObserver.disconnect();
     instance.removeChangeListener();
     instance.wrapper.parentNode.insertBefore(select, instance.wrapper);
@@ -327,7 +414,7 @@ function destroy(target){
 }
 
 document.addEventListener('click', function(event){
-    if(openInstance && !openInstance.wrapper.contains(event.target)) close(openInstance);
+    if(openInstance && !openInstance.wrapper.contains(event.target) && !openInstance.panel.contains(event.target)) close(openInstance);
 });
 
 const SearchableDropdown = {init, setOptions, setValue, getValue, destroy};

@@ -198,7 +198,7 @@ export function resendEmail() {
     PostMethodFunction('/admin/notifications/email', {id: id}, null, function(response) { fillEmailForResend(response.email); }, null);
 }
 
-export function changeEmailStatus() {
+export async function changeEmailStatus() {
     const button = $(this);
     const id = button.attr('data-id');
     const status = Number(button.attr('data-status'));
@@ -206,7 +206,20 @@ export function changeEmailStatus() {
     const message = queueAgain
         ? '¿Desea poner este correo en cola nuevamente?'
         : '¿Desea marcar este correo como fallido? No será enviado mientras permanezca en este estado.';
-    if (!window.confirm(message)) return;
+    if (typeof window.Swal?.fire !== 'function') {
+        window.alertWarning?.('No fue posible abrir la confirmación. La acción no se ejecutó.');
+        return;
+    }
+    const result = await window.Swal.fire({
+        title: queueAgain ? 'Volver a poner en cola' : 'Marcar correo como fallido',
+        text: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: queueAgain ? 'Sí, poner en cola' : 'Sí, marcar como fallido',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+    });
+    if (!result.isConfirmed) return;
 
     button.prop('disabled', true);
     PostMethodFunction('/admin/notifications/email/change-status', {id: id, status: status}, null, function(response) {

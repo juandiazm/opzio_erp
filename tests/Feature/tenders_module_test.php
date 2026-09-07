@@ -76,6 +76,132 @@ class tenders_module_test extends TestCase
         $this->assertSame('Detalle disponible en SECOP.', $response['data']['description']);
     }
 
+    public function test_tenders_client_exposes_pipeline_history_crud()
+    {
+        config([
+            'services.tenders_ai.base_url' => 'http://127.0.0.1:9081',
+            'services.tenders_ai.token' => 'test-secops-token',
+            'services.tenders_ai.tenant_id' => 'opzio',
+        ]);
+
+        Http::fake(function ($request) {
+            if ($request->method() === 'GET') {
+                return Http::response([
+                    'request_id' => 'history-request-001',
+                    'data' => [['id' => 12, 'stage' => 'saved']],
+                    'meta' => ['page' => 1, 'per_page' => 25, 'total' => 1, 'total_pages' => 1],
+                ]);
+            }
+            if ($request->method() === 'PATCH') {
+                return Http::response([
+                    'request_id' => 'history-request-002',
+                    'data' => ['id' => 12, 'stage' => 'preparing'],
+                    'error' => null,
+                ]);
+            }
+
+            return Http::response([
+                'request_id' => 'history-request-003',
+                'data' => ['id' => 12, 'deleted' => true],
+                'error' => null,
+            ]);
+        });
+
+        $client = new tenders_ai_client();
+        $history = $client->pipeline_history('secop2:fixture-001', 2, 10);
+        $updated = $client->update_pipeline_entry(
+            'secop2:fixture-001',
+            12,
+            ['stage' => 'preparing', 'notes' => 'Preparar propuesta']
+        );
+        $deleted = $client->delete_pipeline_entry('secop2:fixture-001', 12);
+
+        $this->assertSame(1, $history['status']);
+        $this->assertSame(1, $updated['status']);
+        $this->assertSame(1, $deleted['status']);
+        Http::assertSent(function ($request) {
+            parse_str((string) parse_url($request->url(), PHP_URL_QUERY), $query);
+
+            return $request->method() === 'GET'
+                && str_ends_with($request->url(), '/v1/opportunities/secop2%3Afixture-001/pipeline?page=2&per_page=10')
+                && $query === ['page' => '2', 'per_page' => '10'];
+        });
+        Http::assertSent(function ($request) {
+            return $request->method() === 'PATCH'
+                && str_ends_with($request->url(), '/v1/opportunities/secop2%3Afixture-001/pipeline/12')
+                && $request->data()['stage'] === 'preparing';
+        });
+        Http::assertSent(function ($request) {
+            return $request->method() === 'DELETE'
+                && str_ends_with($request->url(), '/v1/opportunities/secop2%3Afixture-001/pipeline/12');
+        });
+    }
+
+    public function test_tenders_client_saves_an_opportunity_without_creating_a_follow_up()
+    {
+        config([
+            'services.tenders_ai.base_url' => 'http://127.0.0.1:9081',
+            'services.tenders_ai.token' => 'test-secops-token',
+            'services.tenders_ai.tenant_id' => 'opzio',
+        ]);
+
+        Http::fake([
+            'http://127.0.0.1:9081/v1/opportunities/*/save' => Http::response([
+                'request_id' => 'save-opportunity-001',
+                'data' => ['opportunity_id' => 'secop2:fixture-001', 'stage' => 'saved'],
+                'meta' => ['created' => true],
+                'error' => null,
+            ]),
+        ]);
+
+        $response = (new tenders_ai_client())->save_opportunity('secop2:fixture-001');
+
+        $this->assertSame(1, $response['status']);
+        $this->assertTrue($response['meta']['created']);
+        Http::assertSent(function ($request) {
+            return $request->method() === 'POST'
+                && $request->url() === 'http://127.0.0.1:9081/v1/opportunities/secop2%3Afixture-001/save';
+        });
+    }
+
+    public function test_tenders_client_passes_pipeline_filters_and_pagination()
+    {
+        config([
+            'services.tenders_ai.base_url' => 'http://127.0.0.1:9081',
+            'services.tenders_ai.token' => 'test-secops-token',
+            'services.tenders_ai.tenant_id' => 'opzio',
+        ]);
+
+        Http::fake([
+            'http://127.0.0.1:9081/*' => Http::response([
+                'request_id' => 'pipeline-request-001',
+                'data' => [],
+                'meta' => [
+                    'page' => 2,
+                    'per_page' => 25,
+                    'total' => 0,
+                    'total_pages' => 0,
+                ],
+            ]),
+        ]);
+
+        $response = (new tenders_ai_client())->applications('saved', 'plataforma', 2, 25);
+
+        $this->assertSame(1, $response['status']);
+        $this->assertSame('pipeline-request-001', $response['request_id']);
+        Http::assertSent(function ($request) {
+            parse_str((string) parse_url($request->url(), PHP_URL_QUERY), $query);
+
+            return $request->method() === 'GET'
+                && $query === [
+                    'stage' => 'saved',
+                    'search' => 'plataforma',
+                    'page' => '2',
+                    'per_page' => '25',
+                ];
+        });
+    }
+
     public function test_tenders_client_syncs_the_company_context()
     {
         config([
@@ -140,6 +266,7 @@ class tenders_module_test extends TestCase
             'per_page' => 10,
             'search' => 'plataforma',
             'status' => 'open',
+            'feedback_state' => 'undefined',
         ]);
 
         $this->assertSame(1, $response['status']);
@@ -149,11 +276,12 @@ class tenders_module_test extends TestCase
         Http::assertSent(function ($request) {
             parse_str((string) parse_url($request->url(), PHP_URL_QUERY), $query);
 
-            return $request->url() === 'http://127.0.0.1:9081/v1/discovery?page=2&per_page=10&search=plataforma&status=open'
+            return $request->url() === 'http://127.0.0.1:9081/v1/discovery?page=2&per_page=10&search=plataforma&status=open&feedback_state=undefined'
                 && $request->header('X-Opzio-Secop-Token')[0] === 'test-secops-token'
                 && $request->header('X-Opzio-Tenant-Id')[0] === 'opzio'
                 && $query['page'] === '2'
-                && $query['per_page'] === '10';
+                && $query['per_page'] === '10'
+                && $query['feedback_state'] === 'undefined';
         });
     }
 

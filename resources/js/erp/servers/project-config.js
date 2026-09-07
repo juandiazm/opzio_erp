@@ -122,19 +122,20 @@ const closeModal = (config) => {
 
 const confirmImportRecipients = async (clientName, count) => {
     const message = `Se encontraron ${count} notificadores para ${clientName || 'este cliente'}. ¿Deseas agregarlos para seleccionar cuáles recibirán alertas?`;
-    if (window.Swal && typeof window.Swal.fire === 'function') {
-        const result = await window.Swal.fire({
-            title: 'Agregar notificadores',
-            text: message,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, mostrar',
-            cancelButtonText: 'Ahora no',
-            reverseButtons: true,
-        });
-        return result.isConfirmed;
+    if (typeof window.Swal?.fire !== 'function') {
+        window.alertWarning?.('No fue posible abrir la confirmación. La importación no se ejecutó.');
+        return false;
     }
-    return window.confirm(message);
+    const result = await window.Swal.fire({
+        title: 'Agregar notificadores',
+        text: message,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, mostrar',
+        cancelButtonText: 'Ahora no',
+        reverseButtons: true,
+    });
+    return result.isConfirmed;
 };
 
 const promptForRecipients = async (config, clientName) => {
@@ -261,19 +262,20 @@ const editNotification = (config, notificationId) => {
 
 const confirmDeleteNotification = async (recipient) => {
     const message = `¿Eliminar ${recipient.value} de los destinatarios de este proyecto?`;
-    if (window.Swal && typeof window.Swal.fire === 'function') {
-        const result = await window.Swal.fire({
-            title: 'Eliminar destinatario',
-            text: message,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true,
-        });
-        return result.isConfirmed;
+    if (typeof window.Swal?.fire !== 'function') {
+        window.alertWarning?.('No fue posible abrir la confirmación. La acción no se ejecutó.');
+        return false;
     }
-    return window.confirm(message);
+    const result = await window.Swal.fire({
+        title: 'Eliminar destinatario',
+        text: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+    });
+    return result.isConfirmed;
 };
 
 const submitNotification = async (state) => {
