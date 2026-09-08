@@ -476,6 +476,7 @@ const loadDiscovery = async (elements, state, resetPage = false) => {
 };
 
 const syncFromSecop = async (elements, state) => {
+    const syncPollMaxAttempts = 36;
     elements.sync.disabled = true;
     elements.query.disabled = true;
     elements.status.textContent = 'Solicitando actualización desde SECOP...';
@@ -490,12 +491,11 @@ const syncFromSecop = async (elements, state) => {
             },
             body: JSON.stringify({
                 source: 'all',
-                lookback_days: 30,
                 page_size: 250,
                 max_pages: 20,
                 recheck_days: 7,
                 recheck_page_size: 250,
-                reset_cursor: true
+                reset_cursor: false
             })
         });
         const payload = await response.json().catch(() => ({}));
@@ -509,8 +509,9 @@ const syncFromSecop = async (elements, state) => {
         const started = syncData.started !== false;
         let matchingRuns = [];
 
-        for (let attempt = 0; attempt < 60; attempt += 1) {
-            await wait(attempt === 0 ? 500 : 2000);
+        let syncCompleted = false;
+        for (let attempt = 0; attempt < syncPollMaxAttempts; attempt += 1) {
+            await wait(attempt === 0 ? 500 : 10000);
             const runs = await loadSyncStatus(elements);
             matchingRuns = syncRequestId
                 ? runs.filter((run) => run.parameters?.request_id === syncRequestId)
@@ -532,11 +533,14 @@ const syncFromSecop = async (elements, state) => {
             }
             if (started && matchingRuns.length < sources.length) continue;
             if (!relevantRuns.length && started) continue;
+            syncCompleted = true;
             break;
         }
 
-        if (started && matchingRuns.length < sources.length) {
-            throw new Error('La actualización desde SECOP sigue en curso. Consulta el estado para ver el resultado.');
+        if (!syncCompleted) {
+            elements.status.textContent = 'La actualización desde SECOP sigue en curso. El estado se actualizará en la próxima consulta.';
+            elements.status.classList.remove('is-error');
+            return;
         }
         await loadDiscovery(elements, state, true);
         elements.status.textContent = '';
