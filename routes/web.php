@@ -43,6 +43,7 @@ use App\Http\Controllers\payment_gateway_wompi_controller;
 use App\Http\Controllers\payment_gateway_bold_controller;
 use App\Http\Controllers\servers_dashboard_controller;
 use App\Http\Controllers\tenders_controller;
+use App\Http\Controllers\jira_controller;
 //Opzio
 use App\Http\Controllers\old_opzio_controller;
 use App\Http\Controllers\client_chat_controller;
@@ -185,6 +186,25 @@ Route::prefix('admin')->group(function () {
             Route::delete('opportunities/{opportunityId}/pipeline/{entryId}', [tenders_controller::class, 'delete_pipeline_entry']);
             Route::get('applications', [tenders_controller::class, 'applications']);
             Route::get('sync-status', [tenders_controller::class, 'sync_status']);
+        });
+        Route::prefix('jira')->group(function () {
+            Route::get('', [jira_controller::class, 'page']);
+            Route::post('configuration/save', [jira_controller::class, 'save_connection']);
+            Route::post('configuration/test', [jira_controller::class, 'test_connection']);
+            Route::post('sync', [jira_controller::class, 'sync_connection']);
+            Route::get('relations/data', [jira_controller::class, 'relations_data']);
+            Route::post('relations/project', [jira_controller::class, 'save_project_relations']);
+            Route::post('relations/user', [jira_controller::class, 'save_user_mapping']);
+            Route::post('relations/epic-license', [jira_controller::class, 'save_epic_license']);
+            Route::post('dashboard/data', [jira_controller::class, 'dashboard_data']);
+            Route::get('reports/data', [jira_controller::class, 'reports_data']);
+            Route::post('reports/generate', [jira_controller::class, 'generate_report']);
+            Route::get('reports/{uniqueId}/pdf', [jira_controller::class, 'download_report_pdf']);
+            Route::post('reports/{uniqueId}/email', [jira_controller::class, 'email_report']);
+            Route::get('reports/{uniqueId}', [jira_controller::class, 'report_detail']);
+            Route::post('reports/{uniqueId}/regenerate', [jira_controller::class, 'regenerate_report']);
+            Route::post('reports/{uniqueId}/delete', [jira_controller::class, 'delete_report']);
+            Route::post('reports/{uniqueId}/restore', [jira_controller::class, 'restore_report']);
         });
         Route::prefix('users')->group(function () {
             Route::get('', [admin_pages_controller::class, 'users_page']);

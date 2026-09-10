@@ -124,6 +124,15 @@
                 </a>
             </li>
             @endif
+            @php($jira_permission = collect(session('app_permissions'))->firstWhere('url', 'admin/jira/'))
+            @if($jira_permission && collect(session('permissions'))->firstWhere('user_permission_id', $jira_permission->id)!=null)
+            <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/jira')?' selected':'' }}">
+                <a href="/admin/jira" class="sidebar-menu-item-link">
+                    <i class="fa-brands fa-jira align-self-center sidebar-menu-item-icon"></i>
+                    <p class="align-self-center sidebar-menu-item-text">Jira</p>
+                </a>
+            </li>
+            @endif
         </ul>
     </nav>
 </aside>

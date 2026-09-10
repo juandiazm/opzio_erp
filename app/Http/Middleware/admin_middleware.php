@@ -31,7 +31,8 @@ class admin_middleware
         $hasContractsPermission = $app_permissions->firstWhere('url', 'admin/contracts/') !== null;
         $hasNotificationsPermission = $app_permissions->firstWhere('url', 'admin/notifications/') !== null;
         $hasLicitacionesPermission = $app_permissions->firstWhere('url', 'admin/tenders/') !== null;
-        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission || !$hasContractsPermission || !$hasNotificationsPermission || !$hasLicitacionesPermission){
+        $hasJiraPermission = $app_permissions->firstWhere('url', 'admin/jira/') !== null;
+        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission || !$hasContractsPermission || !$hasNotificationsPermission || !$hasLicitacionesPermission || !$hasJiraPermission){
             $app_permissions = collect(user_permission::get());
             Session::put('app_permissions', $app_permissions);
             if (Session::has('user')) {
@@ -103,7 +104,7 @@ class admin_middleware
             $payload = collect($request->all())->filter(function ($value, $key) {
                 return $value!=null;
             });
-            $payload = json_encode($payload->except(['_token','password','password_confirmation', 'file', 'image', 'image_file', 'image_file_name', 'image_file_type', 'image_file_size', 'image_file_tmp_name', 'image_file_error']));
+            $payload = json_encode($payload->except(['_token','password','password_confirmation', 'api_token', 'token', 'credentials', 'file', 'image', 'image_file', 'image_file_name', 'image_file_type', 'image_file_size', 'image_file_tmp_name', 'image_file_error']));
             //if $payload is empty
             if($payload == '[]'){
                 $payload = null;

@@ -1049,6 +1049,12 @@
       "_pdf.worker.min-B-tS55GQ.js"
     ]
   },
+  "resources/js/erp/jira/jira.js": {
+    "file": "assets/jira-1MvQLMCU.js",
+    "name": "jira",
+    "src": "resources/js/erp/jira/jira.js",
+    "isEntry": true
+  },
   "resources/js/erp/layouts/app.js": {
     "file": "assets/app-CTrxKD9S.js",
     "name": "app",
@@ -1642,6 +1648,11 @@
   "resources/sass/erp/incomes/incomes.scss": {
     "file": "assets/incomes-D8OuC16a.css",
     "src": "resources/sass/erp/incomes/incomes.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/jira/jira.scss": {
+    "file": "assets/jira-B9jOPb2k.css",
+    "src": "resources/sass/erp/jira/jira.scss",
     "isEntry": true
   },
   "resources/sass/erp/layouts/app.scss": {

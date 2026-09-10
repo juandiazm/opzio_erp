@@ -88,6 +88,11 @@ return [
         'max_payload_bytes' => (int) env('OPZIO_OBSERVER_MAX_PAYLOAD_BYTES', 10485760),
     ],
 
+    'jira' => [
+        'timeout' => (float) env('JIRA_TIMEOUT', 30),
+        'retries' => (int) env('JIRA_RETRIES', 2),
+    ],
+
     'tenders_ai' => [
         'base_url' => env('OPZIO_TENDERS_AI_URL', 'http://127.0.0.1:9081'),
         'token' => env('OPZIO_TENDERS_AI_TOKEN', ''),
