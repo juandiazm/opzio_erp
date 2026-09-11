@@ -151,18 +151,18 @@ jobs:
         cd /var/www/html/opzio_erp_qa
         sudo tar --no-same-owner --no-same-permissions --no-overwrite-dir -xzf build.tar.gz
         if [ -f vendor/autoload.php ]; then
-          php8.2 artisan optimize:clear
+          sudo -u www-data -H env HOME=/var/www php8.2 artisan optimize:clear
         else
           rm -f bootstrap/cache/*.php
         fi
         sudo -u www-data -H env HOME=/var/www NPM_CONFIG_USERCONFIG=/tmp/opzio-erp-qa-npmrc bash scripts/install_production_node_dependencies.sh /var/www/html/opzio_erp_qa
         curl -sS https://getcomposer.org/installer | php8.2
-        php8.2 composer.phar install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
-        php8.2 artisan migrate --force
-        php8.2 artisan storage:link --force
-        php8.2 artisan config:clear
-        php8.2 artisan route:cache
-        php8.2 artisan view:cache
+        sudo -u www-data -H env HOME=/var/www php8.2 composer.phar install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+        sudo -u www-data -H env HOME=/var/www php8.2 artisan migrate --force
+        sudo -u www-data -H env HOME=/var/www php8.2 artisan storage:link --force
+        sudo -u www-data -H env HOME=/var/www php8.2 artisan config:clear
+        sudo -u www-data -H env HOME=/var/www php8.2 artisan route:cache
+        sudo -u www-data -H env HOME=/var/www php8.2 artisan view:cache
         EOF
 
     - name: Setting ownership
