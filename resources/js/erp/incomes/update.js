@@ -14,6 +14,8 @@ export function showCurrentIncome(){
     incomeState.currentContainer.find('.input-description').val(incomeState.currentIncome.description);
     incomeState.currentContainer.find('.input-bill-name').val(incomeState.currentIncome.bill_name);
     incomeState.currentContainer.find('.input-bill-final-value').val(incomeState.currentIncome.bill_final_value);
+    incomeState.currentContainer.find('.input-quotation-totalize').prop('checked', incomeState.currentIncome.quotation_totalize !== false && incomeState.currentIncome.quotation_totalize !== 0 && incomeState.currentIncome.quotation_totalize !== '0');
+    incomeState.currentContainer.find('.quotation-totalize-container').toggle(incomeState.currentIncome.state == 0);
     if(incomeState.currentIncome.state == 0 || incomeState.currentIncome.state == 1 || incomeState.currentIncome.state == 2){
         incomeState.currentContainer.find('#update-income-button').css('display', 'block');
         incomeState.currentContainer.find('.input-client').attr('disabled', false);
@@ -56,7 +58,7 @@ export function updateIncome(){
     if(flag){
         $('#update-income-button').attr('disabled', true);
         $('.state-input-container').addClass('d-none');
-        let dataSend = {id: incomeState.currentIncome.id, state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, bill_name: billName, bill_final_value: billFinalValue, licenses: incomeState.currentLicencesList};
+        let dataSend = {id: incomeState.currentIncome.id, state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, bill_name: billName, bill_final_value: billFinalValue, quotation_totalize: state == '0' ? incomeState.currentContainer.find('.input-quotation-totalize').is(':checked') : true, licenses: incomeState.currentLicencesList};
         PostMethodFunction('/admin/incomes/update', dataSend, null, successUpdateIncome, function(){ $('#update-income-button').attr('disabled', false); $('.state-input-container').removeClass('d-none'); });
     }
 }

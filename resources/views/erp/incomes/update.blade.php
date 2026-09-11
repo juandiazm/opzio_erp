@@ -48,6 +48,13 @@
                     <span class="input-title align-self-center" for="input-total-value">Valor total</span>
                     <p class="input-total-value input-value" ><strong>$0</strong></p>
                 </div>
+                <div class="input-container d-flex justify-content-start quotation-totalize-container">
+                    <span class="input-title align-self-center" for="update-quotation-totalize">PDF</span>
+                    <div class="form-check form-switch input-value">
+                        <input class="form-check-input input-quotation-totalize" type="checkbox" id="update-quotation-totalize" checked>
+                        <label class="form-check-label" for="update-quotation-totalize">Totalizar cotización</label>
+                    </div>
+                </div>
                 <div class="input-container d-flex justify-content-start bill-data-container">
                     <span class="input-title align-self-center" for="input-bill-name">Nombre factura</span>
                     <input type="text" class="input-bill-name form-control input-value"  name="bill-name">

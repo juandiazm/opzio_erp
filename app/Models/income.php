@@ -13,6 +13,9 @@ class income extends Model
 {
     use HasFactory, SoftDeletes;
     protected $appends = ['state_text', 'created_at_string', 'payment_link', 'total_string', 'doc_url', 'bill_final_value_string','payment_state_text', 'cutoff_date_string', 'days_overdue', 'total_advances', 'balance_pending'];
+    protected $casts = [
+        'quotation_totalize' => 'boolean',
+    ];
     public function getStateTextAttribute(){
         switch ($this->state) {
             case '0':

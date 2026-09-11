@@ -334,6 +334,7 @@
             $subtotal = 0;
             $taxes = 0;
             $total = 0;
+            $quotation_totalize = !array_key_exists('quotation_totalize', $Data['income']) || filter_var($Data['income']['quotation_totalize'], FILTER_VALIDATE_BOOLEAN);
             
             // Función para estimar la altura de una fila en cm
             function estimateLicenseRowHeightQuotation($license, $tax_flag, $hours_flag) {
@@ -451,7 +452,7 @@
                                     @if($tax_flag)<th class="text-center">Impuestos</th>@endif
                                     @if($hours_flag)<th class="text-center">Horas</th>@endif
                                     <th class="text-right">Valor Und</th>
-                                    <th class="text-right">Total</th>
+                                    @if($quotation_totalize)<th class="text-right">Total</th>@endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -467,7 +468,7 @@
                                             @if($tax_flag)<td></td>@endif
                                             @if($hours_flag)<td></td>@endif
                                             <td></td>
-                                            <td></td>
+                                            @if($quotation_totalize)<td></td>@endif
                                         </tr>
                                     @endif
                                     <tr>
@@ -481,7 +482,7 @@
                                         @if($tax_flag)<td class="text-center">{{ ($license['tax_value']==0?'':($license['tax_name'].'('.($license['tax_value']*100).'%)')) }}</td>@endif
                                         @if($hours_flag)<td class="text-center">{{ $license['hours'] }}</td>@endif
                                         <td class="text-right money-col">${{ number_format($license['value'],0,',','.') }} <span class="cop">COP</span></td>
-                                        <td class="text-right money-col">${{ number_format($license['total'],0,',','.') }} <span class="cop">COP</span></td>
+                                        @if($quotation_totalize)<td class="text-right money-col">${{ number_format($license['total'],0,',','.') }} <span class="cop">COP</span></td>@endif
                                     </tr>
                                     @php
                                         $subtotal += $license['value'];
@@ -492,7 +493,7 @@
                             </tbody>
                         </table>
                     </div>
-                    @if($pageIndex == $totalPages - 1)
+                    @if($quotation_totalize && $pageIndex == $totalPages - 1)
                     <div id="total-container">
                         <div class="total-sub-container">
                             <p class="title">SubTotal</p>

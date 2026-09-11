@@ -43,7 +43,8 @@ trait incomes_trait
         $licenses,
         $bill_name = null,
         $bill_final_value = null,
-        $create_at = null
+        $create_at = null,
+        $quotation_totalize = true
     ) {
         $Response = array(
             'status' => 0,
@@ -62,6 +63,9 @@ trait incomes_trait
             $income->cutoff_date = $cutoff_date;
             $income->description = $description;
             $income->total = collect($licenses)->sum('total');
+            $income->quotation_totalize = (int) $state === 0
+                ? filter_var($quotation_totalize, FILTER_VALIDATE_BOOLEAN)
+                : true;
             $income->bill_name = $bill_name;
             $income->bill_final_value = $bill_final_value;
             if ($create_at != null) {
@@ -359,7 +363,8 @@ trait incomes_trait
         $description,
         $bill_name,
         $bill_final_value,
-        $licenses
+        $licenses,
+        $quotation_totalize = null
     ) {
         $Response = array(
             'status' => 0,
@@ -390,6 +395,11 @@ trait incomes_trait
             $income->bill_name = $bill_name;
             $income->bill_final_value = $bill_final_value;
             $income->total = collect($licenses)->sum('total');
+            if ((int) $state !== 0) {
+                $income->quotation_totalize = true;
+            } elseif ($quotation_totalize !== null) {
+                $income->quotation_totalize = filter_var($quotation_totalize, FILTER_VALIDATE_BOOLEAN);
+            }
             $income->save();
             income_license::where('income_id', $id)->delete();
             $licensesList = [];

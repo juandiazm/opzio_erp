@@ -42,6 +42,13 @@
                     <span class="input-title align-self-center" for="input-total-value">Valor total</span>
                     <p class="input-total-value input-value" ><strong>$0</strong></p>
                 </div>
+                <div class="input-container d-flex justify-content-start quotation-totalize-container">
+                    <span class="input-title align-self-center" for="create-quotation-totalize">PDF</span>
+                    <div class="form-check form-switch input-value">
+                        <input class="form-check-input input-quotation-totalize" type="checkbox" id="create-quotation-totalize" checked>
+                        <label class="form-check-label" for="create-quotation-totalize">Totalizar cotización</label>
+                    </div>
+                </div>
             </div>
             <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
                 <div class="input-container d-flex flex-column justify-content-center description-container">

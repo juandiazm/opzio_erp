@@ -1,6 +1,10 @@
 import { incomeState } from './state.js';
 
-export function changeCreateOrderState(){ incomeState.currentContainer.find('.state-input').removeClass('selected'); $(this).addClass('selected'); }
+export function changeCreateOrderState(){
+    incomeState.currentContainer.find('.state-input').removeClass('selected');
+    $(this).addClass('selected');
+    incomeState.currentContainer.find('.quotation-totalize-container').toggle($(this).attr('value') == '0');
+}
 
 export function getAllClients(onLoaded = null){
     if(incomeState.clientsList.length == 0) PostMethodFunction('/admin/clients/get-all', {}, null, function(response){ showAllClients(response, onLoaded); }, null);
@@ -170,7 +174,7 @@ export function createIncome(){
     if(incomeState.currentLicencesList.length == 0){ alertWarning('Debes ingresar al menos una licencia'); flag = false; }
     if(flag){
         $('#create-income-button').attr('disabled', true);
-        let dataSend = {state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, licenses: incomeState.currentLicencesList};
+        let dataSend = {state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, quotation_totalize: state == '0' ? incomeState.currentContainer.find('.input-quotation-totalize').is(':checked') : true, licenses: incomeState.currentLicencesList};
         PostMethodFunction('/admin/incomes/create', dataSend, null, successCreateIncome, function(){ $('#create-income-button').attr('disabled', false); });
     }
 }
@@ -185,6 +189,8 @@ function successCreateIncome(response){
     incomeState.currentContainer.find('.input-timely-payment').val('');
     incomeState.currentContainer.find('.input-cutoff-date').val('');
     incomeState.currentContainer.find('.input-description').val('');
+    incomeState.currentContainer.find('.input-quotation-totalize').prop('checked', true);
+    incomeState.currentContainer.find('.quotation-totalize-container').show();
     incomeState.currentContainer.find('.state-input').removeClass('selected');
     incomeState.currentContainer.find('.state-input[value="0"]').addClass('selected');
     incomeState.currentIncome = response.data.income;
