@@ -1,134 +1,89 @@
 <!-- Update tab -->
-<div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-profile-tab">
-    <div id="update-income-container">
-        <div class="row header-income-container">
-            <div class="col-12 d-flex justify-content-around state-container" >
-                <div class="d-flex justify-content-center">
-                    <label class="form-check-label align-self-center state-title"  for="state">Estado</label>
-                    <div  class="state-input-container d-flex justify-content-start align-self-center">
-                        <div class="state-0 update-state state-input selected" value="0">
-                            <label class="state-input-label" for="state-0">Cotización</label>
-                        </div>
-                        <div class="state-1 update-state state-input" value="1">
-                            <label class="state-input-label" for="state-1">Rechazada</label>
-                        </div>
-                        <div class="state-2 update-state state-input" value="2">
-                            <label class="state-input-label" for="state-2">Aprobada</label>
-                        </div>
-                        <div class="state-3 state-input" value="3">
-                            <label class="state-input-label" id="pay-state-btn" for="state-3">Pagada</label>
+<div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab">
+    <div id="update-income-container" class="income-form-shell">
+        <section class="income-form-header">
+            <div class="income-form-title-row">
+                <div class="income-title-copy">
+                    <span class="income-section-kicker">Documento seleccionado</span>
+                    <h2>Editar ingreso</h2>
+                    <span id="update-income-summary" class="income-header-summary"></span>
+                </div>
+                <div class="income-form-header-actions">
+                    <div class="state-container">
+                        <span class="state-title">Estado</span>
+                        <div class="state-input-container">
+                            <div class="state-0 update-state state-input selected" value="0"><span>Cotización</span></div>
+                            <div class="state-1 update-state state-input" value="1"><span>Rechazada</span></div>
+                            <div class="state-2 update-state state-input" value="2"><span>Aprobada</span></div>
+                            <div class="state-3 state-input" value="3"><span id="pay-state-btn">Pagada</span></div>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <i class="fa-solid align-self-center fa-print" id="print-income-button"></i>
-                    <i class="fa-solid align-self-center fa-eye" id="view-income-document"></i>
+                    <div class="income-document-actions">
+                        <button type="button" id="print-income-button" class="btn btn-light" title="Imprimir" aria-label="Imprimir"><i class="fa-solid fa-print"></i></button>
+                        <button type="button" id="view-income-document" class="btn btn-light" title="Ver documento" aria-label="Ver documento"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <button id="update-income-button" class="btn income-primary-action"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+                                        <button type="button" id="toggle-income-header" class="btn income-header-toggle" aria-expanded="false" aria-controls="update-income-header-details" title="Mostrar datos del ingreso" aria-label="Mostrar datos del ingreso"><i class="fa-solid fa-chevron-down"></i></button>
                 </div>
             </div>
-            <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
-                <div class="input-container d-flex justify-content-start">
-                    <span class="input-title align-self-center" for="input-client">Cliente</span>
-                    <select class="input-client form-select align-self-center input-value"  name="client">
+
+                        <div id="update-income-header-details" class="income-header-details" hidden>
+                            <div class="income-form-grid income-update-grid">
+                <div class="income-field income-field-client">
+                    <label for="update-income-client">Cliente</label>
+                    <select id="update-income-client" class="input-client form-select" name="client">
                         <option value="0" selected disabled>Seleccione un cliente</option>
                     </select>
+                    <div class="income-client-readiness" data-client-readiness></div>
                 </div>
-                <div class="input-container d-flex justify-content-start">
-                    <span class="input-title align-self-center" for="input-identification">Identificación</span>
-                    <p class="input-identification form-control input-value" ></p>
+                <div class="income-field">
+                    <label for="update-income-identification">Identificación</label>
+                    <p id="update-income-identification" class="input-identification income-readonly-value">-</p>
                 </div>
-                <div class="input-container d-flex justify-content-start">
-                    <span class="input-title align-self-center" for="input-timely-payment">Pago oportuno</span>
-                    <input type="date" class="input-timely-payment form-control input-value"  name="timely-payment">
+                <div class="income-field">
+                    <label for="update-income-timely-payment">Pago oportuno</label>
+                    <input id="update-income-timely-payment" type="date" class="input-timely-payment form-control" name="timely-payment">
                 </div>
-                <div class="input-container d-flex justify-content-start">
-                    <span class="input-title align-self-center" for="input-cutoff-date">Fecha de corte</span>
-                    <input type="date" class="input-cutoff-date form-control input-value"  name="cutoff-date">
+                <div class="income-field">
+                    <label for="update-income-cutoff-date">Fecha de corte</label>
+                    <input id="update-income-cutoff-date" type="date" class="input-cutoff-date form-control" name="cutoff-date">
                 </div>
-                <div class="input-container d-flex justify-content-start">
-                    <span class="input-title align-self-center" for="input-total-value">Valor total</span>
-                    <p class="input-total-value input-value" ><strong>$0</strong></p>
-                </div>
-                <div class="input-container d-flex justify-content-start quotation-totalize-container">
-                    <span class="input-title align-self-center" for="update-quotation-totalize">PDF</span>
-                    <div class="form-check form-switch input-value">
+                <div class="income-field income-field-totalize quotation-totalize-container">
+                    <label for="update-quotation-totalize">PDF</label>
+                    <div class="form-check">
                         <input class="form-check-input input-quotation-totalize" type="checkbox" id="update-quotation-totalize" checked>
-                        <label class="form-check-label" for="update-quotation-totalize">Totalizar cotización</label>
+                        <label class="form-check-label" for="update-quotation-totalize">Totalizar</label>
                     </div>
                 </div>
-                <div class="input-container d-flex justify-content-start bill-data-container">
-                    <span class="input-title align-self-center" for="input-bill-name">Nombre factura</span>
-                    <input type="text" class="input-bill-name form-control input-value"  name="bill-name">
+                <div class="income-field bill-data-container">
+                    <label for="update-income-bill-name">Nombre factura</label>
+                    <input id="update-income-bill-name" type="text" class="input-bill-name form-control" name="bill-name">
                 </div>
-                <div class="input-container d-flex justify-content-start bill-data-container">
-                    <span class="input-title align-self-center" for="input-bill-final-value">Valor pagado</span>
-                    <input type="number" class="input-bill-final-value form-control input-value"  name="bill-final-value">
+                <div class="income-field bill-data-container">
+                    <label for="update-income-bill-final-value">Valor pagado</label>
+                    <input id="update-income-bill-final-value" type="number" class="input-bill-final-value form-control" name="bill-final-value">
                 </div>
+                            </div>
 
-            </div>
-            <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
-                <div class="input-container d-flex flex-column justify-content-center description-container">
-                    <span class="input-title align-self-start" for="input-description">Descripción</span>
-                    <textarea class="input-description form-control input-value"  name="description"></textarea>
+                            <div class="income-rich-field">
+                <label for="update-income-description-editor">Descripción general</label>
+                <div class="income-rich-text" data-rich-text>
+                    <div class="income-rich-toolbar" data-rich-toolbar>
+                        <button type="button" data-rich-command="bold" title="Negrita" aria-label="Negrita"><i class="fa-solid fa-bold"></i></button>
+                        <button type="button" data-rich-command="italic" title="Cursiva" aria-label="Cursiva"><i class="fa-solid fa-italic"></i></button>
+                        <button type="button" data-rich-command="underline" title="Subrayado" aria-label="Subrayado"><i class="fa-solid fa-underline"></i></button>
+                        <button type="button" data-rich-command="insertUnorderedList" title="Lista" aria-label="Lista"><i class="fa-solid fa-list-ul"></i></button>
+                        <button type="button" data-rich-command="insertOrderedList" title="Lista numerada" aria-label="Lista numerada"><i class="fa-solid fa-list-ol"></i></button>
+                        <button type="button" data-rich-command="removeFormat" title="Limpiar formato" aria-label="Limpiar formato"><i class="fa-solid fa-eraser"></i></button>
+                    </div>
+                    <div id="update-income-description-editor" class="income-rich-editor input-description-editor" contenteditable="true" data-rich-editor data-placeholder="Notas para la cotización"></div>
+                    <textarea class="d-none input-description" data-rich-plain tabindex="-1"></textarea>
                 </div>
-            </div>  
-            <div class="col-12 d-flex justify-content-end">
-                <button id="update-income-button" class="btn align-self-center">Actualizar ingreso</button>
-            </div>          
-        </div>
-        <ul class="income-licenses-list">
-            <li class="add-row order-licenses-list-item-update order-licenses-list-item row">
-                <div class="col-6 d-flex flex-column justify-content-center">
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-license">Licencia</span>
-                        <select class="form-select align-self-center input-value input-item-license" name="item-license">
-                            <option value="0" selected disabled>Seleccione una licencia</option>
-                        </select>
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-service">Servicio</span>
-                        <p class="form-control input-value input-item-service"></p>
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-recurrence">Recurrencia</span>
-                        <p class="form-control input-value input-item-recurrence"></p>
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-value">Valor</span>
-                        <input type="number" class="form-control input-value input-item-value" name="input-item-value">
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-hours">Horas</span>
-                        <input type="number" min="0" class="form-control input-value input-item-hours" name="input-item-value" value="0">
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-employee">Empleado</span>
-                        <p class="form-control input-value input-item-employee"></p>
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-comission">Comisión(%)</span>
-                        <input type="number" class="form-control input-value input-item-comission" name="input-item-value">
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-comission"></span>
-                        <p class="input-value input-item-total-comission">$0</p>
-                    </div>
-                    <div class="input-container d-flex justify-content-start">
-                        <span class="input-title align-self-center" for="input-item-tax">Impuesto</span>
-                        <p class="input-value align-self-center input-item-tax" name="item-tax">0%</p>
-                    </div>
-                </div>
-                <div class="col-6 d-flex flex-column justify-content-center">
-                    <div class="input-container d-flex flex-column justify-content-center description-container">
-                        <span class="input-title align-self-start" for="input-item-description">Descripción</span>
-                        <textarea class="form-control input-value input-item-description" name="description"></textarea>
-                    </div>
-                
-                </div>
-                <i class="fas fa-plus-circle add-license-button"></i>
-            </li>
-        </ul>
-        
+                            </div>
+
+                        </div>
+        </section>
+
+        @include('erp.incomes.items-table', ['mode' => 'update'])
     </div>
-    
-    
 </div>

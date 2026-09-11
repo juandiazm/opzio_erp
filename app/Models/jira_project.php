@@ -13,6 +13,7 @@ class jira_project extends Model
 
     protected $casts = [
         'metadata' => 'array',
+        'story_point_hours_multiplier' => 'decimal:2',
         'jira_updated_at' => 'datetime',
         'last_seen_at' => 'datetime',
     ];

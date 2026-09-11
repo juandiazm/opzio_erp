@@ -29,6 +29,7 @@ trait jira_relations_trait
                 'name' => $project->name,
                 'client_ids' => $project->clients->pluck('id')->values()->all(),
                 'license_ids' => $project->licenses->pluck('id')->values()->all(),
+                    'story_point_hours_multiplier' => (float) ($project->story_point_hours_multiplier ?? 1),
                 'clients' => $project->clients->map(fn (client $item): array => ['id' => $item->id, 'name' => $item->complete_name])->values()->all(),
                 'licenses' => $project->licenses->map(fn (license $item): array => ['id' => $item->id, 'name' => $item->name])->values()->all(),
             ])->values()->all(),
@@ -61,20 +62,36 @@ trait jira_relations_trait
             'client_ids.*' => ['integer', 'exists:clients,id'],
             'license_ids' => ['nullable', 'array'],
             'license_ids.*' => ['integer', 'exists:licenses,id'],
+            'story_point_hours_multiplier' => ['required', 'numeric', 'min:0.01', 'max:9999'],
         ]);
         $project = jira_project::findOrFail((int) $data['jira_project_id']);
         $clientIds = collect($data['client_ids'] ?? [])->map(fn ($id): int => (int) $id)->unique()->values();
         $licenseIds = collect($data['license_ids'] ?? [])->map(fn ($id): int => (int) $id)->unique()->values();
+        $multiplier = round((float) $data['story_point_hours_multiplier'], 2);
         $invalidLicense = license::query()->whereIn('id', $licenseIds)->whereNotIn('client_id', $clientIds)->exists();
         if ($invalidLicense) {
             throw ValidationException::withMessages(['license_ids' => 'Cada licencia debe pertenecer a un cliente asociado al proyecto.']);
         }
-        DB::transaction(function () use ($project, $clientIds, $licenseIds): void {
+        $recalculated = 0;
+        DB::transaction(function () use ($project, $clientIds, $licenseIds, $multiplier, &$recalculated): void {
+            $project->story_point_hours_multiplier = $multiplier;
+            $project->save();
             $project->clients()->sync($clientIds->mapWithKeys(fn (int $id, int $index): array => [$id => ['is_primary' => $index === 0]])->all());
             $project->licenses()->sync($licenseIds->all());
+            $storyTypes = ['story', 'user story', 'historia', 'historia de usuario'];
+            $issues = jira_issue::query()
+                ->where('jira_project_id', $project->id)
+                ->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', $storyTypes)
+                ->where('estimated_hours_manual', false)
+                ->get(['id', 'story_points']);
+            foreach ($issues as $issue) {
+                $issue->estimated_hours = $issue->story_points === null ? null : round((float) $issue->story_points * $multiplier, 2);
+                $issue->save();
+                $recalculated++;
+            }
         });
 
-        return ['message' => 'Relaciones de proyecto guardadas correctamente.'];
+        return ['message' => 'Relaciones de proyecto guardadas correctamente.', 'recalculated_issues' => $recalculated];
     }
 
     public function Jira_SaveUserMapping(Request $request): array

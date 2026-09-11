@@ -13,6 +13,8 @@ class jira_issue extends Model
 
     protected $casts = [
         'story_points' => 'decimal:2',
+        'estimated_hours' => 'decimal:2',
+        'estimated_hours_manual' => 'boolean',
         'original_estimate_seconds' => 'integer',
         'time_spent_seconds' => 'integer',
         'jira_created_at' => 'datetime',

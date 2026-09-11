@@ -1,9 +1,26 @@
 import { incomeState } from './state.js';
+import { getRichTextHtml, getRichTextPlainText, initRichTextEditors, setRichTextContent } from './rich-text.js';
+
+function escapeHtml(value){
+    return String(value ?? '').replace(/[&<>'"]/g, function(character){ return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[character]; });
+}
+
+function richToolbarHtml(){
+    return '<div class="income-rich-toolbar" data-rich-toolbar><button type="button" data-rich-command="bold" title="Negrita" aria-label="Negrita"><i class="fa-solid fa-bold"></i></button><button type="button" data-rich-command="italic" title="Cursiva" aria-label="Cursiva"><i class="fa-solid fa-italic"></i></button><button type="button" data-rich-command="insertUnorderedList" title="Lista" aria-label="Lista"><i class="fa-solid fa-list-ul"></i></button><button type="button" data-rich-command="removeFormat" title="Limpiar formato" aria-label="Limpiar formato"><i class="fa-solid fa-eraser"></i></button></div>';
+}
 
 export function changeCreateOrderState(){
     incomeState.currentContainer.find('.state-input').removeClass('selected');
     $(this).addClass('selected');
     incomeState.currentContainer.find('.quotation-totalize-container').toggle($(this).attr('value') == '0');
+}
+
+export function updateClientReadiness(client = incomeState.currentClient){
+    const status = incomeState.currentContainer?.find('[data-client-readiness]');
+    if(!status || !status.length) return;
+    if(!client){ status.removeClass('is-ready is-pending').empty().hide(); return; }
+    const missing = client.siigo_missing_fields || [];
+    status.removeClass('is-ready is-pending').addClass(client.siigo_ready ? 'is-ready' : 'is-pending').html(client.siigo_ready ? '<i class="fa-solid fa-circle-check"></i> Cliente listo para Siigo' : '<i class="fa-solid fa-circle-exclamation"></i> Pendiente: '+escapeHtml(missing.join(', '))).show();
 }
 
 export function getAllClients(onLoaded = null){
@@ -17,6 +34,7 @@ function showAllClients(response, onLoaded = null){
     incomeState.createCurrentLicenses = [];
     incomeState.selectedLicense = null;
     incomeState.currentLicencesList = [];
+    updateClientReadiness(null);
     const options = [
         {value: '0', label: 'Seleccione un cliente', disabled: true},
         ...incomeState.clientsList.map(function(client){ return {value: client.id, label: client.name}; }),
@@ -44,8 +62,9 @@ export function loadClientData(){
 function getClientData(){
     let clientId = incomeState.currentContainer.find('.input-client').val();
     incomeState.currentClient = incomeState.clientsList.find(client => client.id == clientId);
-    if(incomeState.currentClient == undefined){ alertWarning('El cliente no existe'); return; }
+    if(incomeState.currentClient == undefined){ updateClientReadiness(null); alertWarning('El cliente no existe'); return; }
     incomeState.currentContainer.find('.input-identification').text(incomeState.currentClient.identification);
+    updateClientReadiness(incomeState.currentClient);
     getClientLicenses();
 }
 
@@ -53,7 +72,7 @@ function getClientLicenses(){ PostMethodFunction('/admin/clients/licenses/get-by
 
 function showClientLicenses(response){
     incomeState.createCurrentLicenses = response.licenses;
-    const select = incomeState.currentContainer.find('.input-item-license')[0];
+    const select = incomeState.currentContainer.find('.income-items-table .input-item-license')[0];
     const options = [
         {value: '0', label: 'Seleccione una licencia', disabled: true},
         ...incomeState.createCurrentLicenses.map(function(license){ return {value: license.id, label: license.name}; }),
@@ -70,7 +89,7 @@ function showClientLicenses(response){
 }
 
 export function loadLicenseData(){
-    let container = incomeState.currentContainer.find('.order-licenses-list-item');
+    let container = incomeState.currentContainer.find('.income-items-table .add-row');
     let licenseId = $(this).val();
     incomeState.selectedLicense = incomeState.createCurrentLicenses.find(license => license.id == licenseId);
     if(incomeState.selectedLicense == null){ alertWarning('La licencia no existe'); return; }
@@ -83,16 +102,18 @@ export function loadLicenseData(){
 }
 
 export function getComissionValue(){
-    try{ let container = $(this).parent().parent(); let comission = container.find('.input-item-comission').val(); let value = container.find('.input-item-value').val(); container.find('.input-item-total-comission').text('$'+((comission/100)*value).toLocaleString('es-CO')); }
+    try{ let container = $(this).closest('tr'); let comission = container.find('.input-item-comission').val(); let value = container.find('.input-item-value').val(); container.find('.input-item-total-comission').text('$'+((comission/100)*value).toLocaleString('es-CO')); }
     catch(e){ incomeState.currentContainer.find('.input-item-comission').val('0').change(); }
 }
 
 export function addLicenseItem(){
     let flag = true;
-    let value = incomeState.currentContainer.find('.input-item-value').val();
-    let comission = incomeState.currentContainer.find('.input-item-comission').val();
-    let description = incomeState.currentContainer.find('.input-item-description').val();
-    let hours = incomeState.currentContainer.find('.input-item-hours').val();
+    let row = incomeState.currentContainer.find('.income-items-table .add-row');
+    let value = row.find('.input-item-value').val();
+    let comission = row.find('.input-item-comission').val();
+    let descriptionHtml = getRichTextHtml(row, '.input-item-description-editor');
+    let description = getRichTextPlainText(descriptionHtml);
+    let hours = row.find('.input-item-hours').val();
     if(incomeState.selectedLicense == null){ alertWarning('Debes seleccionar una licencia'); flag = false; }
     if(value == ''){ alertWarning('Debes ingresar un valor'); flag = false; }
     if(hours == '' || hours == null || hours < 0) alertWarning('Debes ingresar las horas invertidas');
@@ -100,7 +121,7 @@ export function addLicenseItem(){
         let taxValue = 0;
         let taxName = '';
         if(incomeState.selectedLicense.service.tax_id != null){ taxValue = incomeState.selectedLicense.service.tax.value; taxName = incomeState.selectedLicense.service.tax.name; }
-        incomeState.currentLicencesList.push({license_id: incomeState.selectedLicense.id, license_name: incomeState.selectedLicense.name, service_id: incomeState.selectedLicense.service_id, service_name: incomeState.selectedLicense.service.name, recurrence_months: (incomeState.selectedLicense.type == 2 || incomeState.selectedLicense.recurrence_months == null) ? null : incomeState.selectedLicense.recurrence_months, value: value, employee_id: incomeState.selectedLicense.employee_id, employee_name: incomeState.selectedLicense.employee == null ? '' : incomeState.selectedLicense.employee.name+(incomeState.selectedLicense.employee.last_name == null ? '' : ' '+incomeState.selectedLicense.employee.last_name), tax_id: incomeState.selectedLicense.service.tax_id, tax_value: taxValue, tax_name: taxName, comission: comission, total: value*(1+parseFloat(taxValue)), hours: hours, description: description});
+        incomeState.currentLicencesList.push({license_id: incomeState.selectedLicense.id, license_name: incomeState.selectedLicense.name, service_id: incomeState.selectedLicense.service_id, service_name: incomeState.selectedLicense.service.name, recurrence_months: (incomeState.selectedLicense.type == 2 || incomeState.selectedLicense.recurrence_months == null) ? null : incomeState.selectedLicense.recurrence_months, value: value, employee_id: incomeState.selectedLicense.employee_id, employee_name: incomeState.selectedLicense.employee == null ? '' : incomeState.selectedLicense.employee.name+(incomeState.selectedLicense.employee.last_name == null ? '' : ' '+incomeState.selectedLicense.employee.last_name), tax_id: incomeState.selectedLicense.service.tax_id, tax_value: taxValue, tax_name: taxName, comission: comission, total: value*(1+parseFloat(taxValue)), hours: hours, description: description, description_html: descriptionHtml});
         resetLicenseInputs();
         alertSuccess('Licencia agregada correctamente');
         showLicensesItems();
@@ -108,50 +129,62 @@ export function addLicenseItem(){
 }
 
 export function resetLicenseInputs(){
-    incomeState.currentContainer.find('.add-row .input-item-value').val('0').select().focus();
-    incomeState.currentContainer.find('.add-row .input-item-description').val('');
-    incomeState.currentContainer.find('.add-row .input-item-employee').text('');
-    incomeState.currentContainer.find('.add-row .input-item-comission').val('0');
-    incomeState.currentContainer.find('.add-row .input-item-total-comission').text('0');
-    incomeState.currentContainer.find('.add-row .input-item-hours').val('0');
+    const row = incomeState.currentContainer.find('.income-items-table .add-row');
+    row.find('.input-item-license').val('0');
+    row.find('.input-item-service, .input-item-recurrence').text('');
+    row.find('.input-item-value').val('0').select().focus();
+    setRichTextContent(row, '.input-item-description-editor', '');
+    row.find('.input-item-comission').val('0');
+    row.find('.input-item-total-comission').text('$0');
+    row.find('.input-item-hours').val('0');
+    row.find('.input-item-tax').text('0%');
+    incomeState.selectedLicense = null;
 }
 
 export function showLicensesItems(){
     let html = '';
     let total = 0;
+    const isUpdate = incomeState.currentTab == 'nav-update-tab';
+    const canEdit = !isUpdate || incomeState.currentIncome?.state == 0 || incomeState.currentIncome?.state == '0';
     $.each(incomeState.currentLicencesList, function(index, item){
-        item.total = parseFloat(item.total); item.tax_value = parseFloat(item.tax_value); item.comission = parseFloat(item.comission); item.value = parseFloat(item.value);
-        html += '<li class="update-income-licenses-list-item order-licenses-list-item row" index="'+index+'"><div class="col-12 col-md-6 d-flex flex-column justify-content-center">';
-        html += '<div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-license">Licencia</span><p class="form-control input-value input-item-license">'+item.license_name+'</p></div><div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-service">Servicio</span><p class="form-control input-value input-item-service">'+item.service_name+'</p></div><div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-recurrence">Recurrencia</span><p class="form-control input-value input-item-recurrence">'+(item.recurrence_months == null ? '' : item.recurrence_months)+'</p></div>';
-        html += '<div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-value">Valor</span>'+(incomeState.currentTab != 'nav-update-tab' || incomeState.currentIncome.state == 0 ? '<input type="number" class="form-control input-value input-item-value" name="input-item-value" value="'+item.value+'">' : '<p class="form-control input-value input-item-value" name="input-item-value">'+item.value+'</p>')+'</div>';
-        html += '<div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-hours">Horas</span><input type="number" class="form-control input-value input-item-hours" name="input-item-hours" value="'+item.hours+'"></div><div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-employee">Empleado</span><p class="form-control input-value input-item-employee">'+(item.employee_name == null ? '' : item.employee_name)+'</p></div>';
-        html += '<div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-comission">Comisión</span>'+(incomeState.currentTab != 'nav-update-tab' || incomeState.currentIncome.state == 0 ? '<input type="number" class="form-control input-value input-item-comission" name="input-item-comission" value="'+item.comission+'">' : '<p class="form-control input-value input-item-comission" name="input-item-comission">'+item.comission+'</p>')+'</div><div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-total-comission">Total Comisión</span><p class="input-value input-item-total-comission">$'+((item.comission/100)*item.value).toLocaleString('es-CO')+'</p></div><div class="input-container d-flex justify-content-start"><span class="input-title align-self-center" for="input-item-tax">Impuesto</span><p class="input-value align-self-center input-item-tax" name="item-tax">'+item.tax_value*100+'%</p></div></div>';
-        html += '<div class="col-12 col-md-6 d-flex flex-column justify-content-center"><div class="input-container d-flex flex-column justify-content-center description-container"><span class="input-title align-self-start" for="input-license-description">Descripción</span>'+(incomeState.currentTab != 'nav-update-tab' || incomeState.currentIncome.state == 0 ? '<textarea class="form-control input-value input-item-description" name="description">'+(item.description == null ? '' : item.description)+'</textarea>' : '<p class="form-control input-value input-item-description" name="description">'+(item.description == null ? '' : item.description)+'</p>')+'</div></div>';
-        if(incomeState.currentTab != 'nav-update-tab' || incomeState.currentIncome.state == 0) html += '<div class="d-flex justify-content-end align-items-center"><i class="fas fa-pen-to-square update-license-button"></i><i class="fas fa-trash-can delete-license-button"></i></div>';
-        html += '</li>';
+        item.total = parseFloat(item.total) || 0; item.tax_value = parseFloat(item.tax_value) || 0; item.comission = parseFloat(item.comission) || 0; item.value = parseFloat(item.value) || 0; item.hours = parseFloat(item.hours) || 0;
+        const descriptionHtml = item.description_html || escapeHtml(item.description || '');
+        const descriptionPlain = escapeHtml(getRichTextPlainText(item.description_html || item.description || ''));
+        html += '<tr class="income-item-saved-row" index="'+index+'">';
+        html += '<td data-label="Licencia / servicio"><strong>'+escapeHtml(item.license_name)+'</strong><small>'+escapeHtml(item.service_name)+'</small>'+(item.recurrence_months == null ? '' : '<small>'+escapeHtml(item.recurrence_months+' meses')+'</small>')+(item.employee_name ? '<small>Empleado: '+escapeHtml(item.employee_name)+'</small>' : '')+'</td>';
+        html += '<td data-label="Valor">'+(canEdit ? '<input type="number" min="0" step="0.01" class="form-control input-item-value" value="'+item.value+'">' : '<span class="income-readonly-value input-item-value">$'+item.value.toLocaleString('es-CO')+'</span>')+'</td>';
+        html += '<td data-label="Horas">'+(canEdit ? '<input type="number" min="0" class="form-control input-item-hours" value="'+item.hours+'">' : '<span class="income-readonly-value input-item-hours">'+item.hours+'</span>')+'</td>';
+        html += '<td data-label="Comisión">'+(canEdit ? '<input type="number" min="0" step="0.01" class="form-control input-item-comission" value="'+item.comission+'">' : '<span class="income-readonly-value input-item-comission">'+item.comission+'%</span>')+'</td>';
+        html += '<td data-label="Impuesto"><span class="income-item-tax input-item-tax">'+(item.tax_value*100)+'%</span></td>';
+        html += '<td data-label="Descripción">'+(canEdit ? '<div class="income-rich-text" data-rich-text>'+richToolbarHtml()+'<div class="income-rich-editor input-item-description-editor" contenteditable="true" data-rich-editor>'+descriptionHtml+'</div><textarea class="d-none input-item-description" data-rich-plain tabindex="-1">'+descriptionPlain+'</textarea></div>' : '<div class="income-rich-preview">'+descriptionHtml+'</div>')+'</td>';
+        html += '<td class="income-item-actions" data-label="Acciones">'+(canEdit ? '<button type="button" class="btn update-license-button" title="Guardar cambios" aria-label="Guardar cambios"><i class="fa-solid fa-check"></i></button><button type="button" class="btn delete-license-button" title="Eliminar ítem" aria-label="Eliminar ítem"><i class="fa-solid fa-trash-can"></i></button>' : '')+'</td></tr>';
         total += item.total;
     });
-    incomeState.currentContainer.find('.update-income-licenses-list-item').remove();
-    incomeState.currentContainer.find('.income-licenses-list').append(html);
-    incomeState.currentContainer.find('.input-total-value').html('<strong>$'+total.toLocaleString('es-CO')+'</strong>');
+    const body = incomeState.currentContainer.find('.income-items-table .income-items-body');
+    body.find('.income-item-saved-row').remove();
+    body.append(html);
+    incomeState.currentContainer.find('.income-items-empty-state').toggle(incomeState.currentLicencesList.length == 0);
+    incomeState.currentContainer.find('.input-total-value').each(function(){ $(this).is('strong') ? $(this).text('$'+total.toLocaleString('es-CO')) : $(this).html('<strong>$'+total.toLocaleString('es-CO')+'</strong>'); });
+    initRichTextEditors(incomeState.currentContainer[0]);
 }
 
 export function deleteLicenseItem(){
-    let index = $(this).parent().parent().attr('index');
-    swallMessage('Eliminar licencia', '¿Estás seguro de eliminar esta licencia?', 'error', 'Si, eliminar', 'No, Cancelar', null, function(){ incomeState.currentLicencesList.splice(index, 1); alertWarning('Licencia eliminada correctamente'); showLicensesItems(); }, null);
+    let index = $(this).closest('.income-item-saved-row').attr('index');
+    swallMessage('Eliminar ítem', '¿Estás seguro de eliminar este ítem?', 'error', 'Si, eliminar', 'No, Cancelar', null, function(){ incomeState.currentLicencesList.splice(index, 1); alertWarning('Ítem eliminado correctamente'); showLicensesItems(); }, null);
 }
 
 export function updateLicenseItem(){
     let flag = true;
-    let container = $(this).closest('.update-income-licenses-list-item');
+    let container = $(this).closest('.income-item-saved-row');
     let index = container.attr('index');
     let value = container.find('.input-item-value').val();
-    let description = container.find('.input-item-description').val();
+    let descriptionHtml = getRichTextHtml(container, '.input-item-description-editor');
+    let description = getRichTextPlainText(descriptionHtml);
     let comission = container.find('.input-item-comission').val();
     let hours = container.find('.input-item-hours').val();
     if(value == ''){ alertWarning('Debes ingresar un valor'); flag = false; }
     if(hours == '' || hours == null || hours < 0){ alertWarning('Debes ingresar las horas invertidas'); flag = false; }
-    if(flag){ incomeState.currentLicencesList[index].value = value; incomeState.currentLicencesList[index].comission = comission; incomeState.currentLicencesList[index].description = description; incomeState.currentLicencesList[index].total = value*(1+incomeState.currentLicencesList[index].tax_value); incomeState.currentLicencesList[index].hours = hours; alertSuccess('Licencia actualizada correctamente'); showLicensesItems(); }
+    if(flag){ incomeState.currentLicencesList[index].value = value; incomeState.currentLicencesList[index].comission = comission; incomeState.currentLicencesList[index].description = description; incomeState.currentLicencesList[index].description_html = descriptionHtml; incomeState.currentLicencesList[index].total = value*(1+incomeState.currentLicencesList[index].tax_value); incomeState.currentLicencesList[index].hours = hours; alertSuccess('Ítem actualizado correctamente'); showLicensesItems(); }
 }
 
 export function changeTimelyPayment(){
@@ -166,7 +199,8 @@ export function createIncome(){
     let clientId = incomeState.currentContainer.find('.input-client').val();
     let timelyPayment = incomeState.currentContainer.find('.input-timely-payment').val();
     let cutoffDate = incomeState.currentContainer.find('.input-cutoff-date').val();
-    let description = incomeState.currentContainer.find('.input-description').val();
+    let descriptionHtml = getRichTextHtml(incomeState.currentContainer, '.input-description-editor');
+    let description = getRichTextPlainText(descriptionHtml);
     let state = incomeState.currentContainer.find('.state-input.selected').attr('value');
     if(clientId == null || clientId == ''){ incomeState.currentContainer.find('.input-client').addClass('is-invalid'); alertWarning('Debes seleccionar un cliente'); flag = false; }else incomeState.currentContainer.find('.input-client').removeClass('is-invalid');
     if(timelyPayment == null || timelyPayment == ''){ incomeState.currentContainer.find('.input-timely-payment').addClass('is-invalid'); alertWarning('Debes ingresar una fecha de pago'); flag = false; }else incomeState.currentContainer.find('.input-timely-payment').removeClass('is-invalid');
@@ -174,7 +208,7 @@ export function createIncome(){
     if(incomeState.currentLicencesList.length == 0){ alertWarning('Debes ingresar al menos una licencia'); flag = false; }
     if(flag){
         $('#create-income-button').attr('disabled', true);
-        let dataSend = {state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, quotation_totalize: state == '0' ? incomeState.currentContainer.find('.input-quotation-totalize').is(':checked') : true, licenses: incomeState.currentLicencesList};
+        let dataSend = {state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, description_html: descriptionHtml, quotation_totalize: state == '0' ? incomeState.currentContainer.find('.input-quotation-totalize').is(':checked') : true, licenses: incomeState.currentLicencesList};
         PostMethodFunction('/admin/incomes/create', dataSend, null, successCreateIncome, function(){ $('#create-income-button').attr('disabled', false); });
     }
 }
@@ -188,7 +222,7 @@ function successCreateIncome(response){
     incomeState.currentContainer.find('.input-identification').text('');
     incomeState.currentContainer.find('.input-timely-payment').val('');
     incomeState.currentContainer.find('.input-cutoff-date').val('');
-    incomeState.currentContainer.find('.input-description').val('');
+    setRichTextContent(incomeState.currentContainer, '.input-description-editor', '');
     incomeState.currentContainer.find('.input-quotation-totalize').prop('checked', true);
     incomeState.currentContainer.find('.quotation-totalize-container').show();
     incomeState.currentContainer.find('.state-input').removeClass('selected');

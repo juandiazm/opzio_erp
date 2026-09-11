@@ -1,19 +1,41 @@
 import { incomeState } from './state.js';
-import { showLicensesItems } from './create.js';
+import { showLicensesItems, updateClientReadiness } from './create.js';
+import { getRichTextHtml, getRichTextPlainText, setRichTextContent } from './rich-text.js';
 import { getIncomesPage } from './list.js';
 import { showIncomeOrder } from './order.js';
 
+function setUpdateHeaderCollapsed(collapsed){
+    const container = incomeState.currentContainer;
+    const details = container.find('#update-income-header-details');
+    const toggle = container.find('#toggle-income-header');
+    if(!details.length || !toggle.length) return;
+    container.toggleClass('income-header-collapsed', collapsed);
+    details.prop('hidden', collapsed);
+    toggle.attr('aria-expanded', collapsed ? 'false' : 'true');
+    toggle.attr('title', collapsed ? 'Mostrar datos del ingreso' : 'Ocultar datos del ingreso');
+    toggle.attr('aria-label', collapsed ? 'Mostrar datos del ingreso' : 'Ocultar datos del ingreso');
+    toggle.find('i').attr('class', collapsed ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up');
+}
+
+export function toggleIncomeHeader(){
+    const collapsed = incomeState.currentContainer.find('#update-income-header-details').prop('hidden') === false;
+    setUpdateHeaderCollapsed(collapsed);
+}
+
 export function showCurrentIncome(){
     incomeState.currentLicencesList = [];
+    setUpdateHeaderCollapsed(true);
     incomeState.currentContainer.find('.state-input').removeClass('selected');
     incomeState.currentContainer.find('.state-input[value="'+incomeState.currentIncome.state+'"]').addClass('selected');
     incomeState.currentContainer.find('.input-client').val(incomeState.currentIncome.client_id).change();
     incomeState.currentContainer.find('.input-identification').text(incomeState.currentIncome.client_identification);
     incomeState.currentContainer.find('.input-timely-payment').val(incomeState.currentIncome.timely_payment);
     incomeState.currentContainer.find('.input-cutoff-date').val(incomeState.currentIncome.cutoff_date);
-    incomeState.currentContainer.find('.input-description').val(incomeState.currentIncome.description);
+    setRichTextContent(incomeState.currentContainer, '.input-description-editor', incomeState.currentIncome.description_html || incomeState.currentIncome.description || '');
     incomeState.currentContainer.find('.input-bill-name').val(incomeState.currentIncome.bill_name);
     incomeState.currentContainer.find('.input-bill-final-value').val(incomeState.currentIncome.bill_final_value);
+    incomeState.currentContainer.find('#update-income-summary').text(incomeState.currentIncome.client_name || 'Ingreso seleccionado');
+    updateClientReadiness(incomeState.currentIncome.client || null);
     incomeState.currentContainer.find('.input-quotation-totalize').prop('checked', incomeState.currentIncome.quotation_totalize !== false && incomeState.currentIncome.quotation_totalize !== 0 && incomeState.currentIncome.quotation_totalize !== '0');
     incomeState.currentContainer.find('.quotation-totalize-container').toggle(incomeState.currentIncome.state == 0);
     if(incomeState.currentIncome.state == 0 || incomeState.currentIncome.state == 1 || incomeState.currentIncome.state == 2){
@@ -24,7 +46,7 @@ export function showCurrentIncome(){
         incomeState.currentContainer.find('.input-description').attr('disabled', false);
         incomeState.currentContainer.find('.input-bill-name').attr('disabled', false);
         incomeState.currentContainer.find('.input-bill-final-value').attr('disabled', false);
-        incomeState.currentContainer.find('.order-licenses-list-item-update').css('display', 'flex');
+        incomeState.currentContainer.find('.order-licenses-list-item-update').css('display', 'table-row');
     }else{
         incomeState.currentContainer.find('#update-income-button').css('display', 'none');
         incomeState.currentContainer.find('.input-client').attr('disabled', true);
@@ -46,7 +68,8 @@ export function updateIncome(){
     let clientId = incomeState.currentContainer.find('.input-client').val();
     let timelyPayment = incomeState.currentContainer.find('.input-timely-payment').val();
     let cutoffDate = incomeState.currentContainer.find('.input-cutoff-date').val();
-    let description = incomeState.currentContainer.find('.input-description').val();
+    let descriptionHtml = getRichTextHtml(incomeState.currentContainer, '.input-description-editor');
+    let description = getRichTextPlainText(descriptionHtml);
     let state = incomeState.currentContainer.find('.state-input.selected').attr('value');
     let billName = incomeState.currentContainer.find('.input-bill-name').val();
     let billFinalValue = incomeState.currentContainer.find('.input-bill-final-value').val();
@@ -58,7 +81,7 @@ export function updateIncome(){
     if(flag){
         $('#update-income-button').attr('disabled', true);
         $('.state-input-container').addClass('d-none');
-        let dataSend = {id: incomeState.currentIncome.id, state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, bill_name: billName, bill_final_value: billFinalValue, quotation_totalize: state == '0' ? incomeState.currentContainer.find('.input-quotation-totalize').is(':checked') : true, licenses: incomeState.currentLicencesList};
+        let dataSend = {id: incomeState.currentIncome.id, state: state, client_id: clientId, client_identification: incomeState.currentClient.identification, client_name: incomeState.currentClient.name+(incomeState.currentClient.last_name == null ? '' : ' '+incomeState.currentClient.last_name), timely_payment: timelyPayment, cutoff_date: cutoffDate, description: description, description_html: descriptionHtml, bill_name: billName, bill_final_value: billFinalValue, quotation_totalize: state == '0' ? incomeState.currentContainer.find('.input-quotation-totalize').is(':checked') : true, licenses: incomeState.currentLicencesList};
         PostMethodFunction('/admin/incomes/update', dataSend, null, successUpdateIncome, function(){ $('#update-income-button').attr('disabled', false); $('.state-input-container').removeClass('d-none'); });
     }
 }

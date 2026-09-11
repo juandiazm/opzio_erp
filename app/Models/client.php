@@ -11,7 +11,7 @@ class client extends Model
 {
     use HasFactory;
     protected $guarded = [];
-    protected $appends = ['photo_path', 'complete_name', 'identification_type_string','active_string', 'verified_string', 'created_at_string', 'created_date_string'];
+    protected $appends = ['photo_path', 'complete_name', 'identification_type_string','active_string', 'verified_string', 'created_at_string', 'created_date_string', 'siigo_ready', 'siigo_missing_fields'];
     public function getPhotoPathAttribute(){
         return ($this->photo==null?'images/no-image.jpg':('storage/images/erp/clients/'.$this->photo));
     }
@@ -48,6 +48,21 @@ class client extends Model
     }
     public function getCreatedDateStringAttribute(){
         return Carbon::parse($this->created_at)->format('Y-m-d');
+    }
+    public function getSiigoMissingFieldsAttribute(){
+        $missing = [];
+        if(trim((string) $this->name) === '') $missing[] = 'nombre';
+        if(trim((string) $this->identification) === '') $missing[] = 'identificación';
+        if(!filter_var(trim((string) $this->email), FILTER_VALIDATE_EMAIL)) $missing[] = 'correo';
+        if(trim((string) $this->phone) === '') $missing[] = 'teléfono';
+        if(trim((string) $this->address) === '') $missing[] = 'dirección';
+        return $missing;
+    }
+    public function isReadyForSiigo(): bool{
+        return count($this->siigo_missing_fields) === 0;
+    }
+    public function getSiigoReadyAttribute(): bool{
+        return $this->isReadyForSiigo();
     }
     /*relationships*/
     public function licenses(){

@@ -23,7 +23,8 @@ class incomes_controller extends Controller
             $request->cutoff_date,
             $request->description,
             $request->licenses,
-            quotation_totalize: $request->boolean('quotation_totalize', true)
+            quotation_totalize: $request->boolean('quotation_totalize', true),
+            description_html: $request->input('description_html')
         );
         if($Response['status'] == 1){
             return $Response;
@@ -117,7 +118,8 @@ class incomes_controller extends Controller
             $request->bill_name,
             $request->bill_final_value,
             $request->licenses,
-            $request->has('quotation_totalize') ? $request->boolean('quotation_totalize') : null
+            $request->has('quotation_totalize') ? $request->boolean('quotation_totalize') : null,
+            $request->input('description_html')
         );
         if($Response['status'] == 1){
             return $Response;

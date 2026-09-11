@@ -15,6 +15,7 @@ use App\Models\income_license;
 use App\Models\client;
 use App\Models\license;
 use App\Models\license_notification;
+use App\Support\SanitizedHtml;
 
 use Carbon\Carbon;
 
@@ -44,7 +45,8 @@ trait incomes_trait
         $bill_name = null,
         $bill_final_value = null,
         $create_at = null,
-        $quotation_totalize = true
+        $quotation_totalize = true,
+        $description_html = null
     ) {
         $Response = array(
             'status' => 0,
@@ -61,7 +63,9 @@ trait incomes_trait
             $income->client_name = $client_name;
             $income->timely_payment = $timely_payment;
             $income->cutoff_date = $cutoff_date;
-            $income->description = $description;
+            $cleanDescriptionHtml = SanitizedHtml::clean($description_html);
+            $income->description = SanitizedHtml::plainText($cleanDescriptionHtml !== '' ? $cleanDescriptionHtml : $description);
+            $income->description_html = $cleanDescriptionHtml !== '' ? $cleanDescriptionHtml : null;
             $income->total = collect($licenses)->sum('total');
             $income->quotation_totalize = (int) $state === 0
                 ? filter_var($quotation_totalize, FILTER_VALIDATE_BOOLEAN)
@@ -92,7 +96,9 @@ trait incomes_trait
                     $income_license->tax_id = $item['tax_id'];
                     $income_license->tax_name = $item['tax_name'];
                     $income_license->tax_value = ($item['tax_value'] == null || $item['tax_value'] == '') ? 0 : $item['tax_value'];
-                    $income_license->description = $item['description'];
+                    $itemDescriptionHtml = SanitizedHtml::clean($item['description_html'] ?? $item['description'] ?? '');
+                    $income_license->description = SanitizedHtml::plainText($itemDescriptionHtml);
+                    $income_license->description_html = $itemDescriptionHtml !== '' ? $itemDescriptionHtml : null;
                     $income_license->total = $item['total'];
                     $income_license->hours = $item['hours'];
                     $income_license->save();
@@ -364,7 +370,8 @@ trait incomes_trait
         $bill_name,
         $bill_final_value,
         $licenses,
-        $quotation_totalize = null
+        $quotation_totalize = null,
+        $description_html = null
     ) {
         $Response = array(
             'status' => 0,
@@ -391,7 +398,9 @@ trait incomes_trait
             $income->client_name = $client_name;
             $income->timely_payment = $timely_payment;
             $income->cutoff_date = $cutoff_date;
-            $income->description = $description;
+            $cleanDescriptionHtml = SanitizedHtml::clean($description_html);
+            $income->description = SanitizedHtml::plainText($cleanDescriptionHtml !== '' ? $cleanDescriptionHtml : $description);
+            $income->description_html = $cleanDescriptionHtml !== '' ? $cleanDescriptionHtml : null;
             $income->bill_name = $bill_name;
             $income->bill_final_value = $bill_final_value;
             $income->total = collect($licenses)->sum('total');
@@ -418,7 +427,9 @@ trait incomes_trait
                 $income_license->tax_id = $item['tax_id'];
                 $income_license->tax_name = $item['tax_name'];
                 $income_license->tax_value = ($item['tax_value'] == null || $item['tax_value'] == '') ? 0 : $item['tax_value'];
-                $income_license->description = $item['description'];
+                $itemDescriptionHtml = SanitizedHtml::clean($item['description_html'] ?? $item['description'] ?? '');
+                $income_license->description = SanitizedHtml::plainText($itemDescriptionHtml);
+                $income_license->description_html = $itemDescriptionHtml !== '' ? $itemDescriptionHtml : null;
                 $income_license->total = $item['total'];
                 $income_license->hours = $item['hours'];
                 $income_license->save();
@@ -701,6 +712,40 @@ trait incomes_trait
      */
     public function Income_CreateSiigoInvoice($income, bool $markAsPaid = false)
     {
+        if ((int) $income->state < 2) {
+            return [
+                'status' => 0,
+                'message' => 'Solo se pueden facturar ingresos aprobados, pagados o facturados',
+                'data' => null,
+            ];
+        }
+
+        $client = $income->client ?: client::find($income->client_id);
+        if (!$client) {
+            return [
+                'status' => 0,
+                'message' => 'El cliente del ingreso no existe',
+                'data' => null,
+            ];
+        }
+        if (!$client->isReadyForSiigo()) {
+            return [
+                'status' => 0,
+                'message' => 'Completa la información del cliente antes de sincronizarlo con Siigo',
+                'data' => ['missing_fields' => $client->siigo_missing_fields],
+            ];
+        }
+        if (empty($client->siigo_id)) {
+            $syncResponse = $this->Client_SyncToSiigoIfReady($client);
+            if ($syncResponse['status'] == 0) {
+                return [
+                    'status' => 0,
+                    'message' => $syncResponse['message'],
+                    'data' => $syncResponse,
+                ];
+            }
+        }
+
         $licenses = $this->Income_GetIncomeLicenses($income->id)['data'];
         $items = [];
         foreach ($licenses as $license) {

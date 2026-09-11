@@ -41,6 +41,13 @@ class jira_controller extends Controller
                 ->count(),
             'projects' => jira_project::query()->with(['clients', 'licenses'])->orderBy('name')->get(),
             'jiraUsers' => jira_user::query()->with('mapping')->orderBy('display_name')->get(),
+            'jiraStatuses' => jira_issue::query()
+                ->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', ['story', 'user story', 'historia', 'historia de usuario'])
+                ->whereNotNull('status')
+                ->where('status', '<>', '')
+                ->distinct()
+                ->orderBy('status')
+                ->pluck('status'),
             'reports' => jira_report::query()->with(['creator', 'project', 'epic'])->latest('updated_at')->limit(25)->get(),
         ]);
     }
@@ -83,6 +90,11 @@ class jira_controller extends Controller
     public function dashboard_data(Request $request): JsonResponse
     {
         return $this->jiraJson(fn (): array => $this->Jira_DashboardData($request));
+    }
+
+    public function update_issue_hours(Request $request): JsonResponse
+    {
+        return $this->jiraJson(fn (): array => $this->Jira_UpdateIssueHours($request));
     }
 
     public function reports_data(Request $request): JsonResponse

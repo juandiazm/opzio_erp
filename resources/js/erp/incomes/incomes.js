@@ -7,6 +7,7 @@ import * as incomeImport from './import.js';
 import * as advances from './advances.js';
 import * as goals from './goals.js';
 import { goToIncomesTraceability } from './shared.js';
+import { initRichTextEditors, initializeRichTextEvents } from './rich-text.js';
 
 function changeTab(){
     incomeState.currentTab = $('#nav-tab .active').attr('id');
@@ -49,6 +50,7 @@ $(document).on('click', '.update-license-button', create.updateLicenseItem);
 $(document).on('change', '.input-timely-payment', create.changeTimelyPayment);
 $(document).on('click', '#create-income-button', create.createIncome);
 $(document).on('click', '#update-income-button', update.updateIncome);
+$(document).on('click', '#toggle-income-header', update.toggleIncomeHeader);
 $(document).on('click', '#view-income-document', order.showIncomeOrder);
 $(document).on('click', '#print-income-button', order.printPdf);
 $(document).on('click', '#pay-state-btn', update.changePayState);
@@ -100,6 +102,8 @@ $(document).ready(function(){
         window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
     }
     order.init();
+    initializeRichTextEvents();
+    initRichTextEditors(document);
     goals.initializeGoalForm();
     changeTab();
 });

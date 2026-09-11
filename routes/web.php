@@ -197,6 +197,7 @@ Route::prefix('admin')->group(function () {
             Route::post('relations/user', [jira_controller::class, 'save_user_mapping']);
             Route::post('relations/epic-license', [jira_controller::class, 'save_epic_license']);
             Route::post('dashboard/data', [jira_controller::class, 'dashboard_data']);
+            Route::post('dashboard/issue-hours', [jira_controller::class, 'update_issue_hours']);
             Route::get('reports/data', [jira_controller::class, 'reports_data']);
             Route::post('reports/generate', [jira_controller::class, 'generate_report']);
             Route::get('reports/{uniqueId}/pdf', [jira_controller::class, 'download_report_pdf']);

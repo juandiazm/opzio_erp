@@ -1002,7 +1002,7 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-CvhzM9SB.js",
+    "file": "assets/incomes-DiIIVF4z.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
@@ -1050,7 +1050,7 @@
     ]
   },
   "resources/js/erp/jira/jira.js": {
-    "file": "assets/jira-1MvQLMCU.js",
+    "file": "assets/jira-mkUl2M_N.js",
     "name": "jira",
     "src": "resources/js/erp/jira/jira.js",
     "isEntry": true
@@ -1646,12 +1646,12 @@
     "isEntry": true
   },
   "resources/sass/erp/incomes/incomes.scss": {
-    "file": "assets/incomes-D8OuC16a.css",
+    "file": "assets/incomes-DCt4TY09.css",
     "src": "resources/sass/erp/incomes/incomes.scss",
     "isEntry": true
   },
   "resources/sass/erp/jira/jira.scss": {
-    "file": "assets/jira-B9jOPb2k.css",
+    "file": "assets/jira-D1QBCRnx.css",
     "src": "resources/sass/erp/jira/jira.scss",
     "isEntry": true
   },

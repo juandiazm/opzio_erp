@@ -29,7 +29,9 @@ class JiraModuleTest extends TestCase
             $table->id();
             $table->string('name');
             $table->string('lastname')->nullable();
+            $table->string('photo')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
         Schema::create('clients', function (Blueprint $table): void {
             $table->id();
@@ -42,7 +44,9 @@ class JiraModuleTest extends TestCase
             $table->id();
             $table->string('name');
             $table->string('last_name')->nullable();
+            $table->string('photo')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
         Schema::create('licenses', function (Blueprint $table): void {
             $table->id();
@@ -52,6 +56,10 @@ class JiraModuleTest extends TestCase
         });
         Artisan::call('migrate', [
             '--path' => database_path('migrations/2026_09_08_000001_create_jira_module_tables.php'),
+            '--realpath' => true,
+        ]);
+        Artisan::call('migrate', [
+            '--path' => database_path('migrations/2026_09_10_000002_add_local_story_point_hours_to_jira.php'),
             '--realpath' => true,
         ]);
     }
@@ -134,26 +142,76 @@ class JiraModuleTest extends TestCase
         $this->assertTrue($result['ok']);
         $this->assertDatabaseHas('jira_projects', ['project_key' => 'OPS']);
         $this->assertDatabaseHas('jira_issues', ['issue_key' => 'OPS-1', 'story_points' => 5.5]);
+        $this->assertDatabaseHas('jira_issues', ['issue_key' => 'OPS-1', 'estimated_hours' => 5.5, 'estimated_hours_manual' => 0]);
         $this->assertDatabaseHas('jira_issue_worklogs', ['external_id' => '30001', 'time_spent_seconds' => 7200]);
         $this->assertDatabaseHas('jira_issue_changelogs', ['external_history_id' => '40001', 'field' => 'status']);
         $this->assertSame('active', $connection->fresh()->status);
+
+        $jiraUser = $connection->users()->where('account_id', 'jira-user-1')->firstOrFail();
+        $employee = new \App\Models\employee();
+        $employee->name = 'Ana';
+        $employee->last_name = 'ERP';
+        $employee->photo = 'ana.webp';
+        $employee->save();
+        $jiraUser->mapping()->create(['employee_id' => $employee->id, 'mapping_source' => 'manual']);
 
         $metrics = app(jira_metrics_service::class)->dashboard([
             'from' => '2026-09-01',
             'to' => '2026-09-08',
         ]);
         $this->assertSame(5.5, $metrics['summary']['story_points']);
+        $this->assertSame(5.5, $metrics['summary']['estimated_hours']);
         $this->assertSame(2.0, $metrics['summary']['worklog_hours']);
         $this->assertSame(1, $metrics['summary']['completed_issues']);
         $this->assertSame('Operacion', $metrics['projects'][0]['label']);
+        $this->assertSame(url('storage/images/erp/employees/ana.webp'), $metrics['issues'][0]['assignee_avatar']);
+        $this->assertSame(url('storage/images/erp/employees/ana.webp'), $metrics['users'][0]['avatar']);
+        $this->assertSame('Operacion', $metrics['users'][0]['top_project']['label']);
+        $this->assertSame(5.5, $metrics['users'][0]['top_project']['story_points']);
+
+        $jiraUser->update(['avatar_url' => 'https://jira.example.test/avatar.png']);
+        $jiraMetricsWithAvatar = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-08',
+        ]);
+        $this->assertSame(url('storage/images/erp/employees/ana.webp'), $jiraMetricsWithAvatar['issues'][0]['assignee_avatar']);
+        $this->assertSame(url('storage/images/erp/employees/ana.webp'), $jiraMetricsWithAvatar['users'][0]['avatar']);
+
+        $erpUser = new \App\Models\user();
+        $erpUser->name = 'Ana';
+        $erpUser->lastname = 'Usuario';
+        $erpUser->photo = 'ana-user.webp';
+        $erpUser->save();
+        $jiraUser->mapping()->update(['employee_id' => null, 'user_id' => $erpUser->id]);
+        $employee->photo = null;
+        $employee->save();
+        $jiraMetricsWithUserPhoto = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-08',
+        ]);
+        $this->assertSame(url('storage/images/erp/users/ana-user.webp'), $jiraMetricsWithUserPhoto['issues'][0]['assignee_avatar']);
+        $this->assertSame(url('storage/images/erp/users/ana-user.webp'), $jiraMetricsWithUserPhoto['users'][0]['avatar']);
+
+        $erpUser->photo = null;
+        $erpUser->save();
+        $jiraMetricsWithJiraFallback = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-08',
+        ]);
+        $this->assertSame('https://jira.example.test/avatar.png', $jiraMetricsWithJiraFallback['issues'][0]['assignee_avatar']);
+        $this->assertSame('https://jira.example.test/avatar.png', $jiraMetricsWithJiraFallback['users'][0]['avatar']);
+
+        $defaultMetrics = app(jira_metrics_service::class)->dashboard();
+        $this->assertSame(now()->startOfMonth()->toDateString(), $defaultMetrics['filters']['from']);
 
         $ongoingIssue = $connection->projects()->first()->issues()->create([
             'jira_connection_id' => $connection->id,
             'external_id' => '20002',
             'issue_key' => 'OPS-2',
-            'issue_type' => 'Task',
+            'issue_type' => 'Story',
             'summary' => 'Trabajo en curso',
             'status' => 'In Progress',
+            'jira_updated_at' => '2026-09-06 10:00:00',
         ]);
         $ongoingIssue->worklogs()->create([
             'jira_connection_id' => $connection->id,
@@ -166,12 +224,76 @@ class JiraModuleTest extends TestCase
             'to' => '2026-09-08',
         ]);
         $this->assertSame(1, $updatedMetrics['summary']['completed_issues']);
+        $this->assertSame(2, $updatedMetrics['summary']['story_issues']);
         $this->assertSame(4.0, $updatedMetrics['summary']['worklog_hours']);
+
+        $filteredMetrics = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-08',
+            'statuses' => ['In Progress'],
+        ]);
+        $this->assertSame(1, $filteredMetrics['summary']['story_issues']);
+        $this->assertSame('OPS-2', $filteredMetrics['issues'][0]['key']);
+
+        $multiStatusMetrics = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-08',
+            'statuses' => ['Done', 'In Progress'],
+        ]);
+        $this->assertSame(2, $multiStatusMetrics['summary']['story_issues']);
+
+        $multiRelationMetrics = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-08',
+            'project_ids' => [$connection->projects()->firstOrFail()->id],
+            'user_ids' => [$jiraUser->id],
+        ]);
+        $this->assertSame(1, $multiRelationMetrics['summary']['story_issues']);
 
         app(jira_sync_service::class)->sync($connection->fresh(), 30);
         $this->assertDatabaseCount('jira_projects', 1);
         $this->assertDatabaseCount('jira_issues', 2);
         $this->assertDatabaseCount('jira_issue_worklogs', 2);
+    }
+
+    public function test_local_story_point_multiplier_and_manual_hours_override(): void
+    {
+        $connection = jira_connection::create([
+            'name' => 'Jira horas locales',
+            'site_url' => 'https://demo.atlassian.net',
+            'provider' => 'jira_cloud',
+            'status' => 'active',
+            'credentials' => ['email' => 'robot@example.test', 'api_token' => 'secret-token'],
+        ]);
+        $project = $connection->projects()->create([
+            'external_id' => '10002',
+            'project_key' => 'HRS',
+            'name' => 'Horas locales',
+            'status' => 'active',
+            'story_point_hours_multiplier' => 2.5,
+        ]);
+        $issue = $project->issues()->create([
+            'jira_connection_id' => $connection->id,
+            'external_id' => '20010',
+            'issue_key' => 'HRS-1',
+            'issue_type' => 'Story',
+            'summary' => 'Historia estimada localmente',
+            'story_points' => 4,
+            'estimated_hours' => 10,
+            'estimated_hours_manual' => false,
+            'jira_created_at' => '2026-09-05 10:00:00',
+        ]);
+
+        $metrics = app(jira_metrics_service::class)->dashboard(['from' => '2026-09-01', 'to' => '2026-09-08']);
+        $this->assertSame(10.0, $metrics['summary']['estimated_hours']);
+        $this->assertSame(10.0, $metrics['issues'][0]['estimated_hours']);
+
+        $issue->update(['estimated_hours' => 7.25, 'estimated_hours_manual' => true]);
+        $project->update(['story_point_hours_multiplier' => 4]);
+        $metrics = app(jira_metrics_service::class)->dashboard(['from' => '2026-09-01', 'to' => '2026-09-08']);
+
+        $this->assertSame(7.25, $metrics['summary']['estimated_hours']);
+        $this->assertTrue($metrics['issues'][0]['estimated_hours_manual']);
     }
 
     public function test_it_marks_invalid_credentials_as_failed_without_exposing_the_token(): void

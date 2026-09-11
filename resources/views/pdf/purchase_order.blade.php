@@ -398,10 +398,11 @@
                     $maxLines = 1;
                     
                     // La descripción es el campo que más puede crecer
-                    if (!empty($license['description'])) {
+                    $licenseDescription = $license['description_html'] ?? $license['description'] ?? '';
+                    if (!empty($licenseDescription)) {
                         // Considerando que la descripción tiene un ancho aproximado de ~400-500px
                         // y el font-size es 13px, estimamos ~60-70 caracteres por línea
-                        $descriptionText = strip_tags($license['description']);
+                        $descriptionText = strip_tags($licenseDescription);
                         $descLines = ceil(strlen($descriptionText) / 65);
                         $maxLines = max($maxLines, $descLines);
                     }
@@ -493,7 +494,7 @@
                         <p>Dir: {{ $Data['client']['address'] }}</p>
                         <p>Tel: {{ $Data['client']['phone'] }}</p>
                         <p>Email: {{ $Data['client']['email'] }}</p>
-                        <p>{{ $Data['client']['country']['name'] }}</p>
+                        <p>{{ data_get($Data['client'], 'country.name', '') }}</p>
                     </div>
                     <div id="qr-container">
                         <a href="{{ $Data['income']['url'] }}">
@@ -546,7 +547,7 @@
                                             <br>
                                             @endif
                                             <p>
-                                            {!! $license['description'] !!}
+                                            {!! \App\Support\SanitizedHtml::clean($license['description_html'] ?? $license['description'] ?? '') !!}
                                             </p>
                                         </td>
                                         @if($tax_flag)<td class="text-center">{{ ($license['tax_value']==0?'':($license['tax_name'].'('.($license['tax_value']*100).'%)')) }}</td>@endif
@@ -580,9 +581,10 @@
                     </div>
                     @endif
                 </div>
-                @if( $Data['income']['description'] != null && $Data['income']['description'] != '')
+                @php($income_description = $Data['income']['description_html'] ?? $Data['income']['description'] ?? '')
+                @if($income_description != null && $income_description != '')
                 <div id="order-description">
-                    <p>{!! $Data['income']['description'] !!}
+                    <p>{!! \App\Support\SanitizedHtml::clean($income_description) !!}</p>
                 </div>
                 @endif
                 <div id="feed-container">

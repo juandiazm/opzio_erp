@@ -358,9 +358,13 @@ class jira_sync_service
             'story_points_field' => $settings['story_points_field'] ?? null,
             'epic_link_field' => $settings['epic_link_field'] ?? null,
         ];
-        $issue = jira_issue::updateOrCreate(
-            ['jira_connection_id' => $connection->id, 'external_id' => (string) ($payload['id'] ?? $payload['key'])],
-            [
+        $issue = jira_issue::firstOrNew([
+            'jira_connection_id' => $connection->id,
+            'external_id' => (string) ($payload['id'] ?? $payload['key']),
+        ]);
+        $wasManualHours = (bool) $issue->estimated_hours_manual;
+        $storyPoints = $this->numeric($this->fieldValue($fields, $settings['story_points_field'] ?? null));
+        $issue->fill([
                 'jira_project_id' => $project->id,
                 'issue_key' => (string) ($payload['key'] ?? ''),
                 'issue_type' => $issueTypeName,
@@ -370,7 +374,7 @@ class jira_sync_service
                 'priority' => data_get($fields, 'priority.name'),
                 'assignee_jira_user_id' => $assignee?->id,
                 'reporter_jira_user_id' => $reporter?->id,
-                'story_points' => $this->numeric($this->fieldValue($fields, $settings['story_points_field'] ?? null)),
+                'story_points' => $storyPoints,
                 'original_estimate_seconds' => $fields['timeoriginalestimate'] ?? null,
                 'time_spent_seconds' => $fields['timespent'] ?? null,
                 'jira_created_at' => $this->date($fields['created'] ?? null),
@@ -381,10 +385,21 @@ class jira_sync_service
                 'components' => collect((array) ($fields['components'] ?? []))->pluck('name')->filter()->values()->all(),
                 'sprints' => $this->sprints($fields['customfield_10020'] ?? []),
                 'raw_fields' => $rawFields,
-            ],
-        );
+            ]);
+        if (! $wasManualHours && $this->isUserStoryType($issueTypeName)) {
+            $issue->estimated_hours = $storyPoints === null
+                ? null
+                : round($storyPoints * (float) ($project->story_point_hours_multiplier ?? 1), 2);
+            $issue->estimated_hours_manual = false;
+        }
+        $issue->save();
 
         return $issue;
+    }
+
+    private function isUserStoryType(?string $issueType): bool
+    {
+        return in_array(strtolower(trim((string) $issueType)), ['story', 'user story', 'historia', 'historia de usuario'], true);
     }
 
     private function syncIssueDetails(jira_client $client, jira_connection $connection, jira_issue $issue, array &$userIds): array

@@ -1,6 +1,16 @@
 import { incomeState } from './state.js';
 import { renderEntityAvatar } from '../shared/list.js';
 
+function renderSiigoAction(income, client){
+    if(income.siigo_invoice_url) return '<a href="'+income.siigo_invoice_url+'" target="_blank" title="Ver factura electrónica"><i class="fa-solid fa-file-invoice text-primary"></i></a>';
+    if(Number(income.state) < 2) return '<span class="text-muted" title="La factura estará disponible cuando el ingreso sea aprobado"><i class="fa-solid fa-clock"></i></span>';
+    if(!client || !client.siigo_ready){
+        const missing = client && client.siigo_missing_fields ? client.siigo_missing_fields.join(', ') : 'datos del cliente';
+        return '<span class="text-warning" title="Completa: '+missing+'"><i class="fa-solid fa-user-clock"></i></span>';
+    }
+    return '<a href="javascript:void(0)" onclick="window.createSiigoInvoice('+income.id+')" title="Crear factura electrónica"><i class="fa-solid fa-file-circle-plus text-success"></i></a>';
+}
+
 export function showPagination(){
     let paginationContainer = $('#db-pagination');
     paginationContainer.empty();
@@ -70,7 +80,7 @@ export function showIncomesPage(response){
         appendedContent += '<td class="columns-identity text-start erp-identity-cell" title="'+value.unique_id+'"><div class="erp-identity">'+renderEntityAvatar(associatedClient, 'clients')+'<div class="erp-identity-copy"><p class="erp-identity-name" title="'+value.client_name+'">'+value.client_name+'</p><span class="erp-identity-meta"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.unique_id+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.unique_id.substr(value.unique_id.length - 5)+'</span></span></div></div></td>';
         appendedContent += '<td class="columns-cycle text-center"><div class="erp-meta-stack"><span>Pago O.: '+value.timely_payment+'</span><small>Corte: '+value.cutoff_date+'</small></div></td>';
         appendedContent += '<td class="columns-total text-end" title="'+value.total+'"><p>$'+value.total.toLocaleString('es-CO')+'</p></td>';
-        appendedContent += '<td class="columns-bill text-center"><div class="erp-meta-stack erp-bill-meta"><span>'+(value.bill_name == null ? '-' : value.bill_name)+'</span><span>'+(value.siigo_invoice_url ? '<a href="'+value.siigo_invoice_url+'" target="_blank" title="Ver factura electrónica"><i class="fa-solid fa-file-invoice text-primary"></i></a>' : '<a href="javascript:void(0)" onclick="window.createSiigoInvoice('+value.id+')" title="Crear factura electrónica"><i class="fa-solid fa-file-circle-plus text-success"></i></a>')+'</span></div></td>';
+        appendedContent += '<td class="columns-bill text-center"><div class="erp-meta-stack erp-bill-meta"><span>'+(value.bill_name == null ? '-' : value.bill_name)+'</span><span>'+renderSiigoAction(value, associatedClient)+'</span></div></td>';
         appendedContent += '<td class="columns-created-at text-center"><p>'+value.created_at_string+'</p></td>';
         appendedContent += '<td class="columns-state text-center"><span class="erp-status status-state-'+value.state+'"><span class="erp-status-label">'+value.state_text+'</span></span></td><td class="columns-actions text-end action-cell">';
         if(value.payment_state != 1 && value.state != 1) appendedContent += '<i class="fa-regular fa-link copy-action me-1 list-pay-link" data-clipboard-text="'+window.location.origin+'/client/payments/pay/'+value.unique_id+'"></i>';
@@ -119,6 +129,6 @@ export function restoreIncome(incomeId){
 
 export function createSiigoInvoice(incomeId){
     swallMessage('¿Crear factura electrónica?', '¿Está seguro que desea crear una factura electrónica para este ingreso?', 'warning', 'Sí, crear', 'Cancelar', null, function(){
-        $.ajax({url: 'incomes/create-siigo-invoice', type: 'POST', data: {income_id: incomeId, _token: $('meta[name="csrf-token"]').attr('content')}, success: function(){ swallMessage('Exitoso', 'Factura electrónica creada exitosamente', 'success', null, null, 3000, null, null); getIncomesPage(); }, error: function(xhr){ console.error('Error:', xhr); swallMessage('Error', 'Error al crear la factura electrónica', 'error', null, null, 3000, null, null); }});
+        $.ajax({url: 'incomes/create-siigo-invoice', type: 'POST', data: {income_id: incomeId, _token: $('meta[name="csrf-token"]').attr('content')}, success: function(){ swallMessage('Exitoso', 'Factura electrónica creada exitosamente', 'success', null, null, 3000, null, null); getIncomesPage(); }, error: function(xhr){ const response = xhr.responseJSON || {}; const missing = response.data && response.data.missing_fields ? '<br><br>Falta: '+response.data.missing_fields.join(', ') : ''; swallMessage('No se puede facturar', (response.message || 'Error al crear la factura electrónica')+missing, 'warning', null, null, 5000, null, null); }});
     }, null);
 }

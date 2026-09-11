@@ -45,6 +45,45 @@ trait clients_trait
         return $base.': '.$message;
     }
 
+    public function Client_SyncToSiigoIfReady(client $client){
+        if(!$client->isReadyForSiigo()){
+            return [
+                'status' => 0,
+                'deferred' => true,
+                'message' => 'El cliente aún no tiene la información mínima para Siigo',
+                'missing_fields' => $client->siigo_missing_fields,
+            ];
+        }
+        if(!empty($client->siigo_id)){
+            return [
+                'status' => 1,
+                'message' => 'El cliente ya está sincronizado con Siigo',
+                'data' => ['id' => $client->siigo_id],
+            ];
+        }
+
+        $siigoResponse = $this->SiigoNew_AddClient(
+            $client->identification,
+            $client->name,
+            $client->lastname,
+            $client->email,
+            $client->phone,
+            $client->address,
+            true
+        );
+        if($siigoResponse['status'] == 1 && isset($siigoResponse['data']['id'])){
+            $client->siigo_id = $siigoResponse['data']['id'];
+            $client->save();
+            return $siigoResponse;
+        }
+
+        return [
+            'status' => 0,
+            'message' => $this->Client_FormatSiigoSyncError($client->id, $siigoResponse),
+            'data' => [],
+        ];
+    }
+
     private $MULTIMEDIA_DIRECTORY = 'clients';
     public function Client_AddClient(
         $verified
@@ -96,29 +135,13 @@ trait clients_trait
             }
             $client->active = $active;
 
-            // Crear cliente en Siigo
-            // Asegurarnos de que el nombre y apellido sean válidos para Siigo
-            $nameForSiigo = trim((string)$name);
-            $lastnameForSiigo = trim((string)$lastname);
-            
-            $siigoResponse = $this->SiigoNew_AddClient(
-                $identification,
-                $nameForSiigo,
-                $lastnameForSiigo,
-                $email,
-                $phone,
-                $address,
-                true // IVAMandatory
-            );
-            
-            if ($siigoResponse['status'] == 1) {
-                $siigo_id = $siigoResponse['data']['id'];
-                $client->siigo_id = $siigo_id;
-            } else {
-                info('Error creating client in Siigo: ' . json_encode($siigoResponse));
-            }
-
             $client->save();
+            if($client->isReadyForSiigo()){
+                $siigoResponse = $this->Client_SyncToSiigoIfReady($client);
+                if($siigoResponse['status'] == 0){
+                    info('Error creating client in Siigo: '.json_encode($siigoResponse));
+                }
+            }
 
             //get country data
             $client->country = country::where('id', $client->country_id)->first();
@@ -301,6 +324,12 @@ trait clients_trait
                 $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $client->photo, $oldPhoto);
             }
             $client->save();
+            if($client->isReadyForSiigo() && empty($client->siigo_id)){
+                $siigoResponse = $this->Client_SyncToSiigoIfReady($client);
+                if($siigoResponse['status'] == 0){
+                    info('Error synchronizing updated client in Siigo: '.json_encode($siigoResponse));
+                }
+            }
             return [
                 'status' => 1,
                 'message' => 'cliente actualizado'
@@ -343,6 +372,12 @@ trait clients_trait
                 $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $client->photo, $oldPhoto);
             }
             $client->save();
+            if($client->isReadyForSiigo() && empty($client->siigo_id)){
+                $siigoResponse = $this->Client_SyncToSiigoIfReady($client);
+                if($siigoResponse['status'] == 0){
+                    info('Error synchronizing profile-updated client in Siigo: '.json_encode($siigoResponse));
+                }
+            }
             Session::forget('client_user');
             return [
                 'status' => 1,
@@ -865,24 +900,13 @@ trait clients_trait
 
             foreach ($clients as $client) {
                 try {
-                    if(trim((string)$client->identification) === ''){
-                        $errors[] = "Error al sincronizar cliente {$client->id}: identificación vacía";
+                    if(!$client->isReadyForSiigo()){
+                        $errors[] = "Cliente {$client->id} pendiente: falta ".implode(', ', $client->siigo_missing_fields);
                         continue;
                     }
 
-                    $siigoResponse = $this->SiigoNew_AddClient(
-                        $client->identification,
-                        $client->name,
-                        $client->lastname,
-                        $client->email,
-                        $client->phone,
-                        $client->address,
-                        true
-                    );
-
-                    if ($siigoResponse['status'] == 1 && isset($siigoResponse['data']['id'])) {
-                        $client->siigo_id = $siigoResponse['data']['id'];
-                        $client->save();
+                    $siigoResponse = $this->Client_SyncToSiigoIfReady($client);
+                    if ($siigoResponse['status'] == 1) {
                         $syncedCount++;
                     } else {
                         $errors[] = $this->Client_FormatSiigoSyncError($client->id, $siigoResponse);
