@@ -46,6 +46,12 @@ node -e 'const path = require.resolve("puppeteer"); if (!path) process.exit(1); 
 
 current_link="${app_dir}/node_modules"
 next_link="${app_dir}/.node_modules.next"
+release_retention_count="${OPZIO_NODE_RELEASE_RETENTION_COUNT:-5}"
+release_grace_seconds="${OPZIO_NODE_RELEASE_GRACE_SECONDS:-86400}"
+
+[[ "${release_retention_count}" =~ ^[2-9][0-9]*$ ]] || { echo "OPZIO_NODE_RELEASE_RETENTION_COUNT must be an integer greater than or equal to 2." >&2; exit 1; }
+[[ "${release_grace_seconds}" =~ ^[0-9]+$ ]] || { echo "OPZIO_NODE_RELEASE_GRACE_SECONDS must be a non-negative integer." >&2; exit 1; }
+
 rm -f "${next_link}"
 ln -s "${node_modules_path}" "${next_link}"
 
@@ -60,13 +66,25 @@ else
     rm -rf "${legacy_dir:-}"
 fi
 
+active_node_modules_path="$(readlink -f "${current_link}")"
+[[ -d "${active_node_modules_path}" ]] || { echo "The active node_modules link is invalid." >&2; exit 1; }
+NODE_PATH="${active_node_modules_path}" \
+PUPPETEER_CACHE_DIR="${puppeteer_cache_dir}" \
+node -e 'const path = require.resolve("puppeteer"); if (!path) process.exit(1); console.log(`Active Puppeteer resolved at ${path}`);'
+[[ -f "${active_node_modules_path}/puppeteer/package.json" ]] || { echo "puppeteer is missing from the active node_modules release." >&2; exit 1; }
+
+active_release_dir="$(dirname "${active_node_modules_path}")"
+current_timestamp="$(date +%s)"
 mapfile -t old_releases < <(
     find "${runtime_dir}/releases" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
         | sort -nr \
-        | tail -n +3 \
+        | tail -n "+$((release_retention_count + 1))" \
         | cut -d' ' -f2-
 )
 for old_release in "${old_releases[@]}"; do
+    [[ "${old_release}" == "${active_release_dir}" ]] && continue
+    release_timestamp="$(stat -c '%Y' "${old_release}")"
+    (( current_timestamp - release_timestamp < release_grace_seconds )) && continue
     rm -rf -- "${old_release}"
 done
 
