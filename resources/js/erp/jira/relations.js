@@ -92,7 +92,6 @@ export async function initializeJiraRelations(root) {
 	const clientSearch = projectForm.querySelector('[data-jira-client-search]');
 	const licenseSearch = projectForm.querySelector('[data-jira-license-search]');
 	const projectSaveState = projectForm.closest('.jira-panel').querySelector('[data-jira-project-save-state]');
-	const hoursMultiplierInput = projectForm.querySelector('[data-jira-hours-multiplier]');
 	const contextState = root.querySelector('[data-jira-context-state]');
 	const contextSummary = root.querySelector('[data-jira-context-summary]');
 
@@ -162,7 +161,6 @@ export async function initializeJiraRelations(root) {
 		contextSummary.querySelector('[data-jira-context-licenses]').textContent = project.license_ids.length;
 		contextSummary.querySelector('[data-jira-context-epics]').textContent = (relationData.epics || []).filter((epic) => String(epic.jira_project_id) === String(project.id)).length;
 		projectIdInput.value = project.id;
-		hoursMultiplierInput.value = Number(project.story_point_hours_multiplier || 1).toFixed(2);
 		renderChoiceList(clientList, relationData.clients, project.client_ids, 'client', 'No hay clientes activos en el ERP.');
 		renderLicenseChoices(project);
 		renderEpics(project);
@@ -175,7 +173,6 @@ export async function initializeJiraRelations(root) {
 			if (event.target.matches('[data-relation-choice="client"]')) renderLicenseChoices(projectById().get(String(contextSelect.value)));
 		});
 		licenseList.addEventListener('change', updateCounts);
-		hoursMultiplierInput.addEventListener('input', () => { projectSaveState.textContent = 'Cambios listos para guardar'; });
 		clientSearch.addEventListener('input', () => filterChoices(clientList, clientSearch.value));
 		licenseSearch.addEventListener('input', () => filterChoices(licenseList, licenseSearch.value));
 		employeeSearch.addEventListener('input', () => renderEmployeeRows(employeeSearch.value));

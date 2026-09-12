@@ -1,4 +1,5 @@
 import { employeeState } from './state.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 
 export function DBshowPagination(){
     let paginationContainer = $('#db-pagination');
@@ -81,21 +82,22 @@ export function DBselectNextPage(){
     }
 }
 
-export function getEmployeesPage(){
+export function getEmployeesPage(onLoaded, recordId = null){
     let dataSend = {
         pagination: employeeState.dbPagination,
         search: $('#search-list-input').val()
     };
-    PostMethodFunction('/admin/employees/get-page',dataSend,null, showEmployeesPage,null);
+    PostMethodFunction('/admin/employees/get-page',dataSend,null,function(response){ showEmployeesPage(response, onLoaded, recordId); },null);
 }
 
 export function goToUpdateTab(row, onLoaded){
     let employeeId = $(row).parent().parent().attr('employee-id');
     employeeState.currentEmployee = employeeState.employees.find(employee => employee.id == employeeId);
     if(employeeState.currentEmployee != null){
-        $('#nav-update-tab').tab('show');
+        setUpdateRecordId(employeeState.currentEmployee.uid || employeeState.currentEmployee.id);
+        $('#nav-update-tab').removeClass('d-none').tab('show');
         $('#nav-update-tab').trigger('click');
-        onLoaded();
+        if(onLoaded) onLoaded();
     }
 }
 
@@ -105,7 +107,7 @@ export function setCurrentEmployeeFromRow(row){
     return employeeState.currentEmployee;
 }
 
-function showEmployeesPage(response){
+function showEmployeesPage(response, onLoaded, recordId){
     employeeState.dbPagination = response.pagination;
     employeeState.employees = response.data;
     let appendContent = '';
@@ -145,4 +147,13 @@ function showEmployeesPage(response){
     });
     $('#employee-list-table #employee-list-table-body').empty().append(appendContent);
     DBshowPagination();
+    if(recordId != null){
+        employeeState.currentEmployee = employeeState.employees.find(employee => String(employee.uid) === String(recordId) || String(employee.id) === String(recordId));
+        if(employeeState.currentEmployee != null){
+            employeeState.tabsView['nav-update-tab'] = false;
+            $('#nav-update-tab').removeClass('d-none').tab('show');
+            $('#nav-update-tab').trigger('click');
+            if(onLoaded) onLoaded();
+        }
+    }
 }

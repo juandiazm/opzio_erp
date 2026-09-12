@@ -1,4 +1,5 @@
 import { clientState } from './state.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 
 export function DBshowPagination(){
     let paginationContainer = $('#db-pagination');
@@ -83,25 +84,26 @@ export function DBselectNextPage(){
     }
 }
 
-export function getClientsPage(){
+export function getClientsPage(onLoaded, recordId = null){
     let dataSend = {
         pagination: clientState.dbPagination,
         search: $('#search-list-input').val()
     };
-    PostMethodFunction('/admin/clients/get-page',dataSend,null, showClientsPage,null);
+    PostMethodFunction('/admin/clients/get-page',dataSend,null,function(response){ showClientsPage(response, onLoaded, recordId); },null);
 }
 
 export function goToUpdateTab(row, onLoaded){
     let clientId = $(row).parent().parent().attr('client-id');
     clientState.currentClient = clientState.clients.find(client => client.id == clientId);
     if(clientState.currentClient != null){
-        $('#nav-update-tab').tab('show');
+        setUpdateRecordId(clientState.currentClient.unique_id || clientState.currentClient.id);
+        $('#nav-update-tab').removeClass('d-none').tab('show');
         $('#nav-update-tab').trigger('click');
-        onLoaded();
+        if(onLoaded) onLoaded();
     }
 }
 
-function showClientsPage(response){
+function showClientsPage(response, onLoaded, recordId){
     clientState.dbPagination = response.pagination;
     clientState.clients = response.data;
     let appendContent = '';
@@ -129,4 +131,13 @@ function showClientsPage(response){
     });
     $('#client-list-table #client-list-table-body').empty().append(appendContent);
     DBshowPagination();
+    if(recordId != null){
+        clientState.currentClient = clientState.clients.find(client => String(client.unique_id) === String(recordId) || String(client.id) === String(recordId));
+        if(clientState.currentClient != null){
+            clientState.tabsView['nav-update-tab'] = false;
+            $('#nav-update-tab').removeClass('d-none').tab('show');
+            $('#nav-update-tab').trigger('click');
+            if(onLoaded) onLoaded();
+        }
+    }
 }

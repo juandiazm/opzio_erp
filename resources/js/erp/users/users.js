@@ -14,6 +14,7 @@ import { getAllUserPermissions } from './permissions.js';
 import * as list from './list.js';
 import { getUserNextId, loadCreateImageBorder, createUser } from './create.js';
 import * as update from './update.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function showCurrentUser(){
     update.showCurrentUser();
@@ -34,6 +35,7 @@ function changeTab(){
         }
     }else if(userState.currentTab == 'nav-update-tab'){
         $('#nav-update-tab').removeClass('d-none');
+        if(userState.currentUser) setUpdateRecordId(userState.currentUser.id);
     }
     userState.tabsView[userState.currentTab] = true;
 }
@@ -65,6 +67,11 @@ $(document).on('click', '#update-user-go-traceability',function(){
 });
 
 $(document).ready(function(){
+    const recordId = getUpdateRecordId(['user_id']);
+    if(recordId != null){
+        userState.userId = recordId;
+        setUpdateRecordId(recordId, ['user_id']);
+    }
     getAllUserPermissions(showCurrentUser);
     changeTab();
 });

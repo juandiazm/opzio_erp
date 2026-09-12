@@ -7,20 +7,33 @@ import { addClientDocument, updateClientDocument, deleteClientDocument } from '.
 import { goToLicense } from './licenses.js';
 import { addClientUser, restoreClientUserPassword, deleteClientUser, restoreClientUser, goToUserTraceability } from './users.js';
 import { initSync } from './sync.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function showCurrentClient(){
     update.showCurrentClient();
+}
+
+function loadClientFromUrl(){
+    const recordId = clientState.urlRecordId;
+    if(recordId == null) return false;
+    clientState.urlRecordId = null;
+    clientState.dbPagination.page = 1;
+    $('#search-list-input').val(recordId);
+    list.getClientsPage(showCurrentClient, recordId);
+    return true;
 }
 
 function changeTab(){
     let tab = $('#nav-tab .active').attr('id');
     if(tab!='nav-update-tab') $('#nav-update-tab').addClass('d-none');
     if(clientState.tabsView[tab]==false && tab == 'nav-list-tab'){
-        list.getClientsPage();
+        if(!loadClientFromUrl()) list.getClientsPage();
     }else if(clientState.tabsView[tab]==false && tab == 'nav-create-tab'){
     }else if(clientState.tabsView[tab]==false && tab == 'nav-traceability-tab'){
     }else if(tab == 'nav-update-tab'){
         $('#nav-update-tab').removeClass('d-none');
+        if(clientState.currentClient) setUpdateRecordId(clientState.currentClient.unique_id || clientState.currentClient.id);
+        else loadClientFromUrl();
     }
     clientState.tabsView[tab] = true;
 }
@@ -49,6 +62,11 @@ $(document).on('click', '.delete-client-file-btn', deleteClientDocument);
 $(document).on('click', '.go-to-license-btn', goToLicense);
 
 $(document).ready(function(){
+    const recordId = getUpdateRecordId(['client_uid']);
+    if(recordId != null){
+        clientState.urlRecordId = recordId;
+        setUpdateRecordId(recordId, ['client_uid']);
+    }
     initSync(list.getClientsPage);
     changeTab();
 });

@@ -72,9 +72,19 @@ class jira_controller extends Controller
         return $this->jiraJson(fn (): array => $this->Jira_RelationsData($request));
     }
 
+    public function productivity_data(Request $request): JsonResponse
+    {
+        return $this->jiraJson(fn (): array => $this->Jira_ProductivityData($request));
+    }
+
     public function save_project_relations(Request $request): JsonResponse
     {
         return $this->jiraJson(fn (): array => $this->Jira_SaveProjectRelations($request));
+    }
+
+    public function save_project_productivity(Request $request): JsonResponse
+    {
+        return $this->jiraJson(fn (): array => $this->Jira_SaveProjectProductivity($request));
     }
 
     public function save_user_mapping(Request $request): JsonResponse

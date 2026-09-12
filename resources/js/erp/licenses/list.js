@@ -1,4 +1,5 @@
 import { licenseState } from './state.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 import { renderEntityAvatar } from '../shared/list.js';
 
 export function DBshowPagination(){
@@ -98,9 +99,10 @@ export function goToUpdateTab(row, onLoaded){
     let licenseId = $(row).parent().parent().attr('license-id');
     licenseState.currentLicense = licenseState.licenses.find(license => license.id == licenseId);
     if(licenseState.currentLicense != null){
-        $('#nav-update-tab').tab('show');
+        setUpdateRecordId(licenseState.currentLicense.id);
+        $('#nav-update-tab').removeClass('d-none').tab('show');
         $('#nav-update-tab').trigger('click');
-        onLoaded();
+        if(onLoaded) onLoaded();
     }
 }
 
@@ -148,8 +150,9 @@ export function getLicenseById(licenseId, onLoaded){
     };
     PostMethodFunction('/admin/licenses/get-by-id',dataSend,null, function(response){
         licenseState.currentLicense = response.license;
-        $('#nav-update-tab').tab('show');
+        setUpdateRecordId(licenseState.currentLicense.id);
+        $('#nav-update-tab').removeClass('d-none').tab('show');
         $('#nav-update-tab').trigger('click');
-        onLoaded();
+        if(onLoaded) onLoaded();
     },null);
 }

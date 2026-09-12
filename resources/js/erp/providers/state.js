@@ -7,6 +7,7 @@ export const providerState = {
     },
     providers: [],
     currentProvider: null,
+    urlRecordId: null,
     currentTab: null,
     pagination: {
         page: 1,

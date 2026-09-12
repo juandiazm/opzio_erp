@@ -1,6 +1,7 @@
 <!-- Create Tab -->
 <div class="tab-pane fade" id="nav-create" role="tabpanel" aria-labelledby="nav-create-tab">
     <div id="create-income-container" class="income-form-shell">
+        <div class="income-editor-column">
         <section class="income-form-header">
             <div class="income-form-title-row">
                 <div>
@@ -65,5 +66,7 @@
         </section>
 
         @include('erp.incomes.items-table', ['mode' => 'create'])
+        </div>
+        @include('erp.incomes.preview')
     </div>
 </div>

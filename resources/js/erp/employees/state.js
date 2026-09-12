@@ -7,6 +7,7 @@ export const employeeState = {
     },
     employees: [],
     currentEmployee: null,
+    urlRecordId: null,
     currentTab: null,
     departments: [],
     troughtUser: false,

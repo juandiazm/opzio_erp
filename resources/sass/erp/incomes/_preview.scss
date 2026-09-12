@@ -1,0 +1,929 @@
+@import '../../variables';
+
+$income-preview-approved: #2563EB;
+$income-preview-paid: #0F766E;
+$income-preview-invoiced: #6D28D9;
+
+#nav-create #create-income-container.income-form-shell,
+#nav-update #update-income-container.income-form-shell {
+    width: min(1600px, 98%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr);
+    align-items: start;
+    gap: 1.25rem;
+}
+
+.income-editor-column {
+    min-width: 0;
+}
+
+.income-live-preview {
+    min-width: 0;
+    position: sticky;
+    top: 1rem;
+}
+
+.income-preview-panel-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem;
+    margin: 0 0 .65rem;
+}
+
+.income-preview-panel-header h3 {
+    margin: .15rem 0 0;
+    color: $primary;
+    font-size: 1.25rem;
+}
+
+.income-preview-live {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .25rem .45rem;
+    border: 1px solid rgba($success, .28);
+    border-radius: 999px;
+    color: $success;
+    font-size: .68rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.income-preview-live i {
+    font-size: .62rem;
+}
+
+.income-preview-document {
+    max-height: calc(100vh - 4.5rem);
+    overflow-y: auto;
+    padding: 1.15rem;
+    border: 1px solid $border-gray;
+    background: #fff;
+    box-shadow: 0 5px 18px rgba(34, 2, 69, .08);
+}
+
+.income-preview-document-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: .85rem;
+    border-bottom: 1px solid $border-gray;
+}
+
+.income-preview-brand {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    min-width: 0;
+}
+
+.income-preview-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 2rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: $primary;
+    color: $text-white;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.income-preview-brand strong,
+.income-preview-brand small {
+    display: block;
+}
+
+.income-preview-brand strong {
+    color: $primary;
+    font-size: .82rem;
+}
+
+.income-preview-brand small {
+    margin-top: .12rem;
+    color: $text-gray;
+    font-size: .65rem;
+}
+
+.income-preview-document-type {
+    text-align: right;
+}
+
+.income-preview-document-type span,
+.income-preview-document-type strong {
+    display: block;
+}
+
+.income-preview-document-type span {
+    color: $text-gray;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+}
+
+.income-preview-document-type strong {
+    margin-top: .2rem;
+    color: $primary;
+    font-size: .72rem;
+}
+
+.income-preview-status-row,
+.income-preview-section-header,
+.income-preview-total,
+.income-preview-bill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.income-preview-status-row {
+    padding: .7rem 0;
+}
+
+.income-preview-status {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .5rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+.income-preview-status i {
+    font-size: .68rem;
+}
+
+.income-preview-status.status-state-0 {
+    border-color: rgba($yellow, .35);
+    background: rgba($yellow, .08);
+    color: $yellow;
+}
+
+.income-preview-status.status-state-1 {
+    border-color: rgba($danger, .3);
+    background: rgba($danger, .07);
+    color: $danger;
+}
+
+.income-preview-status.status-state-2 {
+    border-color: rgba($income-preview-approved, .3);
+    background: rgba($income-preview-approved, .07);
+    color: $income-preview-approved;
+}
+
+.income-preview-status.status-state-3 {
+    border-color: rgba($income-preview-paid, .3);
+    background: rgba($income-preview-paid, .07);
+    color: $income-preview-paid;
+}
+
+.income-preview-status.status-state-4 {
+    border-color: rgba($income-preview-invoiced, .3);
+    background: rgba($income-preview-invoiced, .07);
+    color: $income-preview-invoiced;
+}
+
+.income-preview-draft-label {
+    color: $text-gray;
+    font-size: .68rem;
+}
+
+.income-preview-client-block,
+.income-preview-description,
+.income-preview-items {
+    padding: .75rem;
+    border: 1px solid #e5e5df;
+    background: #fff;
+}
+
+.income-preview-client-block {
+    background: rgba($brand-cream, .55);
+}
+
+.income-preview-label {
+    display: block;
+    margin-bottom: .25rem;
+    color: $text-gray;
+    font-size: .64rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.income-preview-client-block strong {
+    display: block;
+    overflow: hidden;
+    color: $primary;
+    font-size: .84rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.income-preview-client-block > span:last-child {
+    display: block;
+    margin-top: .16rem;
+    color: $text-gray;
+    font-size: .7rem;
+}
+
+.income-preview-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .6rem;
+    margin-top: .6rem;
+}
+
+.income-preview-meta-grid > div {
+    padding: .6rem .7rem;
+    border: 1px solid #e5e5df;
+}
+
+.income-preview-meta-grid strong {
+    display: block;
+    color: $text-black;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.income-preview-bill {
+    margin-top: .6rem;
+    padding: .6rem .7rem;
+    border: 1px solid rgba($income-preview-paid, .22);
+    background: rgba($income-preview-paid, .05);
+}
+
+.income-preview-bill strong:last-child {
+    color: $income-preview-paid;
+    font-size: .82rem;
+}
+
+.income-preview-description,
+.income-preview-items {
+    margin-top: .6rem;
+}
+
+.income-preview-description-content,
+.income-preview-item-description {
+    color: $text-black;
+    font-size: .76rem;
+    line-height: 1.45;
+}
+
+.income-preview-description-content p,
+.income-preview-item-description p {
+    margin: 0 0 .25rem;
+}
+
+.income-preview-description-content p:last-child,
+.income-preview-item-description p:last-child {
+    margin-bottom: 0;
+}
+
+.income-preview-description-content ul,
+.income-preview-description-content ol,
+.income-preview-item-description ul,
+.income-preview-item-description ol {
+    margin: 0 0 .25rem 1rem;
+    padding: 0;
+}
+
+.income-preview-section-header {
+    align-items: flex-end;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid $border-gray;
+}
+
+.income-preview-section-header .income-preview-label {
+    margin-bottom: .1rem;
+}
+
+.income-preview-section-header strong {
+    color: $primary;
+    font-size: .78rem;
+}
+
+.income-preview-section-header > span {
+    color: $text-gray;
+    font-size: .68rem;
+}
+
+.income-preview-item {
+    padding: .65rem 0;
+    border-bottom: 1px solid #ecece7;
+}
+
+.income-preview-item:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.income-preview-item-heading {
+    display: flex;
+    flex-direction: column;
+    gap: .12rem;
+}
+
+.income-preview-item-heading strong {
+    color: $text-black;
+    font-size: .78rem;
+}
+
+.income-preview-item-heading span,
+.income-preview-item > small {
+    color: $text-gray;
+    font-size: .67rem;
+}
+
+.income-preview-item > small {
+    display: block;
+    margin-top: .2rem;
+}
+
+.income-preview-item-description {
+    margin-top: .35rem;
+    color: $text-gray;
+    font-size: .7rem;
+}
+
+.income-preview-item-values {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-top: .45rem;
+    color: $text-gray;
+    font-size: .68rem;
+}
+
+.income-preview-item-values strong {
+    color: $primary;
+    font-size: .78rem;
+}
+
+.income-preview-empty {
+    margin: .7rem 0 .1rem;
+    color: $text-gray;
+    font-size: .72rem;
+    text-align: center;
+}
+
+.income-preview-total {
+    margin-top: .75rem;
+    padding: .8rem 0 0;
+    border-top: 2px solid $primary;
+    color: $primary;
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.income-preview-total strong {
+    font-size: 1.05rem;
+}
+
+@media screen and (max-width: 1199px) {
+    #nav-create #create-income-container.income-form-shell,
+    #nav-update #update-income-container.income-form-shell {
+        display: block;
+    }
+
+    .income-live-preview {
+        position: static;
+        margin-top: 1rem;
+    }
+
+    .income-preview-document {
+        max-height: none;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    #nav-create #create-income-container.income-form-shell,
+    #nav-update #update-income-container.income-form-shell {
+        width: 100%;
+    }
+
+    .income-preview-document {
+        padding: .85rem;
+    }
+
+    .income-preview-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.income-preview-status-row {
+    align-items: center;
+    justify-content: flex-start;
+    gap: .45rem;
+    padding: .35rem 0 .65rem;
+}
+
+.income-preview-status-row .income-preview-label {
+    display: inline;
+    margin: 0 .15rem 0 0;
+}
+
+.income-pdf-preview-status {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .28rem .48rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 700;
+}
+
+.income-pdf-preview-status i {
+    font-size: .66rem;
+}
+
+.income-pdf-preview-status.status-state-0 {
+    border-color: rgba($yellow, .35);
+    background: rgba($yellow, .08);
+    color: $yellow;
+}
+
+.income-pdf-preview-status.status-state-1 {
+    border-color: rgba($danger, .3);
+    background: rgba($danger, .07);
+    color: $danger;
+}
+
+.income-pdf-preview-status.status-state-2 {
+    border-color: rgba($income-preview-approved, .3);
+    background: rgba($income-preview-approved, .07);
+    color: $income-preview-approved;
+}
+
+.income-pdf-preview-status.status-state-3 {
+    border-color: rgba($income-preview-paid, .3);
+    background: rgba($income-preview-paid, .07);
+    color: $income-preview-paid;
+}
+
+.income-pdf-preview-status.status-state-4 {
+    border-color: rgba($income-preview-invoiced, .3);
+    background: rgba($income-preview-invoiced, .07);
+    color: $income-preview-invoiced;
+}
+
+.income-pdf-preview-document {
+    box-sizing: border-box;
+    max-height: calc(100vh - 5.2rem);
+    overflow-y: auto;
+    padding: 1rem;
+    border: 1px solid #D4D4C8;
+    background: #FFFFFF;
+    box-shadow: 0 5px 18px rgba(34, 2, 69, .08);
+    color: #334155;
+    font-family: sans-serif;
+}
+
+.income-pdf-preview-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(145px, .75fr);
+    align-items: center;
+    gap: .75rem;
+    padding-bottom: .75rem;
+    border-bottom: 1px solid #D4D4C8;
+}
+
+.income-pdf-preview-company {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    min-width: 0;
+}
+
+.income-pdf-preview-company > img {
+    display: block;
+    flex: 0 0 6rem;
+    width: 6rem;
+    max-width: 35%;
+    height: auto;
+}
+
+.income-pdf-preview-company > div {
+    min-width: 0;
+}
+
+.income-pdf-preview-company strong,
+.income-pdf-preview-company span,
+.income-pdf-preview-company a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.income-pdf-preview-company strong {
+    color: $primary;
+    font-size: .72rem;
+}
+
+.income-pdf-preview-company span,
+.income-pdf-preview-company a {
+    color: #475569;
+    font-size: .59rem;
+    line-height: 1.45;
+    text-decoration: none;
+}
+
+.income-pdf-preview-document-info {
+    padding: .55rem .65rem;
+    border: 1px solid $primary;
+    text-align: right;
+}
+
+.income-pdf-preview-document-info > strong,
+.income-pdf-preview-document-info > span {
+    display: block;
+    color: #334155;
+    font-size: .59rem;
+    line-height: 1.45;
+}
+
+.income-pdf-preview-document-info > strong {
+    margin-bottom: .15rem;
+    color: $primary;
+    font-size: .82rem;
+}
+
+.income-pdf-preview-client {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: .9rem;
+    margin-top: .9rem;
+    padding: .7rem .8rem;
+    border: 1px solid #D4D4C8;
+    background: #FFFFFF;
+}
+
+.income-pdf-preview-client-data {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.income-pdf-preview-title {
+    display: block;
+    margin-bottom: .28rem;
+    color: $primary;
+    font-size: .66rem;
+    text-transform: uppercase;
+}
+
+.income-pdf-preview-client-data p {
+    margin: .1rem 0;
+    overflow: hidden;
+    color: #475569;
+    font-size: .6rem;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.income-pdf-preview-client-data p b {
+    color: #334155;
+}
+
+.income-pdf-preview-payment {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    flex: 0 0 auto;
+}
+
+.income-pdf-preview-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border: 1px dashed $secondary;
+    color: $secondary;
+}
+
+.income-pdf-preview-qr i {
+    font-size: 1.25rem;
+}
+
+.income-pdf-preview-qr small {
+    max-width: 3rem;
+    margin-top: .15rem;
+    color: $text-gray;
+    font-size: .45rem;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.income-pdf-preview-pay-method {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .2rem;
+    color: #475569;
+    font-size: .56rem;
+    text-align: right;
+}
+
+.income-pdf-preview-pay-method img {
+    display: block;
+    width: 3.4rem;
+    height: auto;
+}
+
+.income-pdf-preview-lines {
+    margin-top: 1rem;
+    overflow-x: auto;
+}
+
+.income-pdf-preview-lines-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .35rem;
+    color: $primary;
+    font-size: .7rem;
+}
+
+.income-pdf-preview-lines-heading span {
+    color: $text-gray;
+    font-size: .58rem;
+}
+
+.income-pdf-preview-lines table {
+    width: 100%;
+    min-width: 28rem;
+    border: 1px solid #D4D4C8;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.income-pdf-preview-lines th,
+.income-pdf-preview-lines td {
+    padding: .42rem .4rem;
+    border-bottom: 1px solid #D4D4C8;
+    color: #334155;
+    font-size: .58rem;
+    line-height: 1.4;
+    vertical-align: top;
+}
+
+.income-pdf-preview-lines th {
+    border-bottom: 2px solid $primary;
+    color: $primary;
+    font-size: .56rem;
+    text-transform: uppercase;
+}
+
+.income-pdf-preview-lines th:first-child,
+.income-pdf-preview-lines td:first-child {
+    width: 42%;
+}
+
+.income-pdf-preview-lines th:nth-last-child(2),
+.income-pdf-preview-lines td:nth-last-child(2),
+.income-pdf-preview-lines th:last-child,
+.income-pdf-preview-lines td:last-child {
+    width: 17%;
+    white-space: nowrap;
+}
+
+.income-pdf-preview-lines .income-pdf-preview-service-row td {
+    padding-top: .32rem;
+    padding-bottom: .32rem;
+    background: #FFFFFF;
+    color: $primary;
+    font-weight: 700;
+}
+
+.income-pdf-preview-lines table.income-pdf-preview-lines--compact {
+    --income-preview-description-width: 62%;
+    --income-preview-tax-width: 0%;
+    --income-preview-hours-width: 0%;
+    --income-preview-value-width: 19%;
+    --income-preview-total-width: 19%;
+}
+
+.income-pdf-preview-lines table.income-pdf-preview-lines--tax {
+    --income-preview-description-width: 48%;
+    --income-preview-tax-width: 13%;
+    --income-preview-hours-width: 0%;
+    --income-preview-value-width: 20%;
+    --income-preview-total-width: 19%;
+}
+
+.income-pdf-preview-lines table.income-pdf-preview-lines--hours {
+    --income-preview-description-width: 48%;
+    --income-preview-tax-width: 0%;
+    --income-preview-hours-width: 13%;
+    --income-preview-value-width: 20%;
+    --income-preview-total-width: 19%;
+}
+
+.income-pdf-preview-lines table.income-pdf-preview-lines--tax-hours {
+    --income-preview-description-width: 42%;
+    --income-preview-tax-width: 10%;
+    --income-preview-hours-width: 10%;
+    --income-preview-value-width: 19%;
+    --income-preview-total-width: 19%;
+}
+
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] th:first-child,
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] td:first-child {
+    width: var(--income-preview-description-width);
+}
+
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] th:nth-child(2),
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] td:nth-child(2) {
+    width: var(--income-preview-tax-width);
+}
+
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] th:nth-child(3),
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] td:nth-child(3) {
+    width: var(--income-preview-hours-width);
+}
+
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] th:nth-child(4),
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] td:nth-child(4) {
+    width: var(--income-preview-value-width);
+}
+
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] th:nth-child(5),
+.income-pdf-preview-lines table[class*="income-pdf-preview-lines--"] td:nth-child(5) {
+    width: var(--income-preview-total-width);
+}
+
+.income-pdf-preview-description-cell {
+    overflow-wrap: anywhere;
+}
+
+.income-pdf-preview-recurrence {
+    display: block;
+    margin-bottom: .15rem;
+    color: #475569;
+}
+
+.income-pdf-preview-line-description {
+    display: block;
+}
+
+.income-pdf-preview-money {
+    white-space: nowrap;
+}
+
+.income-pdf-preview-empty {
+    margin: .65rem 0 0;
+    color: $text-gray;
+    font-size: .62rem;
+    text-align: center;
+}
+
+.income-pdf-preview-totals {
+    width: 48%;
+    min-width: 12rem;
+    margin: 1rem 0 0 auto;
+}
+
+.income-pdf-preview-totals > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .7rem;
+    padding: .25rem 0;
+    border-bottom: 1px solid #D4D4C8;
+    color: #475569;
+    font-size: .62rem;
+}
+
+.income-pdf-preview-totals strong {
+    color: #475569;
+    font-size: .62rem;
+    white-space: nowrap;
+}
+
+.income-pdf-preview-totals .income-pdf-preview-total-row {
+    margin-top: .25rem;
+    padding: .55rem .65rem;
+    border: 1px solid $primary;
+    color: $primary;
+    font-size: .7rem;
+}
+
+.income-pdf-preview-totals .income-pdf-preview-total-row strong {
+    color: $primary;
+    font-size: .76rem;
+}
+
+.income-pdf-preview-description {
+    margin-top: .75rem;
+    padding: .65rem .75rem;
+    border: 1px solid #D4D4C8;
+    color: #475569;
+    font-size: .6rem;
+    line-height: 1.45;
+}
+
+.income-pdf-preview-description p {
+    margin: 0 0 .25rem;
+}
+
+.income-pdf-preview-description p:last-child {
+    margin-bottom: 0;
+}
+
+.income-pdf-preview-description ul,
+.income-pdf-preview-description ol {
+    margin: 0 0 .25rem 1rem;
+    padding: 0;
+}
+
+.income-pdf-preview-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: .8rem;
+    margin-top: 1rem;
+    padding-top: .65rem;
+    border-top: 1px solid #D4D4C8;
+}
+
+.income-pdf-preview-footer-contact {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.income-pdf-preview-footer-contact img {
+    display: block;
+    flex: 0 0 2.1rem;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+}
+
+.income-pdf-preview-footer-contact strong,
+.income-pdf-preview-footer-contact span,
+.income-pdf-preview-footer-contact a,
+.income-pdf-preview-bank strong,
+.income-pdf-preview-bank span {
+    display: block;
+    color: #475569;
+    font-size: .53rem;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+.income-pdf-preview-footer-contact strong,
+.income-pdf-preview-bank strong {
+    color: #334155;
+    font-weight: 700;
+}
+
+.income-pdf-preview-bank {
+    text-align: right;
+}
+
+@media screen and (max-width: 1199px) {
+    .income-pdf-preview-document {
+        max-height: none;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    .income-pdf-preview-header {
+        grid-template-columns: 1fr;
+    }
+
+    .income-pdf-preview-document-info {
+        text-align: left;
+    }
+
+    .income-pdf-preview-client {
+        flex-direction: column;
+    }
+
+    .income-pdf-preview-payment {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .income-pdf-preview-footer {
+        grid-template-columns: 1fr;
+    }
+
+    .income-pdf-preview-bank {
+        text-align: left;
+    }
+}

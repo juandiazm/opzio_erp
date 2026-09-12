@@ -1,4 +1,5 @@
 import { providerState } from './state.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 
 export function showPagination(){
     let totalPages = Math.ceil(providerState.pagination.total/providerState.pagination.per_page);
@@ -33,18 +34,19 @@ export function changePage(){ providerState.pagination.page = $(this).attr('text
 export function selectBackPage(){ providerState.pagination.page = parseInt(providerState.pagination.page)-1; getProvidersPage(); }
 export function selectNextPage(){ providerState.pagination.page = parseInt(providerState.pagination.page)+1; getProvidersPage(); }
 
-export function getProvidersPage(){
+export function getProvidersPage(onLoaded, recordId = null){
     let dataSend = {pagination: providerState.pagination, search: $('#search-list-input').val()};
-    PostMethodFunction('/admin/providers/get-page',dataSend,null, showProvidersPage,null);
+    PostMethodFunction('/admin/providers/get-page',dataSend,null,function(response){ showProvidersPage(response, onLoaded, recordId); },null);
 }
 
 export function goToUpdateTab(row, onLoaded){
     let providerId = $(row).parent().parent().attr('provider-id');
     providerState.currentProvider = providerState.providers.find(provider => provider.id == providerId);
     if(providerState.currentProvider != null){
-        $('#nav-update-tab').tab('show');
+        setUpdateRecordId(providerState.currentProvider.unique_id || providerState.currentProvider.id);
+        $('#nav-update-tab').removeClass('d-none').tab('show');
         $('#nav-update-tab').trigger('click');
-        onLoaded();
+        if(onLoaded) onLoaded();
     }
 }
 
@@ -54,7 +56,7 @@ export function setCurrentProviderFromRow(row){
     return providerState.currentProvider;
 }
 
-function showProvidersPage(response){
+function showProvidersPage(response, onLoaded, recordId){
     providerState.pagination = response.pagination;
     providerState.providers = response.data;
     let appendContent = '';
@@ -84,4 +86,13 @@ function showProvidersPage(response){
     });
     $('#provider-list-table #provider-list-table-body').empty().append(appendContent);
     showPagination();
+    if(recordId != null){
+        providerState.currentProvider = providerState.providers.find(provider => String(provider.unique_id) === String(recordId) || String(provider.id) === String(recordId));
+        if(providerState.currentProvider != null){
+            providerState.tabsView['nav-update-tab'] = false;
+            $('#nav-update-tab').removeClass('d-none').tab('show');
+            $('#nav-update-tab').trigger('click');
+            if(onLoaded) onLoaded();
+        }
+    }
 }

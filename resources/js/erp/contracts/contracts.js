@@ -4,6 +4,7 @@ import { addContract, deleteContract, generateContract, initializeRecurrenceForm
 import { addContractSource, applyLicenseToSources, loadCatalogs, refreshContractSourceRow, removeContractSource, renderContractSources, renderContractVariables, setContractableOptions, setTemplateOptions } from './shared.js';
 import * as types from './types.js';
 import * as templates from './templates.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function changeTab() {
     contractState.currentTab = $('#nav-tab .active').attr('id');
@@ -13,7 +14,12 @@ function changeTab() {
         if(contractState.currentTab === 'nav-types-tab') types.getTypes();
         if(contractState.currentTab === 'nav-templates-tab') templates.getTemplates();
     }
-    if(contractState.currentTab === 'nav-update-tab') showCurrentContract();
+    if(contractState.currentTab === 'nav-update-tab'){
+        if(contractState.currentContract){
+            setUpdateRecordId(contractState.currentContract.id);
+            showCurrentContract();
+        }
+    }
     contractState.tabsView[contractState.currentTab] = true;
 }
 
@@ -78,17 +84,14 @@ $(document).ready(function(){
     templates.initializeTemplateEditor();
     types.initializeTypeForm();
     initializeRecurrenceForms();
-    const urlParams = new URLSearchParams(window.location.search);
-    contractState.urlContractId = urlParams.get('contract_id');
-    if(contractState.urlContractId != null){
-        const url = new URL(window.location.href);
-        url.searchParams.delete('contract_id');
-        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
-    }
+    contractState.urlContractId = getUpdateRecordId(['contract_id']);
+    if(contractState.urlContractId != null) setUpdateRecordId(contractState.urlContractId, ['contract_id']);
     loadCatalogs(function(){
         templates.refreshVariablePalette();
         if(contractState.urlContractId != null){
-            openContract(contractState.urlContractId, showCurrentContract);
+            const contractId = contractState.urlContractId;
+            contractState.urlContractId = null;
+            openContract(contractId, showCurrentContract);
         }else{
             changeTab();
         }

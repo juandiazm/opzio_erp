@@ -37,6 +37,10 @@
     "file": "assets/post-6x08ZAR6.js",
     "name": "post"
   },
+  "_record-url-CkW4yFAP.js": {
+    "file": "assets/record-url-CkW4yFAP.js",
+    "name": "record-url"
+  },
   "_shared-RPBjrMc-.js": {
     "file": "assets/shared-RPBjrMc-.js",
     "name": "shared"
@@ -692,10 +696,13 @@
     "isEntry": true
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-CGPnw8No.js",
+    "file": "assets/clients-DuwaQTOI.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_record-url-CkW4yFAP.js"
+    ]
   },
   "resources/js/erp/clients/create.js": {
     "file": "assets/create-l0sNRNKZ.js",
@@ -767,13 +774,14 @@
     ]
   },
   "resources/js/erp/contracts/contracts.js": {
-    "file": "assets/contracts-o24tEs2x.js",
+    "file": "assets/contracts-DNzBDc_4.js",
     "name": "contracts",
     "src": "resources/js/erp/contracts/contracts.js",
     "isEntry": true,
     "imports": [
       "_shared-RPBjrMc-.js",
-      "_list-ClzTmGL1.js"
+      "_list-ClzTmGL1.js",
+      "_record-url-CkW4yFAP.js"
     ]
   },
   "resources/js/erp/contracts/form.js": {
@@ -852,10 +860,13 @@
     "isEntry": true
   },
   "resources/js/erp/departments/departments.js": {
-    "file": "assets/departments-Tn80o8Ir.js",
+    "file": "assets/departments-CROdFkFJ.js",
     "name": "departments",
     "src": "resources/js/erp/departments/departments.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_record-url-CkW4yFAP.js"
+    ]
   },
   "resources/js/erp/departments/list.js": {
     "file": "assets/list-K6Dvbx-E.js",
@@ -894,10 +905,13 @@
     "isEntry": true
   },
   "resources/js/erp/employees/employees.js": {
-    "file": "assets/employees-EIz6jdMk.js",
+    "file": "assets/employees-CZCpkJrI.js",
     "name": "employees",
     "src": "resources/js/erp/employees/employees.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_record-url-CkW4yFAP.js"
+    ]
   },
   "resources/js/erp/employees/licenses.js": {
     "file": "assets/licenses-DP2rzg_V.js",
@@ -1002,12 +1016,13 @@
     "isEntry": true
   },
   "resources/js/erp/incomes/incomes.js": {
-    "file": "assets/incomes-DiIIVF4z.js",
+    "file": "assets/incomes-qVnh2Und.js",
     "name": "incomes",
     "src": "resources/js/erp/incomes/incomes.js",
     "isEntry": true,
     "imports": [
       "_list-ClzTmGL1.js",
+      "_record-url-CkW4yFAP.js",
       "resources/js/erp/incomes/order.js",
       "_pdf.worker.min-B-tS55GQ.js"
     ]
@@ -1050,16 +1065,19 @@
     ]
   },
   "resources/js/erp/jira/jira.js": {
-    "file": "assets/jira-mkUl2M_N.js",
+    "file": "assets/jira-D2gWvBg1.js",
     "name": "jira",
     "src": "resources/js/erp/jira/jira.js",
     "isEntry": true
   },
   "resources/js/erp/layouts/app.js": {
-    "file": "assets/app-CTrxKD9S.js",
+    "file": "assets/app-WxKNjh7F.js",
     "name": "app",
     "src": "resources/js/erp/layouts/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_record-url-CkW4yFAP.js"
+    ]
   },
   "resources/js/erp/layouts/header.js": {
     "file": "assets/header-DBQ3qKGw.js",
@@ -1092,11 +1110,12 @@
     "isEntry": true
   },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-D7Pkbi27.js",
+    "file": "assets/licenses-hRp2FGDc.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
     "isEntry": true,
     "imports": [
+      "_record-url-CkW4yFAP.js",
       "_list-ClzTmGL1.js"
     ]
   },
@@ -1209,10 +1228,13 @@
     "isEntry": true
   },
   "resources/js/erp/outcomes/outcomes.js": {
-    "file": "assets/outcomes-DwyxN_Yv.js",
+    "file": "assets/outcomes-C8pwXZP1.js",
     "name": "outcomes",
     "src": "resources/js/erp/outcomes/outcomes.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_record-url-CkW4yFAP.js"
+    ]
   },
   "resources/js/erp/outcomes/shared.js": {
     "file": "assets/shared-BIjMHF-b.js",
@@ -1257,10 +1279,13 @@
     "isEntry": true
   },
   "resources/js/erp/providers/providers.js": {
-    "file": "assets/providers-DPSFT_RO.js",
+    "file": "assets/providers-ButdqCar.js",
     "name": "providers",
     "src": "resources/js/erp/providers/providers.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_record-url-CkW4yFAP.js"
+    ]
   },
   "resources/js/erp/providers/shared.js": {
     "file": "assets/shared-BQEWTaK-.js",
@@ -1422,10 +1447,13 @@
     "isEntry": true
   },
   "resources/js/erp/users/users.js": {
-    "file": "assets/users-U5Gl2x28.js",
+    "file": "assets/users-Ctt7lWEN.js",
     "name": "users",
     "src": "resources/js/erp/users/users.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_record-url-CkW4yFAP.js"
+    ]
   },
   "resources/js/erp/web-pages/web-pages.js": {
     "file": "assets/web-pages-BBpola57.js",
@@ -1646,12 +1674,12 @@
     "isEntry": true
   },
   "resources/sass/erp/incomes/incomes.scss": {
-    "file": "assets/incomes-DCt4TY09.css",
+    "file": "assets/incomes-ZlC6Yokd.css",
     "src": "resources/sass/erp/incomes/incomes.scss",
     "isEntry": true
   },
   "resources/sass/erp/jira/jira.scss": {
-    "file": "assets/jira-D1QBCRnx.css",
+    "file": "assets/jira-vqiU9gcL.css",
     "src": "resources/sass/erp/jira/jira.scss",
     "isEntry": true
   },

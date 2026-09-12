@@ -1,5 +1,6 @@
 import { incomeState } from './state.js';
 import { getRichTextHtml, getRichTextPlainText, initRichTextEditors, setRichTextContent } from './rich-text.js';
+import { refreshIncomePreview } from './preview.js';
 
 function escapeHtml(value){
     return String(value ?? '').replace(/[&<>'"]/g, function(character){ return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[character]; });
@@ -13,6 +14,7 @@ export function changeCreateOrderState(){
     incomeState.currentContainer.find('.state-input').removeClass('selected');
     $(this).addClass('selected');
     incomeState.currentContainer.find('.quotation-totalize-container').toggle($(this).attr('value') == '0');
+    refreshIncomePreview();
 }
 
 export function updateClientReadiness(client = incomeState.currentClient){
@@ -62,9 +64,10 @@ export function loadClientData(){
 function getClientData(){
     let clientId = incomeState.currentContainer.find('.input-client').val();
     incomeState.currentClient = incomeState.clientsList.find(client => client.id == clientId);
-    if(incomeState.currentClient == undefined){ updateClientReadiness(null); alertWarning('El cliente no existe'); return; }
+    if(incomeState.currentClient == undefined){ updateClientReadiness(null); refreshIncomePreview(); alertWarning('El cliente no existe'); return; }
     incomeState.currentContainer.find('.input-identification').text(incomeState.currentClient.identification);
     updateClientReadiness(incomeState.currentClient);
+    refreshIncomePreview();
     getClientLicenses();
 }
 
@@ -166,6 +169,7 @@ export function showLicensesItems(){
     incomeState.currentContainer.find('.income-items-empty-state').toggle(incomeState.currentLicencesList.length == 0);
     incomeState.currentContainer.find('.input-total-value').each(function(){ $(this).is('strong') ? $(this).text('$'+total.toLocaleString('es-CO')) : $(this).html('<strong>$'+total.toLocaleString('es-CO')+'</strong>'); });
     initRichTextEditors(incomeState.currentContainer[0]);
+    refreshIncomePreview();
 }
 
 export function deleteLicenseItem(){

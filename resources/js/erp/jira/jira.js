@@ -1,5 +1,6 @@
 import { initializeJiraConfiguration } from './configuration.js';
 import { initializeJiraRelations } from './relations.js';
+import { initializeJiraProductivity } from './productivity.js';
 import { initializeJiraDashboard } from './dashboard.js';
 import { initializeJiraReports } from './reports.js';
 
@@ -13,6 +14,7 @@ if (root) {
         callback(pane);
     };
     initializeTab('#jira-relations', initializeJiraRelations);
+    initializeTab('#jira-productivity', initializeJiraProductivity);
     initializeTab('#jira-dashboard', initializeJiraDashboard);
     initializeTab('#jira-reports', initializeJiraReports);
 }

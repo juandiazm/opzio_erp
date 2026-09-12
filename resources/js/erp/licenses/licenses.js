@@ -6,6 +6,7 @@ import * as update from './update.js';
 import { licenseTypeChange } from './details.js';
 import { addLicenseDocument, updateLicenseDocument, deleteLicenseDocument } from './documents.js';
 import { addnotification, changeNotificationPosition, updateNotification, deleteNotification, restoreNotification, forceDeleteNotification } from './notifications.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function showCurrentLicense(){
     update.showCurrentLicense();
@@ -15,20 +16,29 @@ function openCurrentLicense(){
     showCurrentLicense();
 }
 
+function loadLicenseFromUrl(){
+    if(licenseState.urlLicenseId == null || licenseState.currentLicense != null) return false;
+    const licenseId = licenseState.urlLicenseId;
+    licenseState.urlLicenseId = null;
+    list.getLicenseById(licenseId, openCurrentLicense);
+    return true;
+}
+
 function changeTab(){
     licenseState.currentTab = $('#nav-tab .active').attr('id');
     if(licenseState.currentTab!='nav-update-tab') $('#nav-update-tab').addClass('d-none');
     if(licenseState.tabsView[licenseState.currentTab]==false && licenseState.currentTab == 'nav-list-tab'){
         $('#search-list-input').focus();
-        if(licenseState.urlLicenseId == null){
-            list.getLicensesPage();
-        }else{
-            list.getLicenseById(licenseState.urlLicenseId, openCurrentLicense);
-        }
+        if(!loadLicenseFromUrl()) list.getLicensesPage();
     }else if(licenseState.tabsView[licenseState.currentTab]==false && licenseState.currentTab == 'nav-create-tab'){
     }else if(licenseState.tabsView[licenseState.currentTab]==false && licenseState.currentTab == 'nav-traceability-tab'){
     }else if(licenseState.currentTab == 'nav-update-tab'){
         $('#nav-update-tab').removeClass('d-none');
+        if(licenseState.currentLicense){
+            setUpdateRecordId(licenseState.currentLicense.id);
+        }else{
+            loadLicenseFromUrl();
+        }
     }
     licenseState.tabsView[licenseState.currentTab] = true;
 }
@@ -81,12 +91,8 @@ $(document).on('click', '.restore-notification-btn', restoreNotification);
 $(document).on('click', '.force-delete-notification-btn', forceDeleteNotification);
 
 $(document).ready(function(){
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    licenseState.urlLicenseId = urlParams.get('license_id');
-    if(licenseState.urlLicenseId != null){
-        window.history.replaceState({}, document.title, "/" + "admin/licenses");
-    }
+    licenseState.urlLicenseId = getUpdateRecordId(['license_id']);
+    if(licenseState.urlLicenseId != null) setUpdateRecordId(licenseState.urlLicenseId, ['license_id']);
     $.when(
         getClients(),
         getEmployees(),

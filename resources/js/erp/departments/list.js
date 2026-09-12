@@ -1,4 +1,5 @@
 import { departmentState } from './state.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 
 export function showPagination(){
     let totalPages = Math.ceil(departmentState.pagination.total/departmentState.pagination.per_page);
@@ -18,18 +19,18 @@ export function changePageSize(){ departmentState.pagination.per_page = $('#pagi
 export function changePage(){ departmentState.pagination.page = $(this).attr('text'); getDepartmentsPage(); }
 export function selectBackPage(){ departmentState.pagination.page = parseInt(departmentState.pagination.page)-1; getDepartmentsPage(); }
 export function selectNextPage(){ departmentState.pagination.page = parseInt(departmentState.pagination.page)+1; getDepartmentsPage(); }
-export function getDepartmentsPage(){ PostMethodFunction('/admin/departments/get-page',{pagination: departmentState.pagination,search: $('#search-list-input').val()},null,showDepartmentsPage,null); }
+export function getDepartmentsPage(onLoaded, recordId = null){ PostMethodFunction('/admin/departments/get-page',{pagination: departmentState.pagination,search: $('#search-list-input').val()},null,function(response){ showDepartmentsPage(response, onLoaded, recordId); },null); }
 export function goToUpdateTab(row,onLoaded){
     let departmentId = $(row).parent().parent().attr('department-id');
     departmentState.currentDepartment = departmentState.departments.find(department => department.id == departmentId);
-    if(departmentState.currentDepartment != null){ $('#nav-update-tab').tab('show'); $('#nav-update-tab').trigger('click'); onLoaded(); }
+    if(departmentState.currentDepartment != null){ setUpdateRecordId(departmentState.currentDepartment.unique_id || departmentState.currentDepartment.id); $('#nav-update-tab').removeClass('d-none').tab('show'); $('#nav-update-tab').trigger('click'); if(onLoaded) onLoaded(); }
 }
 export function setCurrentDepartmentFromRow(row){
     let departmentId = $(row).closest('.department-row-info').attr('department-id');
     departmentState.currentDepartment = departmentState.departments.find(department => department.id == departmentId);
     return departmentState.currentDepartment;
 }
-function showDepartmentsPage(response){
+function showDepartmentsPage(response, onLoaded, recordId){
     departmentState.pagination = response.pagination;
     departmentState.departments = response.departments;
     let appendContent = '';
@@ -44,4 +45,13 @@ function showDepartmentsPage(response){
     });
     $('#department-list-table #department-list-table-body').empty().append(appendContent);
     showPagination();
+    if(recordId != null){
+        departmentState.currentDepartment = departmentState.departments.find(department => String(department.unique_id) === String(recordId) || String(department.id) === String(recordId));
+        if(departmentState.currentDepartment != null){
+            departmentState.tabsView['nav-update-tab'] = false;
+            $('#nav-update-tab').removeClass('d-none').tab('show');
+            $('#nav-update-tab').trigger('click');
+            if(onLoaded) onLoaded();
+        }
+    }
 }

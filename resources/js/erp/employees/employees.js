@@ -5,9 +5,20 @@ import { addEmployee } from './create.js';
 import * as update from './update.js';
 import { addEmployeeDocument, getEmployeeDocuments, updateEmployeeDocument, deleteEmployeeDocument } from './documents.js';
 import { getEmployeeLicenses, updateEmployeeLicense } from './licenses.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function showCurrentEmployee(){
     update.showCurrentEmployee();
+}
+
+function loadEmployeeFromUrl(){
+    const recordId = employeeState.urlRecordId;
+    if(recordId == null) return false;
+    employeeState.urlRecordId = null;
+    employeeState.dbPagination.page = 1;
+    $('#search-list-input').val(recordId);
+    list.getEmployeesPage(showCurrentEmployee, recordId);
+    return true;
 }
 
 function changeTab(){
@@ -15,15 +26,20 @@ function changeTab(){
     if(employeeState.currentTab!='nav-update-tab') $('#nav-update-tab').addClass('d-none');
     if(employeeState.tabsView[employeeState.currentTab]==false && employeeState.currentTab == 'nav-list-tab'){
         $('#search-list-input').focus();
-        list.getEmployeesPage();
+        if(!loadEmployeeFromUrl()) list.getEmployeesPage();
     }else if(employeeState.tabsView[employeeState.currentTab]==false && employeeState.currentTab == 'nav-create-tab'){
     }else if(employeeState.tabsView[employeeState.currentTab]==false && employeeState.currentTab == 'nav-traceability-tab'){
         if(employeeState.troughtUser == false){ window.user_id = null; }
         employeeState.troughtUser = false;
     }else if(employeeState.currentTab == 'nav-update-tab'){
         $('#nav-update-tab').removeClass('d-none');
-        getEmployeeDocuments();
-        getEmployeeLicenses();
+        if(employeeState.currentEmployee){
+            setUpdateRecordId(employeeState.currentEmployee.uid || employeeState.currentEmployee.id);
+            getEmployeeDocuments();
+            getEmployeeLicenses();
+        }else{
+            loadEmployeeFromUrl();
+        }
     }
     employeeState.tabsView[employeeState.currentTab] = true;
 }
@@ -59,6 +75,11 @@ $(document).on('click', '#update-employee-go-traceability', function(){goToEmplo
 $(document).on('click', '.update-employee-license-btn', updateEmployeeLicense);
 
 $(document).ready(function(){
+    const recordId = getUpdateRecordId(['employee_uid']);
+    if(recordId != null){
+        employeeState.urlRecordId = recordId;
+        setUpdateRecordId(recordId, ['employee_uid']);
+    }
     changeTab();
     getAllDepartments();
 });

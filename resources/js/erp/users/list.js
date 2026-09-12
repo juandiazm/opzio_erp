@@ -1,4 +1,5 @@
 import { userState } from './state.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 
 export function DBshowPagination(){
     let paginationContainer = $('#db-pagination');
@@ -93,9 +94,10 @@ export function goToUpdateTab(row, onLoaded){
     userState.userId = $(row).parent().parent().attr('user-id');
     userState.currentUser = userState.users.find(user => user.id == userState.userId);
     if(userState.currentUser != null){
-        $('#nav-update-tab').tab('show');
+        setUpdateRecordId(userState.currentUser.id);
+        $('#nav-update-tab').removeClass('d-none').tab('show');
         $('#nav-update-tab').trigger('click');
-        onLoaded();
+        if(onLoaded) onLoaded();
     }
 }
 

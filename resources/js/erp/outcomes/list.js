@@ -1,4 +1,5 @@
 import { outcomeState } from './state.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 
 function escapeHtml(value){ return $('<div>').text(value == null ? '' : value).html(); }
 function associationLabel(value){
@@ -106,18 +107,19 @@ export function showPagination(){
     paginationContainer.append(appendedContent);
 }
 
-export function getOutcomesPage(){
+export function getOutcomesPage(onLoaded, recordId = null){
     let dataSend = {page: outcomeState.pagination.page, size: outcomeState.pagination.size, search: String($('#search-list-input').val() || '').trim(), from: $('#date-from').val() || null, to: $('#date-to').val() || null};
     filterDefinitions.forEach(function(definition){
         dataSend[definition.field] = $(definition.selector).val() || null;
     });
-    PostMethodFunction('/admin/outcomes/get', dataSend, null, showOutcomesPage, null);
+    PostMethodFunction('/admin/outcomes/get', dataSend, null, function(response){ showOutcomesPage(response, onLoaded, recordId); }, null);
 }
 
 export function goToUpdateTab(){
     const outcomeId = $(this).closest('tr').attr('outcome-id');
     outcomeState.currentOutcome = outcomeState.outcomes.find(outcome => outcome.id == outcomeId);
     if(outcomeState.currentOutcome == null || outcomeState.currentOutcome.deleted_at != null) return;
+    setUpdateRecordId(outcomeState.currentOutcome.unique_id || outcomeState.currentOutcome.id);
     outcomeState.tabsView['nav-update-tab'] = false;
     $('#nav-update-tab').removeClass('d-none').tab('show');
     $('#nav-update-tab').trigger('click');
@@ -149,7 +151,7 @@ function renderAssociationCell(outcome, definition){
     return renderAssociationSelect(outcome, definition);
 }
 
-export function showOutcomesPage(response){
+export function showOutcomesPage(response, onLoaded, recordId){
     outcomeState.pagination = response.pagination || outcomeState.pagination;
     outcomeState.totalAmount = Number(response.totals?.amount) || 0;
     outcomeState.outcomes = Array.isArray(response.data) ? response.data : [];
@@ -172,6 +174,16 @@ export function showOutcomesPage(response){
     $('#outcome-list-table #outcome-list-table-body').empty().append(appendedContent);
     showOutcomeTotals(response.totals, outcomeState.pagination.total);
     showPagination();
+    if(recordId != null){
+        outcomeState.currentOutcome = outcomeState.outcomes.find(outcome => String(outcome.unique_id) === String(recordId) || String(outcome.id) === String(recordId));
+        if(outcomeState.currentOutcome != null && outcomeState.currentOutcome.deleted_at == null){
+            outcomeState.tabsView['nav-update-tab'] = false;
+            setUpdateRecordId(outcomeState.currentOutcome.unique_id || outcomeState.currentOutcome.id);
+            $('#nav-update-tab').removeClass('d-none').tab('show');
+            $('#nav-update-tab').trigger('click');
+            if(onLoaded) onLoaded();
+        }
+    }
 }
 
 export function changePageSize(){ outcomeState.pagination.size = $('#db-pagination-per-page').val(); outcomeState.pagination.page = 1; getOutcomesPage(); }

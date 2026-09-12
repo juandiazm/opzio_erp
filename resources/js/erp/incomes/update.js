@@ -1,6 +1,7 @@
 import { incomeState } from './state.js';
 import { showLicensesItems, updateClientReadiness } from './create.js';
 import { getRichTextHtml, getRichTextPlainText, setRichTextContent } from './rich-text.js';
+import { refreshIncomePreview } from './preview.js';
 import { getIncomesPage } from './list.js';
 import { showIncomeOrder } from './order.js';
 
@@ -58,6 +59,7 @@ export function showCurrentIncome(){
         incomeState.currentContainer.find('.order-licenses-list-item-update').css('display', 'none');
     }
     getIncomeLicenses();
+    refreshIncomePreview();
 }
 
 function getIncomeLicenses(){ PostMethodFunction('/admin/incomes/get-licenses', {income_id: incomeState.currentIncome.id}, null, showIncomeLicenses, null); }

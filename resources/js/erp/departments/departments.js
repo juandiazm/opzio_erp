@@ -3,14 +3,24 @@ import { verificationInputChange, getAllEmployees } from './shared.js';
 import * as list from './list.js';
 import { addDepartment } from './create.js';
 import * as update from './update.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function showCurrentDepartment(){ update.showCurrentDepartment(); }
+function loadDepartmentFromUrl(){
+    const recordId = departmentState.urlRecordId;
+    if(recordId == null) return false;
+    departmentState.urlRecordId = null;
+    departmentState.pagination.page = 1;
+    $('#search-list-input').val(recordId);
+    list.getDepartmentsPage(showCurrentDepartment, recordId);
+    return true;
+}
 function goToDepartmentsTraceability(search){ $('#nav-traceability').attr('search',search); $('#nav-traceability-tab').tab('show'); $('#nav-traceability-tab').trigger('click'); }
 function changeTab(){
     departmentState.currentTab = $('#nav-tab .active').attr('id');
     if(departmentState.currentTab!='nav-update-tab') $('#nav-update-tab').addClass('d-none');
-    if(departmentState.tabsView[departmentState.currentTab]==false && departmentState.currentTab == 'nav-list-tab'){ $('#search-list-input').focus(); list.getDepartmentsPage(); }
-    else if(departmentState.currentTab == 'nav-update-tab') $('#nav-update-tab').removeClass('d-none');
+    if(departmentState.tabsView[departmentState.currentTab]==false && departmentState.currentTab == 'nav-list-tab'){ $('#search-list-input').focus(); if(!loadDepartmentFromUrl()) list.getDepartmentsPage(); }
+    else if(departmentState.currentTab == 'nav-update-tab'){ $('#nav-update-tab').removeClass('d-none'); if(departmentState.currentDepartment) setUpdateRecordId(departmentState.currentDepartment.unique_id || departmentState.currentDepartment.id); else loadDepartmentFromUrl(); }
     departmentState.tabsView[departmentState.currentTab] = true;
 }
 $(document).on('click','#nav-tab .nav-link',changeTab);
@@ -28,4 +38,12 @@ $(document).on('click','#update-department-button',update.updateDepartment);
 $(document).on('click','#update-department-delete',function(){update.deleteDepartment(departmentState.currentDepartment.id);});
 $(document).on('click','#update-department-restore',function(){update.restoreDepartment(departmentState.currentDepartment.id);});
 $(document).on('click','#update-department-go-traceability',function(){goToDepartmentsTraceability('id%'+departmentState.currentDepartment.id);});
-$(document).ready(function(){getAllEmployees();changeTab();});
+$(document).ready(function(){
+    const recordId = getUpdateRecordId(['department_uid']);
+    if(recordId != null){
+        departmentState.urlRecordId = recordId;
+        setUpdateRecordId(recordId, ['department_uid']);
+    }
+    getAllEmployees();
+    changeTab();
+});

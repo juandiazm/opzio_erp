@@ -12,6 +12,7 @@ export const outcomeState = {
     currentTab: null,
     currentContainer: null,
     currentOutcome: null,
+    urlRecordId: null,
     catalogsReady: false,
     totalAmount: 0,
     outcomeTypes: [],

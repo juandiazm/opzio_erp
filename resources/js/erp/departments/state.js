@@ -7,6 +7,7 @@ export const departmentState = {
     },
     departments: [],
     currentDepartment: null,
+    urlRecordId: null,
     currentTab: null,
     notAssignedEmployees: [],
     pagination: {

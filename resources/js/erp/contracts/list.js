@@ -1,6 +1,7 @@
 import { contractState } from './state.js';
 import { escapeHtml, formatDate } from './shared.js';
 import { renderEntityAvatar } from '../shared/list.js';
+import { setUpdateRecordId } from '../layouts/record-url.js';
 
 function getContractableImageFolder(contractableType) {
     const normalizedType = String(contractableType || '').toLowerCase();
@@ -78,6 +79,7 @@ function showContractsPage(response) {
 export function openContract(id, onLoaded) {
     PostMethodFunction('/admin/contracts/get-by-id', {id: id}, null, function(response) {
         contractState.currentContract = response.contract;
+        setUpdateRecordId(contractState.currentContract.id);
         $('#nav-update-tab').removeClass('d-none').tab('show').trigger('click');
         if(onLoaded) onLoaded();
     }, null);

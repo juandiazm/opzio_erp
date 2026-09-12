@@ -3,11 +3,13 @@ import * as list from './list.js';
 import * as create from './create.js';
 import * as update from './update.js';
 import * as order from './order.js';
+import * as preview from './preview.js';
 import * as incomeImport from './import.js';
 import * as advances from './advances.js';
 import * as goals from './goals.js';
 import { goToIncomesTraceability } from './shared.js';
 import { initRichTextEditors, initializeRichTextEvents } from './rich-text.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function changeTab(){
     incomeState.currentTab = $('#nav-tab .active').attr('id');
@@ -23,7 +25,12 @@ function changeTab(){
         goals.getGoals();
     }else if(incomeState.currentTab == 'nav-update-tab'){
         $('#nav-update-tab').removeClass('d-none');
-        create.getAllClients(update.showCurrentIncome);
+        if(incomeState.currentIncome){
+            setUpdateRecordId(incomeState.currentIncome.unique_id || incomeState.currentIncome.id);
+            create.getAllClients(update.showCurrentIncome);
+        }else if(incomeState.incomeId){
+            list.getIncomesPage();
+        }
     }
     incomeState.tabsView[incomeState.currentTab] = true;
 }
@@ -48,6 +55,8 @@ $(document).on('click', '.add-license-button', create.addLicenseItem);
 $(document).on('click', '.delete-license-button', create.deleteLicenseItem);
 $(document).on('click', '.update-license-button', create.updateLicenseItem);
 $(document).on('change', '.input-timely-payment', create.changeTimelyPayment);
+$(document).on('input change', '#create-income-container, #update-income-container', preview.refreshIncomePreview);
+$(document).on('click', '#create-income-container .state-input, #update-income-container .state-input', preview.refreshIncomePreview);
 $(document).on('click', '#create-income-button', create.createIncome);
 $(document).on('click', '#update-income-button', update.updateIncome);
 $(document).on('click', '#toggle-income-header', update.toggleIncomeHeader);
@@ -57,6 +66,7 @@ $(document).on('click', '#pay-state-btn', update.changePayState);
 $(document).on('click', '.update-state', update.changeInputState);
 
 $(document).on('click', '#close-order-viewer, [data-close-order-viewer]', order.closeOrderViewer);
+    preview.refreshIncomePreview();
 $(document).on('click', '#order-viewer-container', function(event){ if(event.target === this) order.closeOrderViewer(); });
 $(document).on('click', '#pdf-prev-page', order.pdfPrevPage);
 $(document).on('click', '#pdf-next-page', order.pdfNextPage);
@@ -94,13 +104,8 @@ $(document).on('click', '.income-goal-restore', goals.restoreGoal);
 window.createSiigoInvoice = list.createSiigoInvoice;
 
 $(document).ready(function(){
-    let urlParams = new URLSearchParams(window.location.search);
-    incomeState.incomeId = urlParams.get('income_uid');
-    if(incomeState.incomeId != null && incomeState.incomeId != '' && incomeState.incomeId != 0){
-        const url = new URL(window.location.href);
-        url.searchParams.delete('income_uid');
-        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
-    }
+    incomeState.incomeId = getUpdateRecordId(['income_uid']);
+    if(incomeState.incomeId != null && incomeState.incomeId != '' && incomeState.incomeId != 0) setUpdateRecordId(incomeState.incomeId, ['income_uid']);
     order.init();
     initializeRichTextEvents();
     initRichTextEditors(document);

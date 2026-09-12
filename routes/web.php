@@ -193,7 +193,9 @@ Route::prefix('admin')->group(function () {
             Route::post('configuration/test', [jira_controller::class, 'test_connection']);
             Route::post('sync', [jira_controller::class, 'sync_connection']);
             Route::get('relations/data', [jira_controller::class, 'relations_data']);
+            Route::get('productivity/data', [jira_controller::class, 'productivity_data']);
             Route::post('relations/project', [jira_controller::class, 'save_project_relations']);
+            Route::post('productivity/project', [jira_controller::class, 'save_project_productivity']);
             Route::post('relations/user', [jira_controller::class, 'save_user_mapping']);
             Route::post('relations/epic-license', [jira_controller::class, 'save_epic_license']);
             Route::post('dashboard/data', [jira_controller::class, 'dashboard_data']);

@@ -4,6 +4,18 @@ import * as massImport from './import.js';
 import * as shared from './shared.js';
 import { createOutcome } from './create.js';
 import { updateOutcome, showCurrentOutcome } from './update.js';
+import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
+
+function loadOutcomeFromUrl(){
+    const recordId = outcomeState.urlRecordId;
+    if(recordId == null) return false;
+    outcomeState.urlRecordId = null;
+    outcomeState.pagination.page = 1;
+    $('#search-list-input').val(recordId);
+    $('#date-from, #date-to').val('');
+    list.getOutcomesPage(showCurrentOutcome, recordId);
+    return true;
+}
 
 function changeTab(){
     const activeTab = $('#nav-tab .active');
@@ -14,19 +26,29 @@ function changeTab(){
     $('#nav-update-tab').toggleClass('d-none', outcomeState.currentTab !== 'nav-update-tab');
     if(outcomeState.tabsView[outcomeState.currentTab] == false && outcomeState.currentTab == 'nav-list-tab'){
         $('#search-list-input').focus();
-        list.getOutcomesPage();
+        if(!loadOutcomeFromUrl()) list.getOutcomesPage();
         outcomeState.tabsView['nav-create-tab'] = false;
         outcomeState.tabsView['nav-update-tab'] = false;
     }else if(outcomeState.tabsView[outcomeState.currentTab] == false && outcomeState.currentTab == 'nav-create-tab'){
         outcomeState.tabsView['nav-list-tab'] = false;
         outcomeState.tabsView['nav-update-tab'] = false;
-    }else if(outcomeState.tabsView[outcomeState.currentTab] == false && outcomeState.currentTab == 'nav-update-tab' && outcomeState.currentOutcome){
-        showCurrentOutcome();
+    }else if(outcomeState.currentTab == 'nav-update-tab'){
+        if(outcomeState.currentOutcome){
+            setUpdateRecordId(outcomeState.currentOutcome.unique_id || outcomeState.currentOutcome.id);
+            showCurrentOutcome();
+        }else{
+            loadOutcomeFromUrl();
+        }
     }
     outcomeState.tabsView[outcomeState.currentTab] = true;
 }
 
 $(document).ready(function(){
+    const recordId = getUpdateRecordId(['outcome_uid']);
+    if(recordId != null){
+        outcomeState.urlRecordId = recordId;
+        setUpdateRecordId(recordId, ['outcome_uid']);
+    }
     const finishCatalogLoading = function(){
         outcomeState.catalogsReady = true;
         list.initializeDateRange();

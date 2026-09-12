@@ -7,6 +7,7 @@ export const clientState = {
     },
     clients: [],
     currentClient: null,
+    urlRecordId: null,
     dbPagination: {
         page: 1,
         per_page: 10,

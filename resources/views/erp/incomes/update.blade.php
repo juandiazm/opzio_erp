@@ -1,6 +1,7 @@
 <!-- Update tab -->
 <div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab">
     <div id="update-income-container" class="income-form-shell">
+        <div class="income-editor-column">
         <section class="income-form-header">
             <div class="income-form-title-row">
                 <div class="income-title-copy">
@@ -85,5 +86,7 @@
         </section>
 
         @include('erp.incomes.items-table', ['mode' => 'update'])
+        </div>
+        @include('erp.incomes.preview')
     </div>
 </div>

@@ -1,5 +1,6 @@
 import './sidebar.js';
 import './header.js';
+import { updateRecordQueryParameter } from './record-url.js';
 
 const tabQueryParameter = 'tab';
 const mainTabSelector = '#nav-tab .nav-link';
@@ -9,8 +10,10 @@ function updateTabUrl(tabId){
 
 	if(tabId){
 		url.searchParams.set(tabQueryParameter, tabId);
+		if(tabId !== 'nav-update-tab') url.searchParams.delete(updateRecordQueryParameter);
 	}else{
 		url.searchParams.delete(tabQueryParameter);
+		url.searchParams.delete(updateRecordQueryParameter);
 	}
 
 	window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);

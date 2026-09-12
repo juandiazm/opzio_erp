@@ -53,6 +53,45 @@ trait jira_relations_trait
         ];
     }
 
+    public function Jira_ProductivityData(Request $request): array
+    {
+        $this->Jira_Authorize();
+        $data = $request->validate([
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'in:5,10,50'],
+            'search' => ['nullable', 'string', 'max:255'],
+        ]);
+        $page = (int) ($data['page'] ?? 1);
+        $perPage = (int) ($data['per_page'] ?? 10);
+        $search = trim((string) ($data['search'] ?? ''));
+        $projects = jira_project::query()
+            ->select(['id', 'project_key', 'name', 'story_point_hours_multiplier'])
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query->where('project_key', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name')
+            ->orderBy('project_key')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return [
+            'projects' => $projects->getCollection()->map(fn (jira_project $project): array => [
+                'id' => $project->id,
+                'project_key' => $project->project_key,
+                'name' => $project->name,
+                'story_point_hours_multiplier' => (float) ($project->story_point_hours_multiplier ?? 1),
+            ])->values()->all(),
+            'pagination' => [
+                'page' => $projects->currentPage(),
+                'per_page' => $projects->perPage(),
+                'total' => $projects->total(),
+                'totalPages' => $projects->lastPage(),
+            ],
+        ];
+    }
+
     public function Jira_SaveProjectRelations(Request $request): array
     {
         $this->Jira_Authorize();
@@ -62,36 +101,64 @@ trait jira_relations_trait
             'client_ids.*' => ['integer', 'exists:clients,id'],
             'license_ids' => ['nullable', 'array'],
             'license_ids.*' => ['integer', 'exists:licenses,id'],
-            'story_point_hours_multiplier' => ['required', 'numeric', 'min:0.01', 'max:9999'],
+            'story_point_hours_multiplier' => ['sometimes', 'numeric', 'min:0.01', 'max:9999'],
         ]);
         $project = jira_project::findOrFail((int) $data['jira_project_id']);
         $clientIds = collect($data['client_ids'] ?? [])->map(fn ($id): int => (int) $id)->unique()->values();
         $licenseIds = collect($data['license_ids'] ?? [])->map(fn ($id): int => (int) $id)->unique()->values();
-        $multiplier = round((float) $data['story_point_hours_multiplier'], 2);
+        $multiplier = array_key_exists('story_point_hours_multiplier', $data)
+            ? round((float) $data['story_point_hours_multiplier'], 2)
+            : (float) ($project->story_point_hours_multiplier ?? 1);
         $invalidLicense = license::query()->whereIn('id', $licenseIds)->whereNotIn('client_id', $clientIds)->exists();
         if ($invalidLicense) {
             throw ValidationException::withMessages(['license_ids' => 'Cada licencia debe pertenecer a un cliente asociado al proyecto.']);
         }
         $recalculated = 0;
         DB::transaction(function () use ($project, $clientIds, $licenseIds, $multiplier, &$recalculated): void {
-            $project->story_point_hours_multiplier = $multiplier;
-            $project->save();
+            $recalculated = $this->Jira_UpdateProjectProductivity($project, $multiplier);
             $project->clients()->sync($clientIds->mapWithKeys(fn (int $id, int $index): array => [$id => ['is_primary' => $index === 0]])->all());
             $project->licenses()->sync($licenseIds->all());
-            $storyTypes = ['story', 'user story', 'historia', 'historia de usuario'];
-            $issues = jira_issue::query()
-                ->where('jira_project_id', $project->id)
-                ->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', $storyTypes)
-                ->where('estimated_hours_manual', false)
-                ->get(['id', 'story_points']);
-            foreach ($issues as $issue) {
-                $issue->estimated_hours = $issue->story_points === null ? null : round((float) $issue->story_points * $multiplier, 2);
-                $issue->save();
-                $recalculated++;
-            }
         });
 
         return ['message' => 'Relaciones de proyecto guardadas correctamente.', 'recalculated_issues' => $recalculated];
+    }
+
+    public function Jira_SaveProjectProductivity(Request $request): array
+    {
+        $this->Jira_Authorize();
+        $data = $request->validate([
+            'jira_project_id' => ['required', 'integer', 'exists:jira_projects,id'],
+            'story_point_hours_multiplier' => ['required', 'numeric', 'min:0.01', 'max:9999'],
+        ]);
+        $project = jira_project::findOrFail((int) $data['jira_project_id']);
+        $multiplier = round((float) $data['story_point_hours_multiplier'], 2);
+        $recalculated = DB::transaction(fn (): int => $this->Jira_UpdateProjectProductivity($project, $multiplier));
+
+        return [
+            'message' => 'Relación entre Story Points y horas guardada correctamente.',
+            'recalculated_issues' => $recalculated,
+            'story_point_hours_multiplier' => $multiplier,
+        ];
+    }
+
+    private function Jira_UpdateProjectProductivity(jira_project $project, float $multiplier): int
+    {
+        $project->story_point_hours_multiplier = $multiplier;
+        $project->save();
+        $storyTypes = ['story', 'user story', 'historia', 'historia de usuario'];
+        $issues = jira_issue::query()
+            ->where('jira_project_id', $project->id)
+            ->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', $storyTypes)
+            ->where('estimated_hours_manual', false)
+            ->get(['id', 'story_points']);
+        $recalculated = 0;
+        foreach ($issues as $issue) {
+            $issue->estimated_hours = $issue->story_points === null ? null : round((float) $issue->story_points * $multiplier, 2);
+            $issue->save();
+            $recalculated++;
+        }
+
+        return $recalculated;
     }
 
     public function Jira_SaveUserMapping(Request $request): array
