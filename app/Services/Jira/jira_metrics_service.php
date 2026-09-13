@@ -24,21 +24,21 @@ class jira_metrics_service
         $projectIds = $this->filterIds($filters['project_ids'] ?? $filters['project_id'] ?? null);
         $epicIds = $this->filterIds($filters['epic_ids'] ?? $filters['epic_id'] ?? null);
         $userIds = $this->filterIds($filters['user_ids'] ?? $filters['user_id'] ?? null);
+        $includeAllIssueTypes = (bool) ($filters['include_all_issue_types'] ?? false);
         $issueQuery = jira_issue::query()
-            ->with(['project', 'assignee.mapping.user', 'assignee.mapping.employee', 'epic'])
-            ->where(function ($query): void {
+            ->with(['project', 'assignee.mapping.user', 'assignee.mapping.employee', 'epic', 'parent'])
+            ->when(! $includeAllIssueTypes, function ($query): void {
                 $query->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', ['story', 'user story', 'historia', 'historia de usuario']);
             })
             ->where(function ($query) use ($from, $to): void {
                 $query->whereBetween('jira_created_at', [$from, $to])
-                    ->orWhereBetween('jira_updated_at', [$from, $to])
-                    ->orWhereBetween('jira_resolved_at', [$from, $to]);
+                    ->orWhereBetween('jira_updated_at', [$from, $to]);
             })
             ->when($projectIds->isNotEmpty(), fn ($query) => $query->whereIn('jira_project_id', $projectIds->all()))
             ->when($epicIds->isNotEmpty(), fn ($query) => $query->whereIn('epic_jira_issue_id', $epicIds->all()))
             ->when($userIds->isNotEmpty(), fn ($query) => $query->whereIn('assignee_jira_user_id', $userIds->all()))
             ->when($statuses->isNotEmpty(), fn ($query) => $query->whereIn('status', $statuses->all()));
-        $issues = $issueQuery->orderByRaw('COALESCE(jira_resolved_at, jira_updated_at, jira_created_at)')->get();
+        $issues = $issueQuery->orderByRaw('COALESCE(jira_updated_at, jira_created_at)')->get();
         $worklogs = jira_issue_worklog::query()
             ->with(['user.mapping.user', 'user.mapping.employee', 'issue.project', 'issue.epic'])
             ->where('is_deleted', false)
@@ -81,7 +81,7 @@ class jira_metrics_service
             $epics[$epicKey]['story_points'] += $points;
             $epics[$epicKey]['issues']++;
             $epics[$epicKey]['estimated_hours'] += $estimatedHours;
-            $date = $issue->jira_resolved_at?->toDateString() ?: $issue->jira_updated_at?->toDateString() ?: $issue->jira_created_at?->toDateString() ?: 'sin_fecha';
+            $date = $issue->jira_updated_at?->toDateString() ?: $issue->jira_created_at?->toDateString() ?: 'sin_fecha';
             $daily[$date] ??= ['date' => $date, 'story_points' => 0.0, 'issues' => 0];
             $daily[$date]['story_points'] += $points;
             $daily[$date]['issues']++;
@@ -119,6 +119,9 @@ class jira_metrics_service
             'summary' => [
                 'story_points' => round($issues->sum(fn (jira_issue $issue): float => (float) ($issue->story_points ?? 0)), 2),
                 'story_issues' => $issues->count(),
+                'issue_count' => $issues->count(),
+                'issue_type_counts' => $issues->groupBy(fn (jira_issue $issue): string => (string) ($issue->issue_type ?: 'Sin clasificar'))->map->count()->all(),
+                'story_points_by_issue_type' => $issues->groupBy(fn (jira_issue $issue): string => (string) ($issue->issue_type ?: 'Sin clasificar'))->map(fn ($items): float => round($items->sum(fn (jira_issue $issue): float => (float) ($issue->story_points ?? 0)), 2))->all(),
                 'completed_issues' => $issues->filter(fn (jira_issue $issue): bool => $issue->jira_resolved_at !== null)->count(),
                 'worklog_hours' => round($worklogs->sum(fn (jira_issue_worklog $worklog): float => ((int) $worklog->time_spent_seconds) / 3600), 2),
                 'estimated_hours' => round($issues->sum(function (jira_issue $issue): float {
@@ -140,10 +143,14 @@ class jira_metrics_service
                 'summary' => $issue->summary,
                 'project' => $issue->project?->project_key ?: 'Sin proyecto',
                 'epic' => $issue->epic?->summary ?: 'Sin epica',
+                'parent' => $issue->parent?->summary ?: ($issue->epic?->summary ?: 'Sin padre'),
                 'assignee' => $issue->assignee?->display_name ?: 'Sin responsable',
                 'assignee_avatar' => $this->assigneeAvatarUrl($issue->assignee),
                 'status' => $issue->status ?: 'Sin estado',
                 'issue_type' => $issue->issue_type ?: 'Sin tipo',
+                'priority' => $issue->priority ?: 'Sin prioridad',
+                'description' => $issue->description ?: data_get($issue->raw_fields, 'description'),
+                'comments' => is_array($issue->comments) ? $issue->comments : (is_array(data_get($issue->raw_fields, 'comments')) ? data_get($issue->raw_fields, 'comments') : []),
                 'story_points' => (float) ($issue->story_points ?? 0),
                 'estimated_hours' => $issue->estimated_hours !== null
                     ? (float) $issue->estimated_hours

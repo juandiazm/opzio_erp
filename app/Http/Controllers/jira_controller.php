@@ -48,7 +48,7 @@ class jira_controller extends Controller
                 ->distinct()
                 ->orderBy('status')
                 ->pluck('status'),
-            'reports' => jira_report::query()->with(['creator', 'project', 'epic'])->latest('updated_at')->limit(25)->get(),
+            'reports' => jira_report::query()->with(['creator', 'project', 'epic', 'recurrence'])->latest('updated_at')->limit(25)->get(),
         ]);
     }
 
@@ -143,7 +143,9 @@ class jira_controller extends Controller
         $report = jira_report::where('unique_id', $uniqueId)->firstOrFail();
         return response($pdf, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="jira-'.str($report->title)->slug().'.pdf"',
+            'Content-Disposition' => $request->boolean('download')
+                ? 'attachment; filename="jira-'.str($report->title)->slug().'.pdf"'
+                : 'inline; filename="jira-'.str($report->title)->slug().'.pdf"',
         ]);
     }
 

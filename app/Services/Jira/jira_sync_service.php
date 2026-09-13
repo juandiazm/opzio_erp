@@ -154,6 +154,55 @@ class jira_sync_service
         }
     }
 
+    public function refreshClientReportData(jira_connection $connection): array
+    {
+        $client = new jira_client($connection);
+        $fields = $client->fields();
+        $settings = $this->settings($connection);
+        $settings['story_points_field'] = $settings['story_points_field'] ?? $this->findFieldId($fields, ['story point', 'story points', 'story point estimate']);
+        $settings['epic_link_field'] = $settings['epic_link_field'] ?? $this->findFieldId($fields, ['epic link', 'parent link']);
+        $connection->update(['settings' => $settings]);
+        $projectMap = jira_project::query()
+            ->where('jira_connection_id', $connection->id)
+            ->orderBy('id')
+            ->get()
+            ->keyBy('project_key');
+        $result = ['updated' => 0, 'failed' => 0, 'errors' => []];
+        $userIds = [];
+        $jql = 'issuetype in ("Story", "User Story", "Historia", "Historia de usuario") ORDER BY key ASC';
+        $startAt = 0;
+        $nextPageToken = null;
+        $pageSize = max(1, min((int) config('jira.max_page_size', 50), 100));
+        do {
+            $page = $client->searchIssues($jql, $this->issueFields($settings), $startAt, $pageSize, $nextPageToken);
+            $items = is_array($page['issues'] ?? null) ? $page['issues'] : [];
+            foreach ($items as $payload) {
+                try {
+                    if (! $this->isUserStoryType((string) data_get($payload, 'fields.issuetype.name', ''))) {
+                        continue;
+                    }
+                    $this->upsertIssue($connection, $payload, $projectMap, $settings, $userIds);
+                    $result['updated']++;
+                } catch (Throwable $exception) {
+                    $result['failed']++;
+                    $result['errors'][] = (string) ($payload['key'] ?? 'sin_clave').': '.jira_client::safeMessage($exception);
+                }
+            }
+            $startAt += count($items);
+            $nextPageToken = $page['nextPageToken'] ?? null;
+            $last = ($page['isLast'] ?? false) === true || count($items) === 0;
+            if (isset($page['total']) && $startAt >= (int) $page['total']) {
+                $last = true;
+            }
+            if (($nextPageToken === null || $nextPageToken === '') && ! isset($page['total']) && count($items) < $pageSize) {
+                $last = true;
+            }
+        } while (! $last);
+        $this->resolveHierarchy($connection);
+
+        return $result;
+    }
+
     public function syncBatch(
         jira_connection $connection,
         int $days = 30,
@@ -352,16 +401,29 @@ class jira_sync_service
             $epicKey = $parentKey;
         }
 
-        $rawFields = [
-            'parent_key' => $parentKey,
-            'epic_key' => is_scalar($epicKey) ? (string) $epicKey : null,
-            'story_points_field' => $settings['story_points_field'] ?? null,
-            'epic_link_field' => $settings['epic_link_field'] ?? null,
-        ];
         $issue = jira_issue::firstOrNew([
             'jira_connection_id' => $connection->id,
             'external_id' => (string) ($payload['id'] ?? $payload['key']),
         ]);
+        $rawFields = array_merge((array) $issue->raw_fields, [
+            'parent_key' => $parentKey,
+            'epic_key' => is_scalar($epicKey) ? (string) $epicKey : null,
+            'story_points_field' => $settings['story_points_field'] ?? null,
+            'epic_link_field' => $settings['epic_link_field'] ?? null,
+        ]);
+        if (array_key_exists('description', $fields)) {
+            $rawFields['description'] = $this->jiraText($fields['description']);
+        }
+        $hasCommentField = array_key_exists('comment', $fields);
+        if ($hasCommentField) {
+            $rawFields['comments'] = $this->normalizeCommentItems(data_get($fields, 'comment.comments', []));
+        } else {
+            $rawFields['comments'] = is_array($rawFields['comments'] ?? null) ? $rawFields['comments'] : [];
+        }
+        $description = array_key_exists('description', $fields)
+            ? $this->jiraText($fields['description'])
+            : trim((string) ($issue->description ?: ($rawFields['description'] ?? '')));
+        $comments = $hasCommentField ? $rawFields['comments'] : (is_array($issue->comments) ? $issue->comments : $rawFields['comments']);
         $wasManualHours = (bool) $issue->estimated_hours_manual;
         $storyPoints = $this->numeric($this->fieldValue($fields, $settings['story_points_field'] ?? null));
         $issue->fill([
@@ -369,6 +431,8 @@ class jira_sync_service
                 'issue_key' => (string) ($payload['key'] ?? ''),
                 'issue_type' => $issueTypeName,
                 'summary' => Str::limit(trim((string) ($fields['summary'] ?? 'Sin titulo')), 500, ''),
+                'description' => $description !== '' ? $description : null,
+                'comments' => $comments,
                 'status' => data_get($fields, 'status.name'),
                 'status_category' => data_get($fields, 'status.statusCategory.name'),
                 'priority' => data_get($fields, 'priority.name'),
@@ -467,6 +531,8 @@ class jira_sync_service
             logger()->warning('No fue posible sincronizar historial Jira.', ['issue' => $issue->issue_key, 'message' => jira_client::safeMessage($exception)]);
         }
 
+        $this->syncIssueComments($client, $issue);
+
         return [$worklogs, $history];
     }
 
@@ -508,7 +574,7 @@ class jira_sync_service
     private function issueFields(array $settings): array
     {
         return array_values(array_filter(array_unique([
-            'summary', 'project', 'issuetype', 'status', 'priority', 'assignee', 'reporter', 'parent',
+            'summary', 'description', 'comment', 'project', 'issuetype', 'status', 'priority', 'assignee', 'reporter', 'parent',
             'labels', 'components', 'created', 'updated', 'resolutiondate', 'duedate',
             'timeoriginalestimate', 'timespent', 'customfield_10020',
             $settings['story_points_field'] ?? null,
@@ -521,6 +587,81 @@ class jira_sync_service
         return array_merge([
             'timezone' => config('jira.default_timezone', 'America/Bogota'),
         ], (array) $connection->settings);
+    }
+
+    private function syncIssueComments(jira_client $client, jira_issue $issue): void
+    {
+        try {
+            $startAt = 0;
+            $comments = [];
+            do {
+                $page = $client->comments($issue->issue_key, $startAt, 100);
+                $items = is_array($page['comments'] ?? null) ? $page['comments'] : [];
+                $comments = array_merge($comments, $this->normalizeCommentItems($items));
+                $startAt += count($items);
+                $last = count($items) === 0 || $startAt >= (int) ($page['total'] ?? $startAt);
+            } while (! $last);
+
+            $rawFields = (array) $issue->raw_fields;
+            $rawFields['comments'] = $comments;
+            $issue->comments = $comments;
+            $issue->raw_fields = $rawFields;
+            $issue->saveQuietly();
+        } catch (Throwable $exception) {
+            logger()->warning('No fue posible sincronizar comentarios Jira.', ['issue' => $issue->issue_key, 'message' => jira_client::safeMessage($exception)]);
+        }
+    }
+
+    private function normalizeCommentItems(mixed $items): array
+    {
+        return collect(is_array($items) ? $items : [])->map(function ($payload): ?array {
+            if (! is_array($payload)) {
+                return null;
+            }
+            $content = $this->jiraText($payload['body'] ?? null);
+            if ($content === '') {
+                return null;
+            }
+
+            return [
+                'id' => (string) ($payload['id'] ?? ''),
+                'author' => trim((string) data_get($payload, 'author.displayName', '')),
+                'created' => $payload['created'] ?? null,
+                'content' => $content,
+            ];
+        })->filter()->values()->all();
+    }
+
+    private function jiraText(mixed $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+        if (is_scalar($value)) {
+            return trim((string) $value);
+        }
+        if (! is_array($value)) {
+            return '';
+        }
+        if (isset($value['text']) && is_scalar($value['text'])) {
+            return trim((string) $value['text']);
+        }
+
+        $children = array_key_exists('content', $value) && is_array($value['content'])
+            ? $value['content']
+            : $value;
+        $parts = [];
+        foreach ($children as $child) {
+            $text = $this->jiraText($child);
+            if ($text !== '') {
+                $parts[] = $text;
+            }
+        }
+
+        $type = strtolower((string) ($value['type'] ?? ''));
+        $separator = in_array($type, ['paragraph', 'heading', 'listitem', 'blockquote', 'codeblock'], true) ? "\n" : '';
+
+        return trim(implode($separator, $parts));
     }
 
     private function findFieldId(array $fields, array $names): ?string

@@ -37,6 +37,10 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->timezone('America/Bogota')
             ->withoutOverlapping(120);
+        $schedule->command('jira:process-recurrences')
+            ->dailyAt('00:10')
+            ->timezone('America/Bogota')
+            ->withoutOverlapping(120);
         $schedule->command('db:backup')->cron('0 2 * * *');
     }
 

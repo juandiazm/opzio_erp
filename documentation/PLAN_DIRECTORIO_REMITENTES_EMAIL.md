@@ -28,4 +28,5 @@ Los correos directos y los que se crean en `mail_logs` guardan `_from` y `_reply
 - Contratos: Legal.
 - News, redes y marketing: Comunicaciones.
 - Reportes mensuales de servidores: Soporte.
+- Reportes de Jira: Soporte.
 - Notificaciones manuales: remitente aprobado elegido por el usuario o Información por defecto.

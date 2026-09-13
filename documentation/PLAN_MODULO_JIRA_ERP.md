@@ -659,7 +659,8 @@ Campos recomendados:
 - `intention`;
 - `from_date`, `to_date`;
 - `jira_project_id` nullable;
-- `jira_epic_id` nullable;
+- `jira_epic_issue_id` nullable;
+- `jira_project_ids`, `jira_epic_issue_ids`, `jira_user_ids` y `jira_statuses` como filtros JSON opcionales, alineados con la seleccion multiple del dashboard;
 - `data_sources` JSON;
 - `context_prompt` text nullable;
 - `status` (`generating`, `generated`, `failed`);
@@ -671,7 +672,11 @@ Campos recomendados:
 
 Indices recomendados: estado + created_at, rango de fechas, proyecto y epic.
 
-El snapshot debe conservar tambien `connection_id`, fecha de sincronizacion usada, semantica de Story Points, filtros y calidad de datos.
+El snapshot debe conservar tambien `connection_id`, fecha de sincronizacion usada, semantica de Story Points, los filtros multiples seleccionados (proyectos, epicas, usuarios y estados) y calidad de datos. Los campos singulares de proyecto y epica se mantienen para compatibilidad con reportes legacy.
+
+El rango temporal del dashboard y de los snapshots de reportes se calcula con las fechas de Jira almacenadas en `jira_created_at` y `jira_updated_at`. Los timestamps locales `created_at` y `updated_at` del ERP no participan en la inclusion de issues. Los worklogs se filtran por `started_at`, que corresponde a la fecha de inicio recibida desde Jira; `jira_resolved_at` se conserva para indicadores de completitud, pero no amplia el rango de inclusion.
+
+Para los informes dirigidos a cliente, `jira_issues` conserva ademas `description` y `comments` normalizados desde Jira. La sincronizacion solicita ambos campos y la migracion `2026_09_12_000002_add_client_report_source_fields_to_jira_issues` reconsulta todas las historias de usuario existentes mediante paginas de Jira para completar el backfill sin depender de una exportacion CSV.
 
 ---
 

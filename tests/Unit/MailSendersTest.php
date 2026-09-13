@@ -36,6 +36,7 @@ class MailSendersTest extends TestCase
         $this->assertSame('contabilidad@opzio.co', $policy->Mail_GetSenderForView('mail.purchase_order')['address']);
         $this->assertSame('comunicaciones@opzio.co', $policy->Mail_GetSenderForView('mail.ia_marketing_report')['address']);
         $this->assertSame('soporte@opzio.co', $policy->Mail_GetSenderForView('mail.servers.monthly_report')['address']);
+        $this->assertSame('soporte@opzio.co', $policy->Mail_GetSenderForView('mail.reports.jira')['address']);
         $this->assertSame('info@opzio.co', $policy->Mail_GetSenderForView('mail.notification', 'unknown@example.test')['address']);
         $this->assertSame('legal@opzio.co', $policy->Mail_GetSenderForView('mail.notification', 'legal@opzio.co')['address']);
     }

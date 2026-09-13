@@ -41,6 +41,8 @@ trait mail_senders_trait
         $recommended = null;
         if ($view === 'mail.contract' || str_contains($view, 'contract')) {
             $recommended = 'legal@opzio.co';
+        } elseif (str_contains($view, 'jira_report') || str_contains($view, 'reports.jira')) {
+            $recommended = 'soporte@opzio.co';
         } elseif ($view === 'mail.notification') {
             $recommended = $requestedAddress;
         } elseif (str_contains($view, 'servers.monthly_report') || str_contains($view, 'backup_failed')) {

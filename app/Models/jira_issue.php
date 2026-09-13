@@ -25,6 +25,7 @@ class jira_issue extends Model
         'components' => 'array',
         'sprints' => 'array',
         'raw_fields' => 'array',
+        'comments' => 'array',
     ];
 
     public function connection()
@@ -55,5 +56,10 @@ class jira_issue extends Model
     public function epic()
     {
         return $this->belongsTo(self::class, 'epic_jira_issue_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_jira_issue_id');
     }
 }

@@ -9,6 +9,9 @@ trait pdf_trait
 
         $html = \View::make($view, compact('Data'))->render();
         $html = $this->PDF_InlineLocalAssets($html);
+        $isJiraReport = $view === 'pdf.jira_report';
+        $processTimeout = (int) config('services.pdf.'.($isJiraReport ? 'jira_timeout' : 'timeout'), $isJiraReport ? 300 : 180);
+        $protocolTimeout = (int) config('services.pdf.'.($isJiraReport ? 'jira_protocol_timeout' : 'protocol_timeout'), $isJiraReport ? 300 : 180);
 
         $browsershot = Browsershot::html($html)
             ->setNodeBinary(config('services.pdf.node_binary', 'node'))
@@ -23,6 +26,8 @@ trait pdf_trait
             ->waitUntilNetworkIdle()
             ->newHeadless()
             ->writeOptionsToFile()
+            ->timeout(max(30, $processTimeout))
+            ->protocolTimeout(max(30, $protocolTimeout))
             ->setOption('preferCSSPageSize', true);
 
         $puppeteerCacheDir = getenv('PUPPETEER_CACHE_DIR') ?: null;
@@ -50,6 +55,13 @@ trait pdf_trait
                 ->footerHtml($this->PDF_ContractFooterHtml());
         }
 
+        if ($view === 'pdf.jira_report') {
+            $browsershot
+                ->showBrowserHeaderAndFooter()
+                ->headerHtml($this->PDF_JiraReportHeaderHtml($Data))
+                ->footerHtml($this->PDF_JiraReportFooterHtml());
+        }
+
             if ($view === 'pdf.servers.monthly_report') {
                 $browsershot
                     ->showBrowserHeaderAndFooter()
@@ -63,10 +75,32 @@ trait pdf_trait
     private function PDF_ContractHeaderHtml($Data = [])
     {
         $contract = is_array($Data['contract'] ?? null) ? $Data['contract'] : [];
+        return $this->PDF_EnterpriseHeaderHtml(
+            (string) ($contract['unique_id'] ?? ''),
+            (string) ($contract['date'] ?? now()->format('Y-m-d'))
+        );
+    }
+
+    private function PDF_JiraReportHeaderHtml($Data = [])
+    {
+        $report = $Data['report'] ?? null;
+        $generatedAt = data_get($report, 'generated_at');
+        $date = $generatedAt instanceof \DateTimeInterface
+            ? $generatedAt->format('Y-m-d')
+            : now()->format('Y-m-d');
+
+        return $this->PDF_EnterpriseHeaderHtml(
+            (string) data_get($report, 'unique_id', ''),
+            $date
+        );
+    }
+
+    private function PDF_EnterpriseHeaderHtml($identifier, $date)
+    {
         $logo = $this->PDF_AssetDataUri(public_path('images/opzio-logo-wide-purple-transparent.png'));
         $logo = $logo ? htmlspecialchars($logo, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : null;
-        $identifier = htmlspecialchars((string) ($contract['unique_id'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $date = htmlspecialchars((string) ($contract['date'] ?? now()->format('Y-m-d')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $identifier = htmlspecialchars((string) $identifier, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $date = htmlspecialchars((string) $date, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $logoHtml = $logo
             ? '<img src="'.$logo.'" alt="Opzio" style="display: inline-block; width: 130px; height: auto;">'
             : '<span style="color: #220245; font-size: 16px; font-weight: bold;">OPZIO</span>';
@@ -77,6 +111,11 @@ trait pdf_trait
     private function PDF_ContractFooterHtml()
     {
         return '<div style="box-sizing: border-box; width: 100%; margin: 0; padding: 0 8px;"><table style="box-sizing: border-box; width: 100%; margin: 0; padding: 5px 0 0; border-top: 1px solid #d9d9d9; border-collapse: collapse; color: #777; font-family: Arial, sans-serif; font-size: 8px; white-space: nowrap;"><tr><td style="width: 33%; padding: 5px 0 0; text-align: left;">legal@opzio.co</td><td style="width: 34%; padding: 5px 0 0; text-align: center;">Página <span class="pageNumber"></span> de <span class="totalPages"></span></td><td style="width: 33%; padding: 5px 0 0; text-align: right;">opzio.co</td></tr></table></div>';
+    }
+
+    private function PDF_JiraReportFooterHtml()
+    {
+        return '<div style="box-sizing: border-box; width: 100%; margin: 0; padding: 0 8px;"><table style="box-sizing: border-box; width: 100%; margin: 0; padding: 5px 0 0; border-top: 1px solid #d9d9d9; border-collapse: collapse; color: #777; font-family: Arial, sans-serif; font-size: 8px; white-space: nowrap;"><tr><td style="width: 33%; padding: 5px 0 0; text-align: left;">soporte@opzio.co</td><td style="width: 34%; padding: 5px 0 0; text-align: center;">Página <span class="pageNumber"></span> de <span class="totalPages"></span></td><td style="width: 33%; padding: 5px 0 0; text-align: right;">opzio.co</td></tr></table></div>';
     }
 
     private function PDF_InlineLocalAssets($html)

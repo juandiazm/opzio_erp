@@ -91,6 +91,15 @@ class jira_client
         ]);
     }
 
+    public function comments(string $issueKey, int $startAt = 0, int $maxResults = 100): array
+    {
+        return $this->get('/issue/'.rawurlencode($issueKey).'/comment', [
+            'startAt' => $startAt,
+            'maxResults' => $maxResults,
+            'orderBy' => 'created',
+        ]);
+    }
+
     public function get(string $path, array $query = [], ?float $timeout = null, ?int $retries = null): array
     {
         $response = $this->request($timeout, $retries)->get($path, $query);

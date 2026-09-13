@@ -17,10 +17,15 @@ class jira_report extends Model
         'from_date' => 'date',
         'to_date' => 'date',
         'data_sources' => 'array',
+        'jira_project_ids' => 'array',
+        'jira_epic_issue_ids' => 'array',
+        'jira_user_ids' => 'array',
+        'jira_statuses' => 'array',
         'data_snapshot' => 'array',
         'report_data' => 'array',
         'generated_at' => 'datetime',
         'last_emailed_at' => 'datetime',
+        'recurrence_sequence' => 'integer',
     ];
 
     protected static function booted(): void
@@ -55,5 +60,10 @@ class jira_report extends Model
     public function epic()
     {
         return $this->belongsTo(jira_issue::class, 'jira_epic_issue_id');
+    }
+
+    public function recurrence()
+    {
+        return $this->belongsTo(jira_report_recurrence::class, 'recurrence_id');
     }
 }

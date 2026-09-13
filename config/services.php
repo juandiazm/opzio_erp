@@ -44,7 +44,7 @@ return [
         'models' => [
             'fast' => env('OPENAI_MODEL_FAST', 'gpt-5.6-luna'),
             'chat' => env('OPENAI_MODEL_CHAT', 'gpt-5.6-terra'),
-            'content' => env('OPENAI_MODEL_CONTENT', 'gpt-5.6-terra'),
+            'content' => 'gpt-5.6-luna',
             'reasoning' => env('OPENAI_MODEL_REASONING', 'gpt-5.6-sol'),
             'image' => env('OPENAI_IMAGE_MODEL', 'gpt-image-2'),
         ],
@@ -101,6 +101,10 @@ return [
     ],
 
     'pdf' => [
+        'timeout' => (int) env('PDF_TIMEOUT', 180),
+        'protocol_timeout' => (int) env('PDF_PROTOCOL_TIMEOUT', 180),
+        'jira_timeout' => (int) env('PDF_JIRA_TIMEOUT', 300),
+        'jira_protocol_timeout' => (int) env('PDF_JIRA_PROTOCOL_TIMEOUT', 300),
         'chrome_path' => env(
             'PDF_CHROME_PATH',
             PHP_OS_FAMILY === 'Windows' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : null

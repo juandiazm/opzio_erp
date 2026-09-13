@@ -360,7 +360,7 @@ Confirma que has procesado el archivo respondiendo únicamente:
 PROMPT;
 
         $payload = [
-            'model' => 'gpt-4.1',
+            'model' => 'gpt-5.6-luna',
             'input' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 [
@@ -384,7 +384,7 @@ PROMPT;
         if ($this->IAClient === null) $this->IA_GetConnection();
 
         $payload = [
-            'model'                => 'gpt-4.1',
+            'model'                => 'gpt-5.6-luna',
             'previous_response_id' => $previousResponseId,
             'input'                => [
                 ['role' => 'user', 'content' => $prompt],
@@ -512,7 +512,7 @@ PROMPT;
 
             // Step R0: send the feedback, chained from the last section response
             $feedbackPayload = [
-                'model'                => 'gpt-4.1',
+                'model'                => 'gpt-5.6-luna',
                 'previous_response_id' => $previousResponseId,
                 'input' => [
                     [

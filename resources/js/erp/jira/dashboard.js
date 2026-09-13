@@ -175,7 +175,7 @@ const jiraPiePercentages = {
 	},
 };
 
-function initializeJiraMultiSelect(field, config = {}) {
+export function initializeJiraMultiSelect(field, config = {}) {
 	const select = field?.querySelector('select[multiple]');
 	if (!field || !select || field.dataset.initialized === 'true') return;
 	field.dataset.initialized = 'true';
