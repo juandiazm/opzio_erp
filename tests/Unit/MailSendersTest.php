@@ -24,6 +24,7 @@ class MailSendersTest extends TestCase
         $this->assertSame('OPZIO SAS - Soporte', $directory['soporte@opzio.co']['name']);
         $this->assertSame('OPZIO SAS - Contabilidad', $directory['contabilidad@opzio.co']['name']);
         $this->assertSame('OPZIO SAS - Comunicaciones', $directory['comunicaciones@opzio.co']['name']);
+        $this->assertSame('OPZIO SAS - Product Management', $directory['product-managment@opzio.co']['name']);
         $this->assertSame('info@opzio.co', $policy->Mail_GetReplyTo()['address']);
     }
 
@@ -36,7 +37,7 @@ class MailSendersTest extends TestCase
         $this->assertSame('contabilidad@opzio.co', $policy->Mail_GetSenderForView('mail.purchase_order')['address']);
         $this->assertSame('comunicaciones@opzio.co', $policy->Mail_GetSenderForView('mail.ia_marketing_report')['address']);
         $this->assertSame('soporte@opzio.co', $policy->Mail_GetSenderForView('mail.servers.monthly_report')['address']);
-        $this->assertSame('soporte@opzio.co', $policy->Mail_GetSenderForView('mail.reports.jira')['address']);
+        $this->assertSame('product-managment@opzio.co', $policy->Mail_GetSenderForView('mail.reports.jira')['address']);
         $this->assertSame('info@opzio.co', $policy->Mail_GetSenderForView('mail.notification', 'unknown@example.test')['address']);
         $this->assertSame('legal@opzio.co', $policy->Mail_GetSenderForView('mail.notification', 'legal@opzio.co')['address']);
     }

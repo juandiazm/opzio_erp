@@ -11,8 +11,9 @@ La política vive en `app/traits/mail_senders_trait.php` y se aplica desde `mail
 | `soporte@opzio.co` | `OPZIO SAS - Soporte` | Soporte, accesos, chats, backups y observabilidad |
 | `contabilidad@opzio.co` | `OPZIO SAS - Contabilidad` | Pagos, cotizaciones, órdenes y facturación |
 | `comunicaciones@opzio.co` | `OPZIO SAS - Comunicaciones` | News, publicaciones y reportes de marketing |
+| `product-managment@opzio.co` | `OPZIO SAS - Product Management` | Reportes de Jira |
 
-Todos los correos usan `info@opzio.co` como `Reply-To`, incluyendo flujos que se envían desde Legal, Contabilidad, Soporte o Comunicaciones.
+Los correos usan `info@opzio.co` como `Reply-To` por defecto. Los reportes de Jira usan como `Reply-To` el correo del usuario que inicia el envío.
 
 ## Resolución por propósito
 
@@ -28,5 +29,5 @@ Los correos directos y los que se crean en `mail_logs` guardan `_from` y `_reply
 - Contratos: Legal.
 - News, redes y marketing: Comunicaciones.
 - Reportes mensuales de servidores: Soporte.
-- Reportes de Jira: Soporte.
+- Reportes de Jira: Product Management, con `Reply-To` del usuario que los envía.
 - Notificaciones manuales: remitente aprobado elegido por el usuario o Información por defecto.

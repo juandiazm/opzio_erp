@@ -31,7 +31,7 @@ trait mail_trait
 
 		try {
 			$from = $this->Mail_GetSenderForView($View, $from);
-			$replyTo = $this->Mail_GetReplyTo();
+			$replyTo = $replyTo ?: $this->Mail_GetReplyTo();
 			if (App::environment() === 'local') {
 				$Mails = [
 					[
@@ -97,7 +97,7 @@ trait mail_trait
 			}
 			
 					$from = $this->Mail_GetSenderForView($View, $from);
-					$replyTo = $this->Mail_GetReplyTo();
+					$replyTo = $replyTo ?: $this->Mail_GetReplyTo();
 			
 			$deferred = $this->Mail_ShouldDeferExternalOnSunday($ViewData, $Mails);
 			if ($deferred) {

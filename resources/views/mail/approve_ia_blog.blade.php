@@ -44,7 +44,7 @@
 <div class="email-wrapper">
     <div class="email-container">
         <div class="email-header">
-            <img src="{{ asset('images/opzio-logo-wide-purple-transparent.webp') }}" alt="Opzio S.A.S" class="email-logo-img">
+            <img src="{{ asset('images/opzio-logo-wide-purple-transparent.png') }}" width="180" height="84" alt="Opzio S.A.S" class="email-logo-img" style="display:block;width:180px;max-width:100%;height:auto;margin:0 auto;border:0;outline:none;text-decoration:none;">
             
         </div>
         <div class="email-content">

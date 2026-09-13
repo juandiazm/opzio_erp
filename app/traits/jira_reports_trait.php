@@ -192,6 +192,15 @@ trait jira_reports_trait
         if ($recipients === []) {
             throw ValidationException::withMessages(['recipients' => 'Escribe al menos un correo valido.']);
         }
+        $sessionUser = session('user');
+        $replyToEmail = trim((string) data_get($sessionUser, 'email', ''));
+        $replyToName = trim((string) data_get($sessionUser, 'complete_name', ''));
+        if ($replyToName === '') {
+            $replyToName = trim((string) data_get($sessionUser, 'name', '').' '.(string) (data_get($sessionUser, 'lastname') ?: data_get($sessionUser, 'last_name', '')));
+        }
+        $replyTo = filter_var($replyToEmail, FILTER_VALIDATE_EMAIL)
+            ? ['address' => $replyToEmail, 'name' => $replyToName ?: $replyToEmail]
+            : $this->Mail_GetReplyTo();
         $relativePath = $this->Jira_EnsureReportPdf($report);
         $mailResponse = $this->SendMail_attach_array(
             ['subject' => $report->title],
@@ -203,6 +212,9 @@ trait jira_reports_trait
                 'generated_at' => ($report->generated_at ?: now())->format('d/m/Y H:i'),
             ],
             ['path' => Storage::disk('local')->path($relativePath), 'name' => Str::slug($report->title).'.pdf'],
+            null,
+            null,
+            $replyTo,
         );
         if (($mailResponse['status'] ?? 0) === 1) {
             $report->update(['last_emailed_at' => now()]);
