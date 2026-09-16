@@ -31,6 +31,7 @@
     @endforelse
 </section>
 
+
 <section class="section client-report-copy">
     <div class="section-heading"><span class="section-number">03</span><h2>Esfuerzo registrado</h2></div>
     <p>{{ $clientText($content['effort_analysis'] ?? null, 'Sin analisis de esfuerzo disponible.') }}</p>
