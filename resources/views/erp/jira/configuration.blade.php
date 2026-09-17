@@ -1,4 +1,4 @@
-<div class="tab-pane fade show active" id="jira-configuration" role="tabpanel" aria-labelledby="jira-configuration-tab">
+<div class="tab-pane fade" id="jira-configuration" role="tabpanel" aria-labelledby="jira-configuration-tab">
     <div class="jira-config-layout jira-single-config-layout">
         <form class="jira-panel jira-config-form" data-jira-connection-form>
             <div class="jira-form-grid">

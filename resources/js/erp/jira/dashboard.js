@@ -4,6 +4,7 @@ import { jiraState } from './state.js';
 const number = (value, digits = 0) => new Intl.NumberFormat('es-CO', {maximumFractionDigits: digits}).format(Number(value || 0));
 const labels = (items) => items.map((item) => item.label);
 const values = (items, key) => items.map((item) => Number(item[key] || 0));
+const JIRA_CHART_COLORS = ['#220245', '#885FAE', '#F36803', '#16A34A', '#C2410C', '#2563EB', '#0F766E', '#A21CAF', '#B45309', '#4F46E5'];
 const ISSUE_PAGE_SIZES = [5, 10, 50];
 const DEFAULT_ISSUES_PER_PAGE = 10;
 const issuePagination = {page: 1, perPage: DEFAULT_ISSUES_PER_PAGE};
@@ -445,6 +446,12 @@ function renderIssuesTable(root, issues, requestedPage, requestedPerPage = issue
 		assigneeCell.append(assignee);
 		row.append(assigneeCell);
 
+		[issue.status || 'Sin estado', number(issue.story_points, 2)].forEach((value) => {
+			const cell = document.createElement('td');
+			cell.textContent = value;
+			row.append(cell);
+		});
+
 		const hoursCell = document.createElement('td');
 		const hoursInput = document.createElement('input');
 		hoursInput.type = 'number';
@@ -458,11 +465,9 @@ function renderIssuesTable(root, issues, requestedPage, requestedPerPage = issue
 		hoursCell.append(hoursInput);
 		row.append(hoursCell);
 
-		[issue.status || 'Sin estado', number(issue.story_points, 2), issue.resolved_at || '-'].forEach((value) => {
-			const cell = document.createElement('td');
-			cell.textContent = value;
-			row.append(cell);
-		});
+		const resolvedCell = document.createElement('td');
+		resolvedCell.textContent = issue.resolved_at || '-';
+		row.append(resolvedCell);
 		body.append(row);
 	});
 	if (!pageIssues.length) body.innerHTML = '<tr><td colspan="9" class="jira-empty">No hay historias de usuario en el rango.</td></tr>';
@@ -482,7 +487,7 @@ function renderChart(name, items, datasets, type = 'bar') {
 	if (!canvas || typeof Chart === 'undefined') return;
 	jiraState.charts[name]?.destroy();
 	let options;
-	if (type === 'pie') {
+	if (type === 'pie' || type === 'doughnut') {
 		options = {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -493,8 +498,8 @@ function renderChart(name, items, datasets, type = 'bar') {
 					labels: {
 						generateLabels: (chart) => {
 							const colors = chart.data.datasets[0]?.backgroundColor || [];
-							return items.map((project, index) => ({
-								text: `${project.label || 'Sin proyecto'} · ${number(project.story_points, 2)} SP`,
+							return items.map((item, index) => ({
+								text: `${item.label || 'Sin categoria'} · ${number(item.story_points, 2)} SP`,
 								fillStyle: Array.isArray(colors) ? colors[index] : colors,
 								strokeStyle: '#ffffff',
 								lineWidth: 2,
@@ -508,10 +513,10 @@ function renderChart(name, items, datasets, type = 'bar') {
 				tooltip: {
 					callbacks: {
 						label: (context) => {
-							const project = items[context.dataIndex];
+							const item = items[context.dataIndex];
 							const total = items.reduce((sum, item) => sum + Number(item.story_points || 0), 0);
-							const percentage = total > 0 ? (Number(project?.story_points || 0) / total) * 100 : 0;
-							return `${project?.label || 'Sin proyecto'}: ${number(project?.story_points, 2)} SP · ${number(percentage, 1)}%`;
+							const percentage = total > 0 ? (Number(item?.story_points || 0) / total) * 100 : 0;
+							return `${item?.label || 'Sin categoria'}: ${number(item?.story_points, 2)} SP · ${number(percentage, 1)}%`;
 						},
 					},
 				},
@@ -520,7 +525,7 @@ function renderChart(name, items, datasets, type = 'bar') {
 	} else {
 		options = {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: true, position: 'top'}}, scales: {y: {beginAtZero: true}}};
 	}
-	jiraState.charts[name] = new Chart(canvas, {type, data: {labels: labels(items), datasets}, options, plugins: type === 'pie' ? [jiraPiePercentages] : []});
+	jiraState.charts[name] = new Chart(canvas, {type, data: {labels: labels(items), datasets}, options, plugins: type === 'pie' || type === 'doughnut' ? [jiraPiePercentages] : []});
 }
 
 export async function initializeJiraDashboard(root) {
@@ -600,10 +605,25 @@ export async function initializeJiraDashboard(root) {
 				.filter((project) => Number(project.story_points || 0) > 0)
 				.sort((left, right) => Number(right.story_points || 0) - Number(left.story_points || 0))
 				.slice(0, 10);
+			const epics = (data.epics || [])
+				.filter((epic) => Number(epic.story_points || 0) > 0)
+				.sort((left, right) => Number(right.story_points || 0) - Number(left.story_points || 0))
+			const noEpic = epics.find((epic) => epic.label === 'Sin epica');
+			const namedEpics = epics.filter((epic) => epic !== noEpic);
+			const epicSegments = namedEpics.slice(0, noEpic ? 8 : 9);
+			const remainingEpics = namedEpics.slice(epicSegments.length);
+			if (remainingEpics.length) {
+				epicSegments.push({
+					label: 'Otras epicas',
+					story_points: remainingEpics.reduce((total, epic) => total + Number(epic.story_points || 0), 0),
+				});
+			}
+			if (noEpic) epicSegments.push(noEpic);
 			const users = data.users || [];
 			renderUserStoryPoints(root, users);
 			renderUserHoursTable(root, users);
-			renderChart('projects', projects, [{label: 'Story Points', data: values(projects, 'story_points'), backgroundColor: ['#220245', '#885FAE', '#F36803', '#16A34A', '#C2410C', '#2563EB', '#0F766E', '#A21CAF', '#B45309', '#4F46E5'], borderColor: '#ffffff', borderWidth: 2}], 'pie');
+			renderChart('projects', projects, [{label: 'Story Points', data: values(projects, 'story_points'), backgroundColor: JIRA_CHART_COLORS, borderColor: '#ffffff', borderWidth: 2}], 'pie');
+			renderChart('epics', epicSegments, [{label: 'Story Points', data: values(epicSegments, 'story_points'), backgroundColor: JIRA_CHART_COLORS, borderColor: '#ffffff', borderWidth: 2}], 'doughnut');
 			issues = Array.isArray(data.issues) ? data.issues : [];
 			renderIssuesTable(root, issues, 1);
 			root.querySelector('[data-jira-issue-count]').textContent = number(issues.length);

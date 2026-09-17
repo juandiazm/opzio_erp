@@ -222,7 +222,7 @@
 .jira-user-points-copy { display: grid; gap: 3px; margin-top: 12px; min-width: 0; width: 100%; }
 .jira-user-points-copy > strong { color: var(--jira-ink); font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .jira-user-points-copy > small { color: var(--jira-muted); font-size: .69rem; }
-.jira-user-table-panel { min-width: 0; }
+.jira-user-table-panel { grid-column: 1 / -1; min-width: 0; }
 .jira-user-table-wrap { max-height: 300px; overflow: auto; }
 .jira-user-table { margin-bottom: 0; min-width: 520px; }
 .jira-user-table thead th { background: var(--jira-surface); color: var(--jira-muted); font-size: .7rem; position: sticky; text-transform: uppercase; top: 0; z-index: 1; }
@@ -233,6 +233,7 @@
 .jira-user-table-avatar { align-items: center; background: var(--jira-soft); border: 1px solid var(--jira-line); border-radius: 50%; color: var(--jira-primary); display: inline-flex; flex: 0 0 30px; font-size: .68rem; font-weight: 800; height: 30px; justify-content: center; overflow: hidden; width: 30px; }
 .jira-user-table-avatar img { height: 100%; object-fit: cover; width: 100%; }
 .jira-project-pie-panel canvas { max-height: 300px; }
+.jira-epic-doughnut-panel canvas { max-height: 300px; }
 .jira-chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-bottom: 18px; }
 .jira-chart-panel canvas { max-height: 280px; }
 .jira-table-wrap { max-height: min(500px, 60vh); overflow: auto; }
