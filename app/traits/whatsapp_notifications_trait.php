@@ -13,6 +13,15 @@ trait whatsapp_notifications_trait
 {
     use twilio_whatsapp_trait;
 
+    private function Notification_BroadcastWhatsapp($eventName, array $payload): void
+    {
+        try {
+            event(new \App\Events\pusherEvents('whatsapp', $eventName, $payload));
+        } catch (\Throwable $exception) {
+            info('Notification_BroadcastWhatsapp error: '.$exception->getMessage());
+        }
+    }
+
     private function Notification_WhatsappResponse($message, $data = [], $status = 1): array
     {
         return array_merge([
@@ -406,6 +415,12 @@ trait whatsapp_notifications_trait
         $conversation->window_expires_at = Carbon::now()->addHours(24);
         $conversation->last_inbound_sid = $messageSid ?: null;
         $conversation->save();
+        $this->Notification_BroadcastWhatsapp('message', [
+            'conversation_id' => $conversation->id,
+            'message_id' => $message->id,
+            'direction' => 'inbound',
+            'unread_count' => (int) $conversation->unread_count,
+        ]);
 
         return [
             'status' => 1,
@@ -437,6 +452,12 @@ trait whatsapp_notifications_trait
             $message->sent_at = Carbon::now();
         }
         $message->save();
+        $this->Notification_BroadcastWhatsapp('status', [
+            'conversation_id' => $message->conversation_id,
+            'message_id' => $message->id,
+            'direction' => 'outbound',
+            'status' => $message->status,
+        ]);
 
         return ['status' => 1, 'message_id' => $message->id, 'provider_status' => $status];
     }

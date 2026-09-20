@@ -46,7 +46,15 @@
                 <form class="notifications-whatsapp-composer" id="notifications-whatsapp-message-form">
                     <div class="notifications-whatsapp-composer-tools">
                         <label class="notifications-whatsapp-template-select"><span>Plantilla</span><select id="notifications-whatsapp-template"><option value="">Mensaje libre</option></select></label>
-                        <label class="notifications-whatsapp-variables"><span>Variables JSON</span><input type="text" id="notifications-whatsapp-variables" placeholder='{"1":"Valor"}'></label>
+                        <input type="hidden" id="notifications-whatsapp-variables" value="{}">
+                    </div>
+                    <div class="notifications-whatsapp-template-preview d-none" id="notifications-whatsapp-template-preview">
+                        <div class="notifications-whatsapp-template-preview-header">
+                            <div><strong>Vista previa del mensaje</strong><span id="notifications-whatsapp-template-preview-name"></span></div>
+                            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                        </div>
+                        <div class="notifications-whatsapp-template-preview-body" id="notifications-whatsapp-template-preview-body"></div>
+                        <div class="notifications-whatsapp-template-variables" id="notifications-whatsapp-template-variables-form"></div>
                     </div>
                     <div class="notifications-whatsapp-composer-row">
                         <textarea id="notifications-whatsapp-body" rows="2" maxlength="4096" placeholder="Escribe un mensaje" aria-label="Mensaje de WhatsApp"></textarea>

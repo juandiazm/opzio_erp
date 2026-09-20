@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Events\pusherEvents;
 use App\Console\Commands\send_queued_mails;
 use App\Console\Commands\send_pay_remaining;
 use App\Mail\CustomMail;
@@ -20,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -865,6 +867,25 @@ class notifications_test extends TestCase
         $this->assertSame(1, $read['status']);
         $this->assertSame(0, (int) $conversation->fresh()->unread_count);
         $this->assertSame(0, $this->Notification_GetWhatsappUnreadCount()['unread_count']);
+    }
+
+    public function test_whatsapp_incoming_broadcasts_realtime_message_event()
+    {
+        Event::fake([pusherEvents::class]);
+
+        $response = $this->Notification_HandleWhatsappIncoming([
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-PUSHER-001',
+            'From' => 'whatsapp:+573000000014',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Actualiza el chat',
+        ]);
+
+        Event::assertDispatched(pusherEvents::class, function (pusherEvents $event) use ($response) {
+            return $event->SERVICE_CHANNEL === 'opzio-channel-whatsapp'
+                && $event->SERVICE_EVENT === 'opzio-event-message'
+                && ($event->message['conversation_id'] ?? null) === $response['conversation_id']
+                && ($event->message['message_id'] ?? null) === $response['message_id'];
+        });
     }
 
     public function test_whatsapp_send_allows_freeform_inside_window_and_records_provider_sid()

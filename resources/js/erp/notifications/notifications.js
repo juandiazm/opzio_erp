@@ -9,8 +9,14 @@ function changeTab(event) {
     if (activeTab.length === 0) return;
     notificationState.activeChannel = activeTab.attr('id').includes('sms') ? 'sms' : (activeTab.attr('id').includes('whatsapp') ? 'whatsapp' : 'email');
     if (notificationState.activeChannel === 'sms') sms.loadSms();
-    else if (notificationState.activeChannel === 'whatsapp') whatsapp.loadConversations();
-    else email.loadEmails();
+    else if (notificationState.activeChannel === 'whatsapp') {
+        whatsapp.enableRealtime();
+        whatsapp.loadConversations();
+        whatsapp.loadTemplates();
+    } else {
+        whatsapp.disableRealtime();
+        email.loadEmails();
+    }
 }
 
 $(document).on('shown.bs.tab', '#notifications-sms-tab, #notifications-email-tab, #notifications-whatsapp-tab', changeTab);
@@ -46,10 +52,8 @@ $(document).on('click', '#notifications-whatsapp-template-reset', whatsapp.reset
 $(document).on('click', '.notifications-whatsapp-template-edit', whatsapp.editTemplate);
 $(document).on('click', '.notifications-whatsapp-template-delete', whatsapp.deleteTemplate);
 $(document).on('click', '.notifications-whatsapp-template-submit', whatsapp.submitTemplate);
-$(document).on('change', '#notifications-whatsapp-template', function() {
-    const template = (notificationState.whatsappTemplates || []).find(function(item) { return item.sid === $(this).val(); }.bind(this));
-    if (template) $('#notifications-whatsapp-body').val('');
-});
+$(document).on('change', '#notifications-whatsapp-template', whatsapp.selectTemplate);
+$(document).on('input', '#notifications-whatsapp-template-variables-form input[data-template-variable]', whatsapp.updateTemplateVariables);
 $(document).on('change', '#notifications-email-status, #notifications-sms-status, #notifications-email-date-from, #notifications-email-date-to, #notifications-sms-date-from, #notifications-sms-date-to', function() {
     const channel = $(this).attr('id').includes('email') ? 'email' : 'sms';
     notificationState[channel+'Pagination'].page = 1;
@@ -90,6 +94,12 @@ $(document).ready(function() {
     loadClients();
     const activeTab = $('#nav-tab .active');
     if (activeTab.attr('id') === 'notifications-sms-tab') sms.loadSms();
-    else if (activeTab.attr('id') === 'notifications-whatsapp-tab') whatsapp.loadConversations();
-    else email.loadEmails();
+    else if (activeTab.attr('id') === 'notifications-whatsapp-tab') {
+        whatsapp.enableRealtime();
+        whatsapp.loadConversations();
+        whatsapp.loadTemplates();
+    } else {
+        whatsapp.disableRealtime();
+        email.loadEmails();
+    }
 });

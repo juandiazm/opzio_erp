@@ -72,6 +72,20 @@ Decisiones derivadas de esas fuentes:
   el tipo `twilio/text` en el formulario, pero conserva los tipos recibidos de
   Twilio para no destruir contenido rico al consultar la API.
 
+### Actualizacion en tiempo real
+
+- Se reutiliza la conexion Pusher global ya cargada por el layout ERP.
+- La pestaña WhatsApp se suscribe solo mientras esta activa al canal publico
+   `opzio-channel-whatsapp`.
+- Los mensajes entrantes publican `opzio-event-message`; los cambios de estado
+   de mensajes salientes publican `opzio-event-status`.
+- El payload publicado solo contiene IDs, direccion, estado y contador de no
+   leidos; no incluye cuerpo, telefono ni media.
+- Al recibir un evento, la interfaz refresca conversaciones, contador y el chat
+   abierto correspondiente. Al cambiar a Email/SMS, la suscripcion se desactiva.
+- Como el canal sigue el patron publico existente del chat ERP, no se deben
+   publicar datos sensibles en el payload.
+
 ## Activacion por ambiente
 
 1. Habilitar el sender WhatsApp y su WABA en Twilio. Para produccion, usar un
@@ -140,3 +154,6 @@ npm run build
 
 Las pruebas focalizadas cubren recepcion idempotente, contador de lectura,
 ventana de 24 horas, envio libre y envio templated con `ContentVariables`.
+
+La integracion Pusher queda cubierta por una prueba adicional que valida el
+canal y evento emitidos al recibir un mensaje WhatsApp.

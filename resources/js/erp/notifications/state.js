@@ -15,4 +15,7 @@ export const notificationState = {
     whatsappConversation: null,
     whatsappTemplates: [],
     whatsappPolling: false,
+    whatsappPusherChannel: null,
+    whatsappPusherHandler: null,
+    whatsappPusherWaiting: false,
 };

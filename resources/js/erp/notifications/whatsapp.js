@@ -15,6 +15,56 @@ export function loadUnreadCount() {
     }, null);
 }
 
+function handleRealtimeEvent(payload) {
+    if (notificationState.activeChannel !== 'whatsapp') return;
+    const eventData = payload && payload.message ? payload.message : (payload || {});
+    const conversationId = eventData.conversation_id;
+    notificationState.whatsappPagination.page = 1;
+    loadConversations();
+    if (!notificationState.whatsappConversationId || !conversationId || String(notificationState.whatsappConversationId) === String(conversationId)) {
+        refreshConversation();
+    }
+}
+
+function bindRealtime(pusher) {
+    if (!pusher || notificationState.whatsappPusherChannel) return;
+    const channel = pusher.subscribe('opzio-channel-whatsapp');
+    const handler = function(payload) {
+        handleRealtimeEvent(payload);
+    };
+    channel.bind('opzio-event-message', handler);
+    channel.bind('opzio-event-status', handler);
+    notificationState.whatsappPusherChannel = channel;
+    notificationState.whatsappPusherHandler = handler;
+    notificationState.whatsappPusherWaiting = false;
+}
+
+export function enableRealtime() {
+    if (notificationState.whatsappPusherChannel) return;
+    if (window.opzioPusher) {
+        bindRealtime(window.opzioPusher);
+        return;
+    }
+    if (notificationState.whatsappPusherWaiting) return;
+    notificationState.whatsappPusherWaiting = true;
+    $(document).one('opzio:pusher-ready.notificationsWhatsapp', function(event, pusher) {
+        bindRealtime(pusher);
+    });
+}
+
+export function disableRealtime() {
+    $(document).off('opzio:pusher-ready.notificationsWhatsapp');
+    notificationState.whatsappPusherWaiting = false;
+    const channel = notificationState.whatsappPusherChannel;
+    const handler = notificationState.whatsappPusherHandler;
+    if (!channel) return;
+    channel.unbind('opzio-event-message', handler);
+    channel.unbind('opzio-event-status', handler);
+    if (window.opzioPusher) window.opzioPusher.unsubscribe('opzio-channel-whatsapp');
+    notificationState.whatsappPusherChannel = null;
+    notificationState.whatsappPusherHandler = null;
+}
+
 function conversationInitial(conversation) {
     const name = String(conversation.display_name || conversation.phone || 'W').trim();
     return escapeHtml(name.charAt(0).toUpperCase() || 'W');
@@ -200,10 +250,141 @@ function renderTemplateOptions() {
     select.html(html).val(selected || '');
 }
 
+function selectedTemplate() {
+    const sid = $('#notifications-whatsapp-template').val() || '';
+    return (notificationState.whatsappTemplates || []).find(function(template) {
+        return String(template.sid) === String(sid);
+    }) || null;
+}
+
+function templateContent(template) {
+    const types = template && template.types ? template.types : {};
+    const candidates = [
+        ['twilio/text', function(content) { return content.body; }],
+        ['twilio/media', function(content) { return content.body; }],
+        ['twilio/quick-reply', function(content) { return content.body; }],
+        ['twilio/call-to-action', function(content) { return content.body; }],
+        ['whatsapp/card', function(content) { return [content.body, content.footer].filter(Boolean).join('\n'); }],
+        ['twilio/card', function(content) { return [content.title, content.subtitle].filter(Boolean).join('\n'); }],
+        ['whatsapp/flows', function(content) { return content.body; }],
+    ];
+
+    for (let index = 0; index < candidates.length; index += 1) {
+        const type = candidates[index][0];
+        const content = types[type];
+        if (!content) continue;
+        const body = String(candidates[index][1](content) || '').trim();
+        if (body !== '') return {type: type, body: body};
+    }
+
+    return {type: 'Contenido enriquecido', body: 'Esta plantilla contiene contenido enriquecido.'};
+}
+
+function templateVariableNames(template, body) {
+    const names = [];
+    const addName = function(value) {
+        const name = String(value || '').trim();
+        if (name !== '' && !names.includes(name)) names.push(name);
+    };
+    const matcher = /\{\{\s*([^{}]+?)\s*\}\}/g;
+    let match = matcher.exec(body || '');
+    while (match) {
+        addName(match[1]);
+        match = matcher.exec(body || '');
+    }
+    Object.keys(template && template.variables ? template.variables : {}).forEach(addName);
+    return names;
+}
+
+function templateSample(template, name) {
+    const variables = template && template.variables ? template.variables : {};
+    return variables[name] == null ? '' : String(variables[name]);
+}
+
+function collectTemplateVariables() {
+    const values = {};
+    $('#notifications-whatsapp-template-variables-form input[data-template-variable]').each(function() {
+        const name = String($(this).attr('data-template-variable') || '').trim();
+        const value = String($(this).val() || '').trim();
+        if (name !== '' && value !== '') values[name] = value;
+    });
+    return values;
+}
+
+function renderTemplatePreviewBody(body, values, template) {
+    const samples = {};
+    templateVariableNames(template, body).forEach(function(name) {
+        samples[name] = templateSample(template, name);
+    });
+
+    return escapeHtml(body || '').replace(/\{\{\s*([^{}]+?)\s*\}\}/g, function(match, rawName) {
+        const name = String(rawName || '').trim();
+        const value = Object.prototype.hasOwnProperty.call(values, name) ? values[name] : samples[name];
+        const hasValue = value != null && String(value).trim() !== '';
+        const className = Object.prototype.hasOwnProperty.call(values, name) ? 'is-filled' : 'is-example';
+        return '<mark class="notifications-whatsapp-template-token '+className+'">'+escapeHtml(hasValue ? value : match)+'</mark>';
+    });
+}
+
+function renderTemplateVariableFields(template, names) {
+    const container = $('#notifications-whatsapp-template-variables-form');
+    if (names.length === 0) {
+        container.html('<span class="notifications-whatsapp-template-no-variables">Esta plantilla no requiere variables.</span>');
+        return;
+    }
+
+    let html = '<div class="notifications-whatsapp-template-variables-heading"><strong>Variables a usar</strong><span>Completa los valores antes de enviar.</span></div><div class="notifications-whatsapp-template-variable-grid">';
+    names.forEach(function(name) {
+        const sample = templateSample(template, name);
+        html += '<label class="notifications-whatsapp-template-variable"><span>{{'+escapeHtml(name)+'}}</span><input type="text" class="form-control" data-template-variable="'+escapeHtml(name)+'" placeholder="'+escapeHtml(sample || 'Valor')+'" aria-label="Valor para la variable '+escapeHtml(name)+'"></label>';
+    });
+    html += '</div>';
+    container.html(html);
+}
+
+function updateTemplatePreview() {
+    const template = selectedTemplate();
+    if (!template) return;
+    const content = templateContent(template);
+    const values = collectTemplateVariables();
+    $('#notifications-whatsapp-template-preview-body').html(renderTemplatePreviewBody(content.body, values, template));
+    $('#notifications-whatsapp-variables').val(JSON.stringify(values));
+}
+
+function renderSelectedTemplate() {
+    const template = selectedTemplate();
+    const body = $('#notifications-whatsapp-body');
+    if (!template) {
+        $('#notifications-whatsapp-template-preview').addClass('d-none');
+        $('#notifications-whatsapp-template-preview-name').empty();
+        $('#notifications-whatsapp-template-variables-form').empty();
+        $('#notifications-whatsapp-variables').val('{}');
+        body.prop('disabled', false).attr('placeholder', 'Escribe un mensaje');
+        return;
+    }
+
+    const content = templateContent(template);
+    const names = templateVariableNames(template, content.body);
+    $('#notifications-whatsapp-template-preview-name').text((template.friendly_name || template.sid)+' · '+content.type);
+    renderTemplateVariableFields(template, names);
+    $('#notifications-whatsapp-template-preview').removeClass('d-none');
+    body.val('').prop('disabled', true).attr('placeholder', 'El mensaje se construye con la plantilla seleccionada');
+    updateTemplatePreview();
+}
+
+export function selectTemplate() {
+    renderSelectedTemplate();
+}
+
+export function updateTemplateVariables() {
+    updateTemplatePreview();
+}
+
 export function loadTemplates() {
     PostMethodFunction('/admin/notifications/whatsapp/templates', {}, null, function(response) {
         notificationState.whatsappTemplates = response.templates || [];
         renderTemplateOptions();
+        renderSelectedTemplate();
         renderTemplateList();
     }, null);
 }
@@ -323,8 +504,22 @@ export function sendMessage(event) {
     event.preventDefault();
     if (!notificationState.whatsappConversationId) return;
     const templateSid = $('#notifications-whatsapp-template').val() || '';
-    const body = $('#notifications-whatsapp-body').val() || '';
-    const variables = $('#notifications-whatsapp-variables').val() || '';
+    let body = $('#notifications-whatsapp-body').val() || '';
+    let variables = $('#notifications-whatsapp-variables').val() || '{}';
+    if (templateSid) {
+        const template = selectedTemplate();
+        const content = templateContent(template);
+        const values = collectTemplateVariables();
+        const missing = templateVariableNames(template, content.body).filter(function(name) {
+            return !Object.prototype.hasOwnProperty.call(values, name);
+        });
+        if (missing.length > 0) {
+            window.alertWarning?.('Completa las variables: '+missing.map(function(name) { return '{{'+name+'}}'; }).join(', '));
+            return;
+        }
+        variables = JSON.stringify(values);
+        body = '';
+    }
     $('#notifications-whatsapp-send').prop('disabled', true);
     PostMethodFunction('/admin/notifications/whatsapp/message', {
         conversation_id: notificationState.whatsappConversationId,
@@ -346,6 +541,7 @@ export function initializeWhatsapp() {
     if (notificationState.whatsappPolling) return;
     notificationState.whatsappPolling = true;
     $(document).on('notifications:clients-loaded', renderWhatsappClientOptions);
+    if (notificationState.activeChannel === 'whatsapp') enableRealtime();
     window.setInterval(function() {
         if (notificationState.activeChannel !== 'whatsapp') return;
         loadConversations();
