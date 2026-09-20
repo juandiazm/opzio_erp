@@ -1202,7 +1202,7 @@
     "isEntry": true
   },
   "resources/js/erp/notifications/notifications.js": {
-    "file": "assets/notifications-_W-lbs5d.js",
+    "file": "assets/notifications-wPgira_i.js",
     "name": "notifications",
     "src": "resources/js/erp/notifications/notifications.js",
     "isEntry": true
@@ -1316,7 +1316,7 @@
     "isEntry": true
   },
   "resources/js/erp/pusher/pusher_channels_chat.js": {
-    "file": "assets/pusher_channels_chat-BBbWHH8l.js",
+    "file": "assets/pusher_channels_chat-D1XAJvbA.js",
     "name": "pusher_channels_chat",
     "src": "resources/js/erp/pusher/pusher_channels_chat.js",
     "isEntry": true,
@@ -1718,7 +1718,7 @@
     "isEntry": true
   },
   "resources/sass/erp/notifications/notifications.scss": {
-    "file": "assets/notifications-Dksqfpr5.css",
+    "file": "assets/notifications-DeccDqyf.css",
     "src": "resources/sass/erp/notifications/notifications.scss",
     "isEntry": true
   },

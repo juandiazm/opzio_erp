@@ -212,7 +212,7 @@ trait twilio_whatsapp_trait
 
         $url = trim((string) config('services.twilio.whatsapp.'.($event === 'status' ? 'status_callback_url' : 'webhook_url')));
         if ($url === '') {
-            $url = $request->fullUrl();
+            $url = trim((string) $request->header('X-Opzio-Webhook-Url')) ?: $request->fullUrl();
         }
 
         $parameters = $request->all();

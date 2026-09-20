@@ -92,9 +92,11 @@ Decisiones derivadas de esas fuentes:
    numero aprobado; el Sandbox sirve para pruebas y requiere el flujo de alta
    del Sandbox.
 2. Configurar el webhook entrante del sender o Messaging Service como:
-   `https://HOST/api/webhooks/twilio/whatsapp/incoming` con metodo `POST`.
+   `https://erp.opzio.co/api/webhooks/twilio/whatsapp/incoming` con metodo
+   `POST`.
 3. Configurar el callback de estados como:
-   `https://HOST/api/webhooks/twilio/whatsapp/status` con metodo `POST`.
+   `https://erp.opzio.co/api/webhooks/twilio/whatsapp/status` con metodo
+   `POST`.
 4. Usar HTTPS con certificado publico. Las URLs configuradas en las variables
    deben coincidir con la URL que Twilio firma, incluidos esquema, host, puerto
    y ruta.
@@ -105,8 +107,8 @@ TWILIO_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_WHATSAPP_FROM=whatsapp:+57XXXXXXXXXX
 TWILIO_WHATSAPP_MESSAGING_SERVICE_SID=MGxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_WHATSAPP_WEBHOOK_URL=https://HOST/api/webhooks/twilio/whatsapp/incoming
-TWILIO_WHATSAPP_STATUS_CALLBACK_URL=https://HOST/api/webhooks/twilio/whatsapp/status
+TWILIO_WHATSAPP_WEBHOOK_URL=https://erp.opzio.co/api/webhooks/twilio/whatsapp/incoming
+TWILIO_WHATSAPP_STATUS_CALLBACK_URL=https://erp.opzio.co/api/webhooks/twilio/whatsapp/status
 TWILIO_WHATSAPP_VALIDATE_WEBHOOKS=true
 TWILIO_WHATSAPP_DEFAULT_COUNTRY_CODE=+57
 TWILIO_WHATSAPP_TEMPLATE_LIMIT=100

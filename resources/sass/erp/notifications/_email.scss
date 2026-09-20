@@ -2,6 +2,52 @@
     padding: 0 0 2rem;
 }
 
+@media screen and (min-width: 769px) {
+    .notifications-page:has(#notifications-whatsapp-pane) {
+        display: flex;
+        height: calc(100vh - 86px);
+        min-height: 0;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .notifications-page:has(#notifications-whatsapp-pane) > .tab-content {
+        display: flex;
+        min-height: 0;
+        flex: 1 1 auto;
+        flex-direction: column;
+    }
+
+    .notifications-page:has(#notifications-whatsapp-pane) #notifications-whatsapp-pane {
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .notifications-page:has(#notifications-whatsapp-pane) {
+        display: flex;
+        height: calc(100vh - 142px);
+        min-height: 0;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .notifications-page:has(#notifications-whatsapp-pane) > .tab-content {
+        display: flex;
+        min-height: 0;
+        flex: 1 1 auto;
+        flex-direction: column;
+    }
+
+    .notifications-page:has(#notifications-whatsapp-pane) #notifications-whatsapp-pane {
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+    }
+}
+
 body.notifications-modal-open #erp-app-content {
     z-index: 5001 !important;
 }

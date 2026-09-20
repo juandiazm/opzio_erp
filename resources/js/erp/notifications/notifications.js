@@ -8,6 +8,7 @@ function changeTab(event) {
     const activeTab = event && event.target ? $(event.target) : $('#nav-tab .active');
     if (activeTab.length === 0) return;
     notificationState.activeChannel = activeTab.attr('id').includes('sms') ? 'sms' : (activeTab.attr('id').includes('whatsapp') ? 'whatsapp' : 'email');
+    $('#erp-app-content').toggleClass('notifications-whatsapp-active', notificationState.activeChannel === 'whatsapp');
     if (notificationState.activeChannel === 'sms') sms.loadSms();
     else if (notificationState.activeChannel === 'whatsapp') {
         whatsapp.enableRealtime();
@@ -93,6 +94,7 @@ $(document).ready(function() {
     whatsapp.initializeWhatsapp();
     loadClients();
     const activeTab = $('#nav-tab .active');
+    $('#erp-app-content').toggleClass('notifications-whatsapp-active', activeTab.attr('id') === 'notifications-whatsapp-tab');
     if (activeTab.attr('id') === 'notifications-sms-tab') sms.loadSms();
     else if (activeTab.attr('id') === 'notifications-whatsapp-tab') {
         whatsapp.enableRealtime();

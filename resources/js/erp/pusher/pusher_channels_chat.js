@@ -25,6 +25,7 @@ function Service_usePusherData(data){
     cluster: pusherCluster
   });
   window.opzioPusher = pusher;
+  window.opzioPusherReady = true;
   $(document).trigger('opzio:pusher-ready', [pusher]);
   //Canal de servicios
   var service_channel = pusher.subscribe('opzio-channel-chat');

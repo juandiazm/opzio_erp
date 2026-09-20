@@ -1,3 +1,28 @@
+.notifications-page {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+}
+
+.notifications-page > .tab-content {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+}
+
+#erp-app-content.notifications-whatsapp-active {
+    overflow-y: hidden;
+}
+
+#notifications-whatsapp-pane.active {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+}
+
 .notifications-tab-unread {
     display: inline-flex;
     align-items: center;
@@ -23,7 +48,9 @@
 .notifications-whatsapp-layout {
     display: grid;
     grid-template-columns: minmax(18rem, 27rem) minmax(0, 1fr);
-    min-height: min(68vh, 720px);
+    height: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
     margin: 0 1rem;
     overflow: hidden;
     border: 1px solid rgba($primary, 0.14);
@@ -36,6 +63,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     background: #fff;
     border-right: 1px solid rgba($primary, 0.12);
 }
@@ -84,7 +112,7 @@
 
 .notifications-whatsapp-conversation-list {
     flex: 1 1 auto;
-    min-height: 12rem;
+    min-height: 0;
     overflow-y: auto;
 }
 
@@ -211,6 +239,8 @@
     display: flex;
     min-width: 0;
     min-height: 0;
+    height: 100%;
+    overflow: hidden;
     flex-direction: column;
     background: #f8f7fb;
 }
@@ -303,7 +333,7 @@
 .notifications-whatsapp-messages {
     display: flex;
     flex: 1 1 auto;
-    min-height: 14rem;
+    min-height: 0;
     flex-direction: column;
     gap: 0.6rem;
     padding: 1rem clamp(0.8rem, 3vw, 2.5rem);
@@ -605,20 +635,23 @@
 
     .notifications-whatsapp-layout {
         display: block;
-        min-height: calc(100vh - 12rem);
+        height: 100%;
+        min-height: 0;
         margin: 0;
         border-right: 0;
         border-left: 0;
     }
 
     .notifications-whatsapp-list-panel {
-        min-height: calc(100vh - 12rem);
+        height: 100%;
+        min-height: 0;
         border-right: 0;
     }
 
     .notifications-whatsapp-chat {
         display: none;
-        min-height: calc(100vh - 12rem);
+        height: 100%;
+        min-height: 0;
     }
 
     .notifications-whatsapp-layout.is-chat-open .notifications-whatsapp-list-panel {
