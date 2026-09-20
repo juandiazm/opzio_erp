@@ -30,6 +30,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+
     'siigo' => [
         'username' => env('SIIGO_USERNAME'),
         'access_key' => env('SIIGO_ACCESS_KEY'),
@@ -91,13 +97,6 @@ return [
     'jira' => [
         'timeout' => (float) env('JIRA_TIMEOUT', 30),
         'retries' => (int) env('JIRA_RETRIES', 2),
-    ],
-
-    'tenders_ai' => [
-        'base_url' => env('OPZIO_TENDERS_AI_URL', 'http://127.0.0.1:9081'),
-        'token' => env('OPZIO_TENDERS_AI_TOKEN', ''),
-        'tenant_id' => env('OPZIO_TENDERS_AI_TENANT_ID', 'opzio'),
-        'timeout' => (float) env('OPZIO_TENDERS_AI_TIMEOUT', 30),
     ],
 
     'pdf' => [

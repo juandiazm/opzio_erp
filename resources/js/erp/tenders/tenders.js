@@ -1,5 +1,6 @@
 import { initializeTendersContext } from './context.js';
 import { initializeTendersPipeline, openTendersOpportunity } from './pipeline.js';
+import { initializeTendersConfiguration } from './configuration.js';
 
 const formatCurrency = (amount) => {
     if (amount === null || amount === undefined) return 'Valor no publicado';
@@ -476,71 +477,41 @@ const loadDiscovery = async (elements, state, resetPage = false) => {
 };
 
 const syncFromSecop = async (elements, state) => {
-    const syncPollMaxAttempts = 36;
     elements.sync.disabled = true;
     elements.query.disabled = true;
     elements.status.textContent = 'Solicitando actualización desde SECOP...';
     elements.status.classList.remove('is-error');
 
     try {
-        const response = await fetch('/admin/tenders/sync', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': elements.csrfToken || ''
-            },
-            body: JSON.stringify({
-                source: 'all',
-                page_size: 250,
-                max_pages: 20,
-                recheck_days: 7,
-                recheck_page_size: 250,
-                reset_cursor: false
-            })
-        });
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok || payload.status === 0) {
-            throw new Error(payload.message || `HTTP ${response.status}`);
-        }
-
-        const syncData = payload.data || {};
-        const sources = Array.isArray(syncData.sources) ? syncData.sources : ['secop1', 'secop2'];
-        const syncRequestId = payload.request_id;
-        const started = syncData.started !== false;
-        let matchingRuns = [];
-
-        let syncCompleted = false;
-        for (let attempt = 0; attempt < syncPollMaxAttempts; attempt += 1) {
-            await wait(attempt === 0 ? 500 : 10000);
-            const runs = await loadSyncStatus(elements);
-            matchingRuns = syncRequestId
-                ? runs.filter((run) => run.parameters?.request_id === syncRequestId)
-                : [];
-            const relevantRuns = matchingRuns.length
-                ? matchingRuns
-                : runs.filter((run) => sources.includes(run.source));
-            const failedRun = relevantRuns.find((run) => run.status === 'failed');
-            if (failedRun) {
-                throw new Error(failedRun.error || 'La actualización desde SECOP terminó con errores.');
+        for (const source of ['secop1', 'secop2']) {
+            let cursorAt = null;
+            let cursorId = null;
+            let batch = 0;
+            let hasMore = true;
+            while (hasMore) {
+                batch += 1;
+                const response = await fetch('/admin/tenders/sync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': elements.csrfToken || ''
+                    },
+                    body: JSON.stringify({
+                        source,
+                        mode: 'incremental',
+                        page_size: 250,
+                        cursor_at: cursorAt,
+                        cursor_id: cursorId,
+                    })
+                });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok || payload.status === 0) throw new Error(payload.message || `HTTP ${response.status}`);
+                const data = payload.data || {};
+                hasMore = data.has_more === true;
+                cursorAt = data.next_cursor_at || null;
+                cursorId = data.next_cursor_id || null;
+                elements.status.textContent = `SECOP ${source.toUpperCase()}: lote ${batch}`;
             }
-            if (relevantRuns.some((run) => run.status === 'running')) {
-                const activeSources = relevantRuns
-                    .filter((run) => run.status === 'running')
-                    .map((run) => run.source.toUpperCase())
-                    .join(' y ');
-                elements.status.textContent = `Actualizando SECOP${activeSources ? ` (${activeSources})` : ''}...`;
-                continue;
-            }
-            if (started && matchingRuns.length < sources.length) continue;
-            if (!relevantRuns.length && started) continue;
-            syncCompleted = true;
-            break;
-        }
-
-        if (!syncCompleted) {
-            elements.status.textContent = 'La actualización desde SECOP sigue en curso. El estado se actualizará en la próxima consulta.';
-            elements.status.classList.remove('is-error');
-            return;
         }
         await loadDiscovery(elements, state, true);
         elements.status.textContent = '';
@@ -703,6 +674,7 @@ const loadSyncStatus = async (elements) => {
 };
 
 const init = () => {
+    initializeTendersConfiguration(document);
     initializeTendersContext();
     initializeTendersPipeline();
 

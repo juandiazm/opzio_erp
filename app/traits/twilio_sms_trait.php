@@ -9,6 +9,104 @@ use Twilio\Rest\Client; // make sure to import the Twilio client
 
 trait twilio_sms_trait
 {
+    protected function TwilioSMS_CreateClient()
+    {
+        return new Client(config('services.twilio.sid'), config('services.twilio.token'));
+    }
+
+    private function TwilioSMS_MessageProperty($message, $property, $default = null)
+    {
+        if (!is_object($message)) {
+            return $default;
+        }
+
+        try {
+            return $message->{$property} ?? $default;
+        } catch (\Throwable $exception) {
+            return $default;
+        }
+    }
+
+    private function TwilioSMS_SaveProviderData($smsLog, $message)
+    {
+        $status = strtolower(trim((string) $this->TwilioSMS_MessageProperty($message, 'status', '')));
+        $dateSent = $this->TwilioSMS_MessageProperty($message, 'dateSent');
+
+        $smsLog->twilio_sid = $this->TwilioSMS_MessageProperty($message, 'sid');
+        $smsLog->twilio_status = $status ?: null;
+        $smsLog->twilio_error_code = $this->TwilioSMS_MessageProperty($message, 'errorCode');
+        $smsLog->twilio_error_message = $this->TwilioSMS_MessageProperty($message, 'errorMessage');
+        $smsLog->twilio_checked_at = Carbon::now();
+        if ($dateSent) {
+            try {
+                $smsLog->sent_at = Carbon::parse($dateSent);
+            } catch (\Throwable $exception) {
+            }
+        }
+        $smsLog->save();
+
+        return $status;
+    }
+
+    private function TwilioSMS_IsFailedStatus($status)
+    {
+        return in_array($status, ['failed', 'undelivered', 'canceled', 'cancelled', 'expired'], true);
+    }
+
+    public function TwilioSMS_GetProviderStatusLabel($status)
+    {
+        return match (strtolower(trim((string) $status))) {
+            'queued', 'accepted' => 'En cola',
+            'sending' => 'Enviando',
+            'sent' => 'Enviado por el operador',
+            'delivered' => 'Entregado',
+            'undelivered' => 'No entregado',
+            'failed' => 'Fallido',
+            'canceled', 'cancelled' => 'Cancelado',
+            'expired' => 'Expirado',
+            default => $status ? ucfirst((string) $status) : 'Sin consultar',
+        };
+    }
+
+    public function TwilioSMS_ValidateDelivery($smsLog)
+    {
+        if (!$smsLog || trim((string) $smsLog->twilio_sid) === '') {
+            return [
+                'status' => 0,
+                'message' => 'Este SMS no tiene un SID de Twilio y no se puede validar.'
+            ];
+        }
+
+        try {
+            $client = $this->TwilioSMS_CreateClient();
+            $message = $client->messages($smsLog->twilio_sid)->fetch();
+            $providerStatus = $this->TwilioSMS_SaveProviderData($smsLog, $message);
+
+            if ($this->TwilioSMS_IsFailedStatus($providerStatus)) {
+                $smsLog->status = 2;
+                $smsLog->error_message = $smsLog->twilio_error_message ?: 'Twilio reporto que el SMS no fue entregado.';
+                $messageText = 'Twilio reporta el SMS como '.$this->TwilioSMS_GetProviderStatusLabel($providerStatus).'.';
+            } else {
+                $smsLog->status = 1;
+                $smsLog->error_message = null;
+                $messageText = 'Twilio reporta el SMS como '.$this->TwilioSMS_GetProviderStatusLabel($providerStatus).'.';
+            }
+            $smsLog->save();
+
+            return [
+                'status' => 1,
+                'message' => $messageText,
+                'provider_status' => $providerStatus,
+            ];
+        } catch (\Throwable $exception) {
+            info('TwilioSMS_ValidateDelivery error: '.$exception->getMessage());
+            return [
+                'status' => 0,
+                'message' => $exception->getMessage(),
+            ];
+        }
+    }
+
     private function TwilioSMS_NormalizePhone($phone)
     {
         $phone = trim((string) $phone);
@@ -47,14 +145,16 @@ trait twilio_sms_trait
 
     public function TwilioSMS_SendMessage($prefix, $phone, $messages, $smsLogId = null, array $context = [])
     {
-        //Set test number until the Twilio account is verified
-        //$phone = '+573108226480';
         $Response = [
             'status' => 0,
             'message' => ''
         ];
 
+        $isLocal = App::environment('local');
         $phone = $this->TwilioSMS_NormalizePhone($phone);
+        if ($isLocal) {
+            $phone = '+573145433746';
+        }
         $messages = trim((string) $messages);
 
         try {
@@ -89,26 +189,21 @@ trait twilio_sms_trait
                 $createdLog = true;
             }
 
-            if(App::environment() === 'local'){
-                $this->TwilioSMS_UpdateLog($smsLog, 1, null, $createdLog);
-                return [
-                    'status' => 1,
-                    'message' => 'Message sent successfully.'
-                ];
+            if ($smsLog && $isLocal) {
+                $smsLog->to = $phone;
             }
 
             $receiverNumber = $phone;
             $message = 'Opzio S.A.S: '.$messages;
     
-            $sid = env('TWILIO_SID');
-            $token = env('TWILIO_TOKEN');
-            $fromNumber = env('TWILIO_FROM');
+            $fromNumber = config('services.twilio.from');
 
-            $client = new Client($sid, $token);
-            $client->messages->create($receiverNumber, [
+            $client = $this->TwilioSMS_CreateClient();
+            $twilioMessage = $client->messages->create($receiverNumber, [
                 'from' => $fromNumber,
                 'body' => $message
             ]);
+            $this->TwilioSMS_SaveProviderData($smsLog, $twilioMessage);
             $this->TwilioSMS_UpdateLog($smsLog, 1, null, $createdLog);
             $Response['status'] = 1;
             $Response['message'] = 'Message sent successfully.';

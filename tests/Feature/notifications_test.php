@@ -21,19 +21,102 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
+class NotificationTwilioFakeMessageList
+{
+    private $client;
+
+    public function __construct($client)
+    {
+        $this->client = $client;
+    }
+
+    public function create($to, array $options)
+    {
+        $this->client->lastCreated = ['to' => $to, 'options' => $options];
+        return $this->client->createMessage;
+    }
+}
+
+class NotificationTwilioFakeMessageContext
+{
+    private $client;
+
+    public function __construct($client)
+    {
+        $this->client = $client;
+    }
+
+    public function fetch()
+    {
+        return $this->client->fetchMessage;
+    }
+}
+
+class NotificationTwilioFakeClient
+{
+    public $createMessage;
+    public $fetchMessage;
+    public $lastCreated;
+    public $lastFetchedSid;
+
+    private $messageList;
+
+    public function __construct()
+    {
+        $this->messageList = new NotificationTwilioFakeMessageList($this);
+    }
+
+    public function __get($name)
+    {
+        if ($name === 'messages') {
+            return $this->messageList;
+        }
+
+        throw new \RuntimeException('Unknown fake Twilio property: '.$name);
+    }
+
+    public function __call($name, $arguments)
+    {
+        if ($name === 'messages') {
+            $this->lastFetchedSid = $arguments[0] ?? null;
+            return new NotificationTwilioFakeMessageContext($this);
+        }
+
+        throw new \RuntimeException('Unknown fake Twilio method: '.$name);
+    }
+}
+
 class notifications_test extends TestCase
 {
     use notifications_trait;
 
+    protected $twilioClient;
+
+    protected function TwilioSMS_CreateClient()
+    {
+        return $this->twilioClient;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->twilioClient = new NotificationTwilioFakeClient();
+        $this->twilioClient->createMessage = (object) [
+            'sid' => 'SM00000000000000000000000000000001',
+            'status' => 'queued',
+            'errorCode' => null,
+            'errorMessage' => null,
+            'dateSent' => null,
+        ];
+        $this->twilioClient->fetchMessage = $this->twilioClient->createMessage;
 
         config([
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => ':memory:',
             'app.env' => 'local',
         ]);
+        $this->app['env'] = 'local';
         DB::purge('sqlite');
 
         Schema::create('clients', function (Blueprint $table) {
@@ -94,6 +177,11 @@ class notifications_test extends TestCase
             $table->string('recipient_name', 150)->nullable();
             $table->string('to', 30);
             $table->longText('body');
+            $table->string('twilio_sid', 64)->nullable();
+            $table->string('twilio_status', 50)->nullable();
+            $table->unsignedInteger('twilio_error_code')->nullable();
+            $table->text('twilio_error_message')->nullable();
+            $table->dateTime('twilio_checked_at')->nullable();
             $table->tinyInteger('attempts')->default(0);
             $table->tinyInteger('status')->default(0);
             $table->text('error_message')->nullable();
@@ -555,7 +643,7 @@ class notifications_test extends TestCase
             null,
             ['client_id' => 7, 'recipient_name' => 'Cliente Uno']
         );
-        $sms = sms_log::where('to', '+573000000004')->first();
+        $sms = sms_log::where('to', '+573145433746')->first();
 
         $this->assertSame(1, $response['status']);
         $this->assertNotNull($sms);
@@ -563,6 +651,78 @@ class notifications_test extends TestCase
         $this->assertSame(1, (int) $sms->attempts);
         $this->assertSame(7, (int) $sms->client_id);
         $this->assertNotNull($sms->sent_at);
+        $this->assertSame('SM00000000000000000000000000000001', $sms->twilio_sid);
+        $this->assertSame('queued', $sms->twilio_status);
+    }
+
+    public function test_sms_delivery_validation_marks_delivered_message()
+    {
+        $sms = sms_log::create([
+            'unique_id' => 'SMS-DELIVERED',
+            'to' => '+573000000005',
+            'body' => 'Mensaje entregado',
+            'status' => 1,
+            'twilio_sid' => 'SM00000000000000000000000000000002',
+        ]);
+        $this->twilioClient->fetchMessage = (object) [
+            'sid' => $sms->twilio_sid,
+            'status' => 'delivered',
+            'errorCode' => null,
+            'errorMessage' => null,
+            'dateSent' => Carbon::now(),
+        ];
+
+        $response = $this->Notification_ValidateSmsDelivery($sms->id);
+        $sms->refresh();
+
+        $this->assertSame(1, $response['status']);
+        $this->assertSame('delivered', $sms->twilio_status);
+        $this->assertSame(1, (int) $sms->status);
+        $this->assertNotNull($sms->twilio_checked_at);
+        $this->assertSame($sms->twilio_sid, $this->twilioClient->lastFetchedSid);
+    }
+
+    public function test_sms_delivery_validation_marks_undelivered_message_as_failed()
+    {
+        $sms = sms_log::create([
+            'unique_id' => 'SMS-UNDELIVERED',
+            'to' => '+573000000006',
+            'body' => 'Mensaje no entregado',
+            'status' => 1,
+            'twilio_sid' => 'SM00000000000000000000000000000003',
+        ]);
+        $this->twilioClient->fetchMessage = (object) [
+            'sid' => $sms->twilio_sid,
+            'status' => 'undelivered',
+            'errorCode' => 30007,
+            'errorMessage' => 'Message Delivery - Unknown destination handset',
+            'dateSent' => null,
+        ];
+
+        $response = $this->Notification_ValidateSmsDelivery($sms->id);
+        $sms->refresh();
+
+        $this->assertSame(1, $response['status']);
+        $this->assertSame('undelivered', $sms->twilio_status);
+        $this->assertSame(2, (int) $sms->status);
+        $this->assertSame(30007, (int) $sms->twilio_error_code);
+        $this->assertSame('Message Delivery - Unknown destination handset', $sms->error_message);
+    }
+
+    public function test_sms_delivery_validation_rejects_legacy_log_without_twilio_sid()
+    {
+        $sms = sms_log::create([
+            'unique_id' => 'SMS-WITHOUT-SID',
+            'to' => '+573000000007',
+            'body' => 'Mensaje antiguo',
+            'status' => 1,
+        ]);
+
+        $response = $this->Notification_ValidateSmsDelivery($sms->id);
+
+        $this->assertSame(0, $response['status']);
+        $this->assertStringContainsString('no tiene un SID', $response['message']);
+        $this->assertNull($this->twilioClient->lastFetchedSid);
     }
 
     public function test_email_resend_replaces_recipients_and_keeps_original()

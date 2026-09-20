@@ -1057,3 +1057,178 @@
     padding-bottom: 2px;
     text-align: right;
 }
+
+#tenders-configuration-container {
+    --tenders-configuration-ink: #24323d;
+    --tenders-configuration-muted: #687681;
+    --tenders-configuration-line: #dce4e8;
+    --tenders-configuration-surface: #ffffff;
+    --tenders-configuration-canvas: #f4f7f8;
+    --tenders-configuration-accent: #0f766e;
+    background: var(--tenders-configuration-canvas);
+    color: var(--tenders-configuration-ink);
+    min-height: 100%;
+    padding: 18px 24px 24px;
+}
+
+.tenders-configuration-form {
+    background: var(--tenders-configuration-surface);
+    border: 1px solid var(--tenders-configuration-line);
+    padding: 18px;
+}
+
+.tenders-configuration-header {
+    align-items: center;
+    border-bottom: 1px solid var(--tenders-configuration-line);
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+}
+
+.tenders-configuration-header h2,
+.tenders-configuration-section h3 {
+    margin: 0;
+}
+
+.tenders-configuration-header h2 {
+    font-size: 20px;
+    font-weight: 650;
+}
+
+.tenders-configuration-header p {
+    color: var(--tenders-configuration-muted);
+    font-size: 13px;
+    margin: 5px 0 0;
+}
+
+.tenders-configuration-status {
+    color: var(--tenders-configuration-muted);
+    font-size: 13px;
+    min-height: 20px;
+    margin-bottom: 10px;
+}
+
+.tenders-configuration-status.is-error {
+    color: var(--licitaciones-red);
+}
+
+.tenders-configuration-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tenders-configuration-section {
+    border: 1px solid var(--tenders-configuration-line);
+    padding: 16px;
+}
+
+.tenders-configuration-section h3 {
+    border-bottom: 1px solid var(--tenders-configuration-line);
+    font-size: 14px;
+    margin-bottom: 14px;
+    padding-bottom: 9px;
+}
+
+.tenders-configuration-field {
+    color: var(--tenders-configuration-muted);
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    font-weight: 700;
+    gap: 5px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.tenders-configuration-field input,
+.tenders-configuration-field textarea {
+    border: 0;
+    border-bottom: 1px solid var(--tenders-configuration-line);
+    border-radius: 0;
+    color: var(--tenders-configuration-ink);
+    font-size: 13px;
+    font-weight: 400;
+    padding: 8px 4px;
+    text-transform: none;
+}
+
+.tenders-configuration-field input:focus,
+.tenders-configuration-field textarea:focus {
+    border-bottom-color: var(--tenders-configuration-accent);
+    box-shadow: none;
+    outline: 0;
+}
+
+.tenders-configuration-two-columns {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tenders-configuration-checks,
+.tenders-configuration-check-label {
+    align-items: center;
+    color: var(--tenders-configuration-muted);
+    display: flex;
+    font-size: 12px;
+    gap: 14px;
+    margin: 2px 0 14px;
+}
+
+.tenders-configuration-checks label,
+.tenders-configuration-check-label {
+    cursor: pointer;
+}
+
+.tenders-configuration-status-card {
+    background: var(--tenders-configuration-canvas);
+    color: var(--tenders-configuration-muted);
+    display: grid;
+    font-size: 12px;
+    gap: 5px;
+    margin-top: 14px;
+    padding: 10px 12px;
+}
+
+.tenders-configuration-status-card strong {
+    color: var(--tenders-configuration-ink);
+}
+
+.tenders-configuration-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.tenders-configuration-actions .btn {
+    align-items: center;
+    display: inline-flex;
+    gap: 6px;
+}
+
+.tenders-configuration-progress {
+    color: var(--tenders-configuration-accent);
+    font-size: 12px;
+    min-height: 18px;
+    padding-top: 10px;
+}
+
+@media (max-width: 720px) {
+    #tenders-configuration-container {
+        padding: 14px;
+    }
+
+    .tenders-configuration-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tenders-configuration-grid,
+    .tenders-configuration-two-columns {
+        grid-template-columns: 1fr;
+    }
+}

@@ -3,8 +3,8 @@ import * as email from './email.js';
 import * as sms from './sms.js';
 import { closeComposeModal, loadClients, renderClientList } from './shared.js';
 
-function changeTab() {
-    const activeTab = $('#notifications-tabs .active');
+function changeTab(event) {
+    const activeTab = event && event.target ? $(event.target) : $('#nav-tab .active');
     if (activeTab.length === 0) return;
     notificationState.activeChannel = activeTab.attr('id').includes('sms') ? 'sms' : 'email';
     if (notificationState.activeChannel === 'sms') sms.loadSms();
@@ -23,6 +23,7 @@ $(document).on('click', '.notifications-view-email', email.viewEmail);
 $(document).on('click', '.notifications-resend-email', email.resendEmail);
 $(document).on('click', '.notifications-change-email-status', email.changeEmailStatus);
 $(document).on('click', '.notifications-resend-sms', sms.resendSms);
+$(document).on('click', '.notifications-validate-sms', sms.validateDelivery);
 $(document).on('click', '#notifications-close-email-view', email.closeEmailView);
 $(document).on('click', '#notifications-edit-email-view', email.editEmailFromView);
 $(document).on('click', '#notifications-email-refresh', email.loadEmails);
@@ -56,5 +57,6 @@ $(document).on('keydown', function(event) {
 $(document).ready(function() {
     email.initializeEditor();
     loadClients();
-    email.loadEmails();
+    const activeTab = $('#nav-tab .active');
+    activeTab.attr('id') === 'notifications-sms-tab' ? sms.loadSms() : email.loadEmails();
 });

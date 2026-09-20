@@ -514,6 +514,22 @@ trait notifications_trait
         };
     }
 
+    private function Notification_SmsForClient($sms)
+    {
+        $sms->status_string = $this->Notification_StatusLabel($sms->status);
+        $sms->client_name = $sms->client?->complete_name;
+        $sms->send_at_local = $this->Notification_FormatDateForClient($sms->send_at);
+        $sms->sent_at_local = $this->Notification_FormatDateForClient($sms->sent_at);
+        $sms->twilio_status_label = trim((string) $sms->twilio_status) !== ''
+            ? $this->TwilioSMS_GetProviderStatusLabel($sms->twilio_status)
+            : null;
+        $sms->twilio_checked_at_local = $this->Notification_FormatDateForClient($sms->twilio_checked_at);
+        $sms->can_validate_delivery = trim((string) $sms->twilio_sid) !== '';
+        unset($sms->client, $sms->twilio_sid);
+
+        return $sms;
+    }
+
     private function Notification_NormalizeDateFilter($value)
     {
         $value = trim((string) $value);
@@ -638,12 +654,7 @@ trait notifications_trait
             }
             $result = $query->paginate($pagination['size'], ['*'], 'page', $pagination['page']);
             $result->getCollection()->transform(function ($sms) {
-                $sms->status_string = $this->Notification_StatusLabel($sms->status);
-                $sms->client_name = $sms->client?->complete_name;
-                $sms->send_at_local = $this->Notification_FormatDateForClient($sms->send_at);
-                $sms->sent_at_local = $this->Notification_FormatDateForClient($sms->sent_at);
-                unset($sms->client);
-                return $sms;
+                return $this->Notification_SmsForClient($sms);
             });
             return $this->Notification_Response('SMS obtenidos', [
                 'sms' => $result->items(),
@@ -749,6 +760,30 @@ trait notifications_trait
             return $this->Notification_Response('SMS obtenido', ['sms' => $sms]);
         } catch (\Throwable $exception) {
             info('Notification_GetSmsById error: '.$exception->getMessage());
+            return $this->Notification_Response($exception->getMessage(), [], 0);
+        }
+    }
+
+    public function Notification_ValidateSmsDelivery($id)
+    {
+        try {
+            $sms = sms_log::with('client')->find($id);
+            if (!$sms) {
+                return $this->Notification_Response('El SMS no existe', [], 0);
+            }
+
+            $response = $this->TwilioSMS_ValidateDelivery($sms);
+            if (($response['status'] ?? 0) !== 1) {
+                return $this->Notification_Response($response['message'] ?? 'No fue posible validar el SMS', [], 0);
+            }
+
+            $sms->refresh();
+            $sms->loadMissing('client');
+            return $this->Notification_Response($response['message'], [
+                'sms' => $this->Notification_SmsForClient($sms),
+            ]);
+        } catch (\Throwable $exception) {
+            info('Notification_ValidateSmsDelivery error: '.$exception->getMessage());
             return $this->Notification_Response($exception->getMessage(), [], 0);
         }
     }

@@ -14,6 +14,7 @@ class sms_log extends Model
     protected $casts = [
         'send_at' => 'datetime',
         'sent_at' => 'datetime',
+        'twilio_checked_at' => 'datetime',
     ];
 
     public function client()

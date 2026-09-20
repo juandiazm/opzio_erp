@@ -24,10 +24,8 @@
 
 ### SMS
 
-- No existe una tabla de historial de SMS ni un modulo de administracion.
-- El proyecto ya incluye `twilio/sdk` y `twilio_sms_trait`. El trait envia a
-  Twilio, antepone el texto de marca y simula exito en entorno local.
-- Tambien existe una integracion AWS SNS, pero no es el flujo usado por las
+ Twilio, antepone el texto de marca y en entorno local redirige todos los SMS
+   al numero de pruebas `+573145433746` antes de enviarlos.
   notificaciones operativas actuales; el modulo nuevo usara Twilio para
   mantener una sola politica de entrega.
 
@@ -63,7 +61,8 @@ por lo que no se rompe compatibilidad.
 
 La comprobacion discriminante sera ejecutar el procesador con un correo futuro,
 uno vencido y uno con fecha null: solo los dos ultimos deben cambiar de estado.
-Para SMS se repetira la comprobacion con el simulador local de Twilio.
+Para SMS se repetira la comprobacion en local, verificando que el destinatario
+efectivo sea `+573145433746`.
 
 ## Modelo de datos
 
@@ -80,7 +79,8 @@ Para SMS se repetira la comprobacion con el simulador local de Twilio.
 
 - `unique_id`, `client_id` nullable, nombre del destinatario, telefono,
   contenido, estado, intentos, error, `send_at`, `sent_at`, `notification_batch`,
-  `resend_of_id`, `created_by` y timestamps.
+  `resend_of_id`, `created_by`, SID/estado/error de Twilio, fecha de ultima
+  consulta y timestamps.
 - Estado `0` pendiente, `1` enviado y `2` agotado/fallido.
 - No se guardaran tokens ni respuestas completas del proveedor.
 
@@ -101,7 +101,8 @@ Para SMS se repetira la comprobacion con el simulador local de Twilio.
    destinatarios, asunto, reply-to, contenido y adjuntos editables. El reenvio
    crea nuevos registros y conserva el historial original.
 7. Estados visibles: pendiente, enviado y fallido/ag agotado, junto con fecha
-   programada y fecha efectiva.
+  programada y fecha efectiva. Cada SMS con SID tiene una accion para consultar
+  en Twilio su estado de entrega y actualizar el estado local.
 
 ## Orden de trabajo
 

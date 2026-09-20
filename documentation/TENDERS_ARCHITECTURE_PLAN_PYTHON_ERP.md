@@ -1,5 +1,7 @@
 # Plan de accion v0.2 - Modulo Licitaciones SECOP dentro de Opzio ERP
 
+> **Nota de estado (2026-09-19):** este documento conserva el historico de la arquitectura Python inicial. Para la implementacion vigente, el runtime de Licitaciones se migra al ERP y la guia operativa es [TENDERS_MIGRATION_PLAN_ERP.md](TENDERS_MIGRATION_PLAN_ERP.md).
+
 **Estado:** Base implementada para refinamiento
 **Producto:** Descubrimiento, priorizacion y seguimiento de oportunidades de contratacion publica
 **Nombre visible en ERP:** Licitaciones

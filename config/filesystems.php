@@ -34,6 +34,12 @@ return [
             'driver' => 'local',
             'root' => storage_path('app'),
         ],
+        'tenders_documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/tenders_documents'),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

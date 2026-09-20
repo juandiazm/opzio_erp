@@ -41,6 +41,10 @@ class Kernel extends ConsoleKernel
             ->dailyAt('00:10')
             ->timezone('America/Bogota')
             ->withoutOverlapping(120);
+        $schedule->command('tenders:sync --source=all --mode=incremental')
+            ->everyThirtyMinutes()
+            ->timezone('America/Bogota')
+            ->withoutOverlapping(120);
         $schedule->command('db:backup')->cron('0 2 * * *');
     }
 

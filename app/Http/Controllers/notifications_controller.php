@@ -46,6 +46,11 @@ class notifications_controller extends Controller
         return $this->response($this->Notification_GetSmsById($request->id));
     }
 
+    public function validate_sms_delivery(Request $request)
+    {
+        return $this->response($this->Notification_ValidateSmsDelivery($request->id));
+    }
+
     public function add_email(Request $request)
     {
         return $this->response($this->Notification_CreateEmail($request->all(), $request->file('attachments', []), $this->actorId()));

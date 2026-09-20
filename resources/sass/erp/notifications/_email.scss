@@ -203,6 +203,13 @@ body.notifications-modal-open #erp-app-content {
     color: #842029;
 }
 
+.notifications-provider-status {
+    display: block;
+    margin-top: 0.25rem;
+    color: #6c757d;
+    font-size: 0.7rem;
+}
+
 .notifications-action {
     display: inline-flex;
     align-items: center;
@@ -219,6 +226,12 @@ body.notifications-modal-open #erp-app-content {
 .notifications-action:focus {
     color: $primary;
     text-decoration: none;
+}
+
+.notifications-action:disabled {
+    color: #adb5bd;
+    cursor: wait;
+    opacity: 0.7;
 }
 
 .notifications-action-group {

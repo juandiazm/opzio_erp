@@ -174,6 +174,8 @@ Route::prefix('admin')->group(function () {
         });
         Route::prefix('tenders')->group(function () {
             Route::get('', [tenders_controller::class, 'page']);
+            Route::post('configuration/save', [tenders_controller::class, 'configuration_save']);
+            Route::post('configuration/test', [tenders_controller::class, 'configuration_test']);
             Route::post('discovery', [tenders_controller::class, 'discovery']);
             Route::post('sync', [tenders_controller::class, 'sync']);
             Route::post('context', [tenders_controller::class, 'update_context']);
@@ -377,6 +379,7 @@ Route::prefix('admin')->group(function () {
             Route::post('sms', [notifications_controller::class, 'get_sms']);
             Route::post('email', [notifications_controller::class, 'get_email']);
             Route::post('sms-by-id', [notifications_controller::class, 'get_sms_by_id']);
+            Route::post('sms/validate-delivery', [notifications_controller::class, 'validate_sms_delivery']);
             Route::post('email/add', [notifications_controller::class, 'add_email']);
             Route::post('sms/add', [notifications_controller::class, 'add_sms']);
             Route::post('email/resend', [notifications_controller::class, 'resend_email']);

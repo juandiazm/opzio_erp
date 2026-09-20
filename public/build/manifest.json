@@ -1166,7 +1166,7 @@
     "isEntry": true
   },
   "resources/js/erp/login/login.js": {
-    "file": "assets/login-BxF9RdEi.js",
+    "file": "assets/login-CeZ22cFG.js",
     "name": "login",
     "src": "resources/js/erp/login/login.js",
     "isEntry": true
@@ -1202,7 +1202,7 @@
     "isEntry": true
   },
   "resources/js/erp/notifications/notifications.js": {
-    "file": "assets/notifications-Y7YKUX7b.js",
+    "file": "assets/notifications-DidkPgXJ.js",
     "name": "notifications",
     "src": "resources/js/erp/notifications/notifications.js",
     "isEntry": true
@@ -1409,7 +1409,7 @@
     "isEntry": true
   },
   "resources/js/erp/tenders/tenders.js": {
-    "file": "assets/tenders-Bvd5ersg.js",
+    "file": "assets/tenders-DJMSRiZX.js",
     "name": "tenders",
     "src": "resources/js/erp/tenders/tenders.js",
     "isEntry": true
@@ -1718,7 +1718,7 @@
     "isEntry": true
   },
   "resources/sass/erp/notifications/notifications.scss": {
-    "file": "assets/notifications-Dync6Vhd.css",
+    "file": "assets/notifications-BYPyxVYo.css",
     "src": "resources/sass/erp/notifications/notifications.scss",
     "isEntry": true
   },
@@ -1753,7 +1753,7 @@
     "isEntry": true
   },
   "resources/sass/erp/tenders/tenders.scss": {
-    "file": "assets/tenders-Bxqv4GXT.css",
+    "file": "assets/tenders-BaT1K7hl.css",
     "src": "resources/sass/erp/tenders/tenders.scss",
     "isEntry": true
   },

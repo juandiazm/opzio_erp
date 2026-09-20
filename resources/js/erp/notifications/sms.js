@@ -12,10 +12,17 @@ export function renderSms(response) {
             html += '<td>'+escapeHtml(sms.recipient_name || sms.client_name || 'Destinatario')+'</td>';
             html += '<td>'+escapeHtml(sms.to)+'</td>';
             html += '<td><span class="notifications-message-preview" title="'+escapeHtml(sms.body)+'">'+escapeHtml(sms.body)+'</span></td>';
-            html += '<td><span class="notifications-status status-'+sms.status+'">'+escapeHtml(sms.status_string)+'</span></td>';
+            html += '<td><span class="notifications-status status-'+sms.status+'">'+escapeHtml(sms.status_string)+'</span>';
+            if (sms.twilio_status_label) {
+                html += '<small class="notifications-provider-status">Twilio: '+escapeHtml(sms.twilio_status_label)+'</small>';
+            }
+            html += '</td>';
             html += '<td>'+escapeHtml(formatDate(sms.send_at_local || sms.send_at))+'</td>';
             html += '<td>'+escapeHtml(formatDate(sms.sent_at_local || sms.sent_at))+'</td>';
-            html += '<td class="notifications-actions text-end"><div class="notifications-action-group"><button type="button" class="btn btn-link notifications-action notifications-resend-sms" data-id="'+escapeHtml(sms.id)+'" title="Reenviar" aria-label="Reenviar SMS"><i class="fa-solid fa-reply"></i></button></div></td>';
+            html += '<td class="notifications-actions text-end"><div class="notifications-action-group">';
+            html += '<button type="button" class="btn btn-link notifications-action notifications-validate-sms" data-id="'+escapeHtml(sms.id)+'" title="Validar entrega en Twilio" aria-label="Validar entrega en Twilio"><i class="fa-solid fa-check-double"></i></button>';
+            html += '<button type="button" class="btn btn-link notifications-action notifications-resend-sms" data-id="'+escapeHtml(sms.id)+'" title="Reenviar" aria-label="Reenviar SMS"><i class="fa-solid fa-reply"></i></button>';
+            html += '</div></td>';
             html += '</tr>';
         });
         $('#notifications-sms-list').html(html);
@@ -92,4 +99,16 @@ function fillSmsForResend(sms) {
 export function resendSms() {
     const id = $(this).attr('data-id');
     PostMethodFunction('/admin/notifications/sms-by-id', {id: id}, null, function(response) { fillSmsForResend(response.sms); }, null);
+}
+
+export function validateDelivery() {
+    const button = $(this);
+    const id = button.attr('data-id');
+    button.prop('disabled', true);
+    PostMethodFunction('/admin/notifications/sms/validate-delivery', {id: id}, null, function(response) {
+        alertSuccess(response.message || 'Entrega validada');
+        loadSms();
+    }, function() {
+        button.prop('disabled', false);
+    });
 }

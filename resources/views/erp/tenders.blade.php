@@ -10,11 +10,13 @@
         <button class="nav-link active" id="tenders-discovery-tab" data-bs-toggle="tab" data-bs-target="#tenders-discovery" type="button" role="tab" aria-controls="tenders-discovery" aria-selected="true">Discovery</button>
         <button class="nav-link" id="tenders-context-tab" data-bs-toggle="tab" data-bs-target="#tenders-context" type="button" role="tab" aria-controls="tenders-context" aria-selected="false">Contexto</button>
         <button class="nav-link" id="tenders-pipeline-tab" data-bs-toggle="tab" data-bs-target="#tenders-pipeline" type="button" role="tab" aria-controls="tenders-pipeline" aria-selected="false">Oportunidad</button>
+        <button class="nav-link" id="tenders-configuration-tab" data-bs-toggle="tab" data-bs-target="#tenders-configuration" type="button" role="tab" aria-controls="tenders-configuration" aria-selected="false">Configuracion</button>
     </div>
 </nav>
 <div class="tab-content" id="tenders-tab-content">
     @include('erp.tenders.discovery')
     @include('erp.tenders.context')
     @include('erp.tenders.pipeline')
+    @include('erp.tenders.configuration', ['connection' => $connection, 'settings' => $settings])
 </div>
 @endsection
