@@ -54,7 +54,7 @@ Route::prefix('internal/servers/v1')->middleware('servers')->group(function () {
     Route::post('/heartbeat', [\App\Domain\Servers\Http\Controllers\servers_controller::class, 'heartbeat']);
 });
 
-Route::prefix('webhooks/twilio/whatsapp')->middleware('web_api_token')->group(function () {
+Route::prefix('webhooks/twilio/whatsapp')->group(function () {
     Route::post('/incoming', [notifications_controller::class, 'whatsapp_incoming_webhook']);
     Route::post('/status', [notifications_controller::class, 'whatsapp_status_webhook']);
 });

@@ -888,6 +888,15 @@ class notifications_test extends TestCase
         });
     }
 
+    public function test_whatsapp_webhooks_are_not_protected_by_web_integration_token()
+    {
+        $incoming = app('router')->getRoutes()->match(Request::create('/api/webhooks/twilio/whatsapp/incoming', 'POST'));
+        $status = app('router')->getRoutes()->match(Request::create('/api/webhooks/twilio/whatsapp/status', 'POST'));
+
+        $this->assertNotContains('web_api_token', $incoming->gatherMiddleware());
+        $this->assertNotContains('web_api_token', $status->gatherMiddleware());
+    }
+
     public function test_whatsapp_send_allows_freeform_inside_window_and_records_provider_sid()
     {
         $this->Notification_HandleWhatsappIncoming([
