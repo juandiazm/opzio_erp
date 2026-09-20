@@ -1,0 +1,551 @@
+.notifications-tab-unread {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.2rem;
+    height: 1.2rem;
+    padding: 0 0.25rem;
+    margin-left: 0.3rem;
+    border-radius: 999px;
+    background: $accent;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.notifications-whatsapp-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notifications-whatsapp-layout {
+    display: grid;
+    grid-template-columns: minmax(18rem, 27rem) minmax(0, 1fr);
+    min-height: min(68vh, 720px);
+    margin: 0 1rem;
+    overflow: hidden;
+    border: 1px solid rgba($primary, 0.14);
+    background: #fff;
+    box-shadow: 0 0.6rem 1.4rem rgba($primary, 0.08);
+}
+
+.notifications-whatsapp-list-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: #fff;
+    border-right: 1px solid rgba($primary, 0.12);
+}
+
+.notifications-whatsapp-list-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.75rem;
+    background: $brand-cream;
+}
+
+.notifications-whatsapp-search {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    padding: 0 0.65rem;
+    border: 1px solid rgba($primary, 0.18);
+    background: #fff;
+    color: $text-gray;
+}
+
+.notifications-whatsapp-search input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.55rem 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: $text-black;
+    font-size: 0.8rem;
+}
+
+.notifications-whatsapp-unread-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.85rem;
+    border-bottom: 1px solid rgba($primary, 0.08);
+    color: $text-gray;
+    font-size: 0.76rem;
+    cursor: pointer;
+}
+
+.notifications-whatsapp-conversation-list {
+    flex: 1 1 auto;
+    min-height: 12rem;
+    overflow-y: auto;
+}
+
+.notifications-whatsapp-conversation {
+    display: grid;
+    grid-template-columns: 2.55rem minmax(0, 1fr) auto;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.78rem 0.8rem;
+    border: 0;
+    border-bottom: 1px solid rgba($primary, 0.08);
+    background: #fff;
+    color: $text-black;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.notifications-whatsapp-conversation:hover,
+.notifications-whatsapp-conversation.is-active {
+    background: rgba($secondary, 0.1);
+}
+
+.notifications-whatsapp-conversation.is-unread .notifications-whatsapp-conversation-name {
+    color: $primary;
+    font-weight: 700;
+}
+
+.notifications-whatsapp-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.55rem;
+    height: 2.55rem;
+    border-radius: 50%;
+    background: $primary;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.notifications-whatsapp-conversation-avatar {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: 0.9rem;
+}
+
+.notifications-whatsapp-conversation-main,
+.notifications-whatsapp-conversation-meta {
+    min-width: 0;
+}
+
+.notifications-whatsapp-conversation-name,
+.notifications-whatsapp-conversation-preview {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notifications-whatsapp-conversation-name {
+    font-size: 0.85rem;
+}
+
+.notifications-whatsapp-conversation-phone,
+.notifications-whatsapp-conversation-preview,
+.notifications-whatsapp-conversation-time {
+    color: $text-gray;
+    font-size: 0.72rem;
+}
+
+.notifications-whatsapp-conversation-preview {
+    margin-top: 0.2rem;
+}
+
+.notifications-whatsapp-conversation-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+}
+
+.notifications-whatsapp-unread-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.2rem;
+    height: 1.2rem;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    background: $accent;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+.notifications-whatsapp-list-panel > .notifications-pagination {
+    padding: 0.55rem;
+    border-top: 1px solid rgba($primary, 0.08);
+}
+
+.notifications-whatsapp-start {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.7rem;
+    left: 0.7rem;
+    z-index: 2;
+    padding: 0.85rem;
+    border: 1px solid rgba($primary, 0.2);
+    background: #fff;
+    box-shadow: 0 0.8rem 1.5rem rgba($primary, 0.16);
+}
+
+.notifications-whatsapp-start .notifications-section-heading {
+    margin-bottom: 0.75rem;
+}
+
+.notifications-whatsapp-start-close {
+    padding: 0.1rem 0.25rem;
+    color: $text-gray;
+}
+
+.notifications-whatsapp-chat {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    background: #f8f7fb;
+}
+
+.notifications-whatsapp-chat-empty {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.45rem;
+    color: $text-gray;
+    text-align: center;
+}
+
+.notifications-whatsapp-chat-empty i {
+    margin-bottom: 0.5rem;
+    color: $primary;
+    font-size: 3rem;
+}
+
+.notifications-whatsapp-chat-empty strong {
+    color: $primary;
+    font-size: 1rem;
+}
+
+.notifications-whatsapp-chat-empty span {
+    font-size: 0.8rem;
+}
+
+.notifications-whatsapp-chat-content {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+}
+
+.notifications-whatsapp-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 4.2rem;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid rgba($primary, 0.12);
+    background: #fff;
+}
+
+.notifications-whatsapp-back {
+    display: none;
+    padding: 0.25rem;
+    color: $primary;
+}
+
+.notifications-whatsapp-chat-contact {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+
+.notifications-whatsapp-chat-contact strong,
+.notifications-whatsapp-chat-contact span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notifications-whatsapp-chat-contact strong {
+    color: $primary;
+    font-size: 0.92rem;
+}
+
+.notifications-whatsapp-chat-contact span {
+    color: $text-gray;
+    font-size: 0.74rem;
+}
+
+.notifications-whatsapp-window {
+    padding: 0.3rem 0.5rem;
+    color: $success;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-align: right;
+}
+
+.notifications-whatsapp-window.is-closed {
+    color: $accent;
+}
+
+.notifications-whatsapp-messages {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 14rem;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem clamp(0.8rem, 3vw, 2.5rem);
+    overflow-y: auto;
+    background-color: #f2eff6;
+    background-image: radial-gradient(rgba($primary, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.notifications-whatsapp-message {
+    display: flex;
+    max-width: min(78%, 36rem);
+    flex-direction: column;
+    align-self: flex-start;
+    padding: 0.55rem 0.7rem 0.4rem;
+    border: 1px solid rgba($primary, 0.08);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba($primary, 0.07);
+}
+
+.notifications-whatsapp-message.is-outbound {
+    align-self: flex-end;
+    border-color: rgba($accent, 0.2);
+    background: #fff5eb;
+}
+
+.notifications-whatsapp-message-body {
+    overflow-wrap: anywhere;
+    color: $text-black;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    white-space: normal;
+}
+
+.notifications-whatsapp-message-media {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.45rem;
+}
+
+.notifications-whatsapp-message-media a {
+    color: $primary;
+    font-size: 0.74rem;
+    overflow-wrap: anywhere;
+}
+
+.notifications-whatsapp-message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+    color: $text-gray;
+    font-size: 0.64rem;
+}
+
+.notifications-whatsapp-message-meta .is-read {
+    color: $primary;
+}
+
+.notifications-whatsapp-composer {
+    padding: 0.7rem 0.9rem;
+    border-top: 1px solid rgba($primary, 0.12);
+    background: #fff;
+}
+
+.notifications-whatsapp-composer-tools {
+    display: grid;
+    grid-template-columns: minmax(10rem, 0.7fr) minmax(12rem, 1fr);
+    gap: 0.6rem;
+    margin-bottom: 0.55rem;
+}
+
+.notifications-whatsapp-composer-tools label,
+.notifications-whatsapp-template-form label {
+    display: block;
+    margin: 0;
+}
+
+.notifications-whatsapp-composer-tools label > span {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: $text-gray;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.notifications-whatsapp-composer-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.55rem;
+}
+
+.notifications-whatsapp-composer-row textarea {
+    flex: 1 1 auto;
+    min-width: 0;
+    resize: vertical;
+    border-color: rgba($primary, 0.2);
+}
+
+.notifications-whatsapp-composer-row button {
+    flex: 0 0 2.55rem;
+    width: 2.55rem;
+    height: 2.55rem;
+    padding: 0;
+}
+
+.notifications-whatsapp-window-note {
+    display: block;
+    margin-top: 0.3rem;
+    color: $text-gray;
+    font-size: 0.68rem;
+}
+
+.notifications-whatsapp-window-note.is-closed {
+    color: $accent;
+}
+
+.notifications-whatsapp-templates-dialog {
+    width: min(1120px, 100%);
+}
+
+.notifications-whatsapp-templates-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+    gap: 1rem;
+}
+
+.notifications-whatsapp-template-list {
+    min-height: 22rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid rgba($primary, 0.12);
+}
+
+.notifications-whatsapp-template-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.7rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba($primary, 0.09);
+}
+
+.notifications-whatsapp-template-item:last-child {
+    border-bottom: 0;
+}
+
+.notifications-whatsapp-template-item strong,
+.notifications-whatsapp-template-item span {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.notifications-whatsapp-template-item strong {
+    color: $primary;
+    font-size: 0.84rem;
+}
+
+.notifications-whatsapp-template-item span {
+    margin-top: 0.2rem;
+    color: $text-gray;
+    font-size: 0.72rem;
+}
+
+.notifications-whatsapp-template-item-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.notifications-whatsapp-template-form {
+    padding: 0.85rem;
+    border: 1px solid rgba($primary, 0.12);
+    background: #fbfbfb;
+}
+
+.notifications-whatsapp-template-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+@media screen and (max-width: 900px) {
+    .notifications-whatsapp-layout {
+        grid-template-columns: minmax(15rem, 34vw) minmax(0, 1fr);
+    }
+
+    .notifications-whatsapp-templates-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .notifications-whatsapp-header-actions {
+        width: 100%;
+    }
+
+    .notifications-whatsapp-header-actions .btn {
+        flex: 1 1 0;
+    }
+
+    .notifications-whatsapp-layout {
+        display: block;
+        min-height: calc(100vh - 12rem);
+        margin: 0;
+        border-right: 0;
+        border-left: 0;
+    }
+
+    .notifications-whatsapp-list-panel {
+        min-height: calc(100vh - 12rem);
+        border-right: 0;
+    }
+
+    .notifications-whatsapp-chat {
+        display: none;
+        min-height: calc(100vh - 12rem);
+    }
+
+    .notifications-whatsapp-layout.is-chat-open .notifications-whatsapp-list-panel {
+        display: none;
+    }
+
+    .notifications-whatsapp-layout.is-chat-open .notifications-whatsapp-chat {
+        display: flex;
+    }
+
+    .notifications-whatsapp-back {
+        display: inline-flex;
+    }
+
+    .notifications-whatsapp-message {
+        max-width: 88%;
+    }
+
+    .notifications-whatsapp-composer-tools {
+        grid-template-columns: 1fr;
+    }
+
+    .notifications-whatsapp-templates-dialog .notifications-modal-body {
+        padding: 0.85rem;
+    }
+}

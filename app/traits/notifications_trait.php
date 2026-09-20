@@ -18,6 +18,7 @@ trait notifications_trait
     use mail_log_trait;
     use mail_senders_trait;
     use twilio_sms_trait;
+    use whatsapp_notifications_trait;
 
     private function Notification_Response($message, $data = [], $status = 1)
     {

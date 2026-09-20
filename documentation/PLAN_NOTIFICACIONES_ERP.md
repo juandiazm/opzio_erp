@@ -84,12 +84,20 @@ efectivo sea `+573145433746`.
 - Estado `0` pendiente, `1` enviado y `2` agotado/fallido.
 - No se guardaran tokens ni respuestas completas del proveedor.
 
+### Nuevas tablas `whatsapp_conversations` y `whatsapp_messages`
+
+- Las conversaciones agrupan por telefono y sender de negocio, con nombre,
+  cliente asociado, ventana de atencion de 24 horas y contador de no leidos.
+- Los mensajes conservan direccion, SID, estado, errores, media, plantillas,
+  variables y payload original del webhook.
+- El SID de Twilio es unico para soportar reintentos idempotentes.
+
 ## Superficie funcional
 
 1. Ruta `/admin/notifications`, visible solo con `admin/notifications/`.
-2. Dos pestañas: `Email` y `SMS`, cada una con listado, filtros de búsqueda,
-  estado y rango de fechas desde/hasta, además del boton de nueva
-  notificacion. El rango inicia con el día actual.
+2. Tres pestañas: `Email`, `SMS` y `WhatsApp`. Email y SMS conservan sus
+  listados, filtros y compositores existentes; WhatsApp lista conversaciones
+  por telefono y abre un chat bidireccional.
 3. Modal de alta con destinatarios por clientes seleccionados, opcion de todos
    los clientes activos y destinatarios manuales.
 4. Email: modo masivo (un correo a todos) o individual (un registro por
@@ -103,6 +111,11 @@ efectivo sea `+573145433746`.
 7. Estados visibles: pendiente, enviado y fallido/ag agotado, junto con fecha
   programada y fecha efectiva. Cada SMS con SID tiene una accion para consultar
   en Twilio su estado de entrega y actualizar el estado local.
+8. WhatsApp: recepcion por webhook, envio libre dentro de la ventana de
+  atencion, envio templated fuera de ella, estados por callback, media entrante,
+  lectura y contador global de mensajes pendientes.
+9. Plantillas: listado, alta, edicion, eliminacion y solicitud de aprobacion
+  usando Content API, sin duplicar la fuente de verdad de Twilio.
 
 ## Orden de trabajo
 
@@ -112,6 +125,7 @@ efectivo sea `+573145433746`.
 - [x] Agregar migracion de `send_at` y `notification_batch` a `mail_logs`.
 - [x] Persistir adjuntos de correo sin romper llamadas existentes.
 - [x] Crear migracion, modelo y relaciones de `sms_logs`.
+- [x] Crear migraciones, modelos y relaciones de conversaciones/mensajes WhatsApp.
 - [x] Crear permiso idempotente y entrada protegida del sidebar.
 
 ### Fase 1 - Dominio y procesamiento
@@ -122,13 +136,16 @@ efectivo sea `+573145433746`.
 - [x] Implementar alta email/SMS, consulta paginada y reenvio editable.
 - [x] Implementar worker de email programado y worker SMS con aislamiento de
   errores y maximo de tres intentos.
+- [x] Implementar envio/recepcion WhatsApp, ventana de 24 horas, idempotencia,
+  callbacks de estado y Content API.
 - [x] Registrar el comando en scheduler sin cambiar el comportamiento de
   comandos legacy salvo el filtro de fecha requerido.
 
 ### Fase 2 - Superficie web
 
-- [x] Crear Blade con dos pestañas y modal de composicion.
+- [x] Crear Blade con tres pestañas, chat WhatsApp y modal de composicion.
 - [x] Crear JS para listado, modal, editor enriquecido, adjuntos y reenvio.
+- [x] Crear JS para conversaciones, chat, plantillas y badge de no leidos.
 - [x] Crear SCSS responsive siguiendo el patron ERP existente.
 - [x] Agregar endpoints de catalogo de clientes y estados.
 
@@ -144,7 +161,8 @@ efectivo sea `+573145433746`.
 
 - Un usuario sin `admin/notifications/` no puede abrir la pagina ni ejecutar
   endpoints del modulo.
-- Email y SMS aparecen en pestañas separadas y tienen listado historico.
+- Email, SMS y WhatsApp aparecen en pestañas separadas; WhatsApp lista contactos
+  y mantiene historial bidireccional.
 - Se puede crear un envio por cliente, para todos los clientes o con
   destinatarios manuales; email distingue masivo de individual.
 - El cuerpo HTML se conserva con formato permitido, sin scripts, eventos ni
@@ -166,6 +184,9 @@ efectivo sea `+573145433746`.
   crea un log por destinatario para que cada reenvio y fallo sean independientes.
 - Los adjuntos se limitan por cantidad, tamano y tipo permitido en el endpoint;
   las rutas siempre se generan en almacenamiento controlado por la aplicacion.
+- WhatsApp exige firma Twilio en webhooks, opt-in del contacto y plantilla
+  aprobada fuera de la ventana de atencion. Content API permanece como fuente
+  de verdad de plantillas; el ERP solo presenta sus operaciones permitidas.
 
 ## Bitacora de implementacion
 
@@ -228,3 +249,17 @@ efectivo sea `+573145433746`.
 - Verificado con `php artisan view:cache`, `npm run build`, `php artisan
   route:list --path=admin/notifications`, `notifications_test.php` (11 tests) y
   diagnosticos del editor.
+
+### 2026-09-20 - WhatsApp bidireccional y Content API
+
+- Se agregaron `whatsapp_conversations` y `whatsapp_messages`, con asociacion
+  opcional a clientes, ventana de atencion, media y deduplicacion por SID.
+- Se agregaron los webhooks firmados `/api/webhooks/twilio/whatsapp/incoming`
+  y `/api/webhooks/twilio/whatsapp/status`.
+- La pestaña lista telefonos, abre chat responsive, permite texto libre o
+  `ContentSid`, marca conversaciones leidas y actualiza el badge del sidebar.
+- Se agrego CRUD de Content Templates y solicitud de aprobacion sobre la API
+  oficial de Twilio.
+- Verificado con `php artisan test tests/Feature/notifications_test.php` (22
+  tests, 122 assertions), `php artisan migrate --pretend`, `php artisan
+  view:cache`, ambos `route:list` y `npm run build`.

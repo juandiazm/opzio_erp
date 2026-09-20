@@ -11,15 +11,19 @@ use App\Models\license_notification;
 use App\Models\mail_log;
 use App\Models\mail_log_attachment;
 use App\Models\sms_log;
+use App\Models\whatsapp_conversation;
+use App\Models\whatsapp_message;
 use App\traits\notifications_trait;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Twilio\Security\RequestValidator;
 
 class NotificationTwilioFakeMessageList
 {
@@ -97,6 +101,11 @@ class notifications_test extends TestCase
         return $this->twilioClient;
     }
 
+    protected function TwilioWhatsApp_CreateClient()
+    {
+        return $this->twilioClient;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -115,6 +124,13 @@ class notifications_test extends TestCase
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => ':memory:',
             'app.env' => 'local',
+            'services.twilio.sid' => 'AC00000000000000000000000000000000',
+            'services.twilio.token' => 'test-token',
+            'services.twilio.whatsapp.from' => 'whatsapp:+573145433746',
+            'services.twilio.whatsapp.messaging_service_sid' => null,
+            'services.twilio.whatsapp.webhook_url' => null,
+            'services.twilio.whatsapp.status_callback_url' => null,
+            'services.twilio.whatsapp.validate_webhooks' => true,
         ]);
         $this->app['env'] = 'local';
         DB::purge('sqlite');
@@ -191,6 +207,53 @@ class notifications_test extends TestCase
             $table->unsignedBigInteger('resend_of_id')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
+        });
+        Schema::create('whatsapp_conversations', function (Blueprint $table) {
+            $table->id();
+            $table->string('unique_id', 100)->unique();
+            $table->unsignedBigInteger('client_id')->nullable()->index();
+            $table->string('phone', 30);
+            $table->string('business_address', 80);
+            $table->string('wa_id', 40)->nullable();
+            $table->string('display_name', 150)->nullable();
+            $table->string('profile_name', 150)->nullable();
+            $table->unsignedInteger('unread_count')->default(0)->index();
+            $table->text('last_message_preview')->nullable();
+            $table->dateTime('last_message_at')->nullable()->index();
+            $table->dateTime('last_inbound_at')->nullable();
+            $table->dateTime('window_expires_at')->nullable();
+            $table->dateTime('last_read_at')->nullable();
+            $table->string('last_inbound_sid', 64)->nullable();
+            $table->string('last_outbound_sid', 64)->nullable();
+            $table->timestamps();
+            $table->unique(['phone', 'business_address']);
+        });
+        Schema::create('whatsapp_messages', function (Blueprint $table) {
+            $table->id();
+            $table->string('unique_id', 100)->unique();
+            $table->unsignedBigInteger('conversation_id')->index();
+            $table->unsignedBigInteger('client_id')->nullable()->index();
+            $table->string('twilio_sid', 64)->nullable()->unique();
+            $table->string('direction', 20)->index();
+            $table->string('from', 80);
+            $table->string('to', 80);
+            $table->longText('body')->nullable();
+            $table->string('message_type', 40)->default('text');
+            $table->json('media')->nullable();
+            $table->string('content_sid', 64)->nullable()->index();
+            $table->json('content_variables')->nullable();
+            $table->string('status', 40)->default('pending')->index();
+            $table->unsignedInteger('error_code')->nullable();
+            $table->text('error_message')->nullable();
+            $table->unsignedTinyInteger('attempts')->default(0);
+            $table->dateTime('send_at')->nullable();
+            $table->dateTime('sent_at')->nullable();
+            $table->dateTime('received_at')->nullable();
+            $table->dateTime('status_updated_at')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable()->index();
+            $table->json('raw_payload')->nullable();
+            $table->timestamps();
+            $table->index(['conversation_id', 'created_at']);
         });
 
         Storage::fake('local');
@@ -771,5 +834,105 @@ class notifications_test extends TestCase
         $this->assertSame('+573000000001', $original->to);
         $this->assertSame('+573000000002', $resent->to);
         $this->assertSame($original->id, $resent->resend_of_id);
+    }
+
+    public function test_whatsapp_incoming_webhook_is_idempotent_and_updates_unread_window()
+    {
+        $payload = [
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-001',
+            'From' => 'whatsapp:+573000000010',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Hola desde WhatsApp',
+            'ProfileName' => 'Cliente WhatsApp',
+            'WaId' => '573000000010',
+            'NumMedia' => '0',
+        ];
+
+        $response = $this->Notification_HandleWhatsappIncoming($payload);
+        $duplicate = $this->Notification_HandleWhatsappIncoming($payload);
+        $conversation = whatsapp_conversation::first();
+
+        $this->assertSame(1, $response['status']);
+        $this->assertFalse($response['duplicate'] ?? false);
+        $this->assertTrue($duplicate['duplicate']);
+        $this->assertSame('+573000000010', $conversation->phone);
+        $this->assertSame(1, (int) $conversation->unread_count);
+        $this->assertNotNull($conversation->window_expires_at);
+        $this->assertSame(1, whatsapp_message::count());
+        $this->assertSame('received', whatsapp_message::first()->status);
+
+        $read = $this->Notification_MarkWhatsappConversationRead($conversation->id);
+        $this->assertSame(1, $read['status']);
+        $this->assertSame(0, (int) $conversation->fresh()->unread_count);
+        $this->assertSame(0, $this->Notification_GetWhatsappUnreadCount()['unread_count']);
+    }
+
+    public function test_whatsapp_send_allows_freeform_inside_window_and_records_provider_sid()
+    {
+        $this->Notification_HandleWhatsappIncoming([
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-002',
+            'From' => 'whatsapp:+573000000011',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Necesito ayuda',
+        ]);
+        $conversation = whatsapp_conversation::first();
+
+        $response = $this->Notification_SendWhatsappMessage($conversation->id, ['body' => 'Claro, te ayudamos.']);
+        $message = whatsapp_message::where('direction', 'outbound')->first();
+
+        $this->assertSame(1, $response['status']);
+        $this->assertSame('whatsapp:+573000000011', $this->twilioClient->lastCreated['to']);
+        $this->assertSame('Claro, te ayudamos.', $this->twilioClient->lastCreated['options']['body']);
+        $this->assertSame('queued', $message->status);
+        $this->assertSame('SM00000000000000000000000000000001', $message->twilio_sid);
+        $this->assertSame(1, (int) $message->attempts);
+    }
+
+    public function test_whatsapp_requires_template_outside_window_and_sends_content_sid()
+    {
+        $conversation = whatsapp_conversation::create([
+            'unique_id' => 'WA-CLOSED-001',
+            'phone' => '+573000000012',
+            'business_address' => 'whatsapp:+573145433746',
+            'display_name' => 'Ventana cerrada',
+            'window_expires_at' => Carbon::now()->subMinute(),
+        ]);
+
+        $freeform = $this->Notification_SendWhatsappMessage($conversation->id, ['body' => 'No debe salir']);
+        $this->assertSame(0, $freeform['status']);
+        $this->assertSame(0, whatsapp_message::count());
+
+        $contentSid = 'HX'.str_repeat('a', 32);
+        $templated = $this->Notification_SendWhatsappMessage($conversation->id, [
+            'content_sid' => $contentSid,
+            'content_variables' => ['1' => 'Cliente'],
+        ]);
+        $message = whatsapp_message::first();
+
+        $this->assertSame(1, $templated['status']);
+        $this->assertSame($contentSid, $this->twilioClient->lastCreated['options']['contentSid']);
+        $this->assertSame('{"1":"Cliente"}', $this->twilioClient->lastCreated['options']['contentVariables']);
+        $this->assertSame($contentSid, $message->content_sid);
+    }
+
+    public function test_whatsapp_webhook_signature_accepts_twilio_signature_and_rejects_forged_request()
+    {
+        $url = 'https://erp.example.test/api/webhooks/twilio/whatsapp/incoming';
+        $parameters = [
+            'MessageSid' => 'SM-SIGNED-WHATSAPP-001',
+            'From' => 'whatsapp:+573000000013',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Mensaje firmado',
+        ];
+        config(['services.twilio.whatsapp.webhook_url' => $url]);
+
+        $request = Request::create($url, 'POST', $parameters);
+        $validator = new RequestValidator('test-token');
+        $request->headers->set('X-Twilio-Signature', $validator->computeSignature($url, $parameters));
+
+        $this->assertTrue($this->TwilioWhatsApp_ValidateWebhook($request, 'incoming'));
+
+        $request->headers->set('X-Twilio-Signature', 'invalid-signature');
+        $this->assertFalse($this->TwilioWhatsApp_ValidateWebhook($request, 'incoming'));
     }
 }

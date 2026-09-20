@@ -1,5 +1,22 @@
 $(document).on('click', '#sidebar-toggle-btn', toggleSidebar);
 
+function updateWhatsappUnreadBadge(count){
+    const unreadCount = Math.max(0, Number(count || 0));
+    const label = unreadCount > 99 ? '99+' : String(unreadCount);
+    $('[data-whatsapp-unread]').toggleClass('d-none', unreadCount === 0).text(label).attr('aria-label', unreadCount+' mensajes de WhatsApp sin leer');
+}
+
+function loadWhatsappUnreadCount(){
+    if ($('[data-whatsapp-unread]').length === 0 || typeof window.PostMethodFunction !== 'function') return;
+    PostMethodFunction('/admin/notifications/whatsapp/unread-count', {}, null, function(response){
+        updateWhatsappUnreadBadge(response.unread_count || 0);
+    }, null);
+}
+
+$(document).on('notifications:whatsapp-unread-updated', function(event, count){
+    updateWhatsappUnreadBadge(count);
+});
+
 let touchStartY = 0;
 let longPressTimer = null;
 const LONG_PRESS_DURATION = 500;
@@ -12,6 +29,8 @@ $(document).ready(function(){
     if (window.innerWidth <= 768) {
         initMobileSidebarInteractions();
     }
+    loadWhatsappUnreadCount();
+    window.setInterval(loadWhatsappUnreadCount, 30000);
 });
 
 function toggleSidebar(){

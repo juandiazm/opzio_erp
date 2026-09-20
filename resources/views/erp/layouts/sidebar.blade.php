@@ -79,6 +79,7 @@
                 <a href="/admin/notifications" class="sidebar-menu-item-link">
                     <i class="fa-light fa-bell align-self-center sidebar-menu-item-icon"></i>
                     <p class="align-self-center sidebar-menu-item-text">Notificaciones</p>
+                    <span class="sidebar-whatsapp-unread d-none" data-whatsapp-unread>0</span>
                 </a>
             </li>
             @endif

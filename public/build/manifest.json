@@ -1075,7 +1075,7 @@
     ]
   },
   "resources/js/erp/layouts/app.js": {
-    "file": "assets/app-WxKNjh7F.js",
+    "file": "assets/app-ugqGKuZ5.js",
     "name": "app",
     "src": "resources/js/erp/layouts/app.js",
     "isEntry": true,
@@ -1090,7 +1090,7 @@
     "isEntry": true
   },
   "resources/js/erp/layouts/sidebar.js": {
-    "file": "assets/sidebar-Cc3nyM0L.js",
+    "file": "assets/sidebar-Bw6d2kTW.js",
     "name": "sidebar",
     "src": "resources/js/erp/layouts/sidebar.js",
     "isEntry": true
@@ -1202,7 +1202,7 @@
     "isEntry": true
   },
   "resources/js/erp/notifications/notifications.js": {
-    "file": "assets/notifications-DidkPgXJ.js",
+    "file": "assets/notifications-BBExvaML.js",
     "name": "notifications",
     "src": "resources/js/erp/notifications/notifications.js",
     "isEntry": true
@@ -1698,7 +1698,7 @@
     "isEntry": true
   },
   "resources/sass/erp/layouts/sidebar.scss": {
-    "file": "assets/sidebar-D4nS_fr2.css",
+    "file": "assets/sidebar-C6NXBnHy.css",
     "src": "resources/sass/erp/layouts/sidebar.scss",
     "isEntry": true
   },
@@ -1718,7 +1718,7 @@
     "isEntry": true
   },
   "resources/sass/erp/notifications/notifications.scss": {
-    "file": "assets/notifications-BYPyxVYo.css",
+    "file": "assets/notifications-B9QynOWJ.css",
     "src": "resources/sass/erp/notifications/notifications.scss",
     "isEntry": true
   },

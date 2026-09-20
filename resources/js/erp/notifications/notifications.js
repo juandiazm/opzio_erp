@@ -1,17 +1,19 @@
 import { notificationState } from './state.js';
 import * as email from './email.js';
 import * as sms from './sms.js';
+import * as whatsapp from './whatsapp.js';
 import { closeComposeModal, loadClients, renderClientList } from './shared.js';
 
 function changeTab(event) {
     const activeTab = event && event.target ? $(event.target) : $('#nav-tab .active');
     if (activeTab.length === 0) return;
-    notificationState.activeChannel = activeTab.attr('id').includes('sms') ? 'sms' : 'email';
+    notificationState.activeChannel = activeTab.attr('id').includes('sms') ? 'sms' : (activeTab.attr('id').includes('whatsapp') ? 'whatsapp' : 'email');
     if (notificationState.activeChannel === 'sms') sms.loadSms();
+    else if (notificationState.activeChannel === 'whatsapp') whatsapp.loadConversations();
     else email.loadEmails();
 }
 
-$(document).on('shown.bs.tab', '#notifications-sms-tab, #notifications-email-tab', changeTab);
+$(document).on('shown.bs.tab', '#notifications-sms-tab, #notifications-email-tab, #notifications-whatsapp-tab', changeTab);
 $(document).on('click', '#notifications-new-email', email.openNewEmailModal);
 $(document).on('click', '#notifications-new-sms', sms.openNewSmsModal);
 $(document).on('click', '#notifications-close-modal, #notifications-cancel-modal', closeComposeModal);
@@ -28,6 +30,26 @@ $(document).on('click', '#notifications-close-email-view', email.closeEmailView)
 $(document).on('click', '#notifications-edit-email-view', email.editEmailFromView);
 $(document).on('click', '#notifications-email-refresh', email.loadEmails);
 $(document).on('click', '#notifications-sms-refresh', sms.loadSms);
+$(document).on('click', '#notifications-whatsapp-refresh', whatsapp.loadConversations);
+$(document).on('click', '#notifications-whatsapp-chat-refresh', whatsapp.refreshConversation);
+$(document).on('click', '#notifications-whatsapp-new', whatsapp.toggleNewConversation);
+$(document).on('click', '#notifications-whatsapp-start-close', whatsapp.closeNewConversation);
+$(document).on('change', '#notifications-whatsapp-client', whatsapp.selectClient);
+$(document).on('submit', '#notifications-whatsapp-start-form', whatsapp.startConversation);
+$(document).on('click', '#notifications-whatsapp-conversation-list .notifications-whatsapp-conversation', whatsapp.openConversation);
+$(document).on('click', '#notifications-whatsapp-back', whatsapp.closeConversation);
+$(document).on('submit', '#notifications-whatsapp-message-form', whatsapp.sendMessage);
+$(document).on('click', '#notifications-whatsapp-templates', whatsapp.openTemplates);
+$(document).on('click', '#notifications-whatsapp-templates-close', whatsapp.closeTemplates);
+$(document).on('submit', '#notifications-whatsapp-template-form', whatsapp.saveTemplate);
+$(document).on('click', '#notifications-whatsapp-template-reset', whatsapp.resetTemplateForm);
+$(document).on('click', '.notifications-whatsapp-template-edit', whatsapp.editTemplate);
+$(document).on('click', '.notifications-whatsapp-template-delete', whatsapp.deleteTemplate);
+$(document).on('click', '.notifications-whatsapp-template-submit', whatsapp.submitTemplate);
+$(document).on('change', '#notifications-whatsapp-template', function() {
+    const template = (notificationState.whatsappTemplates || []).find(function(item) { return item.sid === $(this).val(); }.bind(this));
+    if (template) $('#notifications-whatsapp-body').val('');
+});
 $(document).on('change', '#notifications-email-status, #notifications-sms-status, #notifications-email-date-from, #notifications-email-date-to, #notifications-sms-date-from, #notifications-sms-date-to', function() {
     const channel = $(this).attr('id').includes('email') ? 'email' : 'sms';
     notificationState[channel+'Pagination'].page = 1;
@@ -37,6 +59,10 @@ $(document).on('change', '#notifications-email-search, #notifications-sms-search
     const channel = $(this).attr('id').includes('email') ? 'email' : 'sms';
     notificationState[channel+'Pagination'].page = 1;
     channel === 'email' ? email.loadEmails() : sms.loadSms();
+});
+$(document).on('input change', '#notifications-whatsapp-search, #notifications-whatsapp-unread-only', function() {
+    notificationState.whatsappPagination.page = 1;
+    whatsapp.loadConversations();
 });
 $(document).on('change', '#notifications-email-client-list input[data-client-id], #notifications-sms-client-list input[data-client-id], #notifications-email-all-clients, #notifications-sms-all-clients', function() {
     const elementId = String($(this).attr('id') || '');
@@ -52,11 +78,18 @@ $(document).on('keydown', function(event) {
     if (event.key !== 'Escape') return;
     if (!$('#notifications-compose-modal').hasClass('d-none')) closeComposeModal();
     else if (!$('#notifications-email-view-modal').hasClass('d-none')) email.closeEmailView();
+    else if (!$('#notifications-whatsapp-templates-modal').hasClass('d-none')) whatsapp.closeTemplates();
+});
+$(document).on('click', '#notifications-whatsapp-templates-modal', function(event) {
+    if (event.target === this) whatsapp.closeTemplates();
 });
 
 $(document).ready(function() {
     email.initializeEditor();
+    whatsapp.initializeWhatsapp();
     loadClients();
     const activeTab = $('#nav-tab .active');
-    activeTab.attr('id') === 'notifications-sms-tab' ? sms.loadSms() : email.loadEmails();
+    if (activeTab.attr('id') === 'notifications-sms-tab') sms.loadSms();
+    else if (activeTab.attr('id') === 'notifications-whatsapp-tab') whatsapp.loadConversations();
+    else email.loadEmails();
 });

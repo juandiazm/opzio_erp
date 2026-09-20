@@ -34,6 +34,15 @@ return [
         'sid' => env('TWILIO_SID'),
         'token' => env('TWILIO_TOKEN'),
         'from' => env('TWILIO_FROM'),
+        'whatsapp' => [
+            'from' => env('TWILIO_WHATSAPP_FROM'),
+            'messaging_service_sid' => env('TWILIO_WHATSAPP_MESSAGING_SERVICE_SID'),
+            'webhook_url' => env('TWILIO_WHATSAPP_WEBHOOK_URL'),
+            'status_callback_url' => env('TWILIO_WHATSAPP_STATUS_CALLBACK_URL'),
+            'validate_webhooks' => (bool) env('TWILIO_WHATSAPP_VALIDATE_WEBHOOKS', true),
+            'default_country_code' => env('TWILIO_WHATSAPP_DEFAULT_COUNTRY_CODE', '+57'),
+            'template_limit' => (int) env('TWILIO_WHATSAPP_TEMPLATE_LIMIT', 100),
+        ],
     ],
 
     'siigo' => [

@@ -385,6 +385,19 @@ Route::prefix('admin')->group(function () {
             Route::post('email/resend', [notifications_controller::class, 'resend_email']);
             Route::post('email/change-status', [notifications_controller::class, 'change_email_status']);
             Route::post('sms/resend', [notifications_controller::class, 'resend_sms']);
+            Route::prefix('whatsapp')->group(function(){
+                Route::post('conversations', [notifications_controller::class, 'get_whatsapp_conversations']);
+                Route::post('conversation', [notifications_controller::class, 'get_whatsapp_conversation']);
+                Route::post('conversations/start', [notifications_controller::class, 'start_whatsapp_conversation']);
+                Route::post('message', [notifications_controller::class, 'send_whatsapp_message']);
+                Route::post('conversation/read', [notifications_controller::class, 'mark_whatsapp_read']);
+                Route::post('unread-count', [notifications_controller::class, 'get_whatsapp_unread_count']);
+                Route::post('templates', [notifications_controller::class, 'get_whatsapp_templates']);
+                Route::post('templates/add', [notifications_controller::class, 'add_whatsapp_template']);
+                Route::post('templates/update', [notifications_controller::class, 'update_whatsapp_template']);
+                Route::post('templates/delete', [notifications_controller::class, 'delete_whatsapp_template']);
+                Route::post('templates/submit', [notifications_controller::class, 'submit_whatsapp_template']);
+            });
         });
         Route::prefix('incomes')->group(function(){
             Route::get('/', [admin_pages_controller::class, 'incomes_page']);

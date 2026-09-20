@@ -1,5 +1,53 @@
 @import '../../variables';
 
+.sidebar-whatsapp-unread{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    margin-left: auto;
+    border-radius: 999px;
+    background: $accent;
+    color: $text-white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+@media screen and (min-width: 769px){
+    #sidebar-menu .sidebar-menu-item-link{
+        position: relative;
+    }
+
+    #erp-app-container > #erp-app-sidebar.collapsed #sidebar-menu .sidebar-whatsapp-unread{
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 3px;
+        font-size: 0.55rem;
+    }
+}
+
+@media screen and (max-width: 768px){
+    #sidebar-menu .sidebar-menu-item-link{
+        position: relative;
+    }
+
+    #sidebar-menu .sidebar-whatsapp-unread{
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        min-width: 15px;
+        height: 15px;
+        padding: 0 3px;
+        font-size: 0.52rem;
+    }
+}
+
 @media screen and (min-width: 769px) {
     #erp-app-container > #erp-app-sidebar{
         display: flex !important;

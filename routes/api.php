@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\notifications_controller;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,4 +52,9 @@ Route::prefix('internal/servers/v1')->middleware('servers')->group(function () {
     Route::post('/discovery', [\App\Domain\Servers\Http\Controllers\servers_controller::class, 'discovery']);
     Route::post('/ingest', [\App\Domain\Servers\Http\Controllers\servers_controller::class, 'ingest']);
     Route::post('/heartbeat', [\App\Domain\Servers\Http\Controllers\servers_controller::class, 'heartbeat']);
+});
+
+Route::prefix('webhooks/twilio/whatsapp')->group(function () {
+    Route::post('/incoming', [notifications_controller::class, 'whatsapp_incoming_webhook']);
+    Route::post('/status', [notifications_controller::class, 'whatsapp_status_webhook']);
 });

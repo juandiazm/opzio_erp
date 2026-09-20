@@ -63,6 +63,7 @@ export function loadClients() {
         notificationState.clientsLoading = false;
         renderClientList('email');
         renderClientList('sms');
+        $(document).trigger('notifications:clients-loaded');
     }, function() {
         notificationState.clientsLoading = false;
     });
