@@ -79,11 +79,10 @@ class admin_middleware
             });
             //$match_app_permissions = $app_permissions->where('url', $current_url);
             $match_app_permissions = $app_permissions->filter(function ($perm) use ($current_url) {
-                $val = explode('/',$perm['url']);
-                $val = array_filter($val, function ($value) {
+                $val = array_values(array_filter(explode('/', $perm['url']), function ($value) {
                     return !empty($value);
-                });
-                return empty(array_diff($val, $current_url));
+                }));
+                return array_slice($current_url, 0, count($val)) === $val;
             });
             //if user is logged in but does not have permissions
             if($match_app_permissions->count() == 0){

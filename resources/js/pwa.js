@@ -53,11 +53,13 @@ function showUpdateNotification() {
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     console.log('PWA puede ser instalada');
-    // Prevenir que Chrome 67 y anteriores muestren el prompt automáticamente
+    // Keep the browser's default banner when there is no custom action available.
+    if (localStorage.getItem('pwa-install-dismissed') === 'true') return;
+    if (!document.getElementById('pwa-install-button')) return;
+
+    // Defer the native prompt until the user clicks the custom install button.
     e.preventDefault();
-    // Guardar el evento para poder dispararlo después
     deferredPrompt = e;
-    // Mostrar botón de instalación personalizado
     showInstallButton();
 });
 
@@ -65,6 +67,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function showInstallButton() {
     // Verificar si el usuario ya rechazó la instalación
     if (localStorage.getItem('pwa-install-dismissed') === 'true') {
+        deferredPrompt = null;
         return;
     }
 
