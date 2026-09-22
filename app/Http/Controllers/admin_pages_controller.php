@@ -50,6 +50,10 @@ class admin_pages_controller extends Controller
     {
         return view('erp.notifications');
     }
+    public function contacts_page(Request $request)
+    {
+        return view('erp.contacts');
+    }
     public function incomes_page(Request $request)
     {
         return view('erp.incomes');

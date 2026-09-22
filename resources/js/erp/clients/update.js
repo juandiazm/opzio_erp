@@ -1,6 +1,7 @@
 import { clientState } from './state.js';
 import { getClientDocuments } from './documents.js';
 import { getClientLicenses } from './licenses.js';
+import { getClientContacts } from './contacts.js';
 import { getClientUsers } from './users.js';
 
 export function showCurrentClient(){
@@ -45,6 +46,7 @@ export function showCurrentClient(){
     getClientUsers();
     getClientDocuments();
     getClientLicenses();
+    getClientContacts();
 }
 
 export function updateClient(){

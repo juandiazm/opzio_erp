@@ -198,7 +198,7 @@ export function initializeJiraMultiSelect(field, config = {}) {
 	trigger.append(triggerText, triggerCount, triggerIcon);
 
 	const panel = document.createElement('div');
-	panel.className = 'jira-multiselect__panel';
+	panel.className = 'jira-multiselect__panel jira-multiselect__panel--portal';
 	panel.hidden = true;
 	const searchWrapper = document.createElement('div');
 	searchWrapper.className = 'jira-multiselect__search-wrapper';
@@ -300,6 +300,25 @@ export function initializeJiraMultiSelect(field, config = {}) {
 		createAction('Limpiar', 'fa-xmark', clearAll),
 	);
 
+	const positionPanel = () => {
+		if (panel.hidden) return;
+		const triggerRect = trigger.getBoundingClientRect();
+		const viewportPadding = 8;
+		const panelWidth = Math.min(Math.max(triggerRect.width, 190), window.innerWidth - (viewportPadding * 2));
+		const left = Math.min(Math.max(viewportPadding, triggerRect.left), window.innerWidth - panelWidth - viewportPadding);
+		const spaceBelow = Math.max(0, window.innerHeight - triggerRect.bottom - viewportPadding);
+		const spaceAbove = Math.max(0, triggerRect.top - viewportPadding);
+		const opensAbove = spaceBelow < 300 && spaceAbove > spaceBelow;
+		const availableSpace = opensAbove ? spaceAbove : spaceBelow;
+		const optionsHeight = Math.max(100, Math.min(220, availableSpace - 104));
+		optionsList.style.maxHeight = `${optionsHeight}px`;
+		panel.style.width = `${panelWidth}px`;
+		panel.style.left = `${left}px`;
+		panel.style.top = opensAbove
+			? `${Math.max(viewportPadding, triggerRect.top - panel.offsetHeight - 4)}px`
+			: `${Math.min(window.innerHeight - panel.offsetHeight - viewportPadding, triggerRect.bottom + 4)}px`;
+	};
+
 	const close = () => {
 		wrapper.classList.remove('is-open');
 		panel.hidden = true;
@@ -311,7 +330,10 @@ export function initializeJiraMultiSelect(field, config = {}) {
 		trigger.setAttribute('aria-expanded', 'true');
 		searchInput.value = '';
 		renderOptions();
-		window.requestAnimationFrame(() => searchInput.focus());
+		window.requestAnimationFrame(() => {
+			positionPanel();
+			searchInput.focus();
+		});
 	};
 
 	trigger.addEventListener('click', () => (panel.hidden ? open() : close()));
@@ -330,8 +352,10 @@ export function initializeJiraMultiSelect(field, config = {}) {
 		}
 	});
 	document.addEventListener('click', (event) => {
-		if (!wrapper.contains(event.target)) close();
+		if (!wrapper.contains(event.target) && !panel.contains(event.target)) close();
 	});
+	window.addEventListener('resize', positionPanel);
+	window.addEventListener('scroll', positionPanel, true);
 	select.addEventListener('change', () => {
 		syncTrigger();
 		renderOptions();
@@ -339,8 +363,9 @@ export function initializeJiraMultiSelect(field, config = {}) {
 	});
 
 	field.insertBefore(wrapper, select);
-	wrapper.append(select, trigger, panel);
+	wrapper.append(select, trigger);
 	panel.append(searchWrapper, actions, optionsList);
+	document.body.append(panel);
 	select.classList.add('jira-multiselect__native');
 	const instanceId = `jira-multiselect-${select.name.replace(/[^a-z0-9]+/gi, '-')}`;
 	trigger.setAttribute('aria-controls', `${instanceId}-options`);

@@ -1,37 +1,28 @@
-<div class="tab-pane fade" id="sub-nav-notifications" role="tabpanel" aria-labelledby="sub-nav-details-tab">
-    <table class="table sub-table table-strech" id="notifications-table">
-        <thead>
-            <tr>
-                <th scope="col" class="text-left"></th>
-                <th scope="col" class="columns-notification-email text-left">Correo</th>
-                <th scope="col" class="columns-notification-phone text-left">Teléfono</th>
-                <th scope="col" class="columns-notification-state text-center">Estado</th>
-                <th scope="col" class="columns-notification-actions text-center">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr id="add-notification-row" class="table-row-add">
-                <td class="text-center"></td>
-                <td class="columns-notification-email text-center">
-                    <input type="email" class="form-control align-self-center notification-email text-start" placeholder="license@gmail.com">
-                </td>
-                <td class="columns-notification-phone text-center">
-                    <input type="number" class="form-control align-self-center notification-phone text-start" placeholder="573191425639">
-                </td>
-                <td class="columns-notification-state text-center">
-                    <div class="toggle-container row notification-active" value="1">
-                        <div class="toggle-value d-flex justify-content-center col-6" value="1">
-                            <p>Activo</p>
-                        </div>
-                        <div class="toggle-value d-flex justify-content-center col-6" value="0">
-                            <p>Inactivo</p>
-                        </div>
-                    </div>
-                </td>
-                <td class="columns-notification-actions text-center">
-                    <i class="fa-solid fa-plus" id="add-notification"></i>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<div class="tab-pane fade notification-contacts-pane" id="sub-nav-notifications" role="tabpanel" aria-labelledby="sub-nav-details-tab">
+    <div class="table-responsive">
+        <table class="table sub-table align-middle" id="notifications-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Valor</th>
+                    <th>Tipo</th>
+                    <th>Canales</th>
+                    <th>Etiquetas</th>
+                    <th>Estado</th>
+                    <th class="text-end contact-actions-cell">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="add-notification-row" class="table-row-add">
+                    <td><input type="text" class="form-control notification-name" placeholder="Nombre del contacto"></td>
+                    <td><input type="text" class="form-control notification-value" placeholder="correo@ejemplo.com o 3000000000"></td>
+                    <td><select class="form-select notification-type"><option value="email">Correo</option><option value="phone">Número</option></select></td>
+                    <td><select class="form-select notification-channels" multiple size="3"></select></td>
+                    <td class="text-start"><button type="button" class="contact-tag-add" title="Guarda el contacto para agregar etiquetas" aria-label="Guarda el contacto para agregar etiquetas" disabled><i class="fa-solid fa-plus"></i></button></td>
+                    <td><div class="toggle-container row notification-active" value="1"><div class="toggle-value d-flex justify-content-center col-6" value="1"><p>Activo</p></div><div class="toggle-value d-flex justify-content-center col-6" value="0"><p>Inactivo</p></div></div></td>
+                    <td class="text-end contact-actions-cell"><button type="button" class="btn btn-link" id="add-notification" title="Agregar contacto" aria-label="Agregar contacto"><i class="fa-solid fa-plus"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

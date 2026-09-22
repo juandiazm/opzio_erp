@@ -349,6 +349,107 @@ trait whatsapp_notifications_trait
         }
     }
 
+    public function Notification_QueueWhatsappTemplate(string $phone, $clientId, ?string $recipientName, string $contentSid, array $contentVariables = [], $sendAt = null, $createdBy = null): array
+    {
+        $phone = $this->TwilioWhatsApp_NormalizePhone($phone);
+        $contentSid = trim($contentSid);
+        if ($phone === '') {
+            return ['status' => 0, 'message' => 'El telefono de WhatsApp no es valido.'];
+        }
+        if (!preg_match('/^HX[0-9a-fA-F]{32}$/', $contentSid)) {
+            return ['status' => 0, 'message' => 'El ContentSid de WhatsApp no es valido.'];
+        }
+
+        try {
+            $conversation = $this->Notification_WhatsappConversation(
+                $phone,
+                $this->TwilioWhatsApp_BusinessAddress(),
+                trim((string) $recipientName) ?: null,
+                null,
+                $clientId ? (int) $clientId : null
+            );
+            $message = whatsapp_message::create([
+                'unique_id' => strtoupper(Str::uuid()->toString()),
+                'conversation_id' => $conversation->id,
+                'client_id' => $clientId ? (int) $clientId : $conversation->client_id,
+                'direction' => 'outbound',
+                'from' => $conversation->business_address,
+                'to' => $this->TwilioWhatsApp_ChannelAddress($phone),
+                'body' => 'Plantilla '.$contentSid,
+                'message_type' => 'template',
+                'content_sid' => $contentSid,
+                'content_variables' => $contentVariables ?: null,
+                'status' => 'pending',
+                'send_at' => $sendAt,
+                'created_by' => $createdBy,
+            ]);
+
+            return ['status' => 1, 'message' => 'Mensaje de WhatsApp registrado para envio.', 'message_record' => $message];
+        } catch (\Throwable $exception) {
+            info('Notification_QueueWhatsappTemplate error: '.$exception->getMessage());
+            return ['status' => 0, 'message' => $exception->getMessage()];
+        }
+    }
+
+    public function Notification_ProcessWhatsappQueue($now = null): array
+    {
+        $now = $now ? Carbon::parse($now) : Carbon::now();
+        $messages = whatsapp_message::with('conversation')
+            ->where('direction', 'outbound')
+            ->where('status', 'pending')
+            ->where('attempts', '<', 3)
+            ->whereNotNull('content_sid')
+            ->where(function ($query) use ($now) {
+                $query->whereNull('send_at')->orWhere('send_at', '<=', $now);
+            })
+            ->orderBy('id')
+            ->limit(100)
+            ->get();
+        $result = ['processed' => 0, 'sent' => 0, 'failed' => 0];
+        foreach ($messages as $message) {
+            try {
+                $response = $this->TwilioWhatsApp_SendMessage(
+                    $message->conversation,
+                    $message,
+                    '',
+                    $message->content_sid,
+                    is_array($message->content_variables) ? $message->content_variables : []
+                );
+                $result['processed']++;
+                if (($response['status'] ?? 0) === 1) {
+                    $result['sent']++;
+                    $this->Notification_BroadcastWhatsapp('status', [
+                        'conversation_id' => $message->conversation_id,
+                        'message_id' => $message->id,
+                        'direction' => 'outbound',
+                        'status' => $message->fresh()->status,
+                    ]);
+                } else {
+                    $message->refresh();
+                    if ((int) $message->attempts < 3) {
+                        $message->status = 'pending';
+                        $message->save();
+                    } else {
+                        $result['failed']++;
+                    }
+                }
+            } catch (\Throwable $exception) {
+                $message->refresh();
+                $message->attempts = (int) $message->attempts + 1;
+                $message->status = $message->attempts >= 3 ? 'failed' : 'pending';
+                $message->error_message = $exception->getMessage();
+                $message->status_updated_at = Carbon::now();
+                $message->save();
+                $result['processed']++;
+                if ($message->status === 'failed') {
+                    $result['failed']++;
+                }
+            }
+        }
+
+        return $this->Notification_WhatsappResponse('Cola WhatsApp procesada', ['data' => $result]);
+    }
+
     public function Notification_HandleWhatsappIncoming(array $payload): array
     {
         $from = $this->TwilioWhatsApp_NormalizePhone($payload['From'] ?? '');

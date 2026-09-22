@@ -1,3 +1,5 @@
+@import '../contact-tags';
+
 @media screen and (min-width: 768px) {
     #nav-update{
         #update-inputs-container{
@@ -225,6 +227,27 @@
             }
         }
         #sub-nav-notifications{
+            .notification-contacts-toolbar{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                margin: 12px 0 16px;
+            }
+            .notification-contact-tags{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .notification-contact-tag{
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                max-width: 280px;
+            }
+            .notification-contact-tag .form-control{
+                min-width: 120px;
+            }
             #notifications-table{
                 thead{
                     background: #FFFFFF 0% 0% no-repeat padding-box;
@@ -255,6 +278,31 @@
                 }
                 .notification-active{
                     margin: 0 auto;
+                }
+                .notification-channels,
+                .notification-tags{
+                    min-width: 150px;
+                }
+                .contact-actions-cell{
+                    text-align: right !important;
+                    white-space: nowrap;
+                }
+                .contact-actions-cell .btn{
+                    color: $text-gray;
+                    font-size: 16px;
+                    margin-left: 3px;
+                    padding: 3px 5px;
+                }
+                .contact-actions-cell .btn i{
+                    color: inherit;
+                    font-size: 16px;
+                    margin: 0;
+                }
+                .contact-actions-cell .contact-delete-action:hover,
+                .contact-actions-cell .contact-delete-action:focus-visible,
+                .contact-actions-cell .contact-delete-action:hover i,
+                .contact-actions-cell .contact-delete-action:focus-visible i{
+                    color: $danger !important;
                 }
             }
         }
@@ -481,6 +529,13 @@
             }
         }
         #sub-nav-notifications{
+            .notification-contacts-toolbar{
+                display: block;
+                margin: 12px 0;
+            }
+            .notification-contacts-toolbar > div:last-child{
+                margin-top: 10px;
+            }
             .columns-notification-state{
                 display: none;
             }
@@ -514,6 +569,10 @@
                 }
                 .notification-active{
                     margin: 0 auto;
+                }
+                .notification-channels,
+                .notification-tags{
+                    min-width: 135px;
                 }
             }
         }

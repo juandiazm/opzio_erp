@@ -235,11 +235,16 @@ class licenses_controller extends Controller
         return \Response::json($Response , 400);
     }
     public function add_license_notification(Request $request){
+        $type = strtolower((string) $request->input('type'));
+        $value = $request->input('value');
         $Response = $this->License_AddLicenseNotification(
             $request->license_id,
-            $request->email,
-            $request->phone,
-            $request->state
+            $type === 'email' ? $value : $request->email,
+            $type === 'phone' ? $value : $request->phone,
+            $request->state,
+            $request->name,
+            $request->channels ?? $request->channel,
+            $request->tag_ids ?? $request->tags
         );
         if($Response['status'] == 1){
             return $Response;
@@ -267,11 +272,16 @@ class licenses_controller extends Controller
         return \Response::json($Response , 400);    
     }
     public function update_license_notification(Request $request){
+        $type = strtolower((string) $request->input('type'));
+        $value = $request->input('value');
         $Response = $this->License_UpdateLicenseNotification(
             $request->id,
-            $request->email,
-            $request->phone,
-            $request->state
+            $type === 'email' ? $value : $request->email,
+            $type === 'phone' ? $value : $request->phone,
+            $request->state,
+            $request->name,
+            $request->channels ?? $request->channel,
+            $request->tag_ids ?? $request->tags
         );
         if($Response['status'] == 1){
             return $Response;

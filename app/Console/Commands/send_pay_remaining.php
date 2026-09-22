@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -11,6 +12,7 @@ use App\traits\licenses_trait;
 use App\traits\open_ia_trait;
 use App\traits\mail_trait;
 use App\traits\twilio_sms_trait;
+use App\traits\whatsapp_notifications_trait;
 use App\traits\incomes_trait;
 use App\Models\sms_log;
 
@@ -21,6 +23,7 @@ class send_pay_remaining extends Command
     ,open_ia_trait
     ,mail_trait
     ,twilio_sms_trait
+    ,whatsapp_notifications_trait
     ,incomes_trait
     ;
     /**
@@ -92,6 +95,7 @@ class send_pay_remaining extends Command
                     'income_ids' => [], // Track unique income IDs
                     'emails' => [],
                     'phones' => [],
+                    'whatsapp_phones' => [],
                     'service_names' => [],
                 ];
             }
@@ -123,14 +127,46 @@ class send_pay_remaining extends Command
             // Get notification emails and phones from licenses associated with this income
             $license_ids = $income->income_licenses->pluck('license_id')->toArray();
             $notificationsResponse = $this->License_GetLicenseNotificationsByLicensesIds($license_ids);
+            $notificationData = collect($notificationsResponse['data'] ?? []);
+            $hasContactPayload = $notificationData->contains(function ($item) {
+                return is_array($item) && array_key_exists('tags', $item);
+            });
+            $hasContactSchema = Schema::hasTable('notification_tags')
+                && Schema::hasColumn('license_notifications', 'client_id');
+            if ($hasContactSchema && ($hasContactPayload || $notificationData->isEmpty())) {
+                $tagSlug = config('notifications.collection_tag', 'cobranza');
+                $licenseTagged = $notificationData->filter(function ($item) use ($tagSlug) {
+                    if (!is_array($item) || !($item['active'] ?? true)) {
+                        return false;
+                    }
+                    return collect($item['tags'] ?? [])->contains(function ($tag) use ($tagSlug) {
+                        return data_get($tag, 'slug') === $tagSlug;
+                    });
+                })->values();
+                $notificationsResponse = $licenseTagged->isNotEmpty()
+                    ? array_merge($notificationsResponse, ['data' => $licenseTagged->all()])
+                    : $this->License_GetTaggedLicenseNotificationsByLicensesIds($license_ids, $client_id, $tagSlug);
+            }
             
             if($notificationsResponse['status'] == 1){
                 foreach($notificationsResponse['data'] as $item){
-                    if($item['email'] != null && $item['email'] != ''){
-                        $groupedByClient[$client_id]['emails'][] = $item['email'];
+                    $email = trim((string) ($item['email'] ?? ''));
+                    $phone = trim((string) ($item['phone'] ?? ''));
+                    try {
+                        $channels = $this->NotificationContact_NormalizeChannels($item['channels'] ?? [], $email, $phone);
+                    } catch (\Throwable $exception) {
+                        $channels = [];
+                        if($email !== '') $channels[] = 'email';
+                        if($phone !== '') $channels[] = 'sms';
                     }
-                    if($item['phone'] != null && $item['phone'] != ''){
-                        $groupedByClient[$client_id]['phones'][] = $item['phone'];
+                    if(in_array('email', $channels, true) && filter_var($email, FILTER_VALIDATE_EMAIL)){
+                        $groupedByClient[$client_id]['emails'][] = $email;
+                    }
+                    if(in_array('sms', $channels, true) && $phone !== ''){
+                        $groupedByClient[$client_id]['phones'][] = $phone;
+                    }
+                    if(in_array('whatsapp', $channels, true) && $phone !== ''){
+                        $groupedByClient[$client_id]['whatsapp_phones'][] = $phone;
                     }
                 }
             }
@@ -277,6 +313,32 @@ class send_pay_remaining extends Command
                 }
             }catch(\Exception $e) {
                 info('command:send_pay_remaining sms grouped: '.$e->getMessage());
+            }
+
+            try{
+                $uniqueWhatsappPhones = array_unique($clientData['whatsapp_phones']);
+                $totalAmount = array_sum(array_column($clientData['incomes'], 'total'));
+                $paymentLink = $clientData['incomes'][0]['payment_link'] ?? '';
+                $contentVariables = [
+                    '1' => $clientData['client']['name'],
+                    '2' => number_format($totalAmount, 0, ',', '.'),
+                    '3' => $paymentLink,
+                ];
+                foreach($uniqueWhatsappPhones as $phone){
+                    $response = $this->Notification_QueueWhatsappTemplate(
+                        $phone,
+                        $clientData['client']['id'],
+                        $clientData['client']['name'],
+                        config('notifications.overdue_payment_template_sid', 'HX9990ce79b043c2a8a8fc31aa3b220a46'),
+                        $contentVariables,
+                        $sendAt
+                    );
+                    if (($response['status'] ?? 0) !== 1) {
+                        info('command:send_pay_remaining whatsapp: '.$response['message']);
+                    }
+                }
+            }catch(\Exception $e) {
+                info('command:send_pay_remaining whatsapp grouped: '.$e->getMessage());
             }
             
             // Add each unique income to report (no duplicates)

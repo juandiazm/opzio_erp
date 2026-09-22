@@ -24,7 +24,8 @@
                 </a>
             </li>
             @endif
-            @if(collect(session('permissions'))->firstWhere('user_permission_id', 2)!=null)
+            @php($contacts_permission = collect(session('app_permissions'))->firstWhere('url', 'admin/contacts/'))
+            @if($contacts_permission && collect(session('permissions'))->firstWhere('user_permission_id', $contacts_permission->id)!=null)
             <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/clients')?' selected':'' }}">
                 <a href="/admin/clients" class="sidebar-menu-item-link">
                     <i class="fa-light fa-address-card align-self-center sidebar-menu-item-icon"></i>
@@ -80,6 +81,14 @@
                     <i class="fa-light fa-bell align-self-center sidebar-menu-item-icon"></i>
                     <p class="align-self-center sidebar-menu-item-text">Notificaciones</p>
                     <span class="sidebar-whatsapp-unread d-none" data-whatsapp-unread>0</span>
+                </a>
+            </li>
+            @endif
+            @if(collect(session('permissions'))->firstWhere('user_permission_id', 2)!=null)
+            <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/contacts')?' selected':'' }}">
+                <a href="/admin/contacts" class="sidebar-menu-item-link">
+                    <i class="fa-light fa-address-book align-self-center sidebar-menu-item-icon"></i>
+                    <p class="align-self-center sidebar-menu-item-text">Contactos</p>
                 </a>
             </li>
             @endif

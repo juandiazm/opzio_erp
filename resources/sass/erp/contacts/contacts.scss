@@ -1,0 +1,545 @@
+@import '../../variables';
+@import '../contact-tags';
+
+.contacts-directory{
+    min-height: 100%;
+    padding: 22px 26px 32px;
+    background: #f7f7f7;
+    color: $text-black;
+}
+
+.contacts-filter-bar{
+    display: grid;
+    align-items: end;
+    grid-template-columns: minmax(220px, 1.5fr) repeat(6, minmax(130px, 1fr)) auto;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid #dce4e8;
+}
+
+.contacts-filter-field{
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 5px;
+    color: $text-gray;
+    font-size: .72rem;
+    font-weight: 750;
+}
+
+.contacts-filter-field input,
+.contacts-filter-field select{
+    width: 100%;
+}
+
+.contacts-filter-actions{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.contacts-filter-actions .btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.contacts-filter-icon-button{
+    width: 34px;
+    height: 34px;
+    justify-content: center;
+    padding: 0 !important;
+}
+
+.contacts-filter-menu{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.contacts-filter-tools-menu{
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    z-index: 30;
+    display: grid;
+    min-width: 150px;
+    gap: 2px;
+    padding: 5px;
+    border: 1px solid #dce4e8;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .14);
+}
+
+.contacts-filter-tool{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: $text-black;
+    font-size: .78rem;
+    text-align: left;
+}
+
+.contacts-filter-tool i{
+    width: 15px;
+    color: $text-gray;
+    text-align: center;
+}
+
+.contacts-filter-tool:hover,
+.contacts-filter-tool:focus-visible{
+    background: #f1f5f9;
+    color: $primary;
+    outline: 0;
+}
+
+.contacts-filter-tool:hover i,
+.contacts-filter-tool:focus-visible i{
+    color: $primary;
+}
+
+.contacts-directory-status{
+    min-height: 20px;
+    margin: 8px 0;
+    color: $text-gray;
+    font-size: .8rem;
+}
+
+.contacts-directory-status.is-error{
+    color: $danger;
+}
+
+.contacts-import-errors{
+    max-height: 220px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    overflow-y: auto;
+    border: 1px solid #fecaca;
+    border-radius: 4px;
+    background: #fff7f7;
+    color: #991b1b;
+    font-size: .78rem;
+    text-align: left;
+}
+
+.contacts-import-errors div + div{
+    margin-top: 5px;
+}
+
+.contacts-table-panel{
+    background: #fff;
+    border: 1px solid #dce4e8;
+}
+
+.contacts-table-wrap{
+    overflow-x: auto;
+}
+
+.contacts-table{
+    min-width: 1080px;
+    margin: 0;
+}
+
+.contacts-table thead th{
+    padding: 11px 12px;
+    color: $text-gray;
+    background: #f8fafb;
+    border-bottom: 1px solid #dce4e8;
+    font-size: .7rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.contacts-table tbody td{
+    padding: 11px 12px;
+    border-bottom: 1px solid #e8edf0;
+    font-size: .82rem;
+    vertical-align: middle;
+}
+
+.contacts-table .contacts-edit-button{
+    padding: 3px 6px;
+    color: $text-gray;
+}
+
+.contacts-action-group{
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+}
+
+.contacts-action-button{
+    padding: 3px 6px;
+    color: $text-gray;
+}
+
+.contacts-action-button:hover,
+.contacts-action-button:focus-visible{
+    outline: 0;
+}
+
+.contacts-message-email:hover,
+.contacts-message-email:focus-visible{
+    color: #4338ca;
+}
+
+.contacts-message-sms:hover,
+.contacts-message-sms:focus-visible{
+    color: #047857;
+}
+
+.contacts-message-whatsapp:hover,
+.contacts-message-whatsapp:focus-visible{
+    color: #15803d;
+}
+
+.contacts-table .contacts-edit-button:hover,
+.contacts-table .contacts-edit-button:focus-visible{
+    color: $primary;
+}
+
+.contacts-table tbody tr:last-child td{
+    border-bottom: 0;
+}
+
+.contacts-table tbody td strong{
+    display: block;
+    color: $text-black;
+}
+
+.contacts-client-identity{
+    gap: 7px;
+}
+
+.contacts-client-identity .erp-avatar{
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: 0 0 1.2rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 50% !important;
+    overflow: hidden;
+    clip-path: circle(50%);
+}
+
+.contacts-value{
+    color: $text-black;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.contacts-type{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.contacts-type-icon{
+    width: 14px;
+    color: $text-gray;
+    text-align: center;
+}
+
+.contacts-badge-list{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+
+.contacts-channel-badge{
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: .7rem;
+    font-weight: 750;
+}
+
+.contacts-channel-badge.channel-email{
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.contacts-channel-badge.channel-sms{
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.contacts-channel-badge.channel-whatsapp{
+    background: #ecfdf5;
+    color: #15803d;
+}
+
+.contacts-muted{
+    color: $text-gray;
+    font-size: .75rem;
+}
+
+.contacts-status{
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    min-width: 64px;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 750;
+}
+
+.contacts-status.is-active{
+    background: #dcfce7;
+    color: #166534;
+}
+
+.contacts-status.is-inactive{
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.contacts-status:hover,
+.contacts-status:focus-visible{
+    filter: brightness(.97);
+    outline: 0;
+}
+
+.contacts-status:disabled{
+    cursor: wait;
+    opacity: .65;
+}
+
+.contacts-empty{
+    padding: 34px 14px !important;
+    color: $text-gray;
+    text-align: center;
+}
+
+.contacts-pagination{
+    margin: 0;
+    padding: 12px;
+}
+
+.contacts-pagination .page-link{
+    min-width: 32px;
+    text-align: center;
+}
+
+.contacts-page-size{
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+.contacts-page-size-control{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 58px;
+    height: 32px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background: #fff;
+    color: $text-black;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+.contacts-page-size-control select{
+    width: 100%;
+    height: 100%;
+    appearance: none;
+    padding: 0 24px 0 10px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: .78rem;
+    font-weight: 650;
+}
+
+.contacts-page-size-control i{
+    position: absolute;
+    right: 9px;
+    pointer-events: none;
+    color: $text-gray;
+    font-size: .7rem;
+}
+
+.contacts-page-size-control:focus-within{
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba($primary, .12);
+}
+
+.contacts-edit-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 1090;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 70px 24px 24px;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, .45);
+}
+
+.contacts-edit-modal.d-none{
+    display: none;
+}
+
+.contacts-edit-dialog{
+    width: min(100%, 760px);
+    background: #ffffff;
+    border: 1px solid #dce4e8;
+    border-radius: 6px;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, .2);
+}
+
+.contacts-edit-header,
+.contacts-edit-footer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+}
+
+.contacts-edit-header{
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.contacts-edit-header h2{
+    margin: 3px 0 0;
+    font-size: 1.15rem;
+}
+
+.contacts-edit-kicker{
+    color: $text-gray;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.contacts-edit-close{
+    border: 0;
+    background: transparent;
+    color: $text-gray;
+    font-size: 1.15rem;
+}
+
+.contacts-edit-form{
+    padding: 22px;
+}
+
+.contacts-edit-grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.contacts-edit-field{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    color: $text-gray;
+    font-size: .75rem;
+    font-weight: 750;
+}
+
+.contacts-edit-field-wide{
+    grid-column: 1 / -1;
+}
+
+.contacts-edit-field input,
+.contacts-edit-field select{
+    width: 100%;
+}
+
+.contacts-edit-tags{
+    min-height: 38px;
+    padding: 5px 0;
+}
+
+.contacts-edit-tags .contact-tag-badges{
+    justify-content: flex-start;
+}
+
+.contacts-edit-footer{
+    justify-content: flex-end;
+    margin: 22px -22px -22px;
+    border-top: 1px solid #e5e7eb;
+}
+
+body.contacts-edit-open{
+    overflow: hidden;
+}
+
+@media (max-width: 1250px){
+    .contacts-filter-bar{
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+    }
+
+    .contacts-filter-search{
+        grid-column: 1 / -1;
+    }
+
+    .contacts-filter-actions{
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 700px){
+    .contacts-directory{
+        padding: 14px 12px 24px;
+    }
+
+    .contacts-filter-bar{
+        grid-template-columns: 1fr;
+    }
+
+    .contacts-filter-search,
+    .contacts-filter-actions{
+        grid-column: auto;
+    }
+
+    .contacts-filter-actions{
+        justify-content: stretch;
+    }
+
+    .contacts-filter-actions .contacts-filter-icon-button,
+    .contacts-filter-menu{
+        flex: 1;
+        justify-content: center;
+    }
+
+    .contacts-filter-menu .contacts-filter-icon-button{
+        width: 100%;
+    }
+
+    .contacts-edit-modal{
+        padding: 24px 12px;
+    }
+
+    .contacts-edit-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .contacts-edit-field-wide{
+        grid-column: auto;
+    }
+}

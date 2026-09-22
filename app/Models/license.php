@@ -58,4 +58,7 @@ class license extends Model
     public function license_notifications(){
         return $this->hasMany(license_notification::class, 'license_id');
     }
+    public function contacts(){
+        return $this->hasMany(license_notification::class, 'license_id');
+    }
 }

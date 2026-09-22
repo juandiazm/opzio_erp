@@ -7,6 +7,7 @@ import * as preview from './preview.js';
 import * as incomeImport from './import.js';
 import * as advances from './advances.js';
 import * as goals from './goals.js';
+import * as paymentReminder from './payment-reminder.js';
 import { goToIncomesTraceability } from './shared.js';
 import { initRichTextEditors, initializeRichTextEvents } from './rich-text.js';
 import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
@@ -87,6 +88,12 @@ $(document).on('change', '#import-report-excel-input', incomeImport.importAssist
 $(document).on('click', '#import-report-excel-input', function(event){ event.stopPropagation(); });
 
 $(document).on('click', '.list-manage-advances', advances.openAdvancesModal);
+$(document).on('click', '.list-payment-reminder', paymentReminder.openPaymentReminder);
+$(document).on('click', '#income-payment-reminder-close, #income-payment-reminder-cancel', paymentReminder.closePaymentReminder);
+$(document).on('click', '#income-payment-reminder-send', paymentReminder.sendPaymentReminder);
+$(document).on('change', '#income-payment-reminder-phone', paymentReminder.syncRecipientChannel);
+$(document).on('change', '#income-payment-reminder-channel', paymentReminder.syncRecipientChannel);
+$(document).on('click', '#income-payment-reminder-modal', function(event){ if(event.target === this) paymentReminder.closePaymentReminder(); });
 $(document).on('click', '#close-advances-modal', advances.closeAdvancesModal);
 $(document).on('click', '#create-advance-button', advances.showCreateAdvanceForm);
 $(document).on('click', '#cancel-advance-button', advances.hideAdvanceForm);

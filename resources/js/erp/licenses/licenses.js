@@ -5,7 +5,7 @@ import { addLicense } from './create.js';
 import * as update from './update.js';
 import { licenseTypeChange } from './details.js';
 import { addLicenseDocument, updateLicenseDocument, deleteLicenseDocument } from './documents.js';
-import { addnotification, changeNotificationPosition, updateNotification, deleteNotification, restoreNotification, forceDeleteNotification } from './notifications.js';
+import { addnotification, changeNotificationPosition, updateNotification, deleteNotification, restoreNotification, forceDeleteNotification, syncContactType, openLicenseContactTags, unlinkLicenseContactTag } from './notifications.js';
 import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function showCurrentLicense(){
@@ -89,6 +89,9 @@ $(document).on('click', '.update-notification-btn', updateNotification);
 $(document).on('click', '.delete-notification-btn', deleteNotification);
 $(document).on('click', '.restore-notification-btn', restoreNotification);
 $(document).on('click', '.force-delete-notification-btn', forceDeleteNotification);
+$(document).on('click', '.update-notification-row .contact-tag-add', openLicenseContactTags);
+$(document).on('click', '.update-notification-row .contact-tag-remove', unlinkLicenseContactTag);
+$(document).on('change', '.notification-type', syncContactType);
 
 $(document).ready(function(){
     licenseState.urlLicenseId = getUpdateRecordId(['license_id']);

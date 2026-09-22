@@ -1,4 +1,48 @@
 @import '../../variables';
+@import '../contact-tags';
+
+.notification-contacts-pane{
+	.notification-contacts-toolbar{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin: 12px 0 16px;
+	}
+	.notification-contact-tags{
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.notification-contact-tag{
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		max-width: 280px;
+	}
+	.notification-contact-tag .form-control{
+		min-width: 120px;
+	}
+	.client-contact-channels,
+	.client-contact-tags{
+		min-width: 150px;
+	}
+}
+
+@media screen and (max-width: 768px){
+	.notification-contacts-pane{
+		.notification-contacts-toolbar{
+			display: block;
+		}
+		.notification-contacts-toolbar > div:last-child{
+			margin-top: 10px;
+		}
+		.client-contact-channels,
+		.client-contact-tags{
+			min-width: 135px;
+		}
+	}
+}
 @import './list';
 @import './create';
 @import './update';

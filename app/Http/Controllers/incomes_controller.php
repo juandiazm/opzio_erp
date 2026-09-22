@@ -164,6 +164,26 @@ class incomes_controller extends Controller
         }
         return \Response::json($Response , 400);
     }
+    public function get_payment_reminder_recipients(Request $request){
+        $Response = $this->Income_GetPaymentReminderRecipients(
+            $request->income_id
+        );
+        if($Response['status'] == 1){
+            return $Response;
+        }
+        return \Response::json($Response , 400);
+    }
+    public function send_payment_reminder(Request $request){
+        $Response = $this->Income_SendPaymentReminder(
+            $request->income_id,
+            $request->phone,
+            $request->input('channel', 'sms')
+        );
+        if($Response['status'] == 1){
+            return $Response;
+        }
+        return \Response::json($Response , 400);
+    }
     //Get income data for unlogged user
     public function get_income_data_for_payment_unlogged(Request $request){
         $Response = $this->Income_GetIncomeDataForPaymentUnlogged(

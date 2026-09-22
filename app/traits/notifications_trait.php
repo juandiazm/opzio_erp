@@ -4,6 +4,7 @@ namespace App\traits;
 
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -19,6 +20,7 @@ trait notifications_trait
     use mail_senders_trait;
     use twilio_sms_trait;
     use whatsapp_notifications_trait;
+    use notification_contacts_trait;
 
     private function Notification_Response($message, $data = [], $status = 1)
     {
@@ -232,7 +234,46 @@ trait notifications_trait
         return $result;
     }
 
-    private function Notification_ClientContacts($input)
+    private function Notification_ContactSupportsChannel($contact, ?string $channel, array $tagIds = []): bool
+    {
+        if ($tagIds) {
+            if (!Schema::hasTable('notification_tags')) {
+                return false;
+            }
+            $contactTagIds = $contact->relationLoaded('tags')
+                ? $contact->tags->pluck('id')->map(fn ($id) => (int) $id)->all()
+                : $contact->tags()->pluck('notification_tags.id')->map(fn ($id) => (int) $id)->all();
+            foreach ($tagIds as $tagId) {
+                if (!in_array((int) $tagId, $contactTagIds, true)) {
+                    return false;
+                }
+            }
+        }
+
+        if (!$channel) {
+            return true;
+        }
+
+        $channels = $this->NotificationContact_NormalizeChannels(
+            $contact->channels ?? [],
+            $contact->email,
+            $contact->phone,
+            $this->NotificationContact_Type($contact)
+        );
+        if ($channel === 'email') {
+            return in_array('email', $channels, true) && filter_var($contact->email, FILTER_VALIDATE_EMAIL);
+        }
+        if ($channel === 'sms') {
+            return in_array('sms', $channels, true) && trim((string) $contact->phone) !== '';
+        }
+        if ($channel === 'whatsapp') {
+            return in_array('whatsapp', $channels, true) && trim((string) $contact->phone) !== '';
+        }
+
+        return false;
+    }
+
+    private function Notification_ClientContacts($input, ?string $channel = null)
     {
         $allClients = $this->Notification_Bool($input['all_clients'] ?? false);
         $clientIds = collect($this->Notification_AsArray($input['client_ids'] ?? []))
@@ -245,7 +286,11 @@ trait notifications_trait
             return ['emails' => [], 'phones' => []];
         }
 
+        $tagIds = $this->NotificationContact_TagIds($input['tag_ids'] ?? $input['tagIds'] ?? []);
         $query = client::query()->where('active', 1)->with('licenses.license_notifications');
+        if ($tagIds && Schema::hasTable('notification_tags')) {
+            $query->with('licenses.license_notifications.tags');
+        }
         if ($allClients) {
             $clients = $query->orderBy('id')->limit(500)->get();
         } else {
@@ -256,11 +301,31 @@ trait notifications_trait
         $phones = [];
         foreach ($clients as $client) {
             $name = trim((string) ($client->complete_name ?: $client->name));
-            if (filter_var($client->email, FILTER_VALIDATE_EMAIL)) {
+            if (!$tagIds && (!$channel || $channel === 'email') && filter_var($client->email, FILTER_VALIDATE_EMAIL)) {
                 $emails[] = ['address' => $client->email, 'name' => $name, 'client_id' => $client->id];
             }
-            if (trim((string) $client->phone) !== '') {
+            if (!$tagIds && (!$channel || $channel === 'sms') && trim((string) $client->phone) !== '') {
                 $phones[] = ['phone' => $client->phone, 'name' => $name, 'client_id' => $client->id];
+            }
+            if (Schema::hasColumn('license_notifications', 'client_id')) {
+                $clientContacts = license_notification::query()
+                    ->where('client_id', $client->id)
+                    ->whereNull('license_id')
+                    ->where('active', 1)
+                    ->with('tags')
+                    ->get();
+                foreach ($clientContacts as $contact) {
+                    if (!$this->Notification_ContactSupportsChannel($contact, $channel, $tagIds)) {
+                        continue;
+                    }
+                    $contactName = trim((string) ($contact->name ?: $name));
+                    if ($channel === 'email' && filter_var($contact->email, FILTER_VALIDATE_EMAIL)) {
+                        $emails[] = ['address' => $contact->email, 'name' => $contactName, 'client_id' => $client->id];
+                    }
+                    if ($channel === 'sms' && trim((string) $contact->phone) !== '') {
+                        $phones[] = ['phone' => $contact->phone, 'name' => $contactName, 'client_id' => $client->id];
+                    }
+                }
             }
             foreach ($client->licenses as $license) {
                 if (!$license->active) {
@@ -270,11 +335,15 @@ trait notifications_trait
                     if (!$notification->active) {
                         continue;
                     }
-                    if (filter_var($notification->email, FILTER_VALIDATE_EMAIL)) {
-                        $emails[] = ['address' => $notification->email, 'name' => $name, 'client_id' => $client->id];
+                    if (!$this->Notification_ContactSupportsChannel($notification, $channel, $tagIds)) {
+                        continue;
                     }
-                    if (trim((string) $notification->phone) !== '') {
-                        $phones[] = ['phone' => $notification->phone, 'name' => $name, 'client_id' => $client->id];
+                    $contactName = trim((string) ($notification->name ?: $name));
+                    if ($channel === 'email' && filter_var($notification->email, FILTER_VALIDATE_EMAIL)) {
+                        $emails[] = ['address' => $notification->email, 'name' => $contactName, 'client_id' => $client->id];
+                    }
+                    if ($channel === 'sms' && trim((string) $notification->phone) !== '') {
+                        $phones[] = ['phone' => $notification->phone, 'name' => $contactName, 'client_id' => $client->id];
                     }
                 }
             }
@@ -376,7 +445,7 @@ trait notifications_trait
 
     private function Notification_EmailRecipients($input, $fallback = [])
     {
-        $contacts = $this->Notification_ClientContacts($input);
+        $contacts = $this->Notification_ClientContacts($input, 'email');
         $manual = $input['recipients'] ?? [];
         $manual = $this->Notification_AsArray($manual) ?: $manual;
         return $this->Notification_NormalizeEmails(array_merge($contacts['emails'], (array) $manual, $fallback));
@@ -384,7 +453,7 @@ trait notifications_trait
 
     private function Notification_SmsRecipients($input, $fallback = [])
     {
-        $contacts = $this->Notification_ClientContacts($input);
+        $contacts = $this->Notification_ClientContacts($input, 'sms');
         $manual = $input['phones'] ?? $input['recipients'] ?? [];
         $manual = $this->Notification_AsArray($manual) ?: $manual;
         return $this->Notification_NormalizePhones(array_merge($contacts['phones'], (array) $manual, $fallback));

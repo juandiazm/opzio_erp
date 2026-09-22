@@ -105,3 +105,93 @@ $income-invoiced: #6D28D9;
         td, th{ width: 20%; }
     }
 }
+
+.income-payment-reminder-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.income-payment-reminder-modal.d-none{
+    display: none;
+}
+
+.income-payment-reminder-dialog{
+    width: min(100%, 520px);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.2);
+}
+
+.income-payment-reminder-header,
+.income-payment-reminder-footer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+}
+
+.income-payment-reminder-header{
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.income-payment-reminder-header h2{
+    margin: 4px 0;
+    font-size: 1.25rem;
+}
+
+.income-payment-reminder-kicker{
+    color: $primary;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+}
+
+.income-payment-reminder-close{
+    border: 0;
+    background: transparent;
+    color: $text-gray;
+    font-size: 1.2rem;
+}
+
+.income-payment-reminder-body{
+    display: grid;
+    gap: 16px;
+    padding: 24px;
+}
+
+.income-payment-reminder-field{
+    display: grid;
+    gap: 6px;
+    margin: 0;
+}
+
+.income-payment-reminder-field > span{
+    color: $text-gray;
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.income-payment-reminder-field small{
+    color: $text-gray;
+}
+
+.income-payment-reminder-empty{
+    margin: -4px 0 0;
+    color: $yellow;
+}
+
+.income-payment-reminder-footer{
+    justify-content: flex-end;
+    border-top: 1px solid #e5e7eb;
+}
+
+body.income-payment-reminder-open{
+    overflow: hidden;
+}

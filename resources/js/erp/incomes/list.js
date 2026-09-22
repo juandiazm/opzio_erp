@@ -98,7 +98,11 @@ export function showIncomesPage(response){
         appendedContent += '<td class="columns-bill text-center"><div class="erp-meta-stack erp-bill-meta"><span>'+(value.bill_name == null ? '-' : value.bill_name)+'</span><span>'+renderSiigoAction(value, associatedClient)+'</span></div></td>';
         appendedContent += '<td class="columns-created-at text-center"><p>'+value.created_at_string+'</p></td>';
         appendedContent += '<td class="columns-state text-center">'+renderIncomeState(value)+'</td><td class="columns-actions text-end action-cell">';
-        if(value.payment_state != 1 && value.state != 1) appendedContent += '<i class="fa-regular fa-link copy-action me-1 list-pay-link" data-clipboard-text="'+window.location.origin+'/client/payments/pay/'+value.unique_id+'"></i>';
+        const paymentLinkAvailable = value.payment_state != 1 && value.state != 1;
+        if(paymentLinkAvailable){
+            appendedContent += '<i class="fa-regular fa-link copy-action me-1 list-pay-link" data-clipboard-text="'+window.location.origin+'/client/payments/pay/'+value.unique_id+'" title="Copiar link de pago" aria-label="Copiar link de pago"></i>';
+            appendedContent += '<i class="fa-solid fa-bell list-payment-reminder" title="Enviar recordatorio de pago" aria-label="Enviar recordatorio de pago"></i>';
+        }
         appendedContent += '<i class="fa-solid fa-receipt list-view-order"></i>';
         if(value.state != 1){ if(value.state == 2) appendedContent += '<i class="fa-solid fa-hand-holding-dollar list-manage-advances" title="Gestionar abonos"></i>'; appendedContent += '<i class="fa-solid fa-pen-to-square list-update-btn"></i><i class="fa-solid fa-bars-progress list-update-traceability"></i>'; }
         else appendedContent += '<i class="fa-solid fa-eye list-update-btn"></i><i class="fa-solid fa-bars-progress list-update-traceability"></i>';

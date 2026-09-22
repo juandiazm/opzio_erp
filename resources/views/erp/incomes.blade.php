@@ -27,5 +27,6 @@
 @include('erp.incomes.document-viewer')
 @include('erp.incomes.import')
 @include('erp.incomes.advances')
+@include('erp.incomes.payment-reminder')
 
 @endsection

@@ -2,6 +2,7 @@
 namespace App\traits;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\URL;
 use Session;
@@ -31,6 +32,7 @@ trait incomes_trait
         , mail_trait
         , open_ia_trait
         , twilio_sms_trait
+        , whatsapp_notifications_trait
     ;
     //Add License
     public function Income_Createincome(
@@ -518,6 +520,198 @@ trait incomes_trait
         $Response['data'] = $Data;
         return $Response;
     }
+    private function Income_PaymentReminderAvailable($income): bool
+    {
+        return $income && (int) $income->payment_state !== 1 && (int) $income->state !== 1;
+    }
+
+    private function Income_PaymentReminderMessage($income, $clientName = null): string
+    {
+        $clientName = trim((string) ($clientName ?: $income->client_name));
+        $documentType = (int) $income->state === 2 ? 'Orden de compra' : 'Cotización';
+        $orderId = substr((string) $income->unique_id, -10);
+
+        return 'Hola '.$clientName.', generamos la '.$documentType.' #'.$orderId.' por un valor de COP $'.number_format($income->total, 0, ',', '.').'. Paga antes del '.$income->cutoff_date.' en '.$income->payment_link;
+    }
+
+    private function Income_NormalizePaymentReminderPhone($phone): string
+    {
+        $phone = $this->TwilioSMS_NormalizePhone($phone);
+        $digits = preg_replace('/\D+/', '', $phone);
+        if ($digits === '' || strlen($digits) < 7 || strlen($digits) > 15) {
+            throw new \InvalidArgumentException('El numero de destino no es valido.');
+        }
+
+        return $phone;
+    }
+
+    public function Income_GetPaymentReminderRecipients($incomeId): array
+    {
+        try {
+            $income = income::with('client')->find($incomeId);
+            if (!$income) {
+                return ['status' => 0, 'message' => 'El ingreso no existe.'];
+            }
+            if (!$this->Income_PaymentReminderAvailable($income)) {
+                return ['status' => 0, 'message' => 'Este ingreso no tiene un link de pago disponible.'];
+            }
+
+            $client = $income->client;
+            if (!$client || (int) $client->active !== 1) {
+                return ['status' => 0, 'message' => 'El cliente no esta activo.'];
+            }
+
+            $licenseIds = income_license::where('income_id', $income->id)->pluck('license_id')->filter()->values();
+            $tagSlug = config('notifications.collection_tag', 'cobranza');
+            $contacts = collect();
+            $source = 'license';
+
+            if ($licenseIds->isNotEmpty()) {
+                $query = license_notification::query()
+                    ->whereIn('license_id', $licenseIds)
+                    ->where('active', 1);
+                if (Schema::hasTable('notification_tags') && Schema::hasColumn('license_notifications', 'client_id')) {
+                    $query->whereHas('tags', function ($tagQuery) use ($tagSlug) {
+                        $tagQuery->where('slug', $tagSlug);
+                    })->with('tags');
+                }
+                $contacts = $query->orderBy('position')->orderBy('id')->get();
+            }
+
+            $hasUsablePhone = function ($contact): bool {
+                $phone = is_array($contact) ? ($contact['phone'] ?? null) : $contact->phone;
+                if (trim((string) $phone) === '') {
+                    return false;
+                }
+                $channels = is_array($contact) ? ($contact['channels'] ?? []) : ($contact->channels ?: []);
+                if (is_string($channels)) {
+                    $channels = json_decode($channels, true) ?: [];
+                }
+                return !$channels || (bool) array_intersect(array_map('strtolower', (array) $channels), ['sms', 'whatsapp', 'sms_whatsapp']);
+            };
+
+            if ((!$contacts->contains($hasUsablePhone)) && Schema::hasTable('notification_tags') && Schema::hasColumn('license_notifications', 'client_id')) {
+                $source = 'client';
+                $contacts = license_notification::query()
+                    ->where('client_id', $client->id)
+                    ->whereNull('license_id')
+                    ->where('active', 1)
+                    ->whereHas('tags', function ($tagQuery) use ($tagSlug) {
+                        $tagQuery->where('slug', $tagSlug);
+                    })
+                    ->with('tags')
+                    ->orderBy('position')
+                    ->orderBy('id')
+                    ->get();
+            }
+
+                    if ((!$contacts->contains($hasUsablePhone)) && !Schema::hasTable('notification_tags')) {
+                $source = 'client';
+                $contacts = collect([[
+                    'name' => $client->complete_name ?: $client->name,
+                    'phone' => $client->phone,
+                    'channels' => ['sms'],
+                ]]);
+            }
+
+            $recipients = [];
+            $seen = [];
+            foreach ($contacts as $contact) {
+                $phone = is_array($contact) ? ($contact['phone'] ?? null) : $contact->phone;
+                if (trim((string) $phone) === '') {
+                    continue;
+                }
+                $normalizedPhone = $this->Income_NormalizePaymentReminderPhone($phone);
+                $key = preg_replace('/\D+/', '', $normalizedPhone);
+                if (isset($seen[$key])) {
+                    continue;
+                }
+                $channels = is_array($contact) ? ($contact['channels'] ?? ['sms']) : ($contact->channels ?: ['sms']);
+                if (is_string($channels)) {
+                    $channels = json_decode($channels, true) ?: [];
+                }
+                $channels = array_values(array_unique(array_map('strtolower', (array) $channels)));
+                if ($channels && !array_intersect($channels, ['sms', 'whatsapp', 'sms_whatsapp'])) {
+                    continue;
+                }
+                $recipients[] = [
+                    'phone' => $normalizedPhone,
+                    'name' => is_array($contact) ? ($contact['name'] ?? $client->complete_name) : ($contact->name ?: $client->complete_name),
+                    'channels' => $channels ?: ['sms'],
+                    'source' => $source,
+                ];
+                $seen[$key] = true;
+            }
+
+            return [
+                'status' => 1,
+                'message' => 'Numeros de recordatorio obtenidos',
+                'recipients' => $recipients,
+                'payment_link' => $income->payment_link,
+            ];
+        } catch (\Throwable $exception) {
+            info('Income_GetPaymentReminderRecipients error: '.$exception->getMessage());
+            return ['status' => 0, 'message' => $exception->getMessage()];
+        }
+    }
+
+    public function Income_SendPaymentReminder($incomeId, $phone, $channel = 'sms'): array
+    {
+        try {
+            $income = income::with('client')->find($incomeId);
+            if (!$income) {
+                return ['status' => 0, 'message' => 'El ingreso no existe.'];
+            }
+            if (!$this->Income_PaymentReminderAvailable($income)) {
+                return ['status' => 0, 'message' => 'Este ingreso no tiene un link de pago disponible.'];
+            }
+            if (!$income->client || (int) $income->client->active !== 1) {
+                return ['status' => 0, 'message' => 'El cliente no esta activo.'];
+            }
+            $channel = strtolower(trim((string) $channel));
+            if (!in_array($channel, ['sms', 'whatsapp'], true)) {
+                return ['status' => 0, 'message' => 'El canal de recordatorio no es valido.'];
+            }
+
+            $phone = $this->Income_NormalizePaymentReminderPhone($phone);
+            $message = $this->Income_PaymentReminderMessage($income, $income->client->complete_name ?: $income->client_name);
+            if ($channel === 'sms') {
+                $response = $this->TwilioSMS_SendMessage('+57', $phone, $message, null, [
+                    'client_id' => $income->client_id,
+                    'recipient_name' => $income->client->complete_name ?: $income->client_name,
+                ]);
+                return ($response['status'] ?? 0) === 1
+                    ? ['status' => 1, 'message' => 'Recordatorio SMS enviado.']
+                    : ['status' => 0, 'message' => $response['message'] ?? 'No fue posible enviar el SMS.'];
+            }
+
+            $conversation = $this->Notification_StartWhatsappConversation([
+                'phone' => $phone,
+                'client_id' => $income->client_id,
+                'display_name' => $income->client->complete_name ?: $income->client_name,
+            ]);
+            $conversationId = data_get($conversation, 'conversation.id');
+            if (($conversation['status'] ?? 0) !== 1 || !$conversationId) {
+                return ['status' => 0, 'message' => $conversation['message'] ?? 'No fue posible preparar WhatsApp.'];
+            }
+            $response = $this->Notification_SendWhatsappMessage($conversationId, [
+                'content_sid' => config('notifications.overdue_payment_template_sid', 'HX9990ce79b043c2a8a8fc31aa3b220a46'),
+                'content_variables' => [
+                    '1' => $income->client->complete_name ?: $income->client_name,
+                    '2' => number_format($income->total, 0, ',', '.'),
+                    '3' => $income->payment_link,
+                ],
+            ]);
+
+            return ($response['status'] ?? 0) === 1
+                ? ['status' => 1, 'message' => 'Recordatorio WhatsApp enviado.']
+                : ['status' => 0, 'message' => $response['message'] ?? 'No fue posible enviar WhatsApp.'];
+        } catch (\Throwable $exception) {
+            info('Income_SendPaymentReminder error: '.$exception->getMessage());
+            return ['status' => 0, 'message' => $exception->getMessage()];
+        }
+    }
+
     //Send income
     public function Income_SendIncome(
         $income_id
@@ -595,7 +789,7 @@ trait incomes_trait
                 $MailResponse = $this->SendMail_attach_array($MailData, $Mails, $View, $ViewData, $attachments);
 
                 //Send SMS
-                $Message = 'Hola ' . $income->client_name . ', generamos la ' . ($income->state == 2 ? 'Orden de compra' : 'Cotización') . ' #' . $order_id . ' por un valor de COP $' . number_format($income->total, 0, ',', '.') . '. Paga antes del ' . $income->cutoff_date . ' en ' . $income->payment_link;
+                $Message = $this->Income_PaymentReminderMessage($income, $income->client_name);
                 foreach ($receivers as $item) {
                     try {
                         if ($item['phone'] != null && $item['phone'] != '') {

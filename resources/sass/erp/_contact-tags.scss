@@ -1,0 +1,506 @@
+.contact-tag-badges{
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 5px;
+    min-width: 90px;
+}
+
+.contact-tag-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 150px;
+    padding: 3px 6px 3px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--contact-tag-color) 14%, white);
+    color: var(--contact-tag-color);
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.contact-tag-badge button,
+.contact-tag-add{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: currentColor;
+    font-size: .7rem;
+}
+
+.contact-tag-badge button:hover,
+.contact-tag-add:hover{
+    background: rgba(15, 23, 42, .1);
+}
+
+.contact-tag-add{
+    border: 1px dashed #94a3b8;
+    color: #475569;
+}
+
+.contact-tag-manager-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 1090;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, .45);
+}
+
+.contact-tag-manager-modal.d-none{
+    display: none;
+}
+
+.contact-tag-manager-dialog{
+    width: min(100%, 680px);
+    max-height: min(720px, 90vh);
+    overflow: hidden;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, .2);
+}
+
+.contact-tag-manager-header,
+.contact-tag-manager-footer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+}
+
+.contact-tag-manager-header{
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.contact-tag-manager-header h2{
+    margin: 4px 0 0;
+    font-size: 1.2rem;
+}
+
+.contact-tag-manager-kicker{
+    color: $primary;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+}
+
+.contact-tag-manager-close{
+    border: 0;
+    background: transparent;
+    color: $text-gray;
+    font-size: 1.2rem;
+}
+
+.contact-tag-manager-body{
+    display: grid;
+    gap: 14px;
+    max-height: 560px;
+    padding: 18px 22px;
+    overflow-y: auto;
+}
+
+.contact-tag-manager-search{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #64748b;
+}
+
+.contact-tag-manager-search input{
+    width: 100%;
+    border: 0;
+    outline: 0;
+}
+
+.contact-tag-manager-list{
+    display: grid;
+    gap: 8px;
+}
+
+.contact-tag-manager-row{
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.contact-tag-manager-color,
+.contact-tag-manager-create-row input[type='color']{
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.contact-tag-manager-color::-webkit-color-swatch-wrapper,
+.contact-tag-manager-create-row input[type='color']::-webkit-color-swatch-wrapper{
+    padding: 0;
+    border-radius: 50%;
+}
+
+.contact-tag-manager-color::-webkit-color-swatch,
+.contact-tag-manager-create-row input[type='color']::-webkit-color-swatch,
+.contact-tag-manager-color::-moz-color-swatch,
+.contact-tag-manager-create-row input[type='color']::-moz-color-swatch{
+    border: 0;
+    border-radius: 50%;
+}
+
+.contact-tag-manager-actions{
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.contact-tag-manager-actions button{
+    width: 32px;
+    height: 32px;
+    padding: 0;
+}
+
+.contact-tag-manager-delete{
+    color: $text-gray;
+    transition: color .15s ease;
+}
+
+.contact-tag-manager-delete:hover,
+.contact-tag-manager-delete:focus-visible{
+    color: $danger;
+}
+
+.contact-tag-manager-name{
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid $text-gray;
+    border-radius: 0;
+    box-shadow: none !important;
+    padding: 4px 0;
+}
+
+.contact-tag-manager-name:focus{
+    border-bottom-color: $primary;
+}
+
+.contact-actions-cell{
+    text-align: right !important;
+    white-space: nowrap;
+}
+
+.contact-actions-cell .btn{
+    color: $text-gray;
+    margin-left: 5px;
+}
+
+.contact-actions-cell .contact-delete-action:hover,
+.contact-actions-cell .contact-delete-action:focus-visible{
+    color: $danger !important;
+}
+
+.contact-actions-cell .contact-delete-action:hover i,
+.contact-actions-cell .contact-delete-action:focus-visible i{
+    color: $danger !important;
+}
+
+.contact-tag-manager-association.is-associated{
+    color: $primary;
+}
+
+.contact-tag-manager-create-row{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+    border: 1px dashed #94a3b8;
+    color: #475569;
+}
+
+.contact-tag-manager-create-row span{
+    flex: 1 1 220px;
+}
+
+.contact-tag-manager-create-row input{
+    width: 30px;
+    height: 30px;
+}
+
+.contact-tag-manager-empty{
+    margin: 0;
+    color: #64748b;
+}
+
+.contact-tag-manager-footer{
+    justify-content: flex-end;
+    border-top: 1px solid #e5e7eb;
+}
+
+body.contact-tag-manager-open{
+    overflow: hidden;
+}
+
+.notification-contacts-pane .client-contact-name,
+.notification-contacts-pane .client-contact-value,
+.notification-contacts-pane .client-contact-type,
+.notification-contacts-pane .notification-name,
+.notification-contacts-pane .notification-value,
+.notification-contacts-pane .notification-type{
+    background: #ffffff;
+    border: 1px solid #dce4e8;
+    border-radius: 3px;
+    box-shadow: none;
+    min-height: 38px;
+    padding: 8px 10px;
+}
+
+.notification-contacts-pane .client-contact-name:focus,
+.notification-contacts-pane .client-contact-value:focus,
+.notification-contacts-pane .client-contact-type:focus,
+.notification-contacts-pane .notification-name:focus,
+.notification-contacts-pane .notification-value:focus,
+.notification-contacts-pane .notification-type:focus{
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba(136, 95, 174, .1);
+    outline: 0;
+}
+
+#notifications-table .update-notification-row .notification-name,
+#notifications-table .update-notification-row .notification-value,
+#notifications-table .update-notification-row .notification-type{
+    border: 1px solid #dce4e8;
+}
+
+.jira-multiselect{
+    min-width: 0;
+    position: relative;
+    width: 100%;
+}
+
+.jira-multiselect__native{
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    width: 1px !important;
+}
+
+.jira-multiselect__trigger{
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dce4e8;
+    border-radius: 3px;
+    color: #171717;
+    cursor: pointer;
+    display: flex;
+    font-size: .85rem;
+    gap: 7px;
+    justify-content: flex-start;
+    min-height: 38px;
+    padding: 8px 10px;
+    text-align: left;
+    width: 100%;
+}
+
+.jira-multiselect__trigger:hover,
+.jira-multiselect__trigger:focus-visible{
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba(136, 95, 174, .1);
+    outline: 0;
+}
+
+.jira-multiselect__text{
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jira-multiselect__text.is-placeholder,
+.jira-multiselect__icon{
+    color: #777777;
+}
+
+.jira-multiselect__count{
+    align-items: center;
+    background: $primary;
+    border-radius: 10px;
+    color: #ffffff;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: .68rem;
+    font-weight: 800;
+    justify-content: center;
+    min-width: 20px;
+    padding: 2px 6px;
+}
+
+.jira-multiselect__icon{
+    flex: 0 0 auto;
+    margin-left: auto;
+    transition: transform 150ms ease;
+}
+
+.jira-multiselect.is-open .jira-multiselect__icon{
+    transform: rotate(180deg);
+}
+
+.jira-multiselect__panel{
+    background: #ffffff;
+    border: 1px solid #dce4e8;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .14);
+    left: 0;
+    min-width: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: calc(100% + 4px);
+    z-index: 1050;
+}
+
+.jira-multiselect__panel--portal{
+    min-width: 0;
+    position: fixed;
+    max-width: calc(100vw - 16px);
+}
+
+.jira-multiselect__search-wrapper{
+    align-items: center;
+    border-bottom: 1px solid #dce4e8;
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+}
+
+.jira-multiselect__search-icon{
+    color: #777777;
+    flex: 0 0 auto;
+    font-size: .78rem;
+}
+
+.jira-multiselect__search{
+    background: transparent;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #171717;
+    font-size: .82rem;
+    min-height: 28px !important;
+    outline: 0;
+    padding: 4px 0 !important;
+    width: 100%;
+}
+
+.jira-multiselect__actions{
+    border-bottom: 1px solid #dce4e8;
+    display: flex;
+    gap: 4px;
+    justify-content: space-between;
+    padding: 6px 8px;
+}
+
+.jira-multiselect__action{
+    background: transparent;
+    border: 0;
+    color: $primary;
+    cursor: pointer;
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 4px 5px;
+}
+
+.jira-multiselect__action:hover,
+.jira-multiselect__action:focus-visible{
+    color: $primary;
+    outline: 0;
+    text-decoration: underline;
+}
+
+.jira-multiselect__action i{
+    margin-right: 4px;
+}
+
+.jira-multiselect__options{
+    list-style: none;
+    margin: 0;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.jira-multiselect__option{
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #171717;
+    cursor: pointer;
+    display: flex;
+    font-size: .82rem;
+    gap: 9px;
+    padding: 8px 10px;
+    text-align: left;
+    width: 100%;
+}
+
+.jira-multiselect__option:hover,
+.jira-multiselect__option:focus-visible,
+.jira-multiselect__option[aria-selected="true"]{
+    background: rgba(136, 95, 174, .08);
+    outline: 0;
+}
+
+.jira-multiselect__check{
+    align-items: center;
+    border: 1px solid #bdbdbd;
+    color: #ffffff;
+    display: inline-flex;
+    flex: 0 0 17px;
+    height: 17px;
+    justify-content: center;
+}
+
+.jira-multiselect__option[aria-selected="true"] .jira-multiselect__check{
+    background: $primary;
+    border-color: $primary;
+}
+
+.jira-multiselect__check i{
+    display: none;
+    font-size: .65rem;
+}
+
+.jira-multiselect__option[aria-selected="true"] .jira-multiselect__check i{
+    display: block;
+}
+
+.jira-multiselect__empty{
+    color: #777777;
+    font-size: .78rem;
+    padding: 12px;
+    text-align: center;
+}

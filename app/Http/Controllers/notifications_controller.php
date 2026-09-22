@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exportable\contacts_directory;
+use App\Imports\GenericImport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Session;
 
 use App\traits\notifications_trait;
@@ -59,6 +63,173 @@ class notifications_controller extends Controller
     public function add_sms(Request $request)
     {
         return $this->response($this->Notification_CreateSms($request->all(), $this->actorId()));
+    }
+
+    public function get_tags(Request $request)
+    {
+        return $this->response($this->NotificationContact_GetTags((bool) $request->with_trashed));
+    }
+
+    public function add_tag(Request $request)
+    {
+        return $this->response($this->NotificationContact_AddTag($request->all()));
+    }
+
+    public function update_tag(Request $request)
+    {
+        return $this->response($this->NotificationContact_UpdateTag($request->id, $request->all()));
+    }
+
+    public function delete_tag(Request $request)
+    {
+        return $this->response($this->NotificationContact_DeleteTag($request->id));
+    }
+
+    public function attach_contact_tag(Request $request)
+    {
+        return $this->response($this->NotificationContact_AttachTag($request->contact_id, $request->tag_id));
+    }
+
+    public function detach_contact_tag(Request $request)
+    {
+        return $this->response($this->NotificationContact_DetachTag($request->contact_id, $request->tag_id));
+    }
+
+    public function get_contact_directory_filters()
+    {
+        return $this->response($this->NotificationContact_GetDirectoryFilters());
+    }
+
+    public function get_contact_directory_page(Request $request)
+    {
+        return $this->response($this->NotificationContact_GetDirectoryPage($request->all()));
+    }
+
+    public function get_contact_message_context(Request $request)
+    {
+        return $this->response($this->NotificationContact_GetMessageContext($request->id));
+    }
+
+    public function export_contact_directory(Request $request)
+    {
+        $response = $this->NotificationContact_GetDirectoryExport($request->all());
+        if (($response['status'] ?? 0) !== 1) {
+            return $this->response($response);
+        }
+
+        return Excel::download(
+            new contacts_directory($response['contacts']),
+            'contactos-'.now()->format('Y-m-d_H-i').'.xlsx'
+        );
+    }
+
+    public function import_contact_directory(Request $request)
+    {
+        $request->validate([
+            'import-file' => 'required|file|mimes:xlsx,xls,csv|max:20480',
+        ]);
+
+        if (!$request->file('import-file')->isValid()) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'El archivo subido es inválido o está corrupto.',
+            ], 422);
+        }
+
+        try {
+            $sheets = Excel::toCollection(new GenericImport(), $request->file('import-file'));
+            $rows = $sheets->first() ?? collect();
+            if ($rows->isEmpty()) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'El archivo no contiene datos.',
+                ], 422);
+            }
+
+            $headerRow = $rows->shift();
+            $headers = [];
+            foreach ($headerRow as $header) {
+                $headers[] = $this->normalizeContactImportHeader($header);
+            }
+            if (!in_array('value', $headers, true)) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'La plantilla debe incluir la columna Valor.',
+                ], 422);
+            }
+
+            $mappedRows = $rows->map(function ($row) use ($headers): array {
+                $values = is_object($row) ? $row->toArray() : (array) $row;
+                $mapped = [];
+                foreach ($headers as $index => $key) {
+                    if ($key !== null) {
+                        $mapped[$key] = $values[$index] ?? null;
+                    }
+                }
+                return $mapped;
+            })->filter(function (array $row): bool {
+                foreach ($row as $value) {
+                    if (trim((string) $value) !== '') {
+                        return true;
+                    }
+                }
+                return false;
+            })->values()->all();
+
+            return response()->json($this->NotificationContact_ImportDirectory($mappedRows));
+        } catch (\Throwable $exception) {
+            info('import_contact_directory error: '.$exception->getMessage());
+            return response()->json([
+                'status' => 0,
+                'message' => 'No fue posible leer el archivo: '.$exception->getMessage(),
+            ], 422);
+        }
+    }
+
+    private function normalizeContactImportHeader($value): ?string
+    {
+        $header = Str::lower(Str::ascii(trim((string) $value)));
+        $header = trim((string) preg_replace('/[^a-z0-9]+/', '_', $header), '_');
+
+        return [
+            'id' => 'id',
+            'contacto_id' => 'id',
+            'nombre' => 'name',
+            'name' => 'name',
+            'valor' => 'value',
+            'value' => 'value',
+            'tipo' => 'type',
+            'type' => 'type',
+            'canales' => 'channels',
+            'canal' => 'channels',
+            'channels' => 'channels',
+            'cliente_id' => 'client_id',
+            'client_id' => 'client_id',
+            'licencia_id' => 'license_id',
+            'license_id' => 'license_id',
+            'etiquetas' => 'tags',
+            'etiqueta' => 'tags',
+            'tags' => 'tags',
+            'estado' => 'active',
+            'status' => 'active',
+            'activo' => 'active',
+            'active' => 'active',
+        ][$header] ?? null;
+    }
+
+    public function update_contact_directory(Request $request)
+    {
+        return $this->response($this->NotificationContact_UpdateDirectory($request->id, $request->all()));
+    }
+
+    public function add_contact_directory(Request $request)
+    {
+        return $this->response($this->NotificationContact_AddDirectory($request->all()));
+    }
+
+    public function toggle_contact_directory_status(Request $request)
+    {
+        return $this->response($this->NotificationContact_ToggleDirectoryStatus($request->id, $request->input('active')));
     }
 
     public function resend_email(Request $request)

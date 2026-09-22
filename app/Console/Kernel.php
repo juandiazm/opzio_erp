@@ -21,6 +21,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('notifications:process-sms')
             ->cron('*/10 * * * *')
             ->withoutOverlapping(9);
+        //$schedule->command('notifications:process-whatsapp')
+        //    ->cron('*/10 * * * *')
+        //    ->withoutOverlapping(9);
+        
         $schedule->command('command:create_month_incomes')->cron('0 8 * * *');
         $schedule->command('command:update_licenses_remaining_days')->cron('0 4 * * *');
         $schedule->command('contracts:process-recurrences')

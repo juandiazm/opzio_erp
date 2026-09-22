@@ -259,6 +259,14 @@ Route::prefix('admin')->group(function () {
                 Route::post('update', [clients_controller::class, 'update_client_document']);
                 Route::post('delete', [clients_controller::class, 'delete_client_document']);
             });
+            Route::prefix('contacts')->group(function(){
+                Route::post('add', [clients_controller::class, 'add_client_contact']);
+                Route::post('get', [clients_controller::class, 'get_client_contacts']);
+                Route::post('update', [clients_controller::class, 'update_client_contact']);
+                Route::post('delete', [clients_controller::class, 'delete_client_contact']);
+                Route::post('restore', [clients_controller::class, 'restore_client_contact']);
+                Route::post('force-delete', [clients_controller::class, 'force_delete_client_contact']);
+            });
             Route::prefix('licenses')->group(function(){
                 Route::post('get-by-client-id', [licenses_controller::class, 'get_license_by_client_id']);
             });
@@ -375,6 +383,16 @@ Route::prefix('admin')->group(function () {
         Route::prefix('notifications')->group(function(){
             Route::get('/', [admin_pages_controller::class, 'notifications_page']);
             Route::post('clients', [notifications_controller::class, 'get_clients']);
+            Route::prefix('tags')->group(function(){
+                Route::post('get', [notifications_controller::class, 'get_tags']);
+                Route::post('add', [notifications_controller::class, 'add_tag']);
+                Route::post('update', [notifications_controller::class, 'update_tag']);
+                Route::post('delete', [notifications_controller::class, 'delete_tag']);
+            });
+            Route::prefix('contact-tags')->group(function(){
+                Route::post('attach', [notifications_controller::class, 'attach_contact_tag']);
+                Route::post('detach', [notifications_controller::class, 'detach_contact_tag']);
+            });
             Route::post('emails', [notifications_controller::class, 'get_emails']);
             Route::post('sms', [notifications_controller::class, 'get_sms']);
             Route::post('email', [notifications_controller::class, 'get_email']);
@@ -399,6 +417,17 @@ Route::prefix('admin')->group(function () {
                 Route::post('templates/submit', [notifications_controller::class, 'submit_whatsapp_template']);
             });
         });
+        Route::prefix('contacts')->group(function(){
+            Route::get('/', [admin_pages_controller::class, 'contacts_page']);
+            Route::post('filters', [notifications_controller::class, 'get_contact_directory_filters']);
+            Route::post('get-page', [notifications_controller::class, 'get_contact_directory_page']);
+            Route::post('message-context', [notifications_controller::class, 'get_contact_message_context']);
+            Route::get('export', [notifications_controller::class, 'export_contact_directory']);
+            Route::post('import', [notifications_controller::class, 'import_contact_directory']);
+            Route::post('add', [notifications_controller::class, 'add_contact_directory']);
+            Route::post('update', [notifications_controller::class, 'update_contact_directory']);
+            Route::post('toggle-status', [notifications_controller::class, 'toggle_contact_directory_status']);
+        });
         Route::prefix('incomes')->group(function(){
             Route::get('/', [admin_pages_controller::class, 'incomes_page']);
             Route::post('create', [incomes_controller::class, 'create_income']);
@@ -406,6 +435,8 @@ Route::prefix('admin')->group(function () {
             Route::post('import-massive-quotations', [incomes_controller::class, 'importMassiveQuotations']);
             Route::post('get-page', [incomes_controller::class, 'get_page']);
             Route::post('get-licenses', [incomes_controller::class, 'get_licenses']);
+            Route::post('payment-reminder-recipients', [incomes_controller::class, 'get_payment_reminder_recipients']);
+            Route::post('send-payment-reminder', [incomes_controller::class, 'send_payment_reminder']);
             Route::post('update', [incomes_controller::class, 'update_income']);
             Route::post('send', [incomes_controller::class, 'send_income']);
             Route::post('change-state', [incomes_controller::class, 'change_state']);

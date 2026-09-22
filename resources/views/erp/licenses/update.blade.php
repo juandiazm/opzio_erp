@@ -4,7 +4,7 @@
         <div class="nav nav-tabs sub-nav-tabs" id="sub-nav-tab" role="tablist">
             <button class="nav-link active" id="sub-nav-general-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-general" type="button" role="tab" aria-controls="sub-nav-general" aria-selected="true">General</button>
             <button class="nav-link" id="sub-nav-documents-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-documents" type="button" role="tab" aria-controls="sub-nav-documents" aria-selected="false">Documentos</button>
-            <button class="nav-link" id="sub-nav-notifications-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-notifications" type="button" role="tab" aria-controls="sub-nav-notifications" aria-selected="false">Notificaciones</button>
+            <button class="nav-link" id="sub-nav-notifications-tab" data-bs-toggle="tab" data-bs-target="#sub-nav-notifications" type="button" role="tab" aria-controls="sub-nav-notifications" aria-selected="false">Contactos</button>
         </div>
     </nav>
     <div class="tab-content" id="sub-nav-tabContent">

@@ -14,6 +14,41 @@ export function selectedClientIds(channel) {
     }).get();
 }
 
+export function selectedTagIds(channel) {
+    return ($('#notifications-'+channel+'-tags').val() || []).map(function(value) {
+        return String(value);
+    });
+}
+
+export function renderNotificationTags(channel) {
+    const selector = $('#notifications-'+channel+'-tags');
+    if (selector.length === 0) return;
+    selector.html((notificationState.tags || []).map(function(tag) {
+        return '<option value="'+escapeHtml(tag.id)+'">'+escapeHtml(tag.name)+'</option>';
+    }).join(''));
+}
+
+export function loadNotificationTags(done) {
+    if (notificationState.tagsLoaded) {
+        renderNotificationTags('email');
+        renderNotificationTags('sms');
+        if (done) done();
+        return;
+    }
+    if (notificationState.tagsLoading) return;
+    notificationState.tagsLoading = true;
+    PostMethodFunction('/admin/notifications/tags/get', {}, null, function(response) {
+        notificationState.tags = response.tags || [];
+        notificationState.tagsLoaded = true;
+        notificationState.tagsLoading = false;
+        renderNotificationTags('email');
+        renderNotificationTags('sms');
+        if (done) done();
+    }, function() {
+        notificationState.tagsLoading = false;
+    });
+}
+
 function manualRecipients(channel) {
     return $('#notifications-'+channel+'-manual').val() || '';
 }
@@ -123,6 +158,7 @@ export function showComposeModal(channel) {
     $('#notifications-compose-modal').removeClass('d-none');
     $('body').addClass('notifications-modal-open');
     loadClients();
+    loadNotificationTags();
 }
 
 export function closeComposeModal() {
@@ -134,6 +170,7 @@ export function appendCommonRecipientData(formData, channel) {
     const selected = selectedClientPayload(channel);
     formData.append('client_ids', selected.client_ids);
     formData.append('all_clients', selected.all_clients);
+    formData.append('tag_ids', JSON.stringify(selectedTagIds(channel)));
     formData.append('recipients', manualRecipients(channel));
 }
 
@@ -145,5 +182,6 @@ export function postFormData(url, formData, success) {
 export function resetClientSelectors(channel) {
     $('#notifications-'+channel+'-all-clients').prop('checked', false);
     $('#notifications-'+channel+'-client-search').val('');
+    $('#notifications-'+channel+'-tags').val([]);
     renderClientList(channel);
 }

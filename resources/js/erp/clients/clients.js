@@ -7,6 +7,7 @@ import { addClientDocument, updateClientDocument, deleteClientDocument } from '.
 import { goToLicense } from './licenses.js';
 import { addClientUser, restoreClientUserPassword, deleteClientUser, restoreClientUser, goToUserTraceability } from './users.js';
 import { initSync } from './sync.js';
+import * as contacts from './contacts.js';
 import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
 
 function showCurrentClient(){
@@ -60,6 +61,14 @@ $(document).on('click','#add-client-documens-button', addClientDocument);
 $(document).on('click', '.update-client-file-btn', updateClientDocument);
 $(document).on('click', '.delete-client-file-btn', deleteClientDocument);
 $(document).on('click', '.go-to-license-btn', goToLicense);
+$(document).on('click', '#add-client-contact', contacts.addClientContact);
+$(document).on('click', '.update-client-contact-btn', contacts.updateClientContact);
+$(document).on('click', '.delete-client-contact-btn', contacts.deleteClientContact);
+$(document).on('click', '.restore-client-contact-btn', contacts.restoreClientContact);
+$(document).on('click', '.force-delete-client-contact-btn', contacts.forceDeleteClientContact);
+$(document).on('click', '.update-client-contact-row .contact-tag-add', contacts.openClientContactTags);
+$(document).on('click', '.update-client-contact-row .contact-tag-remove', contacts.unlinkClientContactTag);
+$(document).on('change', '.client-contact-type', contacts.syncContactType);
 
 $(document).ready(function(){
     const recordId = getUpdateRecordId(['client_uid']);

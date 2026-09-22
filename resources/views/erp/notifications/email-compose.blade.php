@@ -7,6 +7,7 @@
         <div class="notifications-section-heading"><h3>Destinatarios</h3><label class="form-check-label"><input type="checkbox" id="notifications-email-all-clients" class="form-check-input"> Todos los clientes activos</label></div>
         <input type="search" id="notifications-email-client-search" class="form-control notifications-client-search" placeholder="Buscar cliente" aria-label="Buscar cliente para email">
         <div id="notifications-email-client-list" class="notifications-client-list"></div>
+        <label class="notifications-field"><span>Etiquetas de contacto</span><select id="notifications-email-tags" class="form-select" multiple size="4" aria-label="Etiquetas para email"></select></label>
         <label class="notifications-field"><span>Correos adicionales</span><textarea id="notifications-email-manual" class="form-control" rows="2" placeholder="correo@ejemplo.com, otro@ejemplo.com"></textarea></label>
     </div>
     <div class="notifications-form-grid">

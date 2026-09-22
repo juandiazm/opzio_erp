@@ -1,4 +1,4 @@
-<section class="tab-pane fade notifications-pane" id="notifications-whatsapp-pane" role="tabpanel" aria-labelledby="notifications-whatsapp-tab">
+<section class="tab-pane fade show active notifications-pane" id="notifications-whatsapp-pane" role="tabpanel" aria-labelledby="notifications-whatsapp-tab">
     <div class="notifications-list-header notifications-whatsapp-header">
         <div>
             <h2>Conversaciones WhatsApp</h2>

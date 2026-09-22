@@ -2,6 +2,7 @@
 namespace App\traits;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Session;
 
 
@@ -25,6 +26,7 @@ trait licenses_trait
 {
     use
     twilio_sms_trait
+    ,notification_contacts_trait
     ;
     //Set License web data
     public function License_WebData(
@@ -100,12 +102,34 @@ trait licenses_trait
             $license = $license->refresh();
             //add default notification
             $client = client::where('id', $client_id)->first();
-            $license_notification = new license_notification();
-            $license_notification->license_id = $license->id;
-            $license_notification->email = $client->email;
-            $license_notification->phone = $client->phone;
-            $license_notification->active = 1;
-            $license_notification->save();
+            if (Schema::hasColumn('license_notifications', 'client_id')) {
+                $tag = $this->NotificationContact_EnsureCollectionTag();
+                $contactData = [
+                    'name' => trim((string) ($client->complete_name ?: $client->name)),
+                    'tag_ids' => $tag ? [$tag->id] : [],
+                ];
+                if (filter_var($client->email, FILTER_VALIDATE_EMAIL)) {
+                    $this->NotificationContact_Save('license', $license->id, array_merge($contactData, [
+                        'type' => 'email',
+                        'value' => $client->email,
+                        'channels' => ['email'],
+                    ]));
+                }
+                if (trim((string) $client->phone) !== '') {
+                    $this->NotificationContact_Save('license', $license->id, array_merge($contactData, [
+                        'type' => 'phone',
+                        'value' => $client->phone,
+                        'channels' => ['sms'],
+                    ]));
+                }
+            } else {
+                $license_notification = new license_notification();
+                $license_notification->license_id = $license->id;
+                $license_notification->email = $client->email;
+                $license_notification->phone = $client->phone;
+                $license_notification->active = 1;
+                $license_notification->save();
+            }
             $license = $this->License_WebData($license);
             return [
                 'status' => 1,
@@ -744,6 +768,9 @@ trait licenses_trait
         ,$email
         ,$phone
         ,$active
+        ,$name = null
+        ,$channels = []
+        ,$tag_ids = []
     ){
         try{
             $license = license::where('id', $license_id)->first();
@@ -751,6 +778,25 @@ trait licenses_trait
                 return [
                     'status' => 0,
                     'message' => 'La licencia no existe'
+                ];
+            }
+            if (Schema::hasColumn('license_notifications', 'client_id')) {
+                $contactResponse = $this->NotificationContact_AddLicense($license_id, [
+                    'name' => $name,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'active' => $active,
+                    'channels' => $channels,
+                    'tag_ids' => $tag_ids,
+                ]);
+                if (($contactResponse['status'] ?? 0) !== 1) {
+                    return $contactResponse;
+                }
+                return [
+                    'status' => 1,
+                    'message' => 'Contacto agregado',
+                    'id' => $contactResponse['contact']['id'],
+                    'contact' => $contactResponse['contact'],
                 ];
             }
             $license_notification = new license_notification();
@@ -761,7 +807,7 @@ trait licenses_trait
             $license_notification->save();
             return [
                 'status' => 1,
-                'message' => 'Notificacion agregada',
+                'message' => 'Contacto agregado',
                 'id' => $license_notification->id
             ];
         }catch(\Exception $e){
@@ -778,6 +824,17 @@ trait licenses_trait
         ,$with_trashed = false
     ){
         try{
+            if (Schema::hasColumn('license_notifications', 'client_id')) {
+                $response = $this->NotificationContact_GetLicenseContacts($license_id, $with_trashed);
+                if (($response['status'] ?? 0) !== 1) {
+                    return $response;
+                }
+                return [
+                    'status' => 1,
+                    'message' => 'Contactos obtenidos',
+                    'data' => $response['contacts'],
+                ];
+            }
             $notifications = license_notification::where('license_id', $license_id)->orderBy('email');
             if($search != null && $search != ''){
                 $notifications = $notifications->where('email', 'like', '%'.$search.'%');
@@ -802,7 +859,18 @@ trait licenses_trait
     public function License_GetLicenseNotificationsByLicensesIds(
         $license_ids
     ){
+        return $this->License_GetTaggedLicenseNotificationsByLicensesIds($license_ids, null, null);
+    }
+
+    public function License_GetTaggedLicenseNotificationsByLicensesIds(
+        $license_ids
+        ,$client_id = null
+        ,$tag_slug = null
+    ){
         try{
+            if ($tag_slug !== null && (!Schema::hasTable('notification_tags') || !Schema::hasColumn('license_notifications', 'client_id'))) {
+                return $this->License_GetLicenseNotificationsByLicensesIds($license_ids);
+            }
             //Filter by current client
             if(Session::has('client_user')){
                 $client_id = Session::get('client_user')['active_client']['id'];
@@ -814,12 +882,32 @@ trait licenses_trait
                     ];
                 }
             }
-            $notifications = license_notification::whereIn('license_id', $license_ids)->orderBy('email')->get();
-            //get unique notifications by email
-            $notifications = $notifications->unique('email');
+            $query = license_notification::whereIn('license_id', $license_ids)->orderBy('email');
+            if ($tag_slug !== null && Schema::hasTable('notification_tags') && Schema::hasColumn('license_notifications', 'client_id')) {
+                $query->where('active', 1)->whereHas('tags', function ($tagQuery) use ($tag_slug) {
+                    $tagQuery->where('slug', $tag_slug);
+                })->with('tags');
+            }
+            $notifications = $query->get();
+            if ($tag_slug !== null && $notifications->isEmpty() && $client_id && Schema::hasColumn('license_notifications', 'client_id')) {
+                $notifications = license_notification::where('client_id', $client_id)
+                    ->whereNull('license_id')
+                    ->where('active', 1)
+                    ->whereHas('tags', function ($tagQuery) use ($tag_slug) {
+                        $tagQuery->where('slug', $tag_slug);
+                    })
+                    ->with('tags')
+                    ->orderBy('position')
+                    ->get();
+            }
+            $notifications = Schema::hasColumn('license_notifications', 'client_id')
+                ? $notifications->map(fn ($notification) => $this->NotificationContact_Payload($notification))->unique(function ($notification) {
+                    return strtolower((string) ($notification['email'] ?? '')).'|'.preg_replace('/\D+/', '', (string) ($notification['phone'] ?? ''));
+                })->values()
+                : $notifications->unique('email')->values();
             return [
                 'status' => 1,
-                'message' => 'Notificaciones obtenidas',
+                'message' => 'Contactos obtenidos',
                 'data' => $notifications
             ];
         }catch(\Exception $e){
@@ -835,8 +923,24 @@ trait licenses_trait
         ,$email
         ,$phone
         ,$active
+        ,$name = null
+        ,$channels = []
+        ,$tag_ids = []
     ){
         try{
+            if (Schema::hasColumn('license_notifications', 'client_id')) {
+                $response = $this->NotificationContact_UpdateLicense($id, [
+                    'name' => $name,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'active' => $active,
+                    'channels' => $channels,
+                    'tag_ids' => $tag_ids,
+                ]);
+                return $response['status'] == 1
+                    ? ['status' => 1, 'message' => 'Contacto actualizado', 'contact' => $response['contact']]
+                    : $response;
+            }
             $notification = license_notification::where('id', $id)->first();
             if(!$notification){
                 return [
@@ -850,7 +954,7 @@ trait licenses_trait
             $notification->save();
             return [
                 'status' => 1,
-                'message' => 'Notificacion actualizada'
+                'message' => 'Contacto actualizado'
             ];
         }catch(\Exception $e){
             info('License_UpdateLicenseNotification error: '.$e->getMessage());

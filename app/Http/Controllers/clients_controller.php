@@ -176,4 +176,40 @@ class clients_controller extends Controller
         
         return \Response::json($response, 400);
     }
+
+    public function get_client_contacts(Request $request)
+    {
+        $response = $this->NotificationContact_GetClientContacts($request->client_id, true);
+        return $response['status'] == 1 ? $response : \Response::json($response, 400);
+    }
+
+    public function add_client_contact(Request $request)
+    {
+        $response = $this->NotificationContact_AddClient($request->client_id, $request->all());
+        return $response['status'] == 1 ? $response : \Response::json($response, 400);
+    }
+
+    public function update_client_contact(Request $request)
+    {
+        $response = $this->NotificationContact_UpdateClient($request->id, $request->all());
+        return $response['status'] == 1 ? $response : \Response::json($response, 400);
+    }
+
+    public function delete_client_contact(Request $request)
+    {
+        $response = $this->NotificationContact_Delete($request->id);
+        return $response['status'] == 1 ? $response : \Response::json($response, 400);
+    }
+
+    public function restore_client_contact(Request $request)
+    {
+        $response = $this->NotificationContact_Restore($request->id);
+        return $response['status'] == 1 ? $response : \Response::json($response, 400);
+    }
+
+    public function force_delete_client_contact(Request $request)
+    {
+        $response = $this->NotificationContact_ForceDelete($request->id);
+        return $response['status'] == 1 ? $response : \Response::json($response, 400);
+    }
 }

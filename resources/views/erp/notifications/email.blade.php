@@ -1,4 +1,4 @@
-<section class="tab-pane fade show active notifications-pane" id="notifications-email-pane" role="tabpanel" aria-labelledby="notifications-email-tab">
+<section class="tab-pane fade notifications-pane" id="notifications-email-pane" role="tabpanel" aria-labelledby="notifications-email-tab">
     <div class="notifications-list-header">
         <div>
             <h2>Correos enviados</h2>

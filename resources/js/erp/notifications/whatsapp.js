@@ -239,6 +239,23 @@ export function startConversation(event) {
     }, null);
 }
 
+export function openContactConversation(contact) {
+    const phone = contact && (contact.phone || (contact.type === 'phone' ? contact.value : ''));
+    if (!phone) {
+        window.alertWarning?.('El contacto no tiene un telefono valido para WhatsApp.');
+        return;
+    }
+    PostMethodFunction('/admin/notifications/whatsapp/conversations/start', {
+        client_id: contact.client_id || '',
+        phone,
+        display_name: contact.name || '',
+    }, null, function(response) {
+        notificationState.whatsappConversationId = response.conversation.id;
+        loadConversations();
+        loadConversationById(response.conversation.id);
+    }, null);
+}
+
 function renderTemplateOptions() {
     const select = $('#notifications-whatsapp-template');
     const selected = select.val();

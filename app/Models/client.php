@@ -16,7 +16,7 @@ class client extends Model
         return ($this->photo==null?'images/no-image.jpg':('storage/images/erp/clients/'.$this->photo));
     }
     public function getCompleteNameAttribute(){
-        return $this->name.(($this->last_name!=null)?' '.$this->last_name:'');
+        return $this->name.(($this->lastname!=null)?' '.$this->lastname:'');
     }
     public function getIdentificationTypeStringAttribute(){
         switch ($this->identification_type) {
@@ -67,6 +67,9 @@ class client extends Model
     /*relationships*/
     public function licenses(){
         return $this->hasMany(license::class, 'client_id');
+    }
+    public function contacts(){
+        return $this->hasMany(license_notification::class, 'client_id')->whereNull('license_id');
     }
     public function serverProjects(){
         return $this->hasMany(servers_project::class, 'client_id');

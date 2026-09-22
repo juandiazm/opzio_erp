@@ -22,6 +22,7 @@ trait clients_trait
     use 
     client_users_trait
     ,mail_trait,
+    notification_contacts_trait,
     siigo_new_trait
     ,multimedia_trait
     ;
@@ -136,6 +137,7 @@ trait clients_trait
             $client->active = $active;
 
             $client->save();
+            $this->NotificationContact_EnsureClientPrimary($client);
             if($client->isReadyForSiigo()){
                 $siigoResponse = $this->Client_SyncToSiigoIfReady($client);
                 if($siigoResponse['status'] == 0){
@@ -324,6 +326,7 @@ trait clients_trait
                 $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $client->photo, $oldPhoto);
             }
             $client->save();
+            $this->NotificationContact_EnsureClientPrimary($client);
             if($client->isReadyForSiigo() && empty($client->siigo_id)){
                 $siigoResponse = $this->Client_SyncToSiigoIfReady($client);
                 if($siigoResponse['status'] == 0){
@@ -372,6 +375,7 @@ trait clients_trait
                 $this->Multimedia_UpdateImage($photo, $this->MULTIMEDIA_DIRECTORY, $client->photo, $oldPhoto);
             }
             $client->save();
+            $this->NotificationContact_EnsureClientPrimary($client);
             if($client->isReadyForSiigo() && empty($client->siigo_id)){
                 $siigoResponse = $this->Client_SyncToSiigoIfReady($client);
                 if($siigoResponse['status'] == 0){
