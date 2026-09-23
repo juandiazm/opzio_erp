@@ -113,6 +113,7 @@ class tenders_context_test extends TestCase
             ->assertSee('Contexto')
             ->assertSee('Seguimiento')
                 ->assertSee('Configuracion')
+            ->assertSee('<option value="undefined" selected>Sin definir</option>', false)
             ->assertSee('OPZIO S.A.S.');
     }
 
@@ -188,6 +189,28 @@ class tenders_context_test extends TestCase
             'payload_hash' => 'fixture-discovery-001',
             'raw_payload' => [],
         ]);
+        tenders_opportunity::create([
+            'source' => 'secop2',
+            'source_id' => 'fixture-discovery-002',
+            'source_process_id' => 'CO1.BDOS.DISCOVERY-002',
+            'title' => 'Servicio de soporte de software',
+            'description' => 'Soporte de plataforma web',
+            'entity' => 'Entidad de prueba',
+            'source_status' => 'Publicado',
+            'opening_status' => 'Abierto',
+            'status' => 'open',
+            'payload_hash' => 'fixture-discovery-002',
+            'raw_payload' => [],
+        ]);
+
+        $this->withoutMiddleware()
+            ->withSession(['user' => ['id' => 7]])
+            ->withHeader('Idempotency-Key', 'fixture-discovery-feedback-001')
+            ->postJson('/admin/tenders/feedback', [
+                'opportunity_id' => 'secop2:fixture-discovery-002',
+                'event_type' => 'interested',
+            ])
+            ->assertOk();
 
         $response = $this->withoutMiddleware()
             ->withSession(['user' => ['id' => 7]])
@@ -195,6 +218,7 @@ class tenders_context_test extends TestCase
                 'page' => 1,
                 'per_page' => 10,
                 'status' => 'open',
+                'feedback_state' => 'undefined',
             ]);
 
         $response

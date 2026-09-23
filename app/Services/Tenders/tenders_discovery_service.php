@@ -139,7 +139,13 @@ class tenders_discovery_service
     private function matchesDerivedFilters(array $item, array $filters): bool
     {
         foreach (['eligibility_state', 'data_confidence', 'feedback_state'] as $field) {
-            if (filled($filters[$field] ?? null) && ($item[$field] ?? null) !== $filters[$field]) return false;
+            $filterValue = $filters[$field] ?? null;
+            if (! filled($filterValue)) continue;
+            if ($field === 'feedback_state' && $filterValue === 'undefined') {
+                if (($item[$field] ?? null) !== null) return false;
+                continue;
+            }
+            if (($item[$field] ?? null) !== $filterValue) return false;
         }
         return true;
     }

@@ -39,7 +39,7 @@
                     <option value="">Todas</option>
                     <option value="interested">Me gustan</option>
                     <option value="not_interested">No me gustan</option>
-                    <option value="undefined">Sin definir</option>
+                    <option value="undefined" selected>Sin definir</option>
                 </select>
             </label>
             <div class="licitaciones-filter-actions">
