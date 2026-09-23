@@ -730,10 +730,13 @@ const init = () => {
                     reason_code: eventType === 'not_interested' ? 'manual_dismissal' : null
                 },
                 key,
-                (payload) => setFeedbackState(
-                    feedbackButton.closest('.licitaciones-opportunity'),
-                    payload.data?.feedback_state || eventType
-                )
+                async (payload) => {
+                    setFeedbackState(
+                        feedbackButton.closest('.licitaciones-opportunity'),
+                        payload.data?.feedback_state || eventType
+                    );
+                    await loadDiscovery(elements, state);
+                }
             );
             return;
         }
