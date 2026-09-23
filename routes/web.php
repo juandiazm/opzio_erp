@@ -427,6 +427,7 @@ Route::prefix('admin')->group(function () {
             Route::post('add', [notifications_controller::class, 'add_contact_directory']);
             Route::post('update', [notifications_controller::class, 'update_contact_directory']);
             Route::post('toggle-status', [notifications_controller::class, 'toggle_contact_directory_status']);
+            Route::post('delete', [notifications_controller::class, 'delete_contact_directory']);
         });
         Route::prefix('incomes')->group(function(){
             Route::get('/', [admin_pages_controller::class, 'incomes_page']);

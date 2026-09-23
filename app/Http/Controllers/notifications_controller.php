@@ -193,6 +193,7 @@ class notifications_controller extends Controller
 
         return [
             'id' => 'id',
+            'contact_id' => 'id',
             'contacto_id' => 'id',
             'nombre' => 'name',
             'name' => 'name',
@@ -230,6 +231,11 @@ class notifications_controller extends Controller
     public function toggle_contact_directory_status(Request $request)
     {
         return $this->response($this->NotificationContact_ToggleDirectoryStatus($request->id, $request->input('active')));
+    }
+
+    public function delete_contact_directory(Request $request)
+    {
+        return $this->response($this->NotificationContact_Delete($request->id));
     }
 
     public function resend_email(Request $request)

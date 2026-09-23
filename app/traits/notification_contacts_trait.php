@@ -809,8 +809,11 @@ trait notification_contacts_trait
                     $input['tag_ids'] = $this->NotificationContact_ImportTagIds($row['tags']);
                 }
 
-                $contactId = $this->NotificationContact_ImportId($row['id'] ?? null, 'contacto');
-                if ($contactId) {
+                $rawContactId = $row['id'] ?? $row['contact_id'] ?? null;
+                $contactId = trim((string) $rawContactId) === ''
+                    ? null
+                    : $this->NotificationContact_ImportId($rawContactId, 'contacto');
+                if ($contactId !== null) {
                     $result = $this->NotificationContact_UpdateDirectory($contactId, $input);
                     if (($result['status'] ?? 0) !== 1) {
                         throw new \InvalidArgumentException($result['message'] ?? 'No fue posible actualizar el contacto.');

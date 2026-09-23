@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Exportable\contacts_directory;
 use App\Http\Controllers\notifications_controller;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -209,6 +210,16 @@ class ContactsDirectoryTest extends TestCase
                 'active' => 'Inactivo',
             ],
             [
+                'id' => '',
+                'name' => 'Nuevo Sin ID',
+                'value' => '3000000002',
+                'type' => 'phone',
+                'channels' => 'sms,whatsapp',
+                'client_id' => $firstClient,
+                'license_id' => '',
+                'active' => 'Activo',
+            ],
+            [
                 'name' => 'Nuevo Importado',
                 'value' => 'nuevo@example.test',
                 'type' => 'email',
@@ -219,10 +230,20 @@ class ContactsDirectoryTest extends TestCase
             ],
         ]);
         $this->assertSame(1, $imported['status']);
-        $this->assertSame(1, $imported['created']);
+        $this->assertSame(2, $imported['created']);
         $this->assertSame(1, $imported['updated']);
         $this->assertSame([], $imported['errors']);
         $this->assertSame('Contacto Importado', DB::table('license_notifications')->where('id', $contactId)->value('name'));
-        $this->assertSame(4, DB::table('license_notifications')->count());
+        $this->assertSame(5, DB::table('license_notifications')->count());
+
+        $deleted = (new notifications_controller())->delete_contact_directory(
+            Request::create('/', 'POST', ['id' => $contactId])
+        );
+        $this->assertSame(1, $deleted['status']);
+        $this->assertNotNull(DB::table('license_notifications')->where('id', $contactId)->value('deleted_at'));
+        $visibleAfterDelete = (new notifications_controller())->NotificationContact_GetDirectoryPage([
+            'pagination' => ['page' => 1, 'per_page' => 20],
+        ]);
+        $this->assertNotContains('Contacto Importado', collect($visibleAfterDelete['contacts'])->pluck('name')->all());
     }
 }

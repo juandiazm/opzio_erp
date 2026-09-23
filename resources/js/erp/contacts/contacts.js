@@ -381,7 +381,11 @@ function importContacts() {
         input.val('');
         loadContacts();
         if (Number(response.status) === 1) {
-            alertSuccess(response.message || 'Contactos importados correctamente');
+            alertSuccess(
+                (response.message || 'Contactos importados correctamente')
+                +' Creados: '+Number(response.created || 0)
+                +' | Actualizados: '+Number(response.updated || 0)
+            );
             return;
         }
 
@@ -471,6 +475,18 @@ function contactMessageActions(contact) {
     return actions.join('');
 }
 
+function deleteDirectoryContact(contactId) {
+    const contact = state.contacts.get(String(contactId));
+    const contactName = contact?.name || 'este contacto';
+    swallMessage('Eliminar contacto', 'El contacto "'+escapeHtml(contactName)+'" quedara fuera del directorio, pero su trazabilidad se conservara.', 'error', 'Si, eliminar', 'No, cancelar', null, function() {
+        PostMethodFunction('/admin/contacts/delete', {id: contactId}, null, function(response) {
+            alertSuccess(response.message || 'Contacto eliminado');
+            state.pagination.page = 1;
+            loadContacts();
+        }, null);
+    }, null);
+}
+
 function renderContacts(response) {
     state.pagination = response.pagination || state.pagination;
     const contacts = response.contacts || [];
@@ -488,7 +504,7 @@ function renderContacts(response) {
         html += '<td>'+escapeHtml(contact.license_name || '-')+'</td>';
         html += '<td><div class="contacts-badge-list">'+contactTagBadges(contact)+'</div></td>';
         html += '<td class="text-center">'+contactStatusBadge(contact)+'</td>';
-        html += '<td class="text-end"><div class="contacts-action-group">'+contactMessageActions(contact)+'<button type="button" class="btn btn-link contacts-action-button contacts-edit-button" data-contact-id="'+contact.id+'" title="Editar contacto" aria-label="Editar contacto"><i class="fa-solid fa-pen-to-square"></i></button></div></td>';
+        html += '<td class="text-end"><div class="contacts-action-group">'+contactMessageActions(contact)+'<button type="button" class="btn btn-link contacts-action-button contacts-edit-button" data-contact-id="'+contact.id+'" title="Editar contacto" aria-label="Editar contacto"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" class="btn btn-link contacts-action-button contacts-delete-button" data-contact-id="'+contact.id+'" title="Eliminar contacto" aria-label="Eliminar contacto"><i class="fa-solid fa-trash-can"></i></button></div></td>';
         html += '</tr>';
     });
     if (!html) html = '<tr><td colspan="9" class="contacts-empty">No hay contactos que coincidan con los filtros.</td></tr>';
@@ -576,6 +592,9 @@ function initialize() {
     $('[data-contact-table-body]').on('click', '.contacts-edit-button', function() {
         const contact = state.contacts.get(String($(this).attr('data-contact-id')));
         if (contact) openEditModal(contact);
+    });
+    $('[data-contact-table-body]').on('click', '.contacts-delete-button', function() {
+        deleteDirectoryContact($(this).attr('data-contact-id'));
     });
     $('[data-contact-table-body]').on('click', '[data-contact-message-channel]', function() {
         const contact = state.contacts.get(String($(this).attr('data-contact-id')));
