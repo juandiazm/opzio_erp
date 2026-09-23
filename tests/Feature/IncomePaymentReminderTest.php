@@ -9,7 +9,9 @@ use App\Models\license;
 use App\Models\license_notification;
 use App\Models\notification_tag;
 use App\Models\sms_log;
+use App\Models\whatsapp_message;
 use App\Http\Controllers\incomes_controller;
+use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -17,8 +19,13 @@ use Tests\TestCase;
 
 class IncomePaymentReminderFakeMessageList
 {
+    public function __construct(private $client)
+    {
+    }
+
     public function create($to, array $options)
     {
+        $this->client->lastCreated = ['to' => $to, 'options' => $options];
         return (object) [
             'sid' => 'SM-INCOME-REMINDER-001',
             'status' => 'queued',
@@ -31,10 +38,19 @@ class IncomePaymentReminderFakeMessageList
 
 class IncomePaymentReminderFakeTwilioClient
 {
+    public array $lastCreated = [];
+
+    private $messages;
+
+    public function __construct()
+    {
+        $this->messages = new IncomePaymentReminderFakeMessageList($this);
+    }
+
     public function __get($name)
     {
         if ($name === 'messages') {
-            return new IncomePaymentReminderFakeMessageList();
+            return $this->messages;
         }
 
         throw new \RuntimeException('Unknown fake Twilio property: '.$name);
@@ -51,6 +67,10 @@ class IncomePaymentReminderTest extends TestCase
             'database.connections.sqlite.database' => ':memory:',
             'app.env' => 'testing',
             'app.url' => 'https://erp.example.test',
+            'services.twilio.sid' => 'AC00000000000000000000000000000000',
+            'services.twilio.token' => 'test-token',
+            'services.twilio.whatsapp.from' => 'whatsapp:+573145433746',
+            'services.twilio.whatsapp.messaging_service_sid' => null,
         ]);
         DB::purge('sqlite');
 
@@ -145,6 +165,52 @@ class IncomePaymentReminderTest extends TestCase
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
         });
+        Schema::create('whatsapp_conversations', function (Blueprint $table): void {
+            $table->id();
+            $table->string('unique_id')->unique();
+            $table->unsignedBigInteger('client_id')->nullable();
+            $table->string('phone');
+            $table->string('business_address');
+            $table->string('wa_id')->nullable();
+            $table->string('display_name')->nullable();
+            $table->string('profile_name')->nullable();
+            $table->unsignedInteger('unread_count')->default(0);
+            $table->text('last_message_preview')->nullable();
+            $table->dateTime('last_message_at')->nullable();
+            $table->dateTime('last_inbound_at')->nullable();
+            $table->dateTime('window_expires_at')->nullable();
+            $table->dateTime('last_read_at')->nullable();
+            $table->string('last_inbound_sid')->nullable();
+            $table->string('last_outbound_sid')->nullable();
+            $table->timestamps();
+            $table->unique(['phone', 'business_address']);
+        });
+        Schema::create('whatsapp_messages', function (Blueprint $table): void {
+            $table->id();
+            $table->string('unique_id')->unique();
+            $table->unsignedBigInteger('conversation_id');
+            $table->unsignedBigInteger('client_id')->nullable();
+            $table->string('twilio_sid')->nullable()->unique();
+            $table->string('direction');
+            $table->string('from');
+            $table->string('to');
+            $table->longText('body')->nullable();
+            $table->string('message_type')->default('text');
+            $table->json('media')->nullable();
+            $table->string('content_sid')->nullable();
+            $table->json('content_variables')->nullable();
+            $table->string('status')->default('pending');
+            $table->unsignedInteger('error_code')->nullable();
+            $table->text('error_message')->nullable();
+            $table->unsignedInteger('attempts')->default(0);
+            $table->dateTime('send_at')->nullable();
+            $table->dateTime('sent_at')->nullable();
+            $table->dateTime('received_at')->nullable();
+            $table->dateTime('status_updated_at')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->json('raw_payload')->nullable();
+            $table->timestamps();
+        });
     }
 
     public function test_payment_reminder_uses_tagged_license_number_and_manual_sms_number(): void
@@ -159,6 +225,11 @@ class IncomePaymentReminderTest extends TestCase
             }
 
             protected function TwilioSMS_CreateClient()
+            {
+                return $this->fakeTwilioClient;
+            }
+
+            protected function TwilioWhatsApp_CreateClient()
             {
                 return $this->fakeTwilioClient;
             }
@@ -214,9 +285,70 @@ class IncomePaymentReminderTest extends TestCase
         $this->assertSame('+573000000003', sms_log::first()->to);
         $this->assertStringContainsString($income->payment_link, sms_log::first()->body);
 
+        $contact->channels = ['sms', 'whatsapp'];
+        $contact->save();
+        $whatsappSent = $service->Income_SendPaymentReminder($income->id, '3000000002', 'whatsapp');
+        $this->assertSame(1, $whatsappSent['status']);
+        $this->assertSame('Contacto Licencia', whatsapp_message::first()->content_variables['1']);
+
         $income->payment_state = 1;
         $income->save();
         $unavailable = $service->Income_GetPaymentReminderRecipients($income->id);
         $this->assertSame(0, $unavailable['status']);
+    }
+
+    public function test_whatsapp_payment_reminder_uses_unique_id_for_template_button(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-09-21 12:00:00'));
+        $fakeTwilioClient = new IncomePaymentReminderFakeTwilioClient();
+        $service = new class($fakeTwilioClient) extends incomes_controller {
+            public function __construct(private IncomePaymentReminderFakeTwilioClient $fakeTwilioClient)
+            {
+                parent::__construct();
+            }
+
+            protected function TwilioWhatsApp_CreateClient()
+            {
+                return $this->fakeTwilioClient;
+            }
+        };
+        $client = client::forceCreate([
+            'name' => 'Cliente WhatsApp',
+            'lastname' => 'Manual',
+            'phone' => '3000000004',
+            'active' => true,
+        ]);
+        $income = income::forceCreate([
+            'unique_id' => 'INCOME-WHATSAPP-MANUAL-001',
+            'client_id' => $client->id,
+            'client_identification' => '9002',
+            'client_name' => 'Cliente WhatsApp Manual',
+            'timely_payment' => '2026-09-01',
+            'cutoff_date' => '2026-09-16',
+            'total' => 1000,
+            'state' => 2,
+            'payment_state' => 0,
+        ]);
+
+        try {
+            $response = $service->Income_SendPaymentReminder($income->id, '3000000004', 'whatsapp');
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $expectedVariables = [
+            '1' => 'Cliente WhatsApp Manual',
+            '2' => '1.000',
+            '3' => '1.000',
+            '4' => '2026-09-16',
+            '5' => '5',
+            '6' => 'INCOME-WHATSAPP-MANUAL-001',
+        ];
+        $this->assertSame(1, $response['status']);
+        $this->assertSame($expectedVariables, whatsapp_message::first()->content_variables);
+        $this->assertSame(
+            $expectedVariables,
+            json_decode($fakeTwilioClient->lastCreated['options']['contentVariables'], true)
+        );
     }
 }

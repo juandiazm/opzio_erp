@@ -525,6 +525,28 @@ trait incomes_trait
         return $income && (int) $income->payment_state !== 1 && (int) $income->state !== 1;
     }
 
+    protected function Income_PaymentReminderTemplateVariables($income, $recipientName = null, $totalAmount = null): array
+    {
+        $value = function (string $key, $default = '') use ($income) {
+            if (is_array($income)) {
+                return $income[$key] ?? $default;
+            }
+
+            return data_get($income, $key, $default);
+        };
+        $total = $totalAmount ?? $value('total', 0);
+        $cutoffDate = $value('cutoff_date');
+
+        return [
+            '1' => trim((string) ($recipientName ?: $value('client_name'))),
+            '2' => number_format($total, 0, ',', '.'),
+            '3' => number_format($total, 0, ',', '.'),
+            '4' => $cutoffDate ? Carbon::parse($cutoffDate)->format('Y-m-d') : '',
+            '5' => (string) ((int) $value('days_overdue', 0)),
+            '6' => trim((string) $value('unique_id')),
+        ];
+    }
+
     private function Income_PaymentReminderMessage($income, $clientName = null): string
     {
         $clientName = trim((string) ($clientName ?: $income->client_name));
@@ -545,6 +567,27 @@ trait incomes_trait
         return $phone;
     }
 
+    private function Income_PaymentReminderRecipientName($incomeId, string $phone, string $fallback): string
+    {
+        $recipients = $this->Income_GetPaymentReminderRecipients($incomeId);
+        if (($recipients['status'] ?? 0) !== 1) {
+            return $fallback;
+        }
+
+        $phoneKey = preg_replace('/\D+/', '', $phone);
+        foreach ($recipients['recipients'] ?? [] as $recipient) {
+            $recipientPhoneKey = preg_replace('/\D+/', '', (string) ($recipient['phone'] ?? ''));
+            if ($recipientPhoneKey !== $phoneKey) {
+                continue;
+            }
+
+            $recipientName = trim((string) ($recipient['name'] ?? ''));
+            return $recipientName !== '' ? $recipientName : $fallback;
+        }
+
+        return $fallback;
+    }
+
     public function Income_GetPaymentReminderRecipients($incomeId): array
     {
         try {
@@ -560,6 +603,7 @@ trait incomes_trait
             if (!$client || (int) $client->active !== 1) {
                 return ['status' => 0, 'message' => 'El cliente no esta activo.'];
             }
+            $fallbackName = trim((string) ($client->complete_name ?: $client->name ?: $income->client_name));
 
             $licenseIds = income_license::where('income_id', $income->id)->pluck('license_id')->filter()->values();
             $tagSlug = config('notifications.collection_tag', 'cobranza');
@@ -634,9 +678,10 @@ trait incomes_trait
                 if ($channels && !array_intersect($channels, ['sms', 'whatsapp', 'sms_whatsapp'])) {
                     continue;
                 }
+                $contactName = is_array($contact) ? ($contact['name'] ?? '') : ($contact->name ?? '');
                 $recipients[] = [
                     'phone' => $normalizedPhone,
-                    'name' => is_array($contact) ? ($contact['name'] ?? $client->complete_name) : ($contact->name ?: $client->complete_name),
+                    'name' => trim((string) $contactName) ?: $fallbackName,
                     'channels' => $channels ?: ['sms'],
                     'source' => $source,
                 ];
@@ -674,6 +719,8 @@ trait incomes_trait
             }
 
             $phone = $this->Income_NormalizePaymentReminderPhone($phone);
+            $clientName = trim((string) ($income->client->complete_name ?: $income->client->name ?: $income->client_name));
+            $recipientName = $this->Income_PaymentReminderRecipientName($income->id, $phone, $clientName);
             $message = $this->Income_PaymentReminderMessage($income, $income->client->complete_name ?: $income->client_name);
             if ($channel === 'sms') {
                 $response = $this->TwilioSMS_SendMessage('+57', $phone, $message, null, [
@@ -688,7 +735,7 @@ trait incomes_trait
             $conversation = $this->Notification_StartWhatsappConversation([
                 'phone' => $phone,
                 'client_id' => $income->client_id,
-                'display_name' => $income->client->complete_name ?: $income->client_name,
+                'display_name' => $recipientName,
             ]);
             $conversationId = data_get($conversation, 'conversation.id');
             if (($conversation['status'] ?? 0) !== 1 || !$conversationId) {
@@ -696,11 +743,10 @@ trait incomes_trait
             }
             $response = $this->Notification_SendWhatsappMessage($conversationId, [
                 'content_sid' => config('notifications.overdue_payment_template_sid', 'HX9990ce79b043c2a8a8fc31aa3b220a46'),
-                'content_variables' => [
-                    '1' => $income->client->complete_name ?: $income->client_name,
-                    '2' => number_format($income->total, 0, ',', '.'),
-                    '3' => $income->payment_link,
-                ],
+                'content_variables' => $this->Income_PaymentReminderTemplateVariables(
+                    $income,
+                    $recipientName
+                ),
             ]);
 
             return ($response['status'] ?? 0) === 1

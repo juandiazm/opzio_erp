@@ -95,7 +95,7 @@ class send_pay_remaining extends Command
                     'income_ids' => [], // Track unique income IDs
                     'emails' => [],
                     'phones' => [],
-                    'whatsapp_phones' => [],
+                    'whatsapp_recipients' => [],
                     'service_names' => [],
                 ];
             }
@@ -166,7 +166,10 @@ class send_pay_remaining extends Command
                         $groupedByClient[$client_id]['phones'][] = $phone;
                     }
                     if(in_array('whatsapp', $channels, true) && $phone !== ''){
-                        $groupedByClient[$client_id]['whatsapp_phones'][] = $phone;
+                        $groupedByClient[$client_id]['whatsapp_recipients'][] = [
+                            'phone' => $phone,
+                            'name' => trim((string) ($item['name'] ?? '')),
+                        ];
                     }
                 }
             }
@@ -316,19 +319,28 @@ class send_pay_remaining extends Command
             }
 
             try{
-                $uniqueWhatsappPhones = array_unique($clientData['whatsapp_phones']);
                 $totalAmount = array_sum(array_column($clientData['incomes'], 'total'));
-                $paymentLink = $clientData['incomes'][0]['payment_link'] ?? '';
-                $contentVariables = [
-                    '1' => $clientData['client']['name'],
-                    '2' => number_format($totalAmount, 0, ',', '.'),
-                    '3' => $paymentLink,
-                ];
-                foreach($uniqueWhatsappPhones as $phone){
+                $whatsappRecipients = collect($clientData['whatsapp_recipients'])
+                    ->map(function ($recipient) {
+                        return [
+                            'phone' => trim((string) ($recipient['phone'] ?? '')),
+                            'name' => trim((string) ($recipient['name'] ?? '')),
+                        ];
+                    })
+                    ->filter(fn ($recipient) => $recipient['phone'] !== '')
+                    ->unique(fn ($recipient) => preg_replace('/\D+/', '', $this->TwilioWhatsApp_NormalizePhone($recipient['phone'])))
+                    ->values();
+                foreach($whatsappRecipients as $recipient){
+                    $recipientName = $recipient['name'] ?: $clientData['client']['name'];
+                    $contentVariables = $this->Income_PaymentReminderTemplateVariables(
+                        $clientData['incomes'][0] ?? [],
+                        $recipientName,
+                        $totalAmount
+                    );
                     $response = $this->Notification_QueueWhatsappTemplate(
-                        $phone,
+                        $recipient['phone'],
                         $clientData['client']['id'],
-                        $clientData['client']['name'],
+                        $recipientName,
                         config('notifications.overdue_payment_template_sid', 'HX9990ce79b043c2a8a8fc31aa3b220a46'),
                         $contentVariables,
                         $sendAt

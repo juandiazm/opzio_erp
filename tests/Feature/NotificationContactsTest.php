@@ -427,5 +427,13 @@ class NotificationContactsTest extends TestCase
         $this->assertSame('HX9990ce79b043c2a8a8fc31aa3b220a46', $message->content_sid);
         $this->assertSame('whatsapp:+573000000005', $message->to);
         $this->assertNotNull($message->send_at);
+        $this->assertSame([
+            '1' => 'Contacto WhatsApp',
+            '2' => '125.000',
+            '3' => '125.000',
+            '4' => '2026-09-10',
+            '5' => '11',
+            '6' => 'INCOME-WHATSAPP-001',
+        ], $message->content_variables);
     }
 }
