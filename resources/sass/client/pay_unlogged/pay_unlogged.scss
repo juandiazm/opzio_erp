@@ -62,7 +62,12 @@
                     flex-shrink: 0;
                     
                     @media (max-width: 767px) {
+                        width: 60px;
+                        height: 60px;
                         margin: 0 auto;
+                        aspect-ratio: 1 / 1;
+                        object-fit: contain;
+                        border-radius: 50%;
                     }
                 }
 
