@@ -17,6 +17,8 @@
         .email-subheading { font-size: 14px; color: #888888; margin-bottom: 24px; }
         .report-item { background-color: #F7F7F8; border: 1px solid #E0E0E0; border-radius: 6px; padding: 16px 20px; margin: 12px 0; }
         .report-item-title { font-size: 13px; font-weight: 700; color: #220245; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #E0E0E0; }
+        .section-title { font-size: 15px; font-weight: 700; color: #220245; margin: 26px 0 10px; }
+        .channel-value { font-weight: 700; color: #220245; }
         .detail-row { padding: 6px 0; border-bottom: 1px solid #F0F0F0; }
         .detail-row:last-child { border-bottom: none; }
         .detail-label { font-size: 12px; color: #888888; }
@@ -46,9 +48,44 @@
             
         </div>
         <div class="email-content">
-            <h1 class="email-greeting">Reporte de Recordatorios de Pago</h1>
-            <p class="email-subheading">Se han enviado {{ count($Data['report_message']) }} recordatorio{{ count($Data['report_message']) != 1 ? 's' : '' }} de pago</p>
-            @foreach($Data['report_message'] as $message)
+            @php
+                $reportMessages = $Data['report_message'] ?? [];
+                $reportClients = $Data['report_clients'] ?? [];
+            @endphp
+            <h1 class="email-greeting">Plan de Recordatorios de Pago</h1>
+            <p class="email-subheading">Se han programado {{ count($reportMessages) }} recordatorio{{ count($reportMessages) != 1 ? 's' : '' }} para {{ count($reportClients) }} cliente{{ count($reportClients) != 1 ? 's' : '' }}.</p>
+
+            @if(count($reportClients) > 0)
+            <div class="section-title">Resumen por cliente</div>
+            @foreach($reportClients as $client)
+            <div class="report-item">
+                <div class="report-item-title">{{ $client['client'] }}</div>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Identificación</td>
+                    <td align="right" class="detail-value">{{ $client['identification'] }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Total cartera vencida</td>
+                    <td align="right" class="detail-value">COP ${{ number_format($client['total'],0,',','.') }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Canales de hoy</td>
+                    <td align="right" class="detail-value channel-value">
+                        @foreach($client['channels'] ?? [] as $channel)
+                        <div>{{ $channel['channel_label'] }}: {{ $channel['orders'] }} orden{{ $channel['orders'] != 1 ? 'es' : '' }} · COP ${{ number_format($channel['total'],0,',','.') }}</div>
+                        @endforeach
+                    </td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Hora programada</td>
+                    <td align="right" class="detail-value">{{ $client['scheduled_for'] }}</td>
+                </tr></table>
+            </div>
+            @endforeach
+            @endif
+
+            <div class="section-title">Mensajes definidos para enviar</div>
+            @foreach($reportMessages as $message)
             <div class="report-item">
                 <div class="report-item-title">Orden #{{ $message['order_id'] }}</div>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
@@ -63,6 +100,16 @@
                     <td class="detail-label">Total</td>
                     <td align="right" class="detail-value">COP ${{ number_format($message['total'],0,',','.') }}</td>
                 </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Canal</td>
+                    <td align="right" class="detail-value channel-value">{{ $message['channel_label'] ?? 'No definido' }}</td>
+                </tr></table>
+                @if(isset($message['scheduled_for']))
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Hora programada</td>
+                    <td align="right" class="detail-value">{{ $message['scheduled_for'] }}</td>
+                </tr></table>
+                @endif
                 @if(isset($message['siigo_invoice_url']) && $message['siigo_invoice_url'])
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
                     <td class="detail-label">F.E.</td>
@@ -81,12 +128,18 @@
                 <div class="summary-box-title">Resumen</div>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>
                     <td class="summary-row-label">Total de órdenes</td>
-                    <td align="right" class="summary-row-value">{{ count($Data['report_message']) }}</td>
+                    <td align="right" class="summary-row-value">{{ count($reportMessages) }}</td>
                 </tr></table>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>
-                    <td class="summary-row-label">Monto total</td>
-                    <td align="right" class="summary-row-value">COP ${{ number_format(array_sum(array_column($Data['report_message'], 'total')),0,',','.') }}</td>
+                    <td class="summary-row-label">Monto con recordatorio hoy</td>
+                    <td align="right" class="summary-row-value">COP ${{ number_format(array_sum(array_column($reportMessages, 'total')),0,',','.') }}</td>
                 </tr></table>
+                @if(count($reportClients) > 0)
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>
+                    <td class="summary-row-label">Cartera total vencida</td>
+                    <td align="right" class="summary-row-value">COP ${{ number_format(array_sum(array_column($reportClients, 'total')),0,',','.') }}</td>
+                </tr></table>
+                @endif
             </div>
         </div>
         <div class="email-footer">

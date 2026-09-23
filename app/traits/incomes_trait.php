@@ -536,10 +536,11 @@ trait incomes_trait
         };
         $total = $totalAmount ?? $value('total', 0);
         $cutoffDate = $value('cutoff_date');
+        $uniqueId = trim((string) $value('unique_id'));
 
         return [
             '1' => trim((string) ($recipientName ?: $value('client_name'))),
-            '2' => number_format($total, 0, ',', '.'),
+            '2' => substr($uniqueId, -5),
             '3' => number_format($total, 0, ',', '.'),
             '4' => $cutoffDate ? Carbon::parse($cutoffDate)->format('Y-m-d') : '',
             '5' => (string) ((int) $value('days_overdue', 0)),
@@ -2096,7 +2097,8 @@ trait incomes_trait
         $Response = [
             'status' => 0,
             'message' => 'Error',
-            'data' => collect()
+            'data' => collect(),
+            'portfolio' => collect(),
         ];
         
         try {
@@ -2213,18 +2215,21 @@ trait incomes_trait
                 })
                 ->get();
             
-            $incomes = $incomes->filter(function($income) use ($today) {
+            $incomes->each(function ($income) use ($today) {
                 $cutoffDate = Carbon::parse($income->cutoff_date)->startOfDay();
                 $daysOverdue = max(0, (int) $cutoffDate->diffInDays($today));
                 $income->days_overdue = $daysOverdue;
                 $income->reminder_channel = $this->Income_PaymentReminderChannelForDaysOverdue($daysOverdue);
-
+            });
+            $portfolio = $incomes->values();
+            $incomes = $portfolio->filter(function ($income) {
                 return $income->reminder_channel !== null;
             })->values();
 
             $Response['status'] = 1;
             $Response['message'] = 'All overdue incomes retrieved';
             $Response['data'] = $incomes;
+            $Response['portfolio'] = $portfolio;
             
         } catch (\Exception $e) {
             info('Income_GetAllOverdueIncomes error: ' . $e->getMessage());

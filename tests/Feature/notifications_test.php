@@ -665,7 +665,7 @@ class notifications_test extends TestCase
         ]);
 
         $this->assertSame(1, $detail['status']);
-        $this->assertStringContainsString('Reporte de Recordatorios de Pago', $detail['email']['content']);
+        $this->assertStringContainsString('Plan de Recordatorios de Pago', $detail['email']['content']);
         $this->assertTrue($detail['email']['can_resend']);
         $this->assertSame(1, $resend['status']);
         $this->assertSame('nuevo@example.test', mail_log::where('subject', 'Reporte reenviado')->first()->to[0]['address']);
@@ -851,6 +851,119 @@ class notifications_test extends TestCase
         $this->assertSame(0, mail_log::where('view', 'mail.pay_remaining_grouped')->count());
         $this->assertSame(0, sms_log::count());
         $this->assertSame(1, whatsapp_message::where('direction', 'outbound')->count());
+    }
+
+    public function test_payment_reminder_report_groups_client_total_and_daily_channels(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-08-17 07:00:00', config('app.timezone')));
+        $command = new class($this->twilioClient) extends send_pay_remaining {
+            public $reportViewData;
+
+            public function __construct(private $fakeTwilioClient)
+            {
+                parent::__construct();
+            }
+
+            protected function TwilioWhatsApp_CreateClient()
+            {
+                return $this->fakeTwilioClient;
+            }
+
+            public function Income_GetAllOverdueIncomes()
+            {
+                $baseIncome = [
+                    'client' => (object) [
+                        'id' => 1,
+                        'name' => 'Cliente Consolidado',
+                        'identification' => '9001',
+                        'active' => 1,
+                    ],
+                    'income_licenses' => collect([(object) [
+                        'license_id' => 1,
+                        'license' => (object) [
+                            'service' => (object) ['name' => 'Servicio'],
+                        ],
+                    ]]),
+                    'client_name' => 'Cliente Consolidado',
+                    'client_identification' => '9001',
+                    'timely_payment' => 1,
+                    'payment_link' => 'https://example.test/pagar',
+                    'state' => 2,
+                    'siigo_invoice_url' => null,
+                ];
+
+                return [
+                    'status' => 1,
+                    'data' => collect([
+                        (object) array_merge($baseIncome, [
+                            'unique_id' => 'INCOME-EMAIL-001',
+                            'cutoff_date' => '2026-08-16',
+                            'total' => 100000,
+                            'days_overdue' => 1,
+                            'reminder_channel' => 'email',
+                        ]),
+                        (object) array_merge($baseIncome, [
+                            'unique_id' => 'INCOME-WHATSAPP-001',
+                            'cutoff_date' => '2026-08-15',
+                            'total' => 200000,
+                            'days_overdue' => 2,
+                            'reminder_channel' => 'whatsapp',
+                        ]),
+                    ]),
+                ];
+            }
+
+            public function License_GetLicenseNotificationsByLicensesIds($licenseIds)
+            {
+                return [
+                    'status' => 1,
+                    'data' => [[
+                        'name' => 'Contacto Consolidado',
+                        'email' => 'cliente@example.test',
+                        'phone' => '3000000001',
+                        'channels' => ['email', 'sms', 'whatsapp'],
+                    ]],
+                ];
+            }
+
+            public function OpenIA_MakeQuestion($message, $model = null, $options = [])
+            {
+                return ['status' => 1, 'data' => ['Mensaje']];
+            }
+
+            public function SendMail($MailData, $Mails, $View, $ViewData, $files, $unique_id = null, $mailer = null, $from = null, $replyTo = null)
+            {
+                if ($View === 'mail.pay_remaining_report') {
+                    $this->reportViewData = $ViewData;
+                }
+
+                return ['status' => 1];
+            }
+        };
+
+        try {
+            $this->assertSame(0, $command->handle());
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $report = $command->reportViewData->toArray();
+        $messages = collect($report['report_message'])->sortBy('order_id')->values();
+        $client = $report['report_clients'][0];
+
+        $this->assertSame(['Email', 'WhatsApp'], $messages->pluck('channel_label')->all());
+        $this->assertSame(300000.0, (float) $client['total']);
+        $this->assertSame('Email, WhatsApp', $client['channels_label']);
+        $this->assertSame(2, $client['orders']);
+        $this->assertNotEmpty($client['scheduled_for']);
+
+        $reportHtml = view('mail.pay_remaining_report', ['Data' => $command->reportViewData])->render();
+        $this->assertStringContainsString('Total cartera vencida', $reportHtml);
+        $this->assertStringContainsString('Canales de hoy', $reportHtml);
+        $this->assertStringContainsString('COP $100.000', $reportHtml);
+        $this->assertStringContainsString('COP $200.000', $reportHtml);
+        $this->assertStringContainsString('Email', $reportHtml);
+        $this->assertStringContainsString('WhatsApp', $reportHtml);
     }
 
     public function test_sms_queue_skips_future_messages_and_processes_due_messages()

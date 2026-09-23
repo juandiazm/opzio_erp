@@ -339,7 +339,7 @@ class IncomePaymentReminderTest extends TestCase
 
         $expectedVariables = [
             '1' => 'Cliente WhatsApp Manual',
-            '2' => '1.000',
+            '2' => 'L-001',
             '3' => '1.000',
             '4' => '2026-09-16',
             '5' => '5',
@@ -446,6 +446,8 @@ class IncomePaymentReminderTest extends TestCase
 
             $this->assertSame(1, $response['status']);
             $this->assertSame($expectedChannels, $actualChannels);
+            $this->assertCount(count($expectedChannels) + 1, $response['portfolio']);
+            $this->assertNull(collect($response['portfolio'])->firstWhere('days_overdue', 2)->reminder_channel);
         } finally {
             Carbon::setTestNow();
         }

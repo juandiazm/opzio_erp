@@ -125,6 +125,13 @@ El comando diario considera ingresos aprobados, no pagados, con fecha limite
 igual o anterior al dia actual y clientes activos. Solo envia en los dias
 definidos por la cadencia; si un cliente tiene varias deudas, sus avisos del
 dia comparten una misma hora aleatoria entre las 08:00 y las 15:00.
+`command:send_pay_remaining` es el orquestador unico de la cobranza: agrupa por
+cliente, separa las ordenes del dia por canal y genera el reporte administrativo.
+Los comandos de email, SMS y WhatsApp que corren cada diez minutos solo entregan
+las colas ya definidas por este orquestador.
+El reporte resume por cliente la cartera vencida completa, los canales y montos
+programados para el dia, la hora comun de envio y el detalle de cada orden con
+su canal correspondiente.
 
 | Dias vencidos | Canal |
 | --- | --- |

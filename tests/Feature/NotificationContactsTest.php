@@ -429,7 +429,7 @@ class NotificationContactsTest extends TestCase
         $this->assertNotNull($message->send_at);
         $this->assertSame([
             '1' => 'Contacto WhatsApp',
-            '2' => '125.000',
+            '2' => 'P-001',
             '3' => '125.000',
             '4' => '2026-09-10',
             '5' => '11',
