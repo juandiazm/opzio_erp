@@ -692,7 +692,7 @@ class notifications_test extends TestCase
         $this->assertTrue($email['can_resend']);
     }
 
-    public function test_payment_reminder_email_and_sms_share_random_schedule_between_eight_and_eleven()
+    public function test_payment_reminder_email_and_sms_share_random_schedule_between_eight_and_three()
     {
         Carbon::setTestNow(Carbon::parse('2026-08-17 07:00:00', config('app.timezone')));
         $command = new class extends send_pay_remaining {
@@ -753,7 +753,7 @@ class notifications_test extends TestCase
 
         $mailLog = mail_log::where('view', 'mail.pay_remaining_grouped')->first();
         $start = Carbon::today(config('app.timezone'))->setTime(8, 0);
-        $end = Carbon::today(config('app.timezone'))->setTime(11, 0);
+        $end = Carbon::today(config('app.timezone'))->setTime(15, 0);
 
         $this->assertNotNull($mailLog);
         $this->assertSame(0, (int) $mailLog->status);
@@ -771,6 +771,86 @@ class notifications_test extends TestCase
         $this->assertSame(0, $command->handle());
         $this->assertSame($clientMailCount, mail_log::where('view', 'mail.pay_remaining_grouped')->count());
         Carbon::setTestNow();
+    }
+
+    public function test_payment_reminder_only_sends_the_scheduled_channel(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-08-17 07:00:00', config('app.timezone')));
+        $command = new class($this->twilioClient) extends send_pay_remaining {
+            public function __construct(private $fakeTwilioClient)
+            {
+                parent::__construct();
+            }
+
+            protected function TwilioWhatsApp_CreateClient()
+            {
+                return $this->fakeTwilioClient;
+            }
+
+            public function Income_GetAllOverdueIncomes()
+            {
+                return [
+                    'status' => 1,
+                    'data' => collect([(object) [
+                        'unique_id' => 'INCOME-CHANNEL-123',
+                        'client' => (object) [
+                            'id' => 1,
+                            'name' => 'Cliente Canal',
+                            'identification' => '123',
+                            'active' => 1,
+                        ],
+                        'income_licenses' => collect([(object) [
+                            'license_id' => 1,
+                            'license' => (object) [
+                                'service' => (object) ['name' => 'Servicio'],
+                            ],
+                        ]]),
+                        'client_name' => 'Cliente Canal',
+                        'client_identification' => '123',
+                        'timely_payment' => 1,
+                        'cutoff_date' => '2026-08-16',
+                        'total' => 100000,
+                        'payment_link' => 'https://example.test/pagar',
+                        'state' => 2,
+                        'days_overdue' => 1,
+                        'reminder_channel' => 'whatsapp',
+                        'siigo_invoice_url' => null,
+                    ]]),
+                ];
+            }
+
+            public function License_GetLicenseNotificationsByLicensesIds($licenseIds)
+            {
+                return [
+                    'status' => 1,
+                    'data' => [[
+                        'email' => 'cliente@example.test',
+                        'phone' => '3000000001',
+                        'channels' => ['email', 'sms', 'whatsapp'],
+                    ]],
+                ];
+            }
+
+            public function OpenIA_MakeQuestion($message, $model = null, $options = [])
+            {
+                return ['status' => 1, 'data' => ['Mensaje']];
+            }
+
+            public function SendMail($MailData, $Mails, $View, $ViewData, $files, $unique_id = null, $mailer = null, $from = null, $replyTo = null)
+            {
+                return ['status' => 1];
+            }
+        };
+
+        try {
+            $this->assertSame(0, $command->handle());
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $this->assertSame(0, mail_log::where('view', 'mail.pay_remaining_grouped')->count());
+        $this->assertSame(0, sms_log::count());
+        $this->assertSame(1, whatsapp_message::where('direction', 'outbound')->count());
     }
 
     public function test_sms_queue_skips_future_messages_and_processes_due_messages()
@@ -1122,6 +1202,7 @@ class notifications_test extends TestCase
         $this->assertSame('handoff', $message->ai_decision);
         $this->assertSame('handoff', $conversation->ai_status);
         $this->assertSame('query_scope_violation', $conversation->ai_handoff_reason);
+        $this->assertSame(1, (int) $conversation->unread_count);
         $this->assertSame(1, whatsapp_message::where('direction', 'inbound')->count());
         $this->assertSame(0, whatsapp_message::where('direction', 'outbound')->count());
     }
@@ -1242,6 +1323,7 @@ class notifications_test extends TestCase
         $this->assertSame('balance', $inbound->ai_query['intent']);
         $this->assertStringContainsString('"balance_pending":70', $this->fakeAiAnswerInput);
         $this->assertSame('answered', $conversation->ai_status);
+        $this->assertSame(0, (int) $conversation->unread_count);
         $this->assertSame(1, whatsapp_message::where('direction', 'outbound')->count());
     }
 

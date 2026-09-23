@@ -18,7 +18,10 @@
         <div id="pay-unlogged-data-container">
             <div class="payment-header">
                 <div class="payment-header-left">
-                    <img src="/images/opzio-logo-wide-purple-transparent.webp" alt="Opzio" class="avatar-img">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="/images/opzio-monogram-circle-cream-bg.webp">
+                        <img src="/images/opzio-logo-wide-purple-transparent.webp" alt="Opzio" class="avatar-img">
+                    </picture>
                     <h1 id="pay-unlogged-title">Realiza tu pago</h1>
                 </div>
                 <div class="payment-header-right">

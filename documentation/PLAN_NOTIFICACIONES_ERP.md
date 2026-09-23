@@ -15,9 +15,11 @@
   cola, no al confirmar la entrega SMTP.
 - `send_queued_mails` busca `status = 0`, reintenta hasta tres veces y vuelve a
   encolar el correo. Actualmente no filtra por fecha de envio.
-- El scheduler ejecuta ese comando cada diez minutos entre las 07:00 y las
-  19:00. La conexion de cola por defecto es `sync`, aunque produccion puede
-  cambiarla por base de datos, Redis u otro driver.
+- El scheduler ejecuta los procesadores de email, SMS y WhatsApp cada diez
+  minutos. La cobranza automatica se genera a las 07:00 hora de Bogota y
+  programa por cliente el envio del canal correspondiente en una hora aleatoria
+  entre las 08:00 y las 15:00. La conexion de cola por defecto es `sync`, aunque
+  produccion puede cambiarla por base de datos, Redis u otro driver.
 - La infraestructura actual soporta `Reply-To`, remitente y archivos en
   `CustomMail`, pero el log no tiene una columna para programacion ni un
   formulario para editar/reutilizar un envio.
@@ -116,6 +118,24 @@ efectivo sea `+573145433746`.
   lectura y contador global de mensajes pendientes.
 9. Plantillas: listado, alta, edicion, eliminacion y solicitud de aprobacion
   usando Content API, sin duplicar la fuente de verdad de Twilio.
+
+### Cadencia automatica de cobranza
+
+El comando diario considera ingresos aprobados, no pagados, con fecha limite
+igual o anterior al dia actual y clientes activos. Solo envia en los dias
+definidos por la cadencia; si un cliente tiene varias deudas, sus avisos del
+dia comparten una misma hora aleatoria entre las 08:00 y las 15:00.
+
+| Dias vencidos | Canal |
+| --- | --- |
+| 0 | Email |
+| 1, 3 | WhatsApp |
+| 5, 12, 21, 36, 48 | SMS |
+| 7, 15, 25, 30, 42, 52, 60 | Email |
+| 10, 18, 28, 33, 39, 45, 56 | WhatsApp |
+| Mayor a 60 | WhatsApp diario |
+
+El dia 60 conserva el correo y el reporte interno para escalamiento manual.
 
 ## Orden de trabajo
 

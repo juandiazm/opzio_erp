@@ -52,7 +52,7 @@ class send_pay_remaining extends Command
 
     private function randomSendAt()
     {
-        return Carbon::today(config('app.timezone'))->setTime(8, 0)->addMinutes(random_int(0, 180));
+        return Carbon::today(config('app.timezone'))->setTime(8, 0)->addMinutes(random_int(0, 420));
     }
 
     /**
@@ -126,6 +126,7 @@ class send_pay_remaining extends Command
             
             // Get notification emails and phones from licenses associated with this income
             $license_ids = $income->income_licenses->pluck('license_id')->toArray();
+            $reminderChannel = strtolower(trim((string) ($income->reminder_channel ?? '')));
             $notificationsResponse = $this->License_GetLicenseNotificationsByLicensesIds($license_ids);
             $notificationData = collect($notificationsResponse['data'] ?? []);
             $hasContactPayload = $notificationData->contains(function ($item) {
@@ -159,13 +160,13 @@ class send_pay_remaining extends Command
                         if($email !== '') $channels[] = 'email';
                         if($phone !== '') $channels[] = 'sms';
                     }
-                    if(in_array('email', $channels, true) && filter_var($email, FILTER_VALIDATE_EMAIL)){
+                    if(($reminderChannel === '' || $reminderChannel === 'email') && in_array('email', $channels, true) && filter_var($email, FILTER_VALIDATE_EMAIL)){
                         $groupedByClient[$client_id]['emails'][] = $email;
                     }
-                    if(in_array('sms', $channels, true) && $phone !== ''){
+                    if(($reminderChannel === '' || $reminderChannel === 'sms') && in_array('sms', $channels, true) && $phone !== ''){
                         $groupedByClient[$client_id]['phones'][] = $phone;
                     }
-                    if(in_array('whatsapp', $channels, true) && $phone !== ''){
+                    if(($reminderChannel === '' || $reminderChannel === 'whatsapp') && in_array('whatsapp', $channels, true) && $phone !== ''){
                         $groupedByClient[$client_id]['whatsapp_recipients'][] = [
                             'phone' => $phone,
                             'name' => trim((string) ($item['name'] ?? '')),

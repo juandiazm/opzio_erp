@@ -2147,9 +2147,38 @@ trait incomes_trait
         return $Response;
     }
 
+    private function Income_PaymentReminderChannelForDaysOverdue(int $daysOverdue): ?string
+    {
+        $channelsByDay = [
+            0 => 'email',
+            1 => 'whatsapp',
+            3 => 'whatsapp',
+            5 => 'sms',
+            7 => 'email',
+            10 => 'whatsapp',
+            12 => 'sms',
+            15 => 'email',
+            18 => 'whatsapp',
+            21 => 'sms',
+            25 => 'email',
+            28 => 'whatsapp',
+            30 => 'email',
+            33 => 'whatsapp',
+            36 => 'sms',
+            39 => 'whatsapp',
+            42 => 'email',
+            45 => 'whatsapp',
+            48 => 'sms',
+            52 => 'email',
+            56 => 'whatsapp',
+            60 => 'email',
+        ];
+
+        return $daysOverdue > 60 ? 'whatsapp' : ($channelsByDay[$daysOverdue] ?? null);
+    }
+
     /**
-     * Get all overdue incomes (both static and recurring) for payment reminders
-     * Applies reminder logic: day 0 (expiration), day 5, and day 10+ (every day)
+     * Get all overdue incomes (both static and recurring) for payment reminders.
      */
     public function Income_GetAllOverdueIncomes()
     {
@@ -2166,8 +2195,8 @@ trait incomes_trait
             $incomes = income::query()
                 // Only unpaid invoices
                 ->whereIn('state', [2])
-                // Only where cutoff_date has passed
-                ->where('cutoff_date', '<', $today)
+                // Include the expiration day as day 0 of the reminder cadence.
+                ->where('cutoff_date', '<=', $today)
                 // Load necessary relationships
                 ->with([
                     'client' => function($query) {
@@ -2184,22 +2213,15 @@ trait incomes_trait
                 })
                 ->get();
             
-            // Filter based on reminder logic: day 0 (expiration), day 5, and day 10+ (every day)
-            /*
-            $incomesToRemind = $incomes->filter(function($income) use ($today) {
+            $incomes = $incomes->filter(function($income) use ($today) {
                 $cutoffDate = Carbon::parse($income->cutoff_date)->startOfDay();
-                $daysOverdue = $today->diffInDays($cutoffDate);
-                
-                // Add days_overdue to the income object
+                $daysOverdue = max(0, (int) $cutoffDate->diffInDays($today));
                 $income->days_overdue = $daysOverdue;
-                
-                // Send reminder on:
-                // 1. Day of expiration (daysOverdue = 0)
-                // 2. 5 days after expiration (daysOverdue = 5)
-                // 3. Every day from day 10 onwards (daysOverdue >= 10)
-                return $daysOverdue == 0 || $daysOverdue == 5 || $daysOverdue >= 10;
-            });
-            */
+                $income->reminder_channel = $this->Income_PaymentReminderChannelForDaysOverdue($daysOverdue);
+
+                return $income->reminder_channel !== null;
+            })->values();
+
             $Response['status'] = 1;
             $Response['message'] = 'All overdue incomes retrieved';
             $Response['data'] = $incomes;

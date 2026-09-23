@@ -203,6 +203,7 @@ trait whatsapp_ai_trait
                 return $this->Notification_WhatsappAiHandoff($conversation, $message, $topicLabel, 'whatsapp_send_failed', 'unavailable');
             }
 
+            $this->Notification_WhatsappAiMarkHandledAsRead($conversation, $message);
             $responseId = trim((string) ($answerResponse['response_id'] ?? '')) ?: null;
             $message->refresh();
             $this->Notification_WhatsappAiUpdateMessage($message, [
@@ -220,6 +221,7 @@ trait whatsapp_ai_trait
                 'message_id' => $message->id,
                 'outbound_message_id' => data_get($sendResponse, 'message_record.id'),
                 'response_id' => $responseId,
+                'unread_count' => (int) $conversation->unread_count,
             ]);
 
             $outboundMessageId = data_get($sendResponse, 'message_record.id');
@@ -234,6 +236,7 @@ trait whatsapp_ai_trait
                         'conversation_id' => $conversation->id,
                         'message_id' => $outboundMessage->id,
                         'direction' => 'outbound',
+                        'unread_count' => (int) $conversation->unread_count,
                     ]);
                 }
             }
@@ -543,6 +546,32 @@ trait whatsapp_ai_trait
         $intent = Str::lower(trim((string) ($plan['intent'] ?? '')));
 
         return !in_array($topic, $topics, true) || $intent === '' || $intent === 'unknown';
+    }
+
+    private function Notification_WhatsappAiMarkHandledAsRead(
+        whatsapp_conversation $conversation,
+        whatsapp_message $message
+    ): void {
+        DB::table('whatsapp_conversations')
+            ->where('id', $conversation->id)
+            ->where('unread_count', '>', 0)
+            ->decrement('unread_count');
+        DB::table('whatsapp_conversations')
+            ->where('id', $conversation->id)
+            ->update(['last_read_at' => now()]);
+        $conversation->refresh();
+
+        $this->Notification_WhatsappAiLog('inbound_marked_read', [
+            'conversation_id' => $conversation->id,
+            'message_id' => $message->id,
+            'unread_count' => (int) $conversation->unread_count,
+        ]);
+        $this->Notification_BroadcastWhatsapp('message', [
+            'conversation_id' => $conversation->id,
+            'message_id' => $message->id,
+            'direction' => 'inbound',
+            'unread_count' => (int) $conversation->unread_count,
+        ]);
     }
 
     private function Notification_WhatsappAiFallbackPlan(array $fallbackIntent): array

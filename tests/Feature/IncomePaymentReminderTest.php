@@ -352,4 +352,102 @@ class IncomePaymentReminderTest extends TestCase
             json_decode($fakeTwilioClient->lastCreated['options']['contentVariables'], true)
         );
     }
+
+    public function test_automatic_payment_reminder_schedule_selects_expected_days_and_channels(): void
+    {
+        $today = Carbon::parse('2026-09-22 07:00:00', config('app.timezone'))->startOfDay();
+        Carbon::setTestNow($today);
+
+        try {
+            $client = client::forceCreate([
+                'name' => 'Cliente Cadencia',
+                'phone' => '3000000099',
+                'active' => true,
+            ]);
+            $license = license::forceCreate([
+                'client_id' => $client->id,
+                'name' => 'Licencia Cadencia',
+                'active' => true,
+            ]);
+            $expectedChannels = [
+                0 => 'email',
+                1 => 'whatsapp',
+                3 => 'whatsapp',
+                5 => 'sms',
+                7 => 'email',
+                10 => 'whatsapp',
+                12 => 'sms',
+                15 => 'email',
+                18 => 'whatsapp',
+                21 => 'sms',
+                25 => 'email',
+                28 => 'whatsapp',
+                30 => 'email',
+                33 => 'whatsapp',
+                36 => 'sms',
+                39 => 'whatsapp',
+                42 => 'email',
+                45 => 'whatsapp',
+                48 => 'sms',
+                52 => 'email',
+                56 => 'whatsapp',
+                60 => 'email',
+                61 => 'whatsapp',
+            ];
+
+            foreach (array_keys($expectedChannels) as $daysOverdue) {
+                $income = income::forceCreate([
+                    'unique_id' => 'INCOME-CADENCE-'.$daysOverdue,
+                    'client_id' => $client->id,
+                    'client_identification' => '9009',
+                    'client_name' => 'Cliente Cadencia',
+                    'timely_payment' => $today->copy()->subDays($daysOverdue + 5)->toDateString(),
+                    'cutoff_date' => $today->copy()->subDays($daysOverdue)->toDateString(),
+                    'total' => 1000,
+                    'state' => 2,
+                    'payment_state' => 0,
+                ]);
+                income_license::forceCreate([
+                    'income_id' => $income->id,
+                    'license_id' => $license->id,
+                    'license_name' => 'Licencia Cadencia',
+                    'service_name' => 'Servicio',
+                    'value' => 1000,
+                    'total' => 1000,
+                ]);
+            }
+
+            $ignoredIncome = income::forceCreate([
+                'unique_id' => 'INCOME-CADENCE-2',
+                'client_id' => $client->id,
+                'client_identification' => '9009',
+                'client_name' => 'Cliente Cadencia',
+                'timely_payment' => $today->copy()->subDays(7)->toDateString(),
+                'cutoff_date' => $today->copy()->subDays(2)->toDateString(),
+                'total' => 1000,
+                'state' => 2,
+                'payment_state' => 0,
+            ]);
+            income_license::forceCreate([
+                'income_id' => $ignoredIncome->id,
+                'license_id' => $license->id,
+                'license_name' => 'Licencia Cadencia',
+                'service_name' => 'Servicio',
+                'value' => 1000,
+                'total' => 1000,
+            ]);
+
+            $service = new incomes_controller();
+            $response = $service->Income_GetAllOverdueIncomes();
+            $actualChannels = collect($response['data'])
+                ->mapWithKeys(fn ($income) => [(int) $income->days_overdue => $income->reminder_channel])
+                ->sortKeys()
+                ->all();
+
+            $this->assertSame(1, $response['status']);
+            $this->assertSame($expectedChannels, $actualChannels);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
 }
