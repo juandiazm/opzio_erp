@@ -152,6 +152,7 @@ trait whatsapp_notifications_trait
             'window_expires_at' => $conversation->window_expires_at?->toIso8601String(),
             'window_expires_at_local' => $this->Notification_WhatsappDate($conversation->window_expires_at),
             'window_open' => $conversation->window_expires_at?->isFuture() ?? false,
+            'ai_status' => $conversation->ai_status,
         ];
     }
 
@@ -171,6 +172,9 @@ trait whatsapp_notifications_trait
             'status' => $message->status,
             'status_label' => $this->TwilioWhatsApp_StatusLabel($message->status),
             'error_message' => $message->error_message,
+            'ai_topic' => $message->ai_topic,
+            'ai_decision' => $message->ai_decision,
+            'ai_generated' => (bool) $message->ai_generated,
             'created_at' => $message->created_at?->toIso8601String(),
             'created_at_local' => $this->Notification_WhatsappDate($message->created_at),
             'sent_at_local' => $this->Notification_WhatsappDate($message->sent_at),
@@ -329,6 +333,7 @@ trait whatsapp_notifications_trait
                 'content_sid' => $contentSid ?: null,
                 'content_variables' => $contentVariables ?: null,
                 'status' => 'pending',
+                'ai_generated' => (bool) ($input['ai_generated'] ?? false),
                 'created_by' => $createdBy,
             ]);
 
@@ -523,11 +528,16 @@ trait whatsapp_notifications_trait
             'unread_count' => (int) $conversation->unread_count,
         ]);
 
-        return [
+        $aiResponse = null;
+        if (method_exists($this, 'Notification_ProcessWhatsappAi')) {
+            $aiResponse = $this->Notification_ProcessWhatsappAi($conversation->fresh(), $message->fresh());
+        }
+
+        return array_merge([
             'status' => 1,
             'conversation_id' => $conversation->id,
             'message_id' => $message->id,
-        ];
+        ], $aiResponse === null ? [] : ['ai' => $aiResponse]);
     }
 
     public function Notification_HandleWhatsappStatus(array $payload): array

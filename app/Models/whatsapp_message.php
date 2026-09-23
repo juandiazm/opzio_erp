@@ -19,6 +19,8 @@ class whatsapp_message extends Model
         'sent_at' => 'datetime',
         'received_at' => 'datetime',
         'status_updated_at' => 'datetime',
+        'ai_query' => 'array',
+        'ai_generated' => 'boolean',
     ];
 
     public function conversation()

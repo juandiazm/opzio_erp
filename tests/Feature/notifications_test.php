@@ -97,6 +97,8 @@ class notifications_test extends TestCase
     use notifications_trait;
 
     protected $twilioClient;
+    protected $fakeAiPlan = [];
+    protected $fakeAiCalls = 0;
 
     protected function TwilioSMS_CreateClient()
     {
@@ -106,6 +108,37 @@ class notifications_test extends TestCase
     protected function TwilioWhatsApp_CreateClient()
     {
         return $this->twilioClient;
+    }
+
+    public function OpenIA_AddThread()
+    {
+        return [
+            'status' => 1,
+            'data' => ['thread_id' => 'conv_test_whatsapp'],
+        ];
+    }
+
+    public function OpenIA_MakeQuestionInConversation(
+        string $conversationId,
+        string $message,
+        string $instructions,
+        ?array $jsonSchema = null,
+        array $options = []
+    ): array {
+        $this->fakeAiCalls++;
+        if ($jsonSchema !== null) {
+            return [
+                'status' => 1,
+                'data' => [json_encode($this->fakeAiPlan)],
+                'response_id' => 'resp_test_plan',
+            ];
+        }
+
+        return [
+            'status' => 1,
+            'data' => ['Respuesta autorizada'],
+            'response_id' => 'resp_test_answer',
+        ];
     }
 
     protected function setUp(): void
@@ -133,6 +166,9 @@ class notifications_test extends TestCase
             'services.twilio.whatsapp.webhook_url' => null,
             'services.twilio.whatsapp.status_callback_url' => null,
             'services.twilio.whatsapp.validate_webhooks' => true,
+            'services.twilio.whatsapp.ai.enabled' => true,
+            'services.twilio.whatsapp.ai.admin_numbers' => [],
+            'services.openai.api_key' => null,
         ]);
         $this->app['env'] = 'local';
         DB::purge('sqlite');
@@ -157,11 +193,19 @@ class notifications_test extends TestCase
         Schema::create('license_notifications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('license_id');
+            $table->unsignedBigInteger('client_id')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
+            $table->json('channels')->nullable();
             $table->boolean('active')->default(1);
             $table->timestamps();
             $table->softDeletes();
+        });
+        Schema::create('incomes', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('client_id');
+            $table->dateTime('deleted_at')->nullable();
+            $table->timestamps();
         });
         Schema::create('mail_logs', function (Blueprint $table) {
             $table->id();
@@ -228,6 +272,13 @@ class notifications_test extends TestCase
             $table->string('last_inbound_sid', 64)->nullable();
             $table->string('last_outbound_sid', 64)->nullable();
             $table->timestamps();
+            $table->string('ai_thread_id', 200)->nullable()->unique();
+            $table->json('ai_scope')->nullable();
+            $table->string('ai_scope_hash', 64)->nullable()->index();
+            $table->string('ai_last_response_id', 200)->nullable();
+            $table->string('ai_status', 30)->default('pending')->index();
+            $table->dateTime('ai_last_processed_at')->nullable();
+            $table->text('ai_handoff_reason')->nullable();
             $table->unique(['phone', 'business_address']);
         });
         Schema::create('whatsapp_messages', function (Blueprint $table) {
@@ -255,6 +306,11 @@ class notifications_test extends TestCase
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->json('raw_payload')->nullable();
             $table->timestamps();
+            $table->string('ai_topic', 40)->nullable()->index();
+            $table->string('ai_decision', 30)->nullable()->index();
+            $table->json('ai_query')->nullable();
+            $table->string('ai_response_id', 200)->nullable();
+            $table->boolean('ai_generated')->default(false)->index();
             $table->index(['conversation_id', 'created_at']);
         });
 
@@ -964,5 +1020,62 @@ class notifications_test extends TestCase
 
         $request->headers->set('X-Twilio-Signature', 'invalid-signature');
         $this->assertFalse($this->TwilioWhatsApp_ValidateWebhook($request, 'incoming'));
+    }
+
+    public function test_whatsapp_ai_rejects_a_query_for_an_income_outside_contact_scope()
+    {
+        $client = client::create([
+            'name' => 'Cliente Autorizado',
+            'phone' => '+573000000021',
+            'active' => true,
+        ]);
+        $otherClient = client::create([
+            'name' => 'Cliente No Autorizado',
+            'phone' => '+573000000022',
+            'active' => true,
+        ]);
+        $license = license::forceCreate([
+            'client_id' => $client->id,
+            'name' => 'Licencia autorizada',
+            'active' => true,
+        ]);
+        license_notification::forceCreate([
+            'license_id' => $license->id,
+            'client_id' => $client->id,
+            'phone' => '+573000000021',
+            'channels' => ['whatsapp'],
+            'active' => true,
+        ]);
+        DB::table('incomes')->insertGetId(['client_id' => $client->id]);
+        $otherIncomeId = DB::table('incomes')->insertGetId(['client_id' => $otherClient->id]);
+
+        $this->fakeAiPlan = [
+            'topic' => 'invoice',
+            'intent' => 'details',
+            'search' => '',
+            'license_ids' => [],
+            'income_ids' => [$otherIncomeId],
+            'limit' => 10,
+        ];
+
+        $response = $this->Notification_HandleWhatsappIncoming([
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-AI-SCOPE-001',
+            'From' => 'whatsapp:+573000000021',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Necesito consultar mi factura',
+        ]);
+
+        $conversation = whatsapp_conversation::first();
+        $message = whatsapp_message::first();
+
+        $this->assertSame(1, $response['status']);
+        $this->assertFalse($response['ai']['handled']);
+        $this->assertSame('query_scope_violation', $response['ai']['reason']);
+        $this->assertSame(1, $this->fakeAiCalls);
+        $this->assertSame('handoff', $message->ai_decision);
+        $this->assertSame('handoff', $conversation->ai_status);
+        $this->assertSame('query_scope_violation', $conversation->ai_handoff_reason);
+        $this->assertSame(1, whatsapp_message::where('direction', 'inbound')->count());
+        $this->assertSame(0, whatsapp_message::where('direction', 'outbound')->count());
     }
 }

@@ -28,6 +28,45 @@ Decisiones derivadas de esas fuentes:
 4. Un webhook entrante puede traer texto, media, nombre de perfil, `WaId` y
    datos de mensajes interactivos. Se guarda el payload original para no perder
    informacion cuando Twilio agregue campos nuevos.
+
+### Respuestas asistidas por IA
+
+El webhook entrante puede responder automaticamente solo cuando se cumplen
+todas estas condiciones:
+
+1. El texto menciona un tema integrado: licencia, factura u orden de compra.
+2. El numero coincide con un contacto activo que tenga canal WhatsApp, o esta
+   incluido en la lista explicita de administradores.
+3. El servidor resuelve el scope antes de llamar a OpenAI: el contacto obtiene
+   los clientes asociados y, desde esos clientes, todas sus licencias e
+   ingresos.
+4. La consulta estructurada devuelta por la IA solo puede usar IDs que el
+   servidor incluyo en ese scope. Un ID externo detiene el flujo y deja el
+   mensaje para atencion humana.
+
+El flujo usa una conversacion de OpenAI por telefono y scope. Si cambia la
+lista de clientes, licencias o ingresos autorizados, se crea un hilo nuevo y
+no se reutiliza el contexto anterior. La respuesta final recibe unicamente
+los registros obtenidos por consultas Eloquent limitadas por esos IDs. Los
+temas no integrados, contactos no encontrados, fallos de IA y respuestas que
+no se puedan enviar quedan registrados como `handoff` y no generan un mensaje
+automatico.
+
+La funcion esta controlada por estas variables:
+
+```dotenv
+WHATSAPP_AI_ENABLED=true
+WHATSAPP_AI_ADMIN_NUMBERS=+573XXXXXXXXX,+573YYYYYYYYY
+WHATSAPP_AI_MODEL=${OPENAI_MODEL_CHAT}
+WHATSAPP_AI_PLANNER_MAX_OUTPUT_TOKENS=700
+WHATSAPP_AI_ANSWER_MAX_OUTPUT_TOKENS=900
+WHATSAPP_AI_CATALOG_LIMIT=50
+```
+
+`WHATSAPP_AI_ADMIN_NUMBERS` es la unica excepcion de contacto: sus numeros
+normalizados pueden consultar cualquier cliente, licencia o ingreso, pero
+siguen sujetos a los tres temas integrados. Debe mantenerse vacia hasta que
+los numeros hayan sido revisados y aprobados por el responsable del ambiente.
 5. Los estados de salida llegan por `StatusCallback`; no se debe interpretar
    la respuesta `queued` de la API como entrega final.
 6. Content API es la fuente de verdad de las plantillas. Una plantilla enviada
@@ -142,6 +181,9 @@ npm run build
 - Para volumen alto, mover `Notification_SendWhatsappMessage` a una cola y
   conservar la misma transicion de estados. El flujo actual envia de forma
   sincrona para que el chat tenga respuesta inmediata.
+- Mantener `WHATSAPP_AI_ADMIN_NUMBERS` fuera de repositorios publicos y
+   reconstruir la configuracion (`php artisan config:cache`) despues de
+   cambiarla.
 - Las URLs de media entrante se conservan como referencias de Twilio. Si se
   requiere retencion local, hay que agregar un job de descarga autenticada,
   control de tamano, antivirus y politica de expiracion.
@@ -149,6 +191,9 @@ npm run build
 ## Verificacion ejecutada
 
 - `php artisan test tests/Feature/notifications_test.php`
+- La prueba `test_whatsapp_ai_rejects_a_query_for_an_income_outside_contact_scope`
+   verifica que un ID de otro cliente se bloquee antes de la respuesta y que no
+   se envie ningun mensaje automatico.
 - `php artisan route:list --path=notifications`
 - `php artisan route:list --path=webhooks`
 - `php artisan view:cache`

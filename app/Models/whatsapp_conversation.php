@@ -16,6 +16,8 @@ class whatsapp_conversation extends Model
         'last_inbound_at' => 'datetime',
         'window_expires_at' => 'datetime',
         'last_read_at' => 'datetime',
+        'ai_scope' => 'array',
+        'ai_last_processed_at' => 'datetime',
     ];
 
     public function client()

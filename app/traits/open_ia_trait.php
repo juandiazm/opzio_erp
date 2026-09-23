@@ -130,6 +130,75 @@ trait open_ia_trait
 			'usage' => $response['data']['usage'] ?? null,
 		];
 	}
+
+	public function OpenIA_MakeQuestionInConversation(
+		string $conversationId,
+		string $message,
+		string $instructions,
+		?array $jsonSchema = null,
+		array $options = []
+	): array
+	{
+		$conversationId = $this->OpenIA_ResolveConversationId($conversationId);
+		if(!$conversationId){
+			return [
+				'status' => 0,
+				'message' => 'No se pudo resolver la conversacion.',
+			];
+		}
+
+		$payload = [
+			'model' => $options['model'] ?: $this->OpenIA_GetModel('chat'),
+			'instructions' => $instructions,
+			'conversation' => $conversationId,
+			'input' => $message,
+			'store' => true,
+		];
+		foreach(['max_output_tokens', 'temperature', 'top_p', 'reasoning_effort'] as $option){
+			if(!array_key_exists($option, $options) || $options[$option] === null){
+				continue;
+			}
+			if($option === 'reasoning_effort'){
+				$payload['reasoning'] = ['effort' => $options[$option]];
+			}else{
+				$payload[$option] = $options[$option];
+			}
+		}
+		if(is_array($jsonSchema)){
+			$payload['text'] = [
+				'format' => [
+					'type' => 'json_schema',
+					'name' => $jsonSchema['name'] ?? 'structured_response',
+					'strict' => $jsonSchema['strict'] ?? true,
+					'schema' => $jsonSchema['schema'] ?? $jsonSchema,
+				],
+			];
+		}
+
+		$response = $this->OpenIA_RequestJson('POST', 'responses', $payload);
+		if(($response['status'] ?? 0) !== 1){
+			return $response;
+		}
+
+		$texts = $this->OpenIA_ExtractResponseText($response['data']);
+		if(count($texts) === 0){
+			return [
+				'status' => 0,
+				'message' => 'OpenAI no devolvio texto.',
+				'data' => [],
+			];
+		}
+
+		return [
+			'status' => 1,
+			'message' => 'success',
+			'data' => $texts,
+			'response_id' => $response['data']['id'] ?? null,
+			'model' => $response['data']['model'] ?? $payload['model'],
+			'usage' => $response['data']['usage'] ?? null,
+		];
+	}
+
 	public function OpenIA_AddAssistant($instruction, $name, $tools = [["type" => "retrieval"]], $model = null)
 	{
 		$Response = [

@@ -210,6 +210,7 @@ class IncomePaymentReminderTest extends TestCase
             $table->unsignedBigInteger('created_by')->nullable();
             $table->json('raw_payload')->nullable();
             $table->timestamps();
+            $table->boolean('ai_generated')->default(false);
         });
     }
 

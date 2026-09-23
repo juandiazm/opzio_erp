@@ -42,6 +42,14 @@ return [
             'validate_webhooks' => (bool) env('TWILIO_WHATSAPP_VALIDATE_WEBHOOKS', true),
             'default_country_code' => env('TWILIO_WHATSAPP_DEFAULT_COUNTRY_CODE', '+57'),
             'template_limit' => (int) env('TWILIO_WHATSAPP_TEMPLATE_LIMIT', 100),
+            'ai' => [
+                'enabled' => (bool) env('WHATSAPP_AI_ENABLED', true),
+                'admin_numbers' => array_values(array_filter(array_map('trim', explode(',', (string) env('WHATSAPP_AI_ADMIN_NUMBERS', ''))))),
+                'model' => env('WHATSAPP_AI_MODEL', env('OPENAI_MODEL_CHAT', 'gpt-5.6-terra')),
+                'planner_max_output_tokens' => (int) env('WHATSAPP_AI_PLANNER_MAX_OUTPUT_TOKENS', 700),
+                'answer_max_output_tokens' => (int) env('WHATSAPP_AI_ANSWER_MAX_OUTPUT_TOKENS', 900),
+                'catalog_limit' => (int) env('WHATSAPP_AI_CATALOG_LIMIT', 50),
+            ],
         ],
     ],
 
