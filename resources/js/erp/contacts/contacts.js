@@ -40,6 +40,24 @@ function setOptions(selector, items, valueKey = 'id', labelKey = 'label', placeh
     });
 }
 
+function normalizeContactChannels(value) {
+    let channels = value;
+    if (typeof channels === 'string') {
+        try {
+            channels = JSON.parse(channels);
+        } catch (error) {
+            channels = channels.split(/[,;|]+/);
+        }
+    }
+    if (!Array.isArray(channels)) channels = channels == null ? [] : [channels];
+
+    return [...new Set(channels.flatMap((channel) => {
+        const normalized = String(channel || '').trim().toLowerCase().replace(/[\s/-]+/g, '_');
+        if (normalized === 'smswhatsapp' || normalized === 'sms_whatsapp') return ['sms', 'whatsapp'];
+        return ['email', 'sms', 'whatsapp'].includes(normalized) ? [normalized] : [];
+    }))];
+}
+
 function initializeMultiSelect(fieldSelector, config) {
     const field = document.querySelector(fieldSelector);
     if (field) initializeJiraMultiSelect(field, config);
@@ -94,8 +112,8 @@ function initializeFilters(filters) {
 
 function initializeEditModal() {
     if (state.editInitialized || !state.filters) return;
-    setOptions('[data-contact-edit-client]', state.filters.clients, 'id', 'label', 'Seleccionar cliente');
-    setOptions('[data-contact-edit-license]', state.filters.licenses, 'id', 'label', 'Seleccionar licencia');
+    setEditClientOptions('');
+    setEditLicenseOptions('', '');
     setOptions('[data-contact-edit-channels]', state.filters.channels, 'value', 'label');
     initializeMultiSelect('[data-contact-edit-channels-field]', {
         placeholder: 'Selecciona canales',
@@ -104,10 +122,16 @@ function initializeEditModal() {
         selectedLabel: 'canales seleccionados',
         itemLabel: 'canales',
     });
+    $('[data-contact-edit-client]').on('change', function() {
+        setEditLicenseOptions($(this).val(), '');
+    });
     $('[data-contact-edit-license]').on('change', function() {
         const option = $(this).find('option:selected');
         const clientId = option.attr('data-client-id');
-        if (clientId) $('[data-contact-edit-client]').val(clientId);
+        if (clientId && String($('[data-contact-edit-client]').val() || '') !== String(clientId)) {
+            $('[data-contact-edit-client]').val(String(clientId));
+            setEditLicenseOptions(clientId, $(this).val());
+        }
     });
     $('[data-contact-edit-type]').on('change', syncEditChannels);
     $('[data-contact-edit-form]').on('submit', saveEditedContact);
@@ -118,21 +142,48 @@ function initializeEditModal() {
     state.editInitialized = true;
 }
 
-function setEditChannels(options) {
-    const select = $('[data-contact-edit-channels]');
-    const selected = select.val() || [];
-    select.html(channelOptions(options)).val(selected.filter((channel) => options.some((option) => option.value === channel)));
-    select.trigger('change');
+function setEditClientOptions(selectedClientId = '') {
+    const clients = Array.isArray(state.filters?.clients) ? state.filters.clients : [];
+    setOptions('[data-contact-edit-client]', clients, 'id', 'label', 'Seleccionar cliente');
+    const clientIds = clients.map((client) => String(client.id));
+    const normalizedClientId = String(selectedClientId || '');
+    $('[data-contact-edit-client]').val(clientIds.includes(normalizedClientId) ? normalizedClientId : '');
 }
 
-function syncEditChannels() {
+function setEditLicenseOptions(clientId, selectedLicenseId = '') {
+    const normalizedClientId = String(clientId || '');
+    const licenses = normalizedClientId === ''
+        ? []
+        : (state.filters?.licenses || []).filter((license) => String(license.client_id || '') === normalizedClientId);
+    setOptions('[data-contact-edit-license]', licenses, 'id', 'label', 'Seleccionar licencia');
+    const availableLicenseIds = licenses.map((license) => String(license.id));
+    const normalizedLicenseId = String(selectedLicenseId || '');
+    $('[data-contact-edit-license]').val(availableLicenseIds.includes(normalizedLicenseId) ? normalizedLicenseId : '');
+}
+
+function setEditChannels(options, selectedChannels = null) {
+    const select = $('[data-contact-edit-channels]');
+    const selected = normalizeContactChannels(selectedChannels === null ? select.val() : selectedChannels);
+    select.html(channelOptions(options)).val(selected.filter((channel) => options.some((option) => option.value === channel)));
+    notifyEditChannelsChange(select);
+}
+
+function syncEditChannels(selectedChannels = null) {
     const type = $('[data-contact-edit-type]').val() || 'email';
     const options = type === 'email'
         ? [{value: 'email', label: 'Email'}]
         : [{value: 'sms', label: 'SMS'}, {value: 'whatsapp', label: 'WhatsApp'}];
+    setEditChannels(options, selectedChannels);
     const selected = $('[data-contact-edit-channels]').val() || [];
-    setEditChannels(options);
-    if (!selected.length) $('[data-contact-edit-channels]').val([options[0].value]).trigger('change');
+    if (!selected.length) {
+        const select = $('[data-contact-edit-channels]').val([options[0].value]);
+        notifyEditChannelsChange(select);
+    }
+}
+
+function notifyEditChannelsChange(select) {
+    const element = select?.get(0);
+    if (element) element.dispatchEvent(new Event('change', {bubbles: true}));
 }
 
 function channelOptions(options) {
@@ -143,14 +194,19 @@ function openEditModal(contact) {
     state.editingId = contact.id;
     state.editingContact = contact;
     setEditMode(false);
-    $('[data-contact-edit-name]').val(contact.name || '');
-    $('[data-contact-edit-value]').val(contact.value || contact.email || contact.phone || '');
-    $('[data-contact-edit-type]').val(contact.type || (contact.email ? 'email' : 'phone'));
-    $('[data-contact-edit-client]').val(contact.client_id || '');
-    $('[data-contact-edit-license]').val(contact.license_id || '');
+    const channels = normalizeContactChannels(contact.channels);
+    const hasPhoneChannel = channels.some((channel) => channel === 'sms' || channel === 'whatsapp');
+    const type = hasPhoneChannel ? 'phone' : (contact.type || (contact.email ? 'email' : 'phone'));
+    const value = contact.value ?? contact.email ?? contact.phone ?? '';
+    const clientId = contact.client_id == null ? '' : String(contact.client_id);
+    const licenseId = contact.license_id == null ? '' : String(contact.license_id);
+    $('[data-contact-edit-name]').val(contact.name ?? '');
+    $('[data-contact-edit-value]').val(value);
+    $('[data-contact-edit-type]').val(type);
+    setEditClientOptions(clientId);
+    setEditLicenseOptions(clientId, licenseId);
     renderEditTags(contact.tags || []);
-    $('[data-contact-edit-channels]').val((contact.channels || []).map(String));
-    syncEditChannels();
+    syncEditChannels(channels);
     const active = contact.active ? '1' : '0';
     $('[data-contact-edit-active]').attr('value', active).find('.toggle-value[value="'+active+'"]').click();
     $('[data-contact-edit-modal]').removeClass('d-none');
@@ -171,8 +227,8 @@ function openCreateModal() {
     $('[data-contact-edit-name]').val('');
     $('[data-contact-edit-value]').val('');
     $('[data-contact-edit-type]').val('email');
-    $('[data-contact-edit-client]').val('');
-    $('[data-contact-edit-license]').val('');
+    setEditClientOptions('');
+    setEditLicenseOptions('', '');
     $('[data-contact-edit-active]').attr('value', '1').find('.toggle-value[value="1"]').click();
     setEditMode(true);
     syncEditChannels();
