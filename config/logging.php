@@ -60,6 +60,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        'whatsapp_ai_flow' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/whatsapp_ai_flow.log'),
+            'level' => env('WHATSAPP_AI_LOG_LEVEL', 'debug'),
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

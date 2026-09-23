@@ -34,7 +34,7 @@ Decisiones derivadas de esas fuentes:
 El webhook entrante puede responder automaticamente solo cuando se cumplen
 todas estas condiciones:
 
-1. El texto menciona un tema integrado: licencia, factura u orden de compra.
+1. El texto menciona un tema integrado: licencia, factura, cartera, orden de compra, valores o medios de pago.
 2. El numero coincide con un contacto activo que tenga canal WhatsApp, o esta
    incluido en la lista explicita de administradores.
 3. El servidor resuelve el scope antes de llamar a OpenAI: el contacto obtiene
@@ -65,8 +65,29 @@ WHATSAPP_AI_CATALOG_LIMIT=50
 
 `WHATSAPP_AI_ADMIN_NUMBERS` es la unica excepcion de contacto: sus numeros
 normalizados pueden consultar cualquier cliente, licencia o ingreso, pero
-siguen sujetos a los tres temas integrados. Debe mantenerse vacia hasta que
+siguen sujetos a los temas integrados. Debe mantenerse vacia hasta que
 los numeros hayan sido revisados y aprobados por el responsable del ambiente.
+
+#### Matriz de consultas del chat
+
+La decision ocurre en este orden: tema permitido, contacto y scope, plan
+estructurado, validacion de IDs, consulta ERP y redaccion. La IA nunca decide
+si un registro pertenece al cliente; solo propone la forma de la consulta.
+
+| Pregunta | Tema/intencion | Condicion server-side | Respuesta entregada a la IA |
+| --- | --- | --- | --- |
+| `Cual es mi cartera?` | `portfolio/balance` | Estados 2, 3 o 4; se excluyen rechazados y pagos aprobados. | `balance_pending = total - abonos`, total pendiente y vencido. |
+| `Dame mi ultima factura` | `invoice/latest` | `state = 4`, `bill_name` o `siigo_invoice_id`; orden descendente por `created_at`; máximo un registro. | Factura más reciente, valor, estado, fechas y enlace si aplica. |
+| `Por donde puedo pagar?` | `payment/payment_methods` | Solo ingresos autorizados con saldo, `payment_state != 1` y estados 0 o 2. | Bold y únicamente los enlaces de pago válidos. |
+| `Facturas generadas en los ultimos 3 meses` | `invoice/history` | Facturas por `created_at` dentro del período; si no se indica período, se usan los últimos 12 meses. | Conteo, total y resumen agrupado por `YYYY-MM`. |
+| `Dame mis ordenes de compra` | `purchase_order/list` | Estados 2, 3 o 4 dentro del scope. | Orden, estado, valor, vencimiento y enlace si está habilitado. |
+| `Cuales son los valores de mis licencias?` | `license/values` | Licencias cuyo `id` está en el scope. | Valor por licencia y suma de valores autorizados. |
+
+Si el mensaje mezcla palabras como `factura` y `ultimos 3 meses`, la regla
+de histórico tiene prioridad sobre `latest`. Si el plan de OpenAI propone
+otra intención, el servidor la normaliza con estas reglas antes de consultar.
+Un período inválido, un ID fuera del scope, un resultado que requiera datos
+no disponibles o un tema distinto deriva la conversación a una persona.
 5. Los estados de salida llegan por `StatusCallback`; no se debe interpretar
    la respuesta `queued` de la API como entrega final.
 6. Content API es la fuente de verdad de las plantillas. Una plantilla enviada

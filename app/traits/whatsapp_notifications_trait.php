@@ -7,11 +7,33 @@ use App\Models\whatsapp_conversation;
 use App\Models\whatsapp_message;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 trait whatsapp_notifications_trait
 {
     use twilio_whatsapp_trait;
+
+    private function Notification_WhatsappAiLog(string $event, array $context = []): void
+    {
+        try {
+            Log::channel('whatsapp_ai_flow')->info('whatsapp_ai.'.$event, $context);
+        } catch (\Throwable $exception) {
+            info('Notification_WhatsappAiLog error: '.$exception->getMessage());
+        }
+    }
+
+    private function Notification_WhatsappAiMaskPhone(?string $phone): ?string
+    {
+        $phone = trim((string) $phone);
+        if ($phone === '') {
+            return null;
+        }
+
+        return strlen($phone) <= 4
+            ? str_repeat('*', strlen($phone))
+            : substr($phone, 0, 4).str_repeat('*', max(0, strlen($phone) - 6)).substr($phone, -2);
+    }
 
     private function Notification_BroadcastWhatsapp($eventName, array $payload): void
     {
@@ -464,13 +486,31 @@ trait whatsapp_notifications_trait
         $to = trim((string) ($payload['To'] ?? ''));
         $businessAddress = $to !== '' ? $this->TwilioWhatsApp_ChannelAddress($to) : $this->TwilioWhatsApp_BusinessAddress();
         $messageSid = trim((string) ($payload['MessageSid'] ?? $payload['SmsMessageSid'] ?? $payload['SmsSid'] ?? ''));
+        $this->Notification_WhatsappAiLog('incoming_received', [
+            'message_sid' => $messageSid ?: null,
+            'phone' => $this->Notification_WhatsappAiMaskPhone($from),
+            'business_address' => $businessAddress,
+            'has_body' => trim((string) ($payload['Body'] ?? '')) !== '',
+            'media_count' => max(0, (int) ($payload['NumMedia'] ?? 0)),
+        ]);
         if ($messageSid !== '' && whatsapp_message::where('twilio_sid', $messageSid)->exists()) {
+            $this->Notification_WhatsappAiLog('incoming_duplicate', [
+                'message_sid' => $messageSid,
+                'phone' => $this->Notification_WhatsappAiMaskPhone($from),
+            ]);
+
             return ['status' => 1, 'duplicate' => true];
         }
 
         $profileName = trim((string) ($payload['ProfileName'] ?? '')) ?: null;
         $waId = trim((string) ($payload['WaId'] ?? '')) ?: null;
         $conversation = $this->Notification_WhatsappConversation($from, $businessAddress, $profileName, $waId);
+        $this->Notification_WhatsappAiLog('conversation_resolved', [
+            'conversation_id' => $conversation->id,
+            'message_sid' => $messageSid ?: null,
+            'phone' => $this->Notification_WhatsappAiMaskPhone($from),
+            'client_id' => $conversation->client_id,
+        ]);
         $media = [];
         $mediaCount = max(0, (int) ($payload['NumMedia'] ?? 0));
         for ($index = 0; $index < $mediaCount; $index++) {
@@ -509,10 +549,23 @@ trait whatsapp_notifications_trait
             ]);
         } catch (QueryException $exception) {
             if ($messageSid && ($message = whatsapp_message::where('twilio_sid', $messageSid)->first())) {
+                $this->Notification_WhatsappAiLog('incoming_duplicate_after_insert_race', [
+                    'message_sid' => $messageSid,
+                    'message_id' => $message->id,
+                ]);
+
                 return ['status' => 1, 'duplicate' => true, 'message_id' => $message->id];
             }
             throw $exception;
         }
+
+        $this->Notification_WhatsappAiLog('incoming_message_stored', [
+            'conversation_id' => $conversation->id,
+            'message_id' => $message->id,
+            'message_sid' => $messageSid ?: null,
+            'body_length' => mb_strlen($body, 'UTF-8'),
+            'message_type' => $media ? 'media' : 'text',
+        ]);
 
         $conversation->unread_count = (int) $conversation->unread_count + 1;
         $conversation->last_message_preview = $body !== '' ? $body : 'Mensaje recibido';
@@ -528,9 +581,25 @@ trait whatsapp_notifications_trait
             'unread_count' => (int) $conversation->unread_count,
         ]);
 
+        $this->Notification_WhatsappAiLog('decision_dispatch', [
+            'conversation_id' => $conversation->id,
+            'message_id' => $message->id,
+            'window_expires_at' => $conversation->window_expires_at?->toIso8601String(),
+        ]);
+
         $aiResponse = null;
         if (method_exists($this, 'Notification_ProcessWhatsappAi')) {
             $aiResponse = $this->Notification_ProcessWhatsappAi($conversation->fresh(), $message->fresh());
+        }
+        if (is_array($aiResponse)) {
+            $this->Notification_WhatsappAiLog('decision_completed', [
+                'conversation_id' => $conversation->id,
+                'message_id' => $message->id,
+                'status' => $aiResponse['status'] ?? null,
+                'handled' => $aiResponse['handled'] ?? null,
+                'reason' => $aiResponse['reason'] ?? null,
+                'topic' => $aiResponse['topic'] ?? null,
+            ]);
         }
 
         return array_merge([

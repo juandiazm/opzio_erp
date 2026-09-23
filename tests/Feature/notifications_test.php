@@ -99,6 +99,7 @@ class notifications_test extends TestCase
     protected $twilioClient;
     protected $fakeAiPlan = [];
     protected $fakeAiCalls = 0;
+    protected $fakeAiAnswerInput = '';
 
     protected function TwilioSMS_CreateClient()
     {
@@ -133,6 +134,8 @@ class notifications_test extends TestCase
                 'response_id' => 'resp_test_plan',
             ];
         }
+
+        $this->fakeAiAnswerInput = $message;
 
         return [
             'status' => 1,
@@ -204,7 +207,32 @@ class notifications_test extends TestCase
         Schema::create('incomes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('client_id');
+            $table->string('unique_id')->nullable();
+            $table->string('client_name')->nullable();
+            $table->date('timely_payment')->nullable();
+            $table->date('cutoff_date')->nullable();
+            $table->text('description')->nullable();
+            $table->decimal('total', 20, 2)->default(0);
+            $table->tinyInteger('state')->default(0);
+            $table->tinyInteger('payment_state')->default(0);
+            $table->date('payment_date')->nullable();
+            $table->string('payment_reference')->nullable();
+            $table->string('bill_name')->nullable();
+            $table->string('bill_final_value')->nullable();
+            $table->string('siigo_invoice_id')->nullable();
+            $table->string('siigo_invoice_url')->nullable();
             $table->dateTime('deleted_at')->nullable();
+            $table->timestamps();
+        });
+        Schema::create('income_advances', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('income_id');
+            $table->decimal('amount', 20, 2)->default(0);
+            $table->date('payment_date')->nullable();
+            $table->string('payment_method')->nullable();
+            $table->string('reference')->nullable();
+            $table->text('notes')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
         });
         Schema::create('mail_logs', function (Blueprint $table) {
@@ -1077,5 +1105,116 @@ class notifications_test extends TestCase
         $this->assertSame('query_scope_violation', $conversation->ai_handoff_reason);
         $this->assertSame(1, whatsapp_message::where('direction', 'inbound')->count());
         $this->assertSame(0, whatsapp_message::where('direction', 'outbound')->count());
+    }
+
+    public function test_whatsapp_ai_normalizes_customer_questions_to_safe_intents()
+    {
+        $normalize = new \ReflectionMethod($this, 'Notification_WhatsappAiNormalizePlan');
+        $normalize->setAccessible(true);
+        $topics = new \ReflectionMethod($this, 'Notification_WhatsappAiTopics');
+        $topics->setAccessible(true);
+        $basePlan = [
+            'topic' => 'invoice',
+            'intent' => 'list',
+            'search' => '',
+            'license_ids' => [],
+            'income_ids' => [],
+            'limit' => 10,
+        ];
+
+        $cases = [
+            ['Cual es mi cartera?', 'portfolio', 'balance'],
+            ['Dame mi ultima factura', 'invoice', 'latest'],
+            ['Por donde puedo pagar?', 'payment', 'payment_methods'],
+            ['Facturas generadas en los ultimos 3 meses', 'invoice', 'history'],
+            ['Dame mis ordenes de compra', 'purchase_order', 'list'],
+            ['Cuales son los valores de mis licencias?', 'license', 'values'],
+        ];
+
+        foreach ($cases as [$question, $expectedTopic, $expectedIntent]) {
+            $detectedTopics = $topics->invoke($this, $question);
+            $plan = $normalize->invoke($this, $question, $detectedTopics, $basePlan);
+
+            $this->assertContains($expectedTopic, $detectedTopics, $question);
+            $this->assertSame($expectedTopic, $plan['topic'], $question);
+            $this->assertSame($expectedIntent, $plan['intent'], $question);
+        }
+
+        $monthlyPlan = $normalize->invoke(
+            $this,
+            'Facturas generadas en los ultimos 3 meses',
+            $topics->invoke($this, 'Facturas generadas en los ultimos 3 meses'),
+            $basePlan
+        );
+        $this->assertNotEmpty($monthlyPlan['period_from']);
+        $this->assertNotEmpty($monthlyPlan['period_to']);
+    }
+
+    public function test_whatsapp_ai_calculates_portfolio_from_income_total_less_advances()
+    {
+        $client = client::create([
+            'name' => 'Cliente Cartera',
+            'phone' => '+573000000031',
+            'active' => true,
+        ]);
+        $license = license::forceCreate([
+            'client_id' => $client->id,
+            'name' => 'Licencia cartera',
+            'active' => true,
+        ]);
+        license_notification::forceCreate([
+            'license_id' => $license->id,
+            'client_id' => $client->id,
+            'phone' => '+573000000031',
+            'channels' => ['whatsapp'],
+            'active' => true,
+        ]);
+        $incomeId = DB::table('incomes')->insertGetId([
+            'client_id' => $client->id,
+            'unique_id' => 'INCOME-PORTFOLIO-001',
+            'client_name' => 'Cliente Cartera',
+            'total' => 100,
+            'state' => 2,
+            'payment_state' => 0,
+            'cutoff_date' => Carbon::today()->subDays(2)->format('Y-m-d'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('income_advances')->insert([
+            'income_id' => $incomeId,
+            'amount' => 30,
+            'payment_date' => Carbon::today()->subDay()->format('Y-m-d'),
+            'payment_method' => 'transferencia',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->fakeAiPlan = [
+            'topic' => 'invoice',
+            'intent' => 'latest',
+            'search' => '',
+            'license_ids' => [],
+            'income_ids' => [],
+            'limit' => 10,
+        ];
+
+        $response = $this->Notification_HandleWhatsappIncoming([
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-AI-PORTFOLIO-001',
+            'From' => 'whatsapp:+573000000031',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Cual es mi cartera?',
+        ]);
+
+        $inbound = whatsapp_message::where('direction', 'inbound')->first();
+        $conversation = whatsapp_conversation::first();
+
+        $this->assertSame(1, $response['status']);
+        $this->assertTrue($response['ai']['handled']);
+        $this->assertSame('answered', $inbound->ai_decision);
+        $this->assertSame('portfolio', $inbound->ai_query['topic']);
+        $this->assertSame('balance', $inbound->ai_query['intent']);
+        $this->assertStringContainsString('"balance_pending":70', $this->fakeAiAnswerInput);
+        $this->assertSame('answered', $conversation->ai_status);
+        $this->assertSame(1, whatsapp_message::where('direction', 'outbound')->count());
     }
 }
