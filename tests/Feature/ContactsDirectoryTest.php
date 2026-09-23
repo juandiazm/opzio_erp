@@ -131,6 +131,18 @@ class ContactsDirectoryTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('license_notifications')->insert([
+            'client_id' => $firstClient,
+            'name' => 'Contacto A',
+            'value' => '3000000001',
+            'type' => 'phone',
+            'phone' => '3000000001',
+            'channels' => json_encode(['sms']),
+            'active' => 1,
+            'position' => 2,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $response = (new notifications_controller())->NotificationContact_GetDirectoryPage([
             'pagination' => ['page' => 1, 'per_page' => 20],
@@ -153,16 +165,16 @@ class ContactsDirectoryTest extends TestCase
         $ordered = (new notifications_controller())->NotificationContact_GetDirectoryPage([
             'pagination' => ['page' => 1, 'per_page' => 20],
         ]);
-        $this->assertSame(['Contacto Excluido', 'Contacto Principal'], collect($ordered['contacts'])->pluck('name')->all());
+        $this->assertSame(['Contacto A', 'Contacto Principal', 'Contacto Excluido'], collect($ordered['contacts'])->pluck('name')->all());
 
         $exported = (new notifications_controller())->NotificationContact_GetDirectoryExport([
             'pagination' => ['page' => 1, 'per_page' => 1],
         ]);
         $this->assertSame(1, $exported['status']);
-        $this->assertCount(2, $exported['contacts']);
+        $this->assertCount(3, $exported['contacts']);
         $export = new contacts_directory($exported['contacts']);
         $this->assertSame(['ID', 'Nombre', 'Valor', 'Tipo', 'Canales', 'Cliente ID', 'Cliente', 'Licencia ID', 'Licencia', 'Etiquetas', 'Estado'], $export->headings());
-        $this->assertCount(2, $export->collection());
+        $this->assertCount(3, $export->collection());
 
         $updated = (new notifications_controller())->NotificationContact_UpdateDirectory($contactId, [
             'name' => 'Contacto Editado',
@@ -211,6 +223,6 @@ class ContactsDirectoryTest extends TestCase
         $this->assertSame(1, $imported['updated']);
         $this->assertSame([], $imported['errors']);
         $this->assertSame('Contacto Importado', DB::table('license_notifications')->where('id', $contactId)->value('name'));
-        $this->assertSame(3, DB::table('license_notifications')->count());
+        $this->assertSame(4, DB::table('license_notifications')->count());
     }
 }

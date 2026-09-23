@@ -495,10 +495,15 @@ trait notification_contacts_trait
 
     private function NotificationContact_DirectoryQuery(array $input = [])
     {
+        $contactTable = (new license_notification())->getTable();
         $query = license_notification::query()
+            ->select($contactTable.'.*')
             ->with(['client', 'license', 'tags'])
-            ->orderBy('name')
-            ->orderBy('id');
+            ->leftJoin('clients as directory_clients', 'directory_clients.id', '=', $contactTable.'.client_id')
+            ->orderByRaw("LOWER(COALESCE(directory_clients.name, ''))")
+            ->orderByRaw("LOWER(COALESCE(directory_clients.lastname, ''))")
+            ->orderByRaw("LOWER(COALESCE({$contactTable}.name, ''))")
+            ->orderBy($contactTable.'.id');
         $search = trim((string) ($input['search'] ?? ''));
         $owner = strtolower(trim((string) ($input['owner'] ?? '')));
         $clientIds = $this->NotificationContact_DirectoryIds($input['client_ids'] ?? []);
@@ -508,23 +513,23 @@ trait notification_contacts_trait
         $tagIds = $this->NotificationContact_DirectoryIds($input['tag_ids'] ?? []);
 
         if ($owner === 'client') {
-            $query->whereNull('license_id');
+            $query->whereNull($contactTable.'.license_id');
         } elseif ($owner === 'license') {
-            $query->whereNotNull('license_id');
+            $query->whereNotNull($contactTable.'.license_id');
         }
         if ($clientIds) {
-            $query->whereIn('client_id', $clientIds);
+            $query->whereIn($contactTable.'.client_id', $clientIds);
         }
         if ($licenseIds) {
-            $query->whereIn('license_id', $licenseIds);
+            $query->whereIn($contactTable.'.license_id', $licenseIds);
         }
         if ($types) {
-            $query->whereIn('type', $types);
+            $query->whereIn($contactTable.'.type', $types);
         }
         if ($channels) {
-            $query->where(function ($channelQuery) use ($channels) {
+            $query->where(function ($channelQuery) use ($channels, $contactTable) {
                 foreach ($channels as $channel) {
-                    $channelQuery->orWhereJsonContains('channels', $channel);
+                    $channelQuery->orWhereJsonContains($contactTable.'.channels', $channel);
                 }
             });
         }
@@ -532,12 +537,12 @@ trait notification_contacts_trait
             $query->whereHas('tags', fn ($tagQuery) => $tagQuery->whereIn('notification_tags.id', $tagIds));
         }
         if ($search !== '') {
-            $query->where(function ($searchQuery) use ($search) {
+            $query->where(function ($searchQuery) use ($search, $contactTable) {
                 $like = '%'.$search.'%';
-                $searchQuery->where('name', 'like', $like)
-                    ->orWhere('value', 'like', $like)
-                    ->orWhere('email', 'like', $like)
-                    ->orWhere('phone', 'like', $like)
+                $searchQuery->where($contactTable.'.name', 'like', $like)
+                    ->orWhere($contactTable.'.value', 'like', $like)
+                    ->orWhere($contactTable.'.email', 'like', $like)
+                    ->orWhere($contactTable.'.phone', 'like', $like)
                     ->orWhereHas('client', function ($clientQuery) use ($like) {
                         $clientQuery->where('name', 'like', $like)->orWhere('lastname', 'like', $like);
                     })
