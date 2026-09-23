@@ -60,7 +60,12 @@ WHATSAPP_AI_ADMIN_NUMBERS=+573XXXXXXXXX,+573YYYYYYYYY
 WHATSAPP_AI_MODEL=${OPENAI_MODEL_CHAT}
 WHATSAPP_AI_PLANNER_MAX_OUTPUT_TOKENS=700
 WHATSAPP_AI_ANSWER_MAX_OUTPUT_TOKENS=900
-WHATSAPP_AI_CATALOG_LIMIT=50
+WHATSAPP_AI_CATALOG_LIMIT=100
+WHATSAPP_AI_LOG_LEVEL=debug
+WHATSAPP_AI_LOG_MESSAGES=true
+WHATSAPP_AI_FALLBACK_ENABLED=true
+WHATSAPP_AI_FALLBACK_MODEL=${OPENAI_MODEL_FAST}
+WHATSAPP_AI_FALLBACK_MAX_OUTPUT_TOKENS=180
 ```
 
 `WHATSAPP_AI_ADMIN_NUMBERS` es la unica excepcion de contacto: sus numeros
@@ -82,6 +87,36 @@ si un registro pertenece al cliente; solo propone la forma de la consulta.
 | `Facturas generadas en los ultimos 3 meses` | `invoice/history` | Facturas por `created_at` dentro del período; si no se indica período, se usan los últimos 12 meses. | Conteo, total y resumen agrupado por `YYYY-MM`. |
 | `Dame mis ordenes de compra` | `purchase_order/list` | Estados 2, 3 o 4 dentro del scope. | Orden, estado, valor, vencimiento y enlace si está habilitado. |
 | `Cuales son los valores de mis licencias?` | `license/values` | Licencias cuyo `id` está en el scope. | Valor por licencia y suma de valores autorizados. |
+
+También se soportan estos alcances extendidos:
+
+- `account/summary`: resumen de empresas, licencias activas, cartera y movimientos autorizados.
+- `license/status`, `license/services` y `license/renewal`: estado, servicios, días restantes y próxima facturación.
+- `invoice/overdue`, `invoice/link` y `invoice/status`: facturas vencidas, enlaces electrónicos y estado de pago.
+- `payment/payment_history` y `payment/payment_status`: abonos, pagos de gateway, referencias y confirmaciones aprobadas.
+- `portfolio/overdue`: cartera vencida y total vencido separado del saldo general.
+
+Las consultas amplias (`summary`, `balance`, `history`, `list`, `values` y
+`payment_methods`) usan todos los registros autorizados aunque el planificador
+de OpenAI haya escogido solo algunos IDs. Los IDs del planificador solo
+restringen consultas explícitas sobre un registro concreto; la validación de
+scope se mantiene en ambos casos.
+
+Si el detector local no encuentra un tema, o el planner devuelve `unknown`, se
+ejecuta una clasificación aislada sin hilo, sin catálogo y sin IDs. Usa el
+modelo configurado en `WHATSAPP_AI_FALLBACK_MODEL` (por defecto el modelo
+`fast`, de menor costo), una salida JSON de máximo 180 tokens y un umbral de
+confianza de 0,55. Si identifica un tema soportado, el flujo continúa con el
+planner, scope y consultas normales; si no, queda en `handoff` sin consultar
+datos ni responder automáticamente.
+
+Cada evento se escribe en `storage/logs/whatsapp_ai_flow.log` con contexto
+estructurado. Con `WHATSAPP_AI_LOG_MESSAGES=true`, los eventos
+`incoming_message_stored`, `outgoing_message_stored`, `outgoing_message_result`
+y `answer_received` incluyen `input_message` u `output_message` completos,
+además de IDs, intención, alcance, resultado y motivo de handoff. Ese archivo
+contiene datos de conversación y debe tener permisos restringidos y una
+política de retención acorde con la operación.
 
 Si el mensaje mezcla palabras como `factura` y `ultimos 3 meses`, la regla
 de histórico tiene prioridad sobre `latest`. Si el plan de OpenAI propone

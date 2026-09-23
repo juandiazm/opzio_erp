@@ -17,6 +17,9 @@ trait whatsapp_notifications_trait
     private function Notification_WhatsappAiLog(string $event, array $context = []): void
     {
         try {
+            if (!filter_var(config('services.twilio.whatsapp.ai.log_messages', true), FILTER_VALIDATE_BOOLEAN)) {
+                unset($context['input_message'], $context['output_message']);
+            }
             Log::channel('whatsapp_ai_flow')->info('whatsapp_ai.'.$event, $context);
         } catch (\Throwable $exception) {
             info('Notification_WhatsappAiLog error: '.$exception->getMessage());
@@ -358,8 +361,22 @@ trait whatsapp_notifications_trait
                 'ai_generated' => (bool) ($input['ai_generated'] ?? false),
                 'created_by' => $createdBy,
             ]);
+            $this->Notification_WhatsappAiLog('outgoing_message_stored', [
+                'conversation_id' => $conversation->id,
+                'message_id' => $messageLog->id,
+                'direction' => 'outbound',
+                'ai_generated' => (bool) ($input['ai_generated'] ?? false),
+                'output_message' => $messageLog->body,
+            ]);
 
             $response = $this->TwilioWhatsApp_SendMessage($conversation, $messageLog, $body, $contentSid ?: null, $contentVariables);
+            $this->Notification_WhatsappAiLog('outgoing_message_result', [
+                'conversation_id' => $conversation->id,
+                'message_id' => $messageLog->id,
+                'status' => $response['status'] ?? null,
+                'provider_status' => $response['provider_status'] ?? null,
+                'output_message' => $messageLog->body,
+            ]);
             if (($response['status'] ?? 0) !== 1) {
                 return $this->Notification_WhatsappResponse($response['message'] ?? 'No fue posible enviar el mensaje.', [
                     'message_record' => $this->Notification_WhatsappMessagePayload($messageLog->fresh()),
@@ -565,6 +582,7 @@ trait whatsapp_notifications_trait
             'message_sid' => $messageSid ?: null,
             'body_length' => mb_strlen($body, 'UTF-8'),
             'message_type' => $media ? 'media' : 'text',
+            'input_message' => $body,
         ]);
 
         $conversation->unread_count = (int) $conversation->unread_count + 1;

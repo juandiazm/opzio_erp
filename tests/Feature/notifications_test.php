@@ -100,6 +100,8 @@ class notifications_test extends TestCase
     protected $fakeAiPlan = [];
     protected $fakeAiCalls = 0;
     protected $fakeAiAnswerInput = '';
+    protected $fakeFallbackIntent = null;
+    protected $fakeFallbackModel = null;
 
     protected function TwilioSMS_CreateClient()
     {
@@ -141,6 +143,23 @@ class notifications_test extends TestCase
             'status' => 1,
             'data' => ['Respuesta autorizada'],
             'response_id' => 'resp_test_answer',
+        ];
+    }
+
+    public function OpenIA_MakeQuestion($message, $model = null, $options = []): array
+    {
+        $this->fakeFallbackModel = $model;
+        if ($this->fakeFallbackIntent === null) {
+            return [
+                'status' => 0,
+                'message' => 'Fallback fake disabled',
+            ];
+        }
+
+        return [
+            'status' => 1,
+            'data' => [json_encode($this->fakeFallbackIntent)],
+            'response_id' => 'resp_test_fallback',
         ];
     }
 
@@ -1129,6 +1148,14 @@ class notifications_test extends TestCase
             ['Facturas generadas en los ultimos 3 meses', 'invoice', 'history'],
             ['Dame mis ordenes de compra', 'purchase_order', 'list'],
             ['Cuales son los valores de mis licencias?', 'license', 'values'],
+            ['Que pagos he hecho?', 'payment', 'payment_history'],
+            ['Cual es el estado de mi pago?', 'payment', 'payment_status'],
+            ['Cuando renueva mi licencia?', 'license', 'renewal'],
+            ['Que licencias estan activas?', 'license', 'status'],
+            ['Dame el enlace de mi factura', 'invoice', 'link'],
+            ['Cuales facturas estan vencidas?', 'invoice', 'overdue'],
+            ['Dame mi ultima orden de compra', 'purchase_order', 'latest'],
+            ['Cual es el resumen de mi cuenta?', 'account', 'summary'],
         ];
 
         foreach ($cases as [$question, $expectedTopic, $expectedIntent]) {
@@ -1215,6 +1242,136 @@ class notifications_test extends TestCase
         $this->assertSame('balance', $inbound->ai_query['intent']);
         $this->assertStringContainsString('"balance_pending":70', $this->fakeAiAnswerInput);
         $this->assertSame('answered', $conversation->ai_status);
+        $this->assertSame(1, whatsapp_message::where('direction', 'outbound')->count());
+    }
+
+    public function test_broad_portfolio_query_uses_all_authorized_incomes_not_only_ai_selected_ids()
+    {
+        $client = client::create([
+            'name' => 'Cliente Scope Completo',
+            'phone' => '+573000000041',
+            'active' => true,
+        ]);
+        $license = license::forceCreate([
+            'client_id' => $client->id,
+            'name' => 'Licencia scope completo',
+            'active' => true,
+        ]);
+        license_notification::forceCreate([
+            'license_id' => $license->id,
+            'client_id' => $client->id,
+            'phone' => '+573000000041',
+            'channels' => ['whatsapp'],
+            'active' => true,
+        ]);
+        $firstIncomeId = DB::table('incomes')->insertGetId([
+            'client_id' => $client->id,
+            'unique_id' => 'INCOME-BROAD-001',
+            'client_name' => 'Cliente Scope Completo',
+            'total' => 100,
+            'state' => 2,
+            'payment_state' => 0,
+            'cutoff_date' => Carbon::today()->addDay()->format('Y-m-d'),
+            'created_at' => now()->subDay(),
+            'updated_at' => now(),
+        ]);
+        DB::table('incomes')->insertGetId([
+            'client_id' => $client->id,
+            'unique_id' => 'INCOME-BROAD-002',
+            'client_name' => 'Cliente Scope Completo',
+            'total' => 200,
+            'state' => 2,
+            'payment_state' => 0,
+            'cutoff_date' => Carbon::today()->addDays(2)->format('Y-m-d'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->fakeAiPlan = [
+            'topic' => 'portfolio',
+            'intent' => 'balance',
+            'search' => '',
+            'license_ids' => [],
+            'income_ids' => [$firstIncomeId],
+            'limit' => 10,
+        ];
+
+        $response = $this->Notification_HandleWhatsappIncoming([
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-AI-BROAD-SCOPE-001',
+            'From' => 'whatsapp:+573000000041',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Cual es mi cartera?',
+        ]);
+
+        $this->assertTrue($response['ai']['handled']);
+        $this->assertStringContainsString('INCOME-BROAD-001', $this->fakeAiAnswerInput);
+        $this->assertStringContainsString('INCOME-BROAD-002', $this->fakeAiAnswerInput);
+        $this->assertStringContainsString('"total_pending":300', $this->fakeAiAnswerInput);
+    }
+
+    public function test_whatsapp_ai_fallback_recovers_an_untyped_invoice_question()
+    {
+        config(['services.twilio.whatsapp.ai.fallback_model' => 'gpt-5.6-luna']);
+        $client = client::create([
+            'name' => 'Cliente Fallback',
+            'phone' => '+573000000051',
+            'active' => true,
+        ]);
+        $license = license::forceCreate([
+            'client_id' => $client->id,
+            'name' => 'Licencia fallback',
+            'active' => true,
+        ]);
+        license_notification::forceCreate([
+            'license_id' => $license->id,
+            'client_id' => $client->id,
+            'phone' => '+573000000051',
+            'channels' => ['whatsapp'],
+            'active' => true,
+        ]);
+        DB::table('incomes')->insertGetId([
+            'client_id' => $client->id,
+            'unique_id' => 'INCOME-FALLBACK-001',
+            'client_name' => 'Cliente Fallback',
+            'total' => 250,
+            'state' => 4,
+            'payment_state' => 1,
+            'bill_name' => 'FAC-FALLBACK-001',
+            'siigo_invoice_id' => 'SIIGO-FALLBACK-001',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->fakeFallbackIntent = [
+            'supported' => true,
+            'topic' => 'invoice',
+            'intent' => 'latest',
+            'search' => '',
+            'period_from' => '',
+            'period_to' => '',
+            'confidence' => 0.96,
+            'reason' => 'Pregunta sobre documento tributario.',
+        ];
+        $this->fakeAiPlan = [
+            'topic' => 'invoice',
+            'intent' => 'latest',
+            'search' => '',
+            'license_ids' => [],
+            'income_ids' => [],
+            'limit' => 10,
+        ];
+
+        $response = $this->Notification_HandleWhatsappIncoming([
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-AI-FALLBACK-001',
+            'From' => 'whatsapp:+573000000051',
+            'To' => 'whatsapp:+573145433746',
+            'Body' => 'Compárteme el documento tributario más reciente',
+        ]);
+
+        $message = whatsapp_message::where('direction', 'inbound')->first();
+        $this->assertSame(1, $response['status']);
+        $this->assertTrue($response['ai']['handled']);
+        $this->assertSame('gpt-5.6-luna', $this->fakeFallbackModel);
+        $this->assertSame('invoice', $message->ai_query['topic']);
+        $this->assertSame('latest', $message->ai_query['intent']);
         $this->assertSame(1, whatsapp_message::where('direction', 'outbound')->count());
     }
 }
