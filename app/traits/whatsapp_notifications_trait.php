@@ -5,6 +5,7 @@ namespace App\traits;
 use App\Models\client;
 use App\Models\whatsapp_conversation;
 use App\Models\whatsapp_message;
+use App\Services\WhatsappMediaStorage;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
@@ -183,6 +184,15 @@ trait whatsapp_notifications_trait
 
     private function Notification_WhatsappMessagePayload(whatsapp_message $message): array
     {
+        $media = [];
+        foreach (is_array($message->media) ? $message->media : [] as $index => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $item['view_url'] = url('/admin/notifications/whatsapp/media/'.$message->id.'/'.$index);
+            $media[] = $item;
+        }
+
         return [
             'id' => $message->id,
             'twilio_sid' => $message->twilio_sid,
@@ -192,8 +202,9 @@ trait whatsapp_notifications_trait
             'to' => $message->to,
             'body' => $message->body,
             'message_type' => $message->message_type,
-            'media' => $message->media ?: [],
+            'media' => $media,
             'content_sid' => $message->content_sid,
+            'content_variables' => $message->content_variables ?: [],
             'status' => $message->status,
             'status_label' => $this->TwilioWhatsApp_StatusLabel($message->status),
             'error_message' => $message->error_message,
@@ -331,7 +342,11 @@ trait whatsapp_notifications_trait
             }
 
             $body = trim((string) ($input['body'] ?? ''));
+            $displayBody = trim((string) ($input['display_body'] ?? $input['rendered_body'] ?? ''));
             if (mb_strlen($body) > 4096) {
+                throw new \InvalidArgumentException('El mensaje de WhatsApp no puede superar 4096 caracteres.');
+            }
+            if (mb_strlen($displayBody) > 4096) {
                 throw new \InvalidArgumentException('El mensaje de WhatsApp no puede superar 4096 caracteres.');
             }
             $contentSid = trim((string) ($input['content_sid'] ?? $input['contentSid'] ?? ''));
@@ -353,7 +368,7 @@ trait whatsapp_notifications_trait
                 'direction' => 'outbound',
                 'from' => $conversation->business_address,
                 'to' => $this->TwilioWhatsApp_ChannelAddress($conversation->phone),
-                'body' => $body !== '' ? $body : 'Plantilla '.$contentSid,
+                'body' => $contentSid !== '' ? ($displayBody !== '' ? $displayBody : null) : $body,
                 'message_type' => $contentSid ? 'template' : 'text',
                 'content_sid' => $contentSid ?: null,
                 'content_variables' => $contentVariables ?: null,
@@ -369,7 +384,7 @@ trait whatsapp_notifications_trait
                 'output_message' => $messageLog->body,
             ]);
 
-            $response = $this->TwilioWhatsApp_SendMessage($conversation, $messageLog, $body, $contentSid ?: null, $contentVariables);
+            $response = $this->TwilioWhatsApp_SendMessage($conversation, $messageLog, $body, $contentSid ?: null, $contentVariables, $displayBody);
             $this->Notification_WhatsappAiLog('outgoing_message_result', [
                 'conversation_id' => $conversation->id,
                 'message_id' => $messageLog->id,
@@ -419,7 +434,7 @@ trait whatsapp_notifications_trait
                 'direction' => 'outbound',
                 'from' => $conversation->business_address,
                 'to' => $this->TwilioWhatsApp_ChannelAddress($phone),
-                'body' => 'Plantilla '.$contentSid,
+                'body' => null,
                 'message_type' => 'template',
                 'content_sid' => $contentSid,
                 'content_variables' => $contentVariables ?: null,
@@ -457,7 +472,8 @@ trait whatsapp_notifications_trait
                     $message,
                     '',
                     $message->content_sid,
-                    is_array($message->content_variables) ? $message->content_variables : []
+                    is_array($message->content_variables) ? $message->content_variables : [],
+                    $message->body
                 );
                 $result['processed']++;
                 if (($response['status'] ?? 0) === 1) {
@@ -574,6 +590,14 @@ trait whatsapp_notifications_trait
                 return ['status' => 1, 'duplicate' => true, 'message_id' => $message->id];
             }
             throw $exception;
+        }
+
+        if ($media) {
+            $storedMedia = app(WhatsappMediaStorage::class)->storeMessageMedia($message);
+            if ($storedMedia !== $media) {
+                $message->media = $storedMedia;
+                $message->save();
+            }
         }
 
         $this->Notification_WhatsappAiLog('incoming_message_stored', [

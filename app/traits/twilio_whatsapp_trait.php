@@ -134,10 +134,11 @@ trait twilio_whatsapp_trait
         return $url !== '' ? $url : null;
     }
 
-    public function TwilioWhatsApp_SendMessage(whatsapp_conversation $conversation, whatsapp_message $messageLog, string $body = '', ?string $contentSid = null, array $contentVariables = []): array
+    public function TwilioWhatsApp_SendMessage(whatsapp_conversation $conversation, whatsapp_message $messageLog, string $body = '', ?string $contentSid = null, array $contentVariables = [], ?string $displayBody = null): array
     {
         $body = trim($body);
         $contentSid = trim((string) $contentSid);
+        $displayBody = trim((string) $displayBody);
         if ($body === '' && $contentSid === '') {
             return ['status' => 0, 'message' => 'Debe indicar un mensaje o una plantilla de WhatsApp.'];
         }
@@ -174,7 +175,7 @@ trait twilio_whatsapp_trait
             $messageLog->attempts = (int) $messageLog->attempts + 1;
             $status = $this->TwilioWhatsApp_SaveProviderData($messageLog, $providerMessage);
             $conversation->last_message_at = Carbon::now();
-            $conversation->last_message_preview = $body !== '' ? $body : 'Plantilla de WhatsApp';
+            $conversation->last_message_preview = $body !== '' ? $body : ($displayBody !== '' ? $displayBody : 'Mensaje enviado');
             $conversation->last_outbound_sid = $messageLog->twilio_sid;
             $conversation->save();
 

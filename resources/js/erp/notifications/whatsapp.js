@@ -111,9 +111,41 @@ function renderMessageBody(body) {
     return escapeHtml(body || '').replace(/\r?\n/g, '<br>');
 }
 
-function safeMediaUrl(url) {
-    const value = String(url || '').trim();
-    return /^https:\/\//i.test(value) ? value : '';
+function safeMediaUrl(item) {
+    const viewUrl = String(item && item.view_url || '').trim();
+    if (/^https?:\/\//i.test(viewUrl)) return viewUrl;
+    const sourceUrl = String(item && item.url || '').trim();
+    return /^https:\/\//i.test(sourceUrl) ? sourceUrl : '';
+}
+
+function mediaLabel(item, contentType) {
+    if (contentType.indexOf('image/') === 0) return 'Imagen';
+    if (contentType.indexOf('video/') === 0) return 'Video';
+    if (contentType.indexOf('audio/') === 0) return 'Audio';
+    if (contentType === 'application/pdf') return 'Documento PDF';
+    return String(item && (item.filename || item.name || item.content_type) || 'Archivo adjunto');
+}
+
+function renderMediaItem(item) {
+    const mediaUrl = safeMediaUrl(item);
+    if (!mediaUrl) return '';
+    const contentType = String(item && item.content_type || '').toLowerCase();
+    const label = mediaLabel(item, contentType);
+    const escapedUrl = escapeHtml(mediaUrl);
+    const escapedLabel = escapeHtml(label);
+
+    if (contentType.indexOf('image/') === 0) {
+        return '<a class="notifications-whatsapp-media-preview" href="'+escapedUrl+'" target="_blank" rel="noopener noreferrer" aria-label="Ver '+escapedLabel+'"><img src="'+escapedUrl+'" alt="'+escapedLabel+'" loading="lazy"></a>';
+    }
+    if (contentType.indexOf('video/') === 0) {
+        return '<video class="notifications-whatsapp-media-video" controls preload="metadata"><source src="'+escapedUrl+'" type="'+escapeHtml(contentType)+'">'+escapedLabel+'</video>';
+    }
+    if (contentType.indexOf('audio/') === 0) {
+        return '<audio class="notifications-whatsapp-media-audio" controls preload="metadata"><source src="'+escapedUrl+'" type="'+escapeHtml(contentType)+'">'+escapedLabel+'</audio>';
+    }
+
+    const icon = contentType === 'application/pdf' ? 'fa-file-pdf' : 'fa-paperclip';
+    return '<a class="notifications-whatsapp-attachment" href="'+escapedUrl+'" target="_blank" rel="noopener noreferrer"><i class="fa-solid '+icon+'" aria-hidden="true"></i><span>'+escapedLabel+'</span></a>';
 }
 
 function messageStatusIcon(message) {
@@ -121,6 +153,22 @@ function messageStatusIcon(message) {
     if (message.status === 'failed' || message.status === 'undelivered') return '<i class="fa-solid fa-circle-exclamation" title="'+escapeHtml(message.status_label || 'Fallido')+'"></i>';
     const isRead = message.status === 'read' || message.status === 'delivered';
     return '<i class="fa-solid fa-check-double'+(isRead ? ' is-read' : '')+'" title="'+escapeHtml(message.status_label || '')+'"></i>';
+}
+
+function templateMessageBody(message) {
+    const template = (notificationState.whatsappTemplates || []).find(function(item) {
+        return String(item.sid) === String(message.content_sid);
+    });
+    if (!template) return '';
+    const content = templateContent(template);
+    const values = message.content_variables && typeof message.content_variables === 'object' ? message.content_variables : {};
+    return renderTemplateText(content.body, values, template);
+}
+
+function messageDisplayBody(message) {
+    const storedBody = String(message.body || '');
+    if (!message.content_sid || !/^Plantilla\s+/i.test(storedBody)) return storedBody;
+    return templateMessageBody(message);
 }
 
 function renderMessages(messages) {
@@ -131,11 +179,11 @@ function renderMessages(messages) {
     let html = '';
     messages.forEach(function(message) {
         const directionClass = message.is_inbound ? ' is-inbound' : ' is-outbound';
-        const body = message.body ? '<div class="notifications-whatsapp-message-body">'+renderMessageBody(message.body)+'</div>' : '';
+        const displayBody = messageDisplayBody(message);
+        const body = displayBody ? '<div class="notifications-whatsapp-message-body">'+renderMessageBody(displayBody)+'</div>' : '';
         let media = '';
         (message.media || []).forEach(function(item) {
-            const mediaUrl = safeMediaUrl(item.url);
-            if (mediaUrl) media += '<a href="'+escapeHtml(mediaUrl)+'" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-paperclip"></i> '+escapeHtml(item.content_type || 'Archivo')+'</a>';
+            media += renderMediaItem(item);
         });
         if (media) media = '<div class="notifications-whatsapp-message-media">'+media+'</div>';
         html += '<article class="notifications-whatsapp-message'+directionClass+'">'+body+media+'<div class="notifications-whatsapp-message-meta"><span>'+escapeHtml(formatDate(message.created_at_local || message.created_at))+'</span>'+messageStatusIcon(message)+'</div></article>';
@@ -343,6 +391,19 @@ function renderTemplatePreviewBody(body, values, template) {
     });
 }
 
+function renderTemplateText(body, values, template) {
+    const samples = {};
+    templateVariableNames(template, body).forEach(function(name) {
+        samples[name] = templateSample(template, name);
+    });
+
+    return String(body || '').replace(/\{\{\s*([^{}]+?)\s*\}\}/g, function(match, rawName) {
+        const name = String(rawName || '').trim();
+        const value = Object.prototype.hasOwnProperty.call(values, name) ? values[name] : samples[name];
+        return value != null && String(value).trim() !== '' ? String(value) : match;
+    });
+}
+
 function renderTemplateVariableFields(template, names) {
     const container = $('#notifications-whatsapp-template-variables-form');
     if (names.length === 0) {
@@ -523,6 +584,7 @@ export function sendMessage(event) {
     const templateSid = $('#notifications-whatsapp-template').val() || '';
     let body = $('#notifications-whatsapp-body').val() || '';
     let variables = $('#notifications-whatsapp-variables').val() || '{}';
+    let displayBody = '';
     if (templateSid) {
         const template = selectedTemplate();
         const content = templateContent(template);
@@ -535,18 +597,20 @@ export function sendMessage(event) {
             return;
         }
         variables = JSON.stringify(values);
+        displayBody = renderTemplateText(content.body, values, template);
         body = '';
     }
     $('#notifications-whatsapp-send').prop('disabled', true);
     PostMethodFunction('/admin/notifications/whatsapp/message', {
         conversation_id: notificationState.whatsappConversationId,
         body: body,
+        display_body: displayBody,
         content_sid: templateSid,
         content_variables: variables,
     }, null, function(response) {
         $('#notifications-whatsapp-send').prop('disabled', false);
         $('#notifications-whatsapp-body').val('');
-        $('#notifications-whatsapp-variables').val('');
+        $('#notifications-whatsapp-variables').val('{}');
         refreshConversation();
         loadConversations();
     }, function() {

@@ -261,7 +261,7 @@ class JiraModuleTest extends TestCase
             'to' => '2026-09-08',
         ]);
         $this->assertSame(1, $updatedMetrics['summary']['completed_issues']);
-        $this->assertSame(2, $updatedMetrics['summary']['story_issues']);
+        $this->assertSame(1, $updatedMetrics['summary']['story_issues']);
         $this->assertSame(4.0, $updatedMetrics['summary']['worklog_hours']);
 
         $filteredMetrics = app(jira_metrics_service::class)->dashboard([
@@ -315,10 +315,12 @@ class JiraModuleTest extends TestCase
             'issue_key' => 'HRS-1',
             'issue_type' => 'Story',
             'summary' => 'Historia estimada localmente',
+            'status' => 'Done',
             'story_points' => 4,
             'estimated_hours' => 10,
             'estimated_hours_manual' => false,
             'jira_created_at' => '2026-09-05 10:00:00',
+            'jira_resolved_at' => '2026-09-06 10:00:00',
         ]);
 
         $metrics = app(jira_metrics_service::class)->dashboard(['from' => '2026-09-01', 'to' => '2026-09-08']);
@@ -498,7 +500,7 @@ class JiraModuleTest extends TestCase
         $this->assertFalse($snapshot['erp_relations']['included']);
     }
 
-    public function test_dashboard_and_report_ranges_use_jira_creation_and_update_dates(): void
+    public function test_dashboard_and_report_ranges_use_jira_resolution_dates_for_completed_issues(): void
     {
         $connection = jira_connection::create([
             'name' => 'Jira fechas fuente',
@@ -570,11 +572,13 @@ class JiraModuleTest extends TestCase
             'context_prompt' => null,
         ]);
 
-        $this->assertSame(['DATES-1'], collect($dashboard['issues'])->pluck('key')->all());
-        $this->assertSame(['DATES-1'], collect($snapshot['issues'])->pluck('key')->all());
-        $this->assertSame(1, $dashboard['summary']['story_issues']);
+        $this->assertSame(['DATES-3', 'DATES-1'], collect($dashboard['issues'])->pluck('key')->all());
+        $this->assertSame(['DATES-3', 'DATES-1'], collect($snapshot['issues'])->pluck('key')->all());
+        $this->assertSame(2, $dashboard['summary']['story_issues']);
         $this->assertSame(1.0, $dashboard['summary']['worklog_hours']);
-        $this->assertSame('2026-09-07', $dashboard['daily'][0]['date']);
+        $this->assertSame(['2026-09-05', '2026-09-07'], collect($dashboard['daily'])->pluck('date')->all());
+        $this->assertSame('completed_issues', $dashboard['trace']['scope']);
+        $this->assertSame('jira_resolved_at_with_done_status_fallback', $dashboard['trace']['date_basis']);
     }
 
     public function test_report_criteria_normalizes_dashboard_filters_and_legacy_values(): void

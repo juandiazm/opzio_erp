@@ -582,7 +582,7 @@ export async function initializeJiraDashboard(root) {
 		itemLabel: 'usuarios',
 	});
 	initializeJiraMultiSelect(form.querySelector('[data-jira-status-filter]'), {
-		placeholder: 'Todos los estados',
+		placeholder: 'Finalizadas por defecto',
 		searchPlaceholder: 'Buscar estado...',
 		searchAriaLabel: 'Buscar estados',
 		emptyText: 'Sin estados coincidentes',

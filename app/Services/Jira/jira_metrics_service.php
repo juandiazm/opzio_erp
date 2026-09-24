@@ -24,21 +24,44 @@ class jira_metrics_service
         $projectIds = $this->filterIds($filters['project_ids'] ?? $filters['project_id'] ?? null);
         $epicIds = $this->filterIds($filters['epic_ids'] ?? $filters['epic_id'] ?? null);
         $userIds = $this->filterIds($filters['user_ids'] ?? $filters['user_id'] ?? null);
+        $usesExplicitStatusFilter = $statuses->isNotEmpty();
+        $completedOnly = (bool) ($filters['completed_only'] ?? true);
+        $usesActivityScope = $usesExplicitStatusFilter || ! $completedOnly;
         $includeAllIssueTypes = (bool) ($filters['include_all_issue_types'] ?? false);
         $issueQuery = jira_issue::query()
             ->with(['project', 'assignee.mapping.user', 'assignee.mapping.employee', 'epic', 'parent'])
             ->when(! $includeAllIssueTypes, function ($query): void {
                 $query->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', ['story', 'user story', 'historia', 'historia de usuario']);
             })
-            ->where(function ($query) use ($from, $to): void {
-                $query->whereBetween('jira_created_at', [$from, $to])
-                    ->orWhereBetween('jira_updated_at', [$from, $to]);
+            ->where(function ($query) use ($from, $to, $usesActivityScope): void {
+                if ($usesActivityScope) {
+                    $query->whereBetween('jira_created_at', [$from, $to])
+                        ->orWhereBetween('jira_updated_at', [$from, $to]);
+
+                    return;
+                }
+
+                $query->whereBetween('jira_resolved_at', [$from, $to])
+                    ->orWhere(function ($query) use ($from, $to): void {
+                        $query->whereNull('jira_resolved_at')
+                            ->where(function ($query): void {
+                                $query->whereRaw('LOWER(TRIM(status_category)) = ?', ['done'])
+                                    ->orWhereRaw('LOWER(TRIM(status)) IN (?, ?, ?, ?, ?)', ['done', 'finalizada', 'finalizado', 'cerrada', 'cerrado']);
+                            })
+                            ->where(function ($query) use ($from, $to): void {
+                                $query->whereBetween('jira_created_at', [$from, $to])
+                                    ->orWhereBetween('jira_updated_at', [$from, $to]);
+                            });
+                    });
             })
             ->when($projectIds->isNotEmpty(), fn ($query) => $query->whereIn('jira_project_id', $projectIds->all()))
             ->when($epicIds->isNotEmpty(), fn ($query) => $query->whereIn('epic_jira_issue_id', $epicIds->all()))
             ->when($userIds->isNotEmpty(), fn ($query) => $query->whereIn('assignee_jira_user_id', $userIds->all()))
             ->when($statuses->isNotEmpty(), fn ($query) => $query->whereIn('status', $statuses->all()));
-        $issues = $issueQuery->orderByRaw('COALESCE(jira_updated_at, jira_created_at)')->get();
+        $issueOrder = $usesActivityScope
+            ? 'COALESCE(jira_updated_at, jira_created_at)'
+            : 'COALESCE(jira_resolved_at, jira_updated_at, jira_created_at)';
+        $issues = $issueQuery->orderByRaw($issueOrder)->get();
         $worklogs = jira_issue_worklog::query()
             ->with(['user.mapping.user', 'user.mapping.employee', 'issue.project', 'issue.epic'])
             ->where('is_deleted', false)
@@ -81,7 +104,7 @@ class jira_metrics_service
             $epics[$epicKey]['story_points'] += $points;
             $epics[$epicKey]['issues']++;
             $epics[$epicKey]['estimated_hours'] += $estimatedHours;
-            $date = $issue->jira_updated_at?->toDateString() ?: $issue->jira_created_at?->toDateString() ?: 'sin_fecha';
+            $date = $this->issueMetricDate($issue, $usesActivityScope);
             $daily[$date] ??= ['date' => $date, 'story_points' => 0.0, 'issues' => 0];
             $daily[$date]['story_points'] += $points;
             $daily[$date]['issues']++;
@@ -116,13 +139,22 @@ class jira_metrics_service
 
         return [
             'filters' => ['from' => $from->toDateString(), 'to' => $to->toDateString(), 'project_ids' => $projectIds->all(), 'epic_ids' => $epicIds->all(), 'user_ids' => $userIds->all(), 'statuses' => $statuses->all()],
+            'trace' => [
+                'source' => 'jira_issues',
+                'scope' => $usesActivityScope
+                    ? ($usesExplicitStatusFilter ? 'selected_statuses_activity' : 'all_issue_types_activity')
+                    : 'completed_issues',
+                'date_basis' => $usesActivityScope
+                    ? 'jira_created_at_or_jira_updated_at'
+                    : 'jira_resolved_at_with_done_status_fallback',
+            ],
             'summary' => [
                 'story_points' => round($issues->sum(fn (jira_issue $issue): float => (float) ($issue->story_points ?? 0)), 2),
                 'story_issues' => $issues->count(),
                 'issue_count' => $issues->count(),
                 'issue_type_counts' => $issues->groupBy(fn (jira_issue $issue): string => (string) ($issue->issue_type ?: 'Sin clasificar'))->map->count()->all(),
                 'story_points_by_issue_type' => $issues->groupBy(fn (jira_issue $issue): string => (string) ($issue->issue_type ?: 'Sin clasificar'))->map(fn ($items): float => round($items->sum(fn (jira_issue $issue): float => (float) ($issue->story_points ?? 0)), 2))->all(),
-                'completed_issues' => $issues->filter(fn (jira_issue $issue): bool => $issue->jira_resolved_at !== null)->count(),
+                'completed_issues' => $issues->filter(fn (jira_issue $issue): bool => $this->isCompletedIssue($issue))->count(),
                 'worklog_hours' => round($worklogs->sum(fn (jira_issue_worklog $worklog): float => ((int) $worklog->time_spent_seconds) / 3600), 2),
                 'estimated_hours' => round($issues->sum(function (jira_issue $issue): float {
                     return $issue->estimated_hours !== null
@@ -190,6 +222,25 @@ class jira_metrics_service
             ->sortByDesc(fn (array $item): float => (float) $item['story_points'] + (float) ($item['estimated_hours'] ?? 0))
             ->values()
             ->all();
+    }
+
+    private function issueMetricDate(jira_issue $issue, bool $usesActivityScope): string
+    {
+        $date = $usesActivityScope
+            ? ($issue->jira_updated_at ?: $issue->jira_created_at)
+            : ($issue->jira_resolved_at ?: $issue->jira_updated_at ?: $issue->jira_created_at);
+
+        return $date?->toDateString() ?: 'sin_fecha';
+    }
+
+    private function isCompletedIssue(jira_issue $issue): bool
+    {
+        $statusCategory = strtolower(trim((string) $issue->status_category));
+        $status = strtolower(trim((string) $issue->status));
+
+        return $issue->jira_resolved_at !== null
+            || $statusCategory === 'done'
+            || in_array($status, ['done', 'finalizada', 'finalizado', 'cerrada', 'cerrado'], true);
     }
 
     private function filterIds(mixed $value): Collection

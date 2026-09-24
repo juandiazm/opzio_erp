@@ -54,6 +54,7 @@ class jira_report_service
             'user_ids' => $criteria['user_ids'],
             'statuses' => $criteria['statuses'],
             'include_all_issue_types' => $criteria['intention'] === 'client_report',
+            'completed_only' => $criteria['intention'] !== 'client_report',
         ]);
         $sources = $criteria['data_sources'];
         if (! in_array('story_points', $sources, true)) {

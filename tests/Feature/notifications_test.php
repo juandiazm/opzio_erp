@@ -1232,6 +1232,7 @@ class notifications_test extends TestCase
         $templated = $this->Notification_SendWhatsappMessage($conversation->id, [
             'content_sid' => $contentSid,
             'content_variables' => ['1' => 'Cliente'],
+            'display_body' => 'Hola Cliente',
         ]);
         $message = whatsapp_message::first();
 
@@ -1239,6 +1240,8 @@ class notifications_test extends TestCase
         $this->assertSame($contentSid, $this->twilioClient->lastCreated['options']['contentSid']);
         $this->assertSame('{"1":"Cliente"}', $this->twilioClient->lastCreated['options']['contentVariables']);
         $this->assertSame($contentSid, $message->content_sid);
+        $this->assertSame('Hola Cliente', $message->body);
+        $this->assertSame('Hola Cliente', $conversation->fresh()->last_message_preview);
     }
 
     public function test_whatsapp_webhook_signature_accepts_twilio_signature_and_rejects_forged_request()

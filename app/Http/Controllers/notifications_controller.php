@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Exportable\contacts_directory;
 use App\Imports\GenericImport;
+use App\Models\whatsapp_message;
+use App\Services\WhatsappMediaStorage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
@@ -261,6 +265,63 @@ class notifications_controller extends Controller
     public function get_whatsapp_conversation(Request $request)
     {
         return $this->response($this->Notification_GetWhatsappConversation($request->id));
+    }
+
+    public function get_whatsapp_media($messageId, $mediaIndex)
+    {
+        $message = whatsapp_message::find((int) $messageId);
+        if (!$message) {
+            abort(404);
+        }
+
+        $mediaIndex = (int) $mediaIndex;
+        $media = is_array($message->media) ? $message->media : [];
+        $item = $mediaIndex >= 0 ? ($media[$mediaIndex] ?? null) : null;
+        $storage = new WhatsappMediaStorage();
+        $storagePath = is_array($item) ? trim((string) ($item['storage_path'] ?? '')) : '';
+
+        if ($storage->isSafeStoragePath($storagePath)) {
+            $filesystem = Storage::disk(WhatsappMediaStorage::DISK);
+            if ($filesystem->exists($storagePath)) {
+                $contentType = $storage->normalizeContentType($item['content_type'] ?? $filesystem->mimeType($storagePath));
+                return response()->file($filesystem->path($storagePath), [
+                    'Content-Type' => $contentType,
+                    'Content-Disposition' => 'inline; filename="'.basename($storagePath).'"',
+                    'Cache-Control' => 'private, max-age=3600',
+                    'X-Content-Type-Options' => 'nosniff',
+                ]);
+            }
+        }
+
+        $url = is_array($item) ? trim((string) ($item['url'] ?? '')) : '';
+        if (!$storage->isTwilioMediaUrl($url)) {
+            abort(404);
+        }
+
+        try {
+            $providerResponse = Http::timeout(30)
+                ->withBasicAuth(config('services.twilio.sid'), config('services.twilio.token'))
+                ->get($url);
+        } catch (\Throwable $exception) {
+            info('get_whatsapp_media error: '.$exception->getMessage());
+            abort(404);
+        }
+
+        if (!$providerResponse->successful()) {
+            abort(404);
+        }
+
+        $contentType = strtolower(trim(explode(';', (string) $providerResponse->header('Content-Type', 'application/octet-stream'))[0]));
+        if (in_array($contentType, ['text/html', 'application/xhtml+xml'], true)) {
+            $contentType = 'application/octet-stream';
+        }
+
+        return response($providerResponse->body(), 200, [
+            'Content-Type' => $contentType ?: 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="whatsapp-'.$message->id.'-'.$mediaIndex.'"',
+            'Cache-Control' => 'private, max-age=300',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     public function start_whatsapp_conversation(Request $request)

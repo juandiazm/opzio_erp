@@ -406,6 +406,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('whatsapp')->group(function(){
                 Route::post('conversations', [notifications_controller::class, 'get_whatsapp_conversations']);
                 Route::post('conversation', [notifications_controller::class, 'get_whatsapp_conversation']);
+                Route::get('media/{message}/{media}', [notifications_controller::class, 'get_whatsapp_media']);
                 Route::post('conversations/start', [notifications_controller::class, 'start_whatsapp_conversation']);
                 Route::post('message', [notifications_controller::class, 'send_whatsapp_message']);
                 Route::post('conversation/read', [notifications_controller::class, 'mark_whatsapp_read']);

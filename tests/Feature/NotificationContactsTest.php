@@ -14,7 +14,9 @@ use App\traits\notification_contacts_trait;
 use App\traits\whatsapp_notifications_trait;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class NotificationContactsFakeMessageList
@@ -349,6 +351,69 @@ class NotificationContactsTest extends TestCase
         $this->assertSame('queued', $message->status);
         $this->assertSame(1, (int) $message->attempts);
         $this->assertSame('whatsapp:+573000000004', $this->twilioClient->lastCreated['to']);
+    }
+
+    public function test_whatsapp_media_is_saved_locally_and_exposes_a_local_view_url(): void
+    {
+        Storage::fake('erp_media');
+        Http::fake([
+            'https://api.twilio.com/*' => Http::response('image-content', 200, ['Content-Type' => 'image/jpeg']),
+        ]);
+
+        $this->Notification_HandleWhatsappIncoming([
+            'MessageSid' => 'SM-INBOUND-WHATSAPP-MEDIA-001',
+            'From' => 'whatsapp:+573000000006',
+            'To' => 'whatsapp:+573145433746',
+            'NumMedia' => '1',
+            'MediaUrl0' => 'https://api.twilio.com/2010-04-01/Accounts/AC000/Media/MG000',
+            'MediaContentType0' => 'image/jpeg',
+        ]);
+
+        $message = whatsapp_message::firstOrFail();
+        $path = 'whatsapp/media/'.$message->id.'/0.jpg';
+
+        Storage::disk('erp_media')->assertExists($path);
+        $this->assertSame($path, $message->media[0]['storage_path']);
+
+        $payload = $this->Notification_GetWhatsappConversation($message->conversation_id);
+        $this->assertStringContainsString(
+            '/admin/notifications/whatsapp/media/'.$message->id.'/0',
+            $payload['messages'][0]['media'][0]['view_url']
+        );
+    }
+
+    public function test_whatsapp_media_migration_backfills_existing_media_idempotently(): void
+    {
+        Storage::fake('erp_media');
+        Http::fake([
+            'https://api.twilio.com/*' => Http::response('%PDF-1.4 local', 200, ['Content-Type' => 'application/pdf']),
+        ]);
+
+        $conversation = whatsapp_conversation::create([
+            'unique_id' => 'WA-MEDIA-MIGRATION-001',
+            'phone' => '+573000000007',
+            'business_address' => 'whatsapp:+573145433746',
+        ]);
+        whatsapp_message::create([
+            'unique_id' => 'WA-MEDIA-MESSAGE-001',
+            'conversation_id' => $conversation->id,
+            'direction' => 'inbound',
+            'from' => 'whatsapp:+573000000007',
+            'to' => 'whatsapp:+573145433746',
+            'media' => [[
+                'url' => 'https://api.twilio.com/2010-04-01/Accounts/AC000/Media/MG001',
+                'content_type' => 'application/pdf',
+            ]],
+        ]);
+
+        $migration = require database_path('migrations/2026_09_24_000001_migrate_whatsapp_media_to_storage.php');
+        $migration->up();
+        $migration->up();
+
+        $message = whatsapp_message::firstOrFail();
+        Storage::disk('erp_media')->assertExists('whatsapp/media/'.$message->id.'/0.pdf');
+        $this->assertSame('whatsapp/media/'.$message->id.'/0.pdf', $message->media[0]['storage_path']);
+        Http::assertSentCount(1);
     }
 
     public function test_payment_reminder_command_queues_tagged_whatsapp_contact(): void
