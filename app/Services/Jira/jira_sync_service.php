@@ -63,7 +63,7 @@ class jira_sync_service
         $days = max(1, min($days, 3650));
         $to = now();
         $from = $full
-            ? ($this->latestStoryCreatedAt($connection) ?: Carbon::create(1970, 1, 1))
+            ? Carbon::create(1970, 1, 1)
             : ($incremental && $connection->last_sync_at
                 ? $connection->last_sync_at->copy()->subMinutes(2)
                 : now()->subDays($days));
@@ -119,7 +119,7 @@ class jira_sync_service
                 if (isset($page['total']) && $startAt >= (int) $page['total']) {
                     $last = true;
                 }
-                if (($nextPageToken === null || $nextPageToken === '') && ! isset($page['total']) && count($issues) < (int) config('jira.max_page_size', 50)) {
+                if (($nextPageToken === null || $nextPageToken === '') && ! isset($page['total']) && count($issues) < $pageSize) {
                     $last = true;
                 }
             } while (! $last);
@@ -221,9 +221,7 @@ class jira_sync_service
         $mode = in_array($mode, ['full', 'updated'], true) ? $mode : 'updated';
         $to = $toDate !== null ? Carbon::parse($toDate) : now();
         if ($mode === 'full') {
-            $from = $fromDate !== null
-                ? Carbon::parse($fromDate)
-                : ($this->latestStoryCreatedAt($connection) ?: Carbon::create(1970, 1, 1));
+            $from = $fromDate !== null ? Carbon::parse($fromDate) : Carbon::create(1970, 1, 1);
         } else {
             $from = $fromDate !== null ? Carbon::parse($fromDate) : $to->copy()->subDays($days);
         }
@@ -328,22 +326,6 @@ class jira_sync_service
             $run->update(['status' => 'failed', 'error_message' => $message, 'finished_at' => now()]);
             throw new RuntimeException($message, 0, $exception);
         }
-    }
-
-    private function latestStoryCreatedAt(jira_connection $connection): ?Carbon
-    {
-        $latest = jira_issue::query()
-            ->where('jira_connection_id', $connection->id)
-            ->whereRaw('LOWER(issue_type) = ?', ['story'])
-            ->max('jira_created_at');
-
-        if ($latest === null) {
-            $latest = jira_issue::query()
-                ->where('jira_connection_id', $connection->id)
-                ->max('jira_created_at');
-        }
-
-        return $latest !== null ? Carbon::parse($latest) : null;
     }
 
     private function syncProjects(jira_client $client, jira_connection $connection, jira_sync_run $run)

@@ -19,7 +19,7 @@ export function initializeJiraConfiguration(root) {
 		}
 		const choice = await window.Swal.fire({
 			title: 'Sincronizar historias',
-			text: 'Elige si quieres completar desde la ultima historia almacenada o actualizar solo los cambios recientes.',
+			text: 'Elige si quieres recorrer todo el historial de Jira o actualizar solo los cambios recientes.',
 			icon: 'question',
 			showDenyButton: true,
 			showCancelButton: true,

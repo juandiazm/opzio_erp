@@ -1000,7 +1000,7 @@ class JiraModuleTest extends TestCase
             };
         });
 
-        $first = app(jira_sync_service::class)->syncBatch($connection, 1, 1);
+        $first = app(jira_sync_service::class)->syncBatch($connection, 1, 1, 0, null, null, null, 'full');
         $second = app(jira_sync_service::class)->syncBatch(
             $connection->fresh(),
             1,
@@ -1009,6 +1009,7 @@ class JiraModuleTest extends TestCase
             $first['next_page_token'],
             $first['from'],
             $first['to'],
+            'full',
         );
 
         $this->assertTrue($first['has_more']);
@@ -1055,7 +1056,7 @@ class JiraModuleTest extends TestCase
         $this->assertNotNull($connection->fresh()->last_sync_at);
     }
 
-    public function test_full_sync_starts_at_the_latest_story_created_in_database(): void
+    public function test_full_sync_starts_at_the_beginning_of_jira_history(): void
     {
         $connection = jira_connection::create([
             'name' => 'Jira completa',
@@ -1099,7 +1100,7 @@ class JiraModuleTest extends TestCase
         $result = app(jira_sync_service::class)->syncBatch($connection, 1, 10, 0, null, null, null, 'full');
 
         $this->assertFalse($result['has_more']);
-        $this->assertStringContainsString('created >= "2026-09-01 10:00', (string) $capturedJql);
+        $this->assertStringContainsString('created >= "1970-01-01 00:00', (string) $capturedJql);
         $this->assertStringContainsString('ORDER BY created ASC', (string) $capturedJql);
     }
 }
