@@ -31,18 +31,10 @@ class jira_controller extends Controller
 
         return view('erp.jira', [
             'connection' => jira_connection::query()->latest('updated_at')->first(),
-            'syncedStories' => jira_issue::query()
-                ->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', [
-                    'story',
-                    'user story',
-                    'historia',
-                    'historia de usuario',
-                ])
-                ->count(),
+            'syncedIssues' => jira_issue::query()->count(),
             'projects' => jira_project::query()->with(['clients', 'licenses'])->orderBy('name')->get(),
             'jiraUsers' => jira_user::query()->with('mapping')->orderBy('display_name')->get(),
             'jiraStatuses' => jira_issue::query()
-                ->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', ['story', 'user story', 'historia', 'historia de usuario'])
                 ->whereNotNull('status')
                 ->where('status', '<>', '')
                 ->distinct()

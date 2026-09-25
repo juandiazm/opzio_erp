@@ -188,6 +188,7 @@
 .jira-multiselect__icon { color: var(--jira-muted); flex: 0 0 auto; margin-left: auto; transition: transform 150ms ease; }
 .jira-multiselect.is-open .jira-multiselect__icon { transform: rotate(180deg); }
 .jira-multiselect__panel { background: #ffffff; border: 1px solid var(--jira-line); border-radius: 6px; box-shadow: 0 6px 18px rgba(0, 0, 0, .14); left: 0; min-width: 100%; overflow: hidden; position: absolute; top: calc(100% + 4px); z-index: 1050; }
+.jira-multiselect__panel--portal { max-width: calc(100vw - 16px); min-width: 0; position: fixed; z-index: 10050; }
 .jira-multiselect__search-wrapper { align-items: center; border-bottom: 1px solid var(--jira-line); display: flex; gap: 8px; padding: 8px 10px; }
 .jira-multiselect__search-icon { color: var(--jira-muted); flex: 0 0 auto; font-size: .78rem; }
 .jira-multiselect__search { background: transparent; border: 0 !important; box-shadow: none !important; color: var(--jira-ink); font-size: .82rem; min-height: 28px !important; outline: 0; padding: 4px 0 !important; width: 100%; }

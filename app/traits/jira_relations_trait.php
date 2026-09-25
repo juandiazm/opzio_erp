@@ -145,10 +145,8 @@ trait jira_relations_trait
     {
         $project->story_point_hours_multiplier = $multiplier;
         $project->save();
-        $storyTypes = ['story', 'user story', 'historia', 'historia de usuario'];
         $issues = jira_issue::query()
             ->where('jira_project_id', $project->id)
-            ->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', $storyTypes)
             ->where('estimated_hours_manual', false)
             ->get(['id', 'story_points']);
         $recalculated = 0;

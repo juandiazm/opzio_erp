@@ -17,8 +17,8 @@
     "file": "assets/cropper-Dqszr6bn.css",
     "src": "_cropper-Dqszr6bn.css"
   },
-  "_dashboard-wr36t-F9.js": {
-    "file": "assets/dashboard-wr36t-F9.js",
+  "_dashboard-DFQelJ_c.js": {
+    "file": "assets/dashboard-DFQelJ_c.js",
     "name": "dashboard"
   },
   "_index-PewBSTf8.js": {
@@ -711,7 +711,7 @@
     "isEntry": true
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-CHGyQrkD.js",
+    "file": "assets/clients-ChCbdWyE.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
     "isEntry": true,
@@ -719,7 +719,7 @@
       "_record-url-CkW4yFAP.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
-      "_dashboard-wr36t-F9.js"
+      "_dashboard-DFQelJ_c.js"
     ]
   },
   "resources/js/erp/clients/contacts.js": {
@@ -789,12 +789,12 @@
     "isEntry": true
   },
   "resources/js/erp/contacts/contacts.js": {
-    "file": "assets/contacts-CeJ07oy0.js",
+    "file": "assets/contacts-DCi4K97e.js",
     "name": "contacts",
     "src": "resources/js/erp/contacts/contacts.js",
     "isEntry": true,
     "imports": [
-      "_dashboard-wr36t-F9.js",
+      "_dashboard-DFQelJ_c.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
       "_list-ClzTmGL1.js"
@@ -1155,12 +1155,12 @@
     "isEntry": true
   },
   "resources/js/erp/jira/jira.js": {
-    "file": "assets/jira-C2gB9S-X.js",
+    "file": "assets/jira-MltuR2rC.js",
     "name": "jira",
     "src": "resources/js/erp/jira/jira.js",
     "isEntry": true,
     "imports": [
-      "_dashboard-wr36t-F9.js",
+      "_dashboard-DFQelJ_c.js",
       "resources/js/erp/incomes/order.js",
       "_pdf.worker.min-B-tS55GQ.js"
     ]
@@ -1239,7 +1239,7 @@
     "isEntry": true
   },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-CpD7JPvl.js",
+    "file": "assets/licenses-BUn_Gr66.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
     "isEntry": true,
@@ -1248,7 +1248,7 @@
       "_list-ClzTmGL1.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
-      "_dashboard-wr36t-F9.js"
+      "_dashboard-DFQelJ_c.js"
     ]
   },
   "resources/js/erp/licenses/list.js": {
@@ -1867,7 +1867,7 @@
     "isEntry": true
   },
   "resources/sass/erp/jira/jira.scss": {
-    "file": "assets/jira-DszZnZpf.css",
+    "file": "assets/jira-34x3FQi6.css",
     "src": "resources/sass/erp/jira/jira.scss",
     "isEntry": true
   },

@@ -8,7 +8,7 @@
                 <label class="jira-field"><span>API token</span><input name="api_token" type="password" autocomplete="new-password"><small>En edicion, dejalo vacio para conservar el token.</small></label>
                 <label class="jira-field"><span>Zona horaria</span><input name="timezone" value="{{ old('timezone', data_get($connection?->settings, 'timezone', 'America/Bogota')) }}" maxlength="80"></label>
             </div>
-            <div class="jira-sync-count" role="status"><span>Historias de usuario sincronizadas</span><strong>{{ number_format($syncedStories) }}</strong></div>
+            <div class="jira-sync-count" role="status"><span>Elementos Jira sincronizados</span><strong>{{ number_format($syncedIssues) }}</strong></div>
             <div class="jira-sync-progress" data-jira-sync-progress hidden aria-live="polite">
                 <div class="jira-sync-progress-meta"><span data-jira-sync-progress-label>Preparando sincronizacion...</span><strong data-jira-sync-progress-count>0</strong></div>
                 <div class="jira-sync-progress-track" aria-hidden="true"><span data-jira-sync-progress-bar></span></div>

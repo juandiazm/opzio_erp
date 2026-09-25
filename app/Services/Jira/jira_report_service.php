@@ -53,7 +53,6 @@ class jira_report_service
             'epic_ids' => $criteria['epic_ids'],
             'user_ids' => $criteria['user_ids'],
             'statuses' => $criteria['statuses'],
-            'include_all_issue_types' => $criteria['intention'] === 'client_report',
         ]);
         $sources = $criteria['data_sources'];
         if (! in_array('story_points', $sources, true)) {

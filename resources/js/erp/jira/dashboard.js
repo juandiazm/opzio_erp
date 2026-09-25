@@ -447,7 +447,7 @@ function renderIssuesTable(root, issues, requestedPage, requestedPerPage = issue
 	body.innerHTML = '';
 	pageIssues.forEach((issue) => {
 		const row = document.createElement('tr');
-		[issue.key, issue.summary, issue.project, issue.epic].forEach((value) => {
+		[issue.key, issue.summary, issue.issue_type, issue.project, issue.epic].forEach((value) => {
 			const cell = document.createElement('td');
 			cell.textContent = value || '-';
 			row.append(cell);
@@ -495,7 +495,7 @@ function renderIssuesTable(root, issues, requestedPage, requestedPerPage = issue
 		row.append(resolvedCell);
 		body.append(row);
 	});
-	if (!pageIssues.length) body.innerHTML = '<tr><td colspan="9" class="jira-empty">No hay historias de usuario en el rango.</td></tr>';
+	if (!pageIssues.length) body.innerHTML = '<tr><td colspan="10" class="jira-empty">No hay elementos Jira en el rango.</td></tr>';
 	renderIssuePagination(
 		pagination,
 		currentPage,

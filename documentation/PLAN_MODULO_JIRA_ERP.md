@@ -365,7 +365,7 @@ El rango debe ser inclusivo y validarse con `from <= to`. Debe aplicarse una zon
 
 ### Cards minimas
 
-- Story Points de historias creadas o actualizadas en el periodo.
+- Story Points de issues creados o actualizados en el periodo.
 - Issues completados.
 - Proyectos con actividad.
 - Usuarios con actividad.
@@ -374,7 +374,7 @@ El rango debe ser inclusivo y validarse con `from <= to`. Debe aplicarse una zon
 
 ### Visualizaciones minimas
 
-1. **Esfuerzo total:** card y evolucion diaria/semanal de Story Points de historias creadas o actualizadas en el periodo.
+1. **Esfuerzo total:** card y evolucion diaria/semanal de Story Points de issues creados o actualizados en el periodo.
 2. **Esfuerzo por proyecto:** barras ordenadas por Story Points, con issues y horas como secundarios.
 3. **Esfuerzo por usuario:** dos lecturas separadas para no mezclar conceptos:
    - Story Points de issues completados cuyo responsable de cierre/asignacion sea el usuario;
@@ -674,7 +674,7 @@ Indices recomendados: estado + created_at, rango de fechas, proyecto y epic.
 
 El snapshot debe conservar tambien `connection_id`, fecha de sincronizacion usada, semantica de Story Points, los filtros multiples seleccionados (proyectos, epicas, usuarios y estados) y calidad de datos. Los campos singulares de proyecto y epica se mantienen para compatibilidad con reportes legacy.
 
-El dashboard y los snapshots operativos filtran el rango con `jira_created_at` o `jira_updated_at`, las fechas recibidas desde Jira para creación y movimiento de una historia. No se aplica un estado implícito: por defecto se contabiliza toda la actividad de historias en el rango. Los estados, incluido `Finalizada`/`Done`, solo restringen el resultado cuando se seleccionan explícitamente. Los timestamps locales `created_at` y `updated_at` del ERP no participan en la inclusion de issues, mientras que los worklogs se filtran por `started_at`, la fecha de inicio recibida desde Jira.
+El dashboard y los snapshots operativos filtran el rango con `jira_created_at` o `jira_updated_at`, las fechas recibidas desde Jira para creación y movimiento de un issue. No se aplica un estado ni un tipo implícito: por defecto se contabiliza toda la actividad de issues en el rango. Los estados, incluido `Finalizada`/`Done`, solo restringen el resultado cuando se seleccionan explícitamente. Los timestamps locales `created_at` y `updated_at` del ERP no participan en la inclusion de issues, mientras que los worklogs se filtran por `started_at`, la fecha de inicio recibida desde Jira.
 
 Para los informes dirigidos a cliente, `jira_issues` conserva ademas `description` y `comments` normalizados desde Jira. La sincronizacion solicita ambos campos y la migracion `2026_09_12_000002_add_client_report_source_fields_to_jira_issues` reconsulta todas las historias de usuario existentes mediante paginas de Jira para completar el backfill sin depender de una exportacion CSV.
 

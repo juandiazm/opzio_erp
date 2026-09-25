@@ -35,10 +35,6 @@ trait jira_dashboard_trait
             'estimated_hours' => ['required', 'numeric', 'min:0', 'max:999999'],
         ]);
         $issue = jira_issue::findOrFail((int) $data['jira_issue_id']);
-        $storyTypes = ['story', 'user story', 'historia', 'historia de usuario'];
-        if (! in_array(strtolower(trim((string) $issue->issue_type)), $storyTypes, true)) {
-            throw \Illuminate\Validation\ValidationException::withMessages(['jira_issue_id' => 'Solo se pueden editar las horas de historias de usuario.']);
-        }
         $issue->estimated_hours = round((float) $data['estimated_hours'], 2);
         $issue->estimated_hours_manual = true;
         $issue->save();

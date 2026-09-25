@@ -19,7 +19,7 @@
         @include('erp.jira.reports.index', ['reports' => $reports])
         @include('erp.jira.relations', ['projects' => $projects, 'jiraUsers' => $jiraUsers])
         @include('erp.jira.productivity')
-        @include('erp.jira.configuration', ['connection' => $connection, 'syncedStories' => $syncedStories])
+        @include('erp.jira.configuration', ['connection' => $connection, 'syncedIssues' => $syncedIssues])
     </div>
 </div>
 @endsection

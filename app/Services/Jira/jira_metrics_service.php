@@ -27,12 +27,8 @@ class jira_metrics_service
         $usesExplicitStatusFilter = $statuses->isNotEmpty();
         $completedOnly = (bool) ($filters['completed_only'] ?? false);
         $usesActivityScope = ! $completedOnly;
-        $includeAllIssueTypes = (bool) ($filters['include_all_issue_types'] ?? false);
         $issueQuery = jira_issue::query()
             ->with(['project', 'assignee.mapping.user', 'assignee.mapping.employee', 'epic', 'parent'])
-            ->when(! $includeAllIssueTypes, function ($query): void {
-                $query->whereRaw('LOWER(TRIM(issue_type)) IN (?, ?, ?, ?)', ['story', 'user story', 'historia', 'historia de usuario']);
-            })
             ->where(function ($query) use ($from, $to): void {
                 $query->whereBetween('jira_created_at', [$from, $to])
                     ->orWhereBetween('jira_updated_at', [$from, $to]);

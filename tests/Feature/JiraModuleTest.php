@@ -592,6 +592,51 @@ class JiraModuleTest extends TestCase
         $this->assertSame('jira_created_at_or_jira_updated_at', $dashboard['trace']['date_basis']);
     }
 
+    public function test_dashboard_includes_all_jira_issue_types_by_default(): void
+    {
+        $connection = jira_connection::create([
+            'name' => 'Jira tipos genericos',
+            'site_url' => 'https://demo.atlassian.net',
+            'provider' => 'jira_cloud',
+            'status' => 'active',
+            'credentials' => ['email' => 'robot@example.test', 'api_token' => 'secret-token'],
+        ]);
+        $project = $connection->projects()->create([
+            'external_id' => '10006',
+            'project_key' => 'PO',
+            'name' => 'P.O. Gestion general',
+            'status' => 'active',
+        ]);
+        $project->issues()->create([
+            'jira_connection_id' => $connection->id,
+            'external_id' => '16074',
+            'issue_key' => 'PO-250',
+            'issue_type' => 'Tarea',
+            'summary' => 'Reu-estrategia opzioni',
+            'status' => 'Finalizada',
+            'story_points' => 0.8,
+            'jira_created_at' => '2026-09-21 10:47:48',
+            'jira_updated_at' => '2026-09-21 11:45:30',
+        ]);
+
+        $metrics = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-30',
+        ]);
+
+        $this->assertSame(['PO-250'], collect($metrics['issues'])->pluck('key')->all());
+        $this->assertSame(0.8, $metrics['summary']['story_points']);
+        $this->assertSame(1, $metrics['summary']['story_issues']);
+        $this->assertSame('all_issue_types_activity', $metrics['trace']['scope']);
+
+        $metricsWithLegacyTypeFlag = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-30',
+            'include_all_issue_types' => false,
+        ]);
+        $this->assertSame(['PO-250'], collect($metricsWithLegacyTypeFlag['issues'])->pluck('key')->all());
+    }
+
     public function test_report_criteria_normalizes_dashboard_filters_and_legacy_values(): void
     {
         $service = app(jira_report_service::class);
@@ -776,6 +821,14 @@ class JiraModuleTest extends TestCase
             'time_spent_seconds' => 7200,
         ]);
 
+        $dashboard = app(jira_metrics_service::class)->dashboard([
+            'from' => '2026-09-01',
+            'to' => '2026-09-08',
+            'project_ids' => [$firstProject->id, $secondProject->id],
+            'epic_ids' => [$firstEpic->id, $secondEpic->id],
+            'user_ids' => [$firstUser->id, $secondUser->id],
+            'statuses' => ['Done', 'In Progress'],
+        ]);
         $snapshot = app(jira_report_service::class)->snapshot([
             'title' => 'Reporte filtrado',
             'intention' => 'executive_summary',
@@ -793,6 +846,8 @@ class JiraModuleTest extends TestCase
         $this->assertSame([$firstEpic->id, $secondEpic->id], $snapshot['filters']['epic_ids']);
         $this->assertSame([$firstUser->id, $secondUser->id], $snapshot['filters']['user_ids']);
         $this->assertSame(['Done', 'In Progress'], $snapshot['filters']['statuses']);
+        $this->assertSame($dashboard['filters'], $snapshot['filters']);
+        $this->assertSame(collect($dashboard['issues'])->pluck('key')->all(), collect($snapshot['issues'])->pluck('key')->all());
         $this->assertCount(2, $snapshot['issues']);
         $this->assertSame(['CRM - Clientes', 'OPS - Operacion'], collect($snapshot['report']['filters']['projects'])->pluck('label')->all());
         $this->assertSame(['OPS-E1 - Operacion comercial', 'CRM-E1 - Relacion con clientes'], collect($snapshot['report']['filters']['epics'])->pluck('label')->all());
