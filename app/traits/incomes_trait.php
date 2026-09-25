@@ -525,7 +525,24 @@ trait incomes_trait
         return $income && (int) $income->payment_state !== 1 && (int) $income->state !== 1;
     }
 
-    protected function Income_PaymentReminderTemplateVariables($income, $recipientName = null, $totalAmount = null): array
+    private function Income_PaymentReminderCompanyContainsName(?string $recipientName, ?string $companyName): bool
+    {
+        $normalize = function (?string $value): string {
+            $value = mb_strtolower(trim((string) $value), 'UTF-8');
+            $value = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $value) ?? '';
+            return trim(preg_replace('/\s+/u', ' ', $value) ?? '');
+        };
+
+        $recipient = $normalize($recipientName);
+        $company = $normalize($companyName);
+        if ($recipient === '' || $company === '') {
+            return false;
+        }
+
+        return $recipient !== '' && $company !== '' && str_contains($company, $recipient);
+    }
+
+    protected function Income_PaymentReminderTemplateVariables($income, $recipientName = null, $totalAmount = null, $companyName = null): array
     {
         $value = function (string $key, $default = '') use ($income) {
             if (is_array($income)) {
@@ -537,10 +554,15 @@ trait incomes_trait
         $total = $totalAmount ?? $value('total', 0);
         $cutoffDate = $value('cutoff_date');
         $uniqueId = trim((string) $value('unique_id'));
+        $variableOne = trim((string) ($recipientName ?: $value('client_name')));
+        $companyName = trim((string) ($companyName ?: data_get($income, 'client.name') ?: $value('client_name')));
+        $variableTwo = $this->Income_PaymentReminderCompanyContainsName($variableOne, $companyName)
+            ? substr($uniqueId, -5)
+            : $companyName;
 
         return [
-            '1' => trim((string) ($recipientName ?: $value('client_name'))),
-            '2' => substr($uniqueId, -5),
+            '1' => $variableOne,
+            '2' => $variableTwo,
             '3' => number_format($total, 0, ',', '.'),
             '4' => $cutoffDate ? Carbon::parse($cutoffDate)->format('Y-m-d') : '',
             '5' => (string) ((int) $value('days_overdue', 0)),
@@ -746,7 +768,9 @@ trait incomes_trait
                 'content_sid' => config('notifications.overdue_payment_template_sid', 'HX9990ce79b043c2a8a8fc31aa3b220a46'),
                 'content_variables' => $this->Income_PaymentReminderTemplateVariables(
                     $income,
-                    $recipientName
+                    $recipientName,
+                    null,
+                    $income->client->name ?: $income->client_name
                 ),
             ]);
 

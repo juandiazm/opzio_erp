@@ -70,6 +70,15 @@ class NotificationContactsTest extends TestCase
         return $this->twilioClient;
     }
 
+    public function TwilioWhatsApp_GetTemplate(string $sid): array
+    {
+        return [
+            'sid' => $sid,
+            'types' => ['twilio/text' => ['body' => 'Hola {{1}}, recuerda tu pago.']],
+            'variables' => [],
+        ];
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -342,6 +351,7 @@ class NotificationContactsTest extends TestCase
 
         $this->assertSame(1, $response['status']);
         $this->assertSame('pending', whatsapp_message::first()->status);
+        $this->assertSame('Hola Cliente, recuerda tu pago.', whatsapp_message::first()->body);
 
         $processed = $this->Notification_ProcessWhatsappQueue();
         $message = whatsapp_message::first();
@@ -351,6 +361,7 @@ class NotificationContactsTest extends TestCase
         $this->assertSame('queued', $message->status);
         $this->assertSame(1, (int) $message->attempts);
         $this->assertSame('whatsapp:+573000000004', $this->twilioClient->lastCreated['to']);
+        $this->assertSame('Hola Cliente, recuerda tu pago.', $message->body);
     }
 
     public function test_whatsapp_media_is_saved_locally_and_exposes_a_local_view_url(): void
@@ -436,6 +447,15 @@ class NotificationContactsTest extends TestCase
                 return $this->fakeClient;
             }
 
+            public function TwilioWhatsApp_GetTemplate(string $sid): array
+            {
+                return [
+                    'sid' => $sid,
+                    'types' => ['twilio/text' => ['body' => 'Hola {{1}}, recuerda tu pago.']],
+                    'variables' => [],
+                ];
+            }
+
             public function Income_GetAllOverdueIncomes()
             {
                 return ['status' => 1, 'data' => collect([(object) [
@@ -491,10 +511,11 @@ class NotificationContactsTest extends TestCase
         $this->assertSame('pending', $message->status);
         $this->assertSame('HX9990ce79b043c2a8a8fc31aa3b220a46', $message->content_sid);
         $this->assertSame('whatsapp:+573000000005', $message->to);
+        $this->assertSame('Hola Contacto WhatsApp, recuerda tu pago.', $message->body);
         $this->assertNotNull($message->send_at);
         $this->assertSame([
             '1' => 'Contacto WhatsApp',
-            '2' => 'P-001',
+            '2' => 'Cliente Cobranza',
             '3' => '125.000',
             '4' => '2026-09-10',
             '5' => '11',

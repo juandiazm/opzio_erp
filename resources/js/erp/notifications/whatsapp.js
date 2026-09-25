@@ -167,8 +167,9 @@ function templateMessageBody(message) {
 
 function messageDisplayBody(message) {
     const storedBody = String(message.body || '');
-    if (!message.content_sid || !/^Plantilla\s+/i.test(storedBody)) return storedBody;
-    return templateMessageBody(message);
+    if (!message.content_sid) return storedBody;
+    if (storedBody && !/^Plantilla\s+/i.test(storedBody)) return storedBody;
+    return templateMessageBody(message) || 'Mensaje de WhatsApp enviado';
 }
 
 function renderMessages(messages) {
@@ -464,6 +465,7 @@ export function loadTemplates() {
         renderTemplateOptions();
         renderSelectedTemplate();
         renderTemplateList();
+        if (notificationState.whatsappConversationId) refreshConversation();
     }, null);
 }
 

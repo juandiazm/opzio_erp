@@ -404,7 +404,8 @@ class send_pay_remaining extends Command
                     $contentVariables = $this->Income_PaymentReminderTemplateVariables(
                         $whatsappIncomes[0] ?? [],
                         $recipientName,
-                        $totalAmount
+                        $totalAmount,
+                        $clientData['client']['name'] ?? ($whatsappIncomes[0]['client_name'] ?? null)
                     );
                     $response = $this->Notification_QueueWhatsappTemplate(
                         $recipient['phone'],

@@ -15,6 +15,8 @@ trait whatsapp_notifications_trait
 {
     use twilio_whatsapp_trait;
 
+    private array $notificationWhatsappTemplateCache = [];
+
     private function Notification_WhatsappAiLog(string $event, array $context = []): void
     {
         try {
@@ -66,6 +68,73 @@ trait whatsapp_notifications_trait
             return is_array($decoded) ? $decoded : [];
         }
         return [];
+    }
+
+    private function Notification_WhatsappTemplateContent(array $template): string
+    {
+        $types = $template['types'] ?? [];
+        if (is_string($types)) {
+            $types = $this->Notification_WhatsappArray($types);
+        } elseif (is_object($types)) {
+            $types = json_decode(json_encode($types), true) ?: [];
+        }
+
+        $candidates = [
+            ['twilio/text', fn ($content) => $content['body'] ?? ''],
+            ['twilio/media', fn ($content) => $content['body'] ?? ''],
+            ['twilio/quick-reply', fn ($content) => $content['body'] ?? ''],
+            ['twilio/call-to-action', fn ($content) => $content['body'] ?? ''],
+            ['whatsapp/card', fn ($content) => implode("\n", array_filter([$content['body'] ?? '', $content['footer'] ?? '']))],
+            ['twilio/card', fn ($content) => implode("\n", array_filter([$content['title'] ?? '', $content['subtitle'] ?? '']))],
+            ['whatsapp/flows', fn ($content) => $content['body'] ?? ''],
+        ];
+
+        foreach ($candidates as [$type, $resolver]) {
+            $content = $types[$type] ?? null;
+            if (!is_array($content)) {
+                continue;
+            }
+            $body = trim((string) $resolver($content));
+            if ($body !== '') {
+                return $body;
+            }
+        }
+
+        return '';
+    }
+
+    private function Notification_WhatsappTemplateDisplayBody(string $contentSid, array $contentVariables): string
+    {
+        if (!array_key_exists($contentSid, $this->notificationWhatsappTemplateCache)) {
+            try {
+                $this->notificationWhatsappTemplateCache[$contentSid] = $this->TwilioWhatsApp_GetTemplate($contentSid);
+            } catch (\Throwable $exception) {
+                $this->notificationWhatsappTemplateCache[$contentSid] = [];
+                info('Notification_WhatsappTemplateDisplayBody error: '.$exception->getMessage(), [
+                    'content_sid' => $contentSid,
+                ]);
+            }
+        }
+
+        $template = $this->notificationWhatsappTemplateCache[$contentSid];
+        if (!is_array($template)) {
+            return '';
+        }
+
+        $body = $this->Notification_WhatsappTemplateContent($template);
+        if ($body === '') {
+            return '';
+        }
+
+        $samples = $this->Notification_WhatsappArray($template['variables'] ?? []);
+        return preg_replace_callback('/\{\{\s*([^{}]+?)\s*\}\}/', function ($matches) use ($contentVariables, $samples) {
+            $name = trim((string) ($matches[1] ?? ''));
+            $value = array_key_exists($name, $contentVariables)
+                ? $contentVariables[$name]
+                : ($samples[$name] ?? $matches[0]);
+
+            return trim((string) $value) !== '' ? (string) $value : $matches[0];
+        }, $body) ?: $body;
     }
 
     private function Notification_WhatsappDate($value): ?string
@@ -427,6 +496,7 @@ trait whatsapp_notifications_trait
                 null,
                 $clientId ? (int) $clientId : null
             );
+            $displayBody = $this->Notification_WhatsappTemplateDisplayBody($contentSid, $contentVariables);
             $message = whatsapp_message::create([
                 'unique_id' => strtoupper(Str::uuid()->toString()),
                 'conversation_id' => $conversation->id,
@@ -434,7 +504,7 @@ trait whatsapp_notifications_trait
                 'direction' => 'outbound',
                 'from' => $conversation->business_address,
                 'to' => $this->TwilioWhatsApp_ChannelAddress($phone),
-                'body' => null,
+                'body' => $displayBody !== '' ? $displayBody : null,
                 'message_type' => 'template',
                 'content_sid' => $contentSid,
                 'content_variables' => $contentVariables ?: null,
@@ -467,13 +537,22 @@ trait whatsapp_notifications_trait
         $result = ['processed' => 0, 'sent' => 0, 'failed' => 0];
         foreach ($messages as $message) {
             try {
+                $contentVariables = is_array($message->content_variables) ? $message->content_variables : [];
+                $displayBody = trim((string) $message->body);
+                if ($displayBody === '' || preg_match('/^Plantilla\s+/i', $displayBody)) {
+                    $displayBody = $this->Notification_WhatsappTemplateDisplayBody($message->content_sid, $contentVariables);
+                    if ($displayBody !== '') {
+                        $message->body = $displayBody;
+                        $message->save();
+                    }
+                }
                 $response = $this->TwilioWhatsApp_SendMessage(
                     $message->conversation,
                     $message,
                     '',
                     $message->content_sid,
-                    is_array($message->content_variables) ? $message->content_variables : [],
-                    $message->body
+                    $contentVariables,
+                    $displayBody
                 );
                 $result['processed']++;
                 if (($response['status'] ?? 0) === 1) {

@@ -291,6 +291,7 @@ class IncomePaymentReminderTest extends TestCase
         $whatsappSent = $service->Income_SendPaymentReminder($income->id, '3000000002', 'whatsapp');
         $this->assertSame(1, $whatsappSent['status']);
         $this->assertSame('Contacto Licencia', whatsapp_message::first()->content_variables['1']);
+        $this->assertSame('Cliente Recordatorio', whatsapp_message::first()->content_variables['2']);
 
         $income->payment_state = 1;
         $income->save();
@@ -298,7 +299,37 @@ class IncomePaymentReminderTest extends TestCase
         $this->assertSame(0, $unavailable['status']);
     }
 
-    public function test_whatsapp_payment_reminder_uses_unique_id_for_template_button(): void
+    public function test_payment_reminder_template_avoids_repeating_company_name(): void
+    {
+        $service = new class extends incomes_controller {
+            public function reminderVariables($income, $recipientName, $companyName): array
+            {
+                return $this->Income_PaymentReminderTemplateVariables($income, $recipientName, null, $companyName);
+            }
+        };
+
+        $sameCompany = $service->reminderVariables(
+            ['client_name' => 'Empresa Principal', 'unique_id' => 'INCOME-001'],
+            'Empresa Principal',
+            'Empresa Principal'
+        );
+        $separateCompany = $service->reminderVariables(
+            ['client_name' => 'Empresa Principal', 'unique_id' => 'INCOME-002'],
+            'Contacto Licencia',
+            'Empresa Principal'
+        );
+        $partialCompany = $service->reminderVariables(
+            ['client_name' => 'Empresa Principal', 'unique_id' => 'INCOME-003'],
+            'Empresa',
+            'Empresa Principal'
+        );
+
+        $this->assertSame('E-001', $sameCompany['2']);
+        $this->assertSame('Empresa Principal', $separateCompany['2']);
+        $this->assertSame('E-003', $partialCompany['2']);
+    }
+
+    public function test_whatsapp_payment_reminder_uses_unique_id_for_template_link_and_company_name(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-09-21 12:00:00'));
         $fakeTwilioClient = new IncomePaymentReminderFakeTwilioClient();
@@ -339,7 +370,7 @@ class IncomePaymentReminderTest extends TestCase
 
         $expectedVariables = [
             '1' => 'Cliente WhatsApp Manual',
-            '2' => 'L-001',
+            '2' => 'Cliente WhatsApp',
             '3' => '1.000',
             '4' => '2026-09-16',
             '5' => '5',
