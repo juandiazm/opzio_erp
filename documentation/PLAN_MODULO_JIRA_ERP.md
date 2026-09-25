@@ -365,7 +365,7 @@ El rango debe ser inclusivo y validarse con `from <= to`. Debe aplicarse una zon
 
 ### Cards minimas
 
-- Story Points completados en el periodo.
+- Story Points de historias creadas en el periodo, finalizadas por defecto.
 - Issues completados.
 - Proyectos con actividad.
 - Usuarios con actividad.
@@ -374,7 +374,7 @@ El rango debe ser inclusivo y validarse con `from <= to`. Debe aplicarse una zon
 
 ### Visualizaciones minimas
 
-1. **Esfuerzo total:** card y evolucion diaria/semanal de Story Points completados.
+1. **Esfuerzo total:** card y evolucion diaria/semanal de Story Points de historias creadas en el periodo.
 2. **Esfuerzo por proyecto:** barras ordenadas por Story Points, con issues y horas como secundarios.
 3. **Esfuerzo por usuario:** dos lecturas separadas para no mezclar conceptos:
    - Story Points de issues completados cuyo responsable de cierre/asignacion sea el usuario;
@@ -389,8 +389,8 @@ Se debe reutilizar Chart.js y la organizacion de `resources/js/erp/dashboard`. L
 La implementacion debe elegir y mostrar una definicion unica:
 
 ```text
-Story Points completados
-= suma de story_points de issues cuyo evento de completado/resolucion cae dentro del rango
+Story Points del dashboard
+= suma de story_points de issues cuya fecha `jira_created_at` cae dentro del rango; por defecto se conservan las historias finalizadas
 ```
 
 No se debe calcular asi:
@@ -674,7 +674,7 @@ Indices recomendados: estado + created_at, rango de fechas, proyecto y epic.
 
 El snapshot debe conservar tambien `connection_id`, fecha de sincronizacion usada, semantica de Story Points, los filtros multiples seleccionados (proyectos, epicas, usuarios y estados) y calidad de datos. Los campos singulares de proyecto y epica se mantienen para compatibilidad con reportes legacy.
 
-El dashboard y los snapshots operativos calculan por defecto el rango de historias completadas con `jira_resolved_at`; si Jira no entrega esa fecha, se usa el estado de categoria `Done` y `jira_created_at` o `jira_updated_at` como respaldo. Los timestamps locales `created_at` y `updated_at` del ERP no participan en la inclusion de issues. Las consultas con estados explicitos y los reportes dirigidos a cliente usan `jira_created_at` o `jira_updated_at` para conservar actividad, mientras que los worklogs se filtran por `started_at`, la fecha de inicio recibida desde Jira.
+El dashboard y los snapshots operativos filtran el rango con `jira_created_at`, la fecha de creacion recibida desde Jira. Por defecto se conservan las historias finalizadas mediante `jira_resolved_at`, la categoria `Done` o estados equivalentes; esa condicion no cambia la fecha del rango. Los timestamps locales `created_at` y `updated_at` del ERP no participan en la inclusion de issues. Las consultas con estados explicitos y los reportes dirigidos a cliente tambien usan `jira_created_at`, mientras que los worklogs se filtran por `started_at`, la fecha de inicio recibida desde Jira.
 
 Para los informes dirigidos a cliente, `jira_issues` conserva ademas `description` y `comments` normalizados desde Jira. La sincronizacion solicita ambos campos y la migracion `2026_09_12_000002_add_client_report_source_fields_to_jira_issues` reconsulta todas las historias de usuario existentes mediante paginas de Jira para completar el backfill sin depender de una exportacion CSV.
 
