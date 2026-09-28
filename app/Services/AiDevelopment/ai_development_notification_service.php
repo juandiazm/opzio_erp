@@ -79,6 +79,7 @@ class ai_development_notification_service
             [
                 'execution' => $execution,
                 'workflow' => $workflow,
+                'github_task_url' => $execution->github_task_url,
                 'detail_url' => url('/admin/jira?tab=ai-development&execution='.$execution->id),
             ],
             null,
