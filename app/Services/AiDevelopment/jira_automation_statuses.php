@@ -2,6 +2,8 @@
 
 namespace App\Services\AiDevelopment;
 
+use Illuminate\Support\Str;
+
 final class jira_automation_statuses
 {
     public const PENDING = 'Pending';
@@ -17,9 +19,26 @@ final class jira_automation_statuses
 
     public static function isPending(?string $status): bool
     {
-        $normalized = strtolower(trim((string) $status));
-        $normalized = str_replace(['-', '_'], ' ', $normalized);
+        $normalized = self::normalize($status);
 
         return in_array($normalized, ['pending', 'to do', 'todo', 'por hacer', 'tareas por hacer', 'open', 'abierto'], true);
+    }
+
+    public static function transitionAliases(string $status): array
+    {
+        return match ($status) {
+            self::IN_PROGRESS => ['in progress', 'en curso', 'en progreso'],
+            self::DEPLOYED => ['deployed', 'deploy', 'desplegado', 'desplegada'],
+            self::QA => ['qa', 'quality', 'calidad', 'quality review'],
+            self::DONE => ['done', 'finalizada', 'finalizado', 'completada', 'completado', 'closed', 'cerrada', 'cerrado'],
+            default => [self::normalize($status)],
+        };
+    }
+
+    public static function normalize(?string $value): string
+    {
+        $normalized = Str::ascii(strtolower(trim((string) $value)));
+
+        return preg_replace('/[-_]+/', ' ', $normalized) ?: $normalized;
     }
 }

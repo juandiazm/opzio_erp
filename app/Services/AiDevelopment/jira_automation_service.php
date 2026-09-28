@@ -104,6 +104,55 @@ class jira_automation_service
         return $approval->fresh(['issue', 'project', 'execution']);
     }
 
+    public function retryBlockedIssue(jira_issue $issue): ?ai_development_approval
+    {
+        $configuration = jira_automation_project::query()
+            ->with(['jiraProject.connection', 'issueTypes', 'assignees', 'defaultAgent'])
+            ->where('jira_project_id', $issue->jira_project_id)
+            ->where('enabled', true)
+            ->first();
+        if (! $configuration || ! $this->isCandidate($issue, $configuration)) {
+            return null;
+        }
+
+        $approval = ai_development_approval::query()
+            ->with('execution')
+            ->where('jira_issue_id', $issue->id)
+            ->whereIn('status', ['blocked', 'expired'])
+            ->latest('id')
+            ->first();
+        if (! $approval || $approval->execution?->status !== ai_development_states::BLOCKED) {
+            return null;
+        }
+
+        $token = Str::random(64);
+        $approval->forceFill([
+            'token_hash' => hash('sha256', $token),
+            'status' => 'pending',
+            'snapshot' => $this->snapshot($issue, $configuration),
+            'story_point_estimate' => null,
+            'selected_agent_id' => $configuration->default_agent_id,
+            'decided_by_user_id' => null,
+            'decided_at' => null,
+            'expires_at' => now()->addHours(max(1, (int) config('ai_development.approval_ttl_hours', 48))),
+            'decision_note' => null,
+            'supervisor_context' => null,
+            'blocked_reason' => null,
+            'last_notified_at' => null,
+        ])->save();
+
+        $execution = $approval->execution;
+        $this->states->event($execution, 'approval_retry_requested', ['approval_id' => $approval->id]);
+        $execution = $this->states->transition($execution, ai_development_states::AWAITING_APPROVAL, ['retry' => true]);
+        $notification = $this->notifications->approval($approval, $token);
+        $this->states->event($execution, ($notification['status'] ?? 0) === 1 ? 'approval_sent' : 'approval_notification_failed', [
+            'retry' => true,
+            'message' => mb_substr((string) ($notification['message'] ?? ''), 0, 500),
+        ]);
+
+        return $approval->fresh(['issue', 'project', 'execution']);
+    }
+
     public function decideApproval(
         int $approvalId,
         string $token,

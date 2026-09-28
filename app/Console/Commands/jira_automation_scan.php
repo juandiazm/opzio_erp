@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Schema;
 
 class jira_automation_scan extends Command
 {
-    protected $signature = 'jira:automation:scan {--project=} {--issue=} {--explain : Explica por que una HU no es candidata} {--expire : Expira solicitudes de aprobacion vencidas}';
+    protected $signature = 'jira:automation:scan {--project=} {--issue=} {--explain : Explica por que una HU no es candidata} {--retry-blocked : Reabre una aprobacion bloqueada de forma explicita} {--expire : Expira solicitudes de aprobacion vencidas}';
 
     protected $description = 'Detecta candidatas Jira y expira aprobaciones vencidas';
 
@@ -41,6 +41,23 @@ class jira_automation_scan extends Command
             if (! $project) {
                 $this->error('No existe configuracion de automatizacion para el proyecto Jira '.$issue->jira_project_id.'.');
                 return self::FAILURE;
+            }
+            if ($this->option('retry-blocked')) {
+                $reasons = $service->candidateReasons($issue, $project, false);
+                if ($reasons !== []) {
+                    $this->warn($issue->issue_key.': no se puede reintentar.');
+                    foreach ($reasons as $reason) {
+                        $this->line('- '.$reason);
+                    }
+                    return self::SUCCESS;
+                }
+                $approval = $service->retryBlockedIssue($issue);
+                if (! $approval) {
+                    $this->warn($issue->issue_key.': no existe una aprobacion bloqueada reintentable.');
+                } else {
+                    $this->info($issue->issue_key.': aprobacion bloqueada reabierta y notificada.');
+                }
+                return self::SUCCESS;
             }
             $reasons = $service->candidateReasons($issue, $project);
             if ($reasons === []) {

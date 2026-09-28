@@ -16,6 +16,7 @@ use App\Models\jira_user;
 use App\Services\AiDevelopment\jira_automation_service;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
 use App\Services\AiDevelopment\github_copilot_agent_provider;
+use App\Services\Jira\jira_client;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -126,7 +127,7 @@ class AiDevelopmentFlowTest extends TestCase
                 return Http::response([], 204);
             }
             if ($request->method() === 'GET' && str_ends_with($path, '/issue/OPS-1/transitions')) {
-                return Http::response(['transitions' => [['id' => '31', 'name' => 'In Progress', 'to' => ['name' => 'In Progress']]]]);
+                return Http::response(['transitions' => [['id' => '31', 'name' => 'En curso', 'to' => ['name' => 'En curso']]]]);
             }
             if ($request->method() === 'POST' && str_ends_with($path, '/issue/OPS-1/transitions')) {
                 return Http::response([], 204);
@@ -278,6 +279,29 @@ class AiDevelopmentFlowTest extends TestCase
                 && $request->data()['create_pull_request'] === true
                 && str_contains($request->data()['prompt'], 'OPS-1');
         });
+    }
+
+    public function test_localized_jira_transitions_are_resolved(): void
+    {
+        [$issue] = $this->fixture();
+        Http::fake(function ($request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            if (str_ends_with($path, '/transitions')) {
+                return Http::response(['transitions' => [
+                    ['id' => '31', 'name' => 'En curso', 'to' => ['name' => 'En curso']],
+                    ['id' => '32', 'name' => 'Deploy', 'to' => ['name' => 'Deploy']],
+                    ['id' => '33', 'name' => 'Quality', 'to' => ['name' => 'Quality']],
+                    ['id' => '34', 'name' => 'Finalizada', 'to' => ['name' => 'Finalizada']],
+                ]]);
+            }
+            return Http::response([], 204);
+        });
+
+        $client = new jira_client($issue->connection);
+        $this->assertSame('31', $client->transitionIssue('OPS-1', 'In Progress')['id']);
+        $this->assertSame('32', $client->transitionIssue('OPS-1', 'Deployed')['id']);
+        $this->assertSame('33', $client->transitionIssue('OPS-1', 'QA')['id']);
+        $this->assertSame('34', $client->transitionIssue('OPS-1', 'Done')['id']);
     }
 
     private function fixture(): array

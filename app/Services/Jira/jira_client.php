@@ -3,6 +3,7 @@
 namespace App\Services\Jira;
 
 use App\Models\jira_connection;
+use App\Services\AiDevelopment\jira_automation_statuses;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
@@ -116,10 +117,15 @@ class jira_client
     public function transitionIssue(string $issueKey, string $statusName): array
     {
         $transitions = $this->get('/issue/'.rawurlencode($issueKey).'/transitions');
-        $wanted = strtolower(trim($statusName));
+        $wanted = jira_automation_statuses::transitionAliases($statusName);
         $transition = collect((array) ($transitions['transitions'] ?? []))->first(function (array $item) use ($wanted): bool {
-            return strtolower(trim((string) ($item['name'] ?? ''))) === $wanted
-                || strtolower(trim((string) data_get($item, 'to.name', ''))) === $wanted;
+            $names = [
+                jira_automation_statuses::normalize($item['name'] ?? null),
+                jira_automation_statuses::normalize(data_get($item, 'to.name')),
+                jira_automation_statuses::normalize(data_get($item, 'to.statusCategory.name')),
+            ];
+
+            return collect($names)->intersect($wanted)->isNotEmpty();
         });
         if (! is_array($transition) || blank($transition['id'] ?? null)) {
             throw new RuntimeException('Jira no ofrece una transicion disponible hacia el estado solicitado.');

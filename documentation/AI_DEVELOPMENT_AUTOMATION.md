@@ -27,6 +27,14 @@ El repositorio debe tener habilitado Copilot cloud agent y el plan/organizacion 
 
 5. Sincronizar Jira. El detector se ejecuta despues de cada upsert y tambien mediante `jira:automation:scan --expire`. La administracion del flujo vive en el modulo GitHub; Jira conserva solamente su integracion funcional, sincronizacion y reportes.
 
+Si una aprobacion queda bloqueada por una transicion Jira temporalmente incompatible, primero se corrige el alias del workflow y luego se reabre de forma explicita, sin duplicar ejecuciones:
+
+```text
+php artisan jira:automation:scan --project=<automation_project_id> --issue=<JIRA_KEY> --retry-blocked
+```
+
+Los estados locales de Jira como `Tareas por hacer`, `En curso`, `Deploy`, `Quality` y `Finalizada` se resuelven contra las etapas canónicas del flujo.
+
 El ERP no incluye un modelo de IA que pueda modificar un repositorio por si mismo. El adaptador `ai_agent_provider_interface` permite conectar Luna u otros agentes/CLI sin acoplar el flujo de negocio a un proveedor concreto. Si el comando no existe, la ejecucion queda bloqueada y se notifica a los supervisores.
 
 ## Seguridad y reglas protegidas
