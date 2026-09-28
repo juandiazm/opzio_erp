@@ -101,6 +101,9 @@ class ai_development_state_machine
     {
         unset($metadata['token'], $metadata['api_token'], $metadata['credentials'], $metadata['secret'], $metadata['authorization']);
 
-        return $metadata;
+        $encoded = json_encode($metadata, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+        $normalized = json_decode($encoded, true, 512, JSON_THROW_ON_ERROR);
+
+        return is_array($normalized) ? $normalized : [];
     }
 }

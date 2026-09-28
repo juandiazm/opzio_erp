@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Jobs\run_ai_development_execution;
 use App\Jobs\promote_ai_development_execution;
+use App\Jobs\monitor_ai_development_pipeline;
 use App\Http\Controllers\github_controller;
 use App\Jobs\monitor_ai_development_jira_statuses;
 use App\Mail\CustomMail;
@@ -20,6 +21,8 @@ use App\Services\AiDevelopment\jira_automation_service;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
 use App\Services\AiDevelopment\jira_automation_statuses;
 use App\Services\AiDevelopment\github_copilot_agent_provider;
+use App\Services\AiDevelopment\ai_development_state_machine;
+use App\Services\AiDevelopment\ai_development_notification_service;
 use App\Services\Jira\jira_client;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -364,6 +367,47 @@ class AiDevelopmentFlowTest extends TestCase
         Queue::assertPushed(promote_ai_development_execution::class, 1);
     }
 
+    public function test_main_promotion_merges_qa_directly_without_pull_request(): void
+    {
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'integrating_main',
+            'current_phase' => 'integrating_main',
+            'base_branch' => 'qa',
+            'context' => [],
+        ])->save();
+
+        Http::fake(function ($request) {
+            return str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/merges')
+                ? Http::response(['sha' => 'main-merge-sha'])
+                : Http::response([], 200);
+        });
+
+        (new promote_ai_development_execution($execution->id))->handle(
+            app(ai_development_state_machine::class),
+            app(ai_development_notification_service::class),
+        );
+
+        $execution->refresh();
+        $this->assertSame('waiting_main_pipeline', $execution->status);
+        $this->assertSame('main_release_pipeline', data_get($execution->context, 'promotion_stage'));
+        $this->assertSame('main-merge-sha', data_get($execution->context, 'main_merge_commit'));
+        Queue::assertPushed(monitor_ai_development_pipeline::class, 1);
+        Http::assertSent(function ($request): bool {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            $data = $request->data();
+
+            return $request->method() === 'POST'
+                && str_ends_with($path, '/merges')
+                && ($data['base'] ?? null) === 'main'
+                && ($data['head'] ?? null) === 'qa';
+        });
+        Http::assertNotSent(fn ($request): bool => str_contains((string) parse_url($request->url(), PHP_URL_PATH), '/pulls'));
+    }
+
     public function test_periodic_jira_monitor_uses_local_status_category_alias(): void
     {
         Queue::fake();
@@ -454,6 +498,19 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertSame('approved', $restarted->approval->status);
         Queue::assertPushed(run_ai_development_execution::class, 1);
         Http::assertSent(fn ($request): bool => $request->method() === 'POST' && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/issue/OPS-1/transitions'));
+    }
+
+    public function test_event_metadata_replaces_invalid_utf8_bytes_before_json_persistence(): void
+    {
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = \App\Models\ai_development_execution::query()->where('approval_id', $approval?->id)->firstOrFail();
+
+        $event = app(ai_development_state_machine::class)->event($execution, 'invalid_utf8_metadata', [
+            'logs' => "GitHub logs \xC3\x28",
+        ]);
+
+        $this->assertSame("GitHub logs \xEF\xBF\xBD(", $event->fresh()->metadata['logs']);
     }
 
     private function fixture(): array

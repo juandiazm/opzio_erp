@@ -12,7 +12,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use RuntimeException;
 use Throwable;
 
 class promote_ai_development_execution implements ShouldQueue
@@ -37,34 +36,26 @@ class promote_ai_development_execution implements ShouldQueue
             $project = $execution->project;
             $github = new github_client($project->githubConnection);
             $context = (array) $execution->context;
-            if (($context['promotion_stage'] ?? 'qa_sync') === 'qa_sync') {
-                $pr = collect($github->openPullRequests($project->github_owner, $project->github_repository, 'main', $execution->base_branch))->first()
-                    ?: $github->createPullRequest($project->github_owner, $project->github_repository, $execution->jira_key.' synchronize main into qa', 'main', $execution->base_branch, 'Synchronize production before final promotion.');
-                $number = (int) ($pr['number'] ?? 0);
-                if ($number < 1) {
-                    throw new RuntimeException('No fue posible crear el pull request main hacia QA.');
-                }
-                $merge = $github->mergePullRequest($project->github_owner, $project->github_repository, $number);
-                if (($merge['merged'] ?? false) !== true) {
-                    throw new RuntimeException('No fue posible integrar main hacia QA.');
-                }
-                $execution->update(['context' => array_merge($context, ['promotion_stage' => 'qa_sync_pipeline', 'qa_sync_pull_request' => $number])]);
-                $states->transition($execution, ai_development_states::WAITING_MAIN_PIPELINE, ['stage' => 'qa_sync', 'pull_request' => $number]);
-                monitor_ai_development_pipeline::dispatch($execution->id, 'main')->delay(now()->addSeconds(5));
-                return;
-            }
-            $pr = collect($github->openPullRequests($project->github_owner, $project->github_repository, $execution->base_branch, 'main'))->first()
-                ?: $github->createPullRequest($project->github_owner, $project->github_repository, $execution->jira_key.' promote QA to main', $execution->base_branch, 'main', 'Promote QA after Jira Done approval.');
-            $number = (int) ($pr['number'] ?? 0);
-            if ($number < 1) {
-                throw new RuntimeException('No fue posible crear el pull request QA hacia main.');
-            }
-            $merge = $github->mergePullRequest($project->github_owner, $project->github_repository, $number);
+            $merge = $github->mergeBranches(
+                $project->github_owner,
+                $project->github_repository,
+                'main',
+                $execution->base_branch,
+                $execution->jira_key.' promote '.$execution->base_branch.' to main',
+            );
             if (($merge['merged'] ?? false) !== true) {
                 throw new RuntimeException('No fue posible integrar QA hacia main.');
             }
-            $execution->update(['context' => array_merge($context, ['promotion_stage' => 'main_release_pipeline', 'main_pull_request' => $number])]);
-            $states->transition($execution, ai_development_states::WAITING_MAIN_PIPELINE, ['stage' => 'main_release', 'pull_request' => $number]);
+            $execution->update(['context' => array_merge($context, [
+                'promotion_stage' => 'main_release_pipeline',
+                'main_merge_commit' => $merge['sha'] ?? null,
+            ])]);
+            $states->transition($execution, ai_development_states::WAITING_MAIN_PIPELINE, [
+                'stage' => 'main_release',
+                'source_branch' => $execution->base_branch,
+                'target_branch' => 'main',
+                'merge_commit' => $merge['sha'] ?? null,
+            ]);
             monitor_ai_development_pipeline::dispatch($execution->id, 'main')->delay(now()->addSeconds(5));
         } catch (Throwable $exception) {
             $states->block($execution, 'No fue posible promover la historia: '.mb_substr($exception->getMessage(), 0, 1200));
