@@ -23,7 +23,7 @@ class ai_development_state_machine
         'waiting_qa_pipeline' => ['waiting_quality_review', 'developing', 'blocked', 'failed'],
         'waiting_quality_review' => ['quality_feedback', 'integrating_main', 'blocked'],
         'quality_feedback' => ['preparing', 'developing', 'blocked', 'failed'],
-        'integrating_main' => ['waiting_main_pipeline', 'blocked', 'failed'],
+        'integrating_main' => ['waiting_main_pipeline', 'completed', 'blocked', 'failed'],
         'waiting_main_pipeline' => ['completed', 'integrating_main', 'developing', 'blocked', 'failed'],
         'failed' => ['preparing', 'waiting_qa_pipeline', 'blocked'],
         'rejected' => [],

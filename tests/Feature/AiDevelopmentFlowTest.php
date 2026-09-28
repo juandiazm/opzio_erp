@@ -521,6 +521,91 @@ class AiDevelopmentFlowTest extends TestCase
         Http::assertNotSent(fn ($request): bool => str_contains((string) parse_url($request->url(), PHP_URL_PATH), '/pulls'));
     }
 
+    public function test_main_promotion_completes_when_github_reports_no_commits_between_branches(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'integrating_main',
+            'current_phase' => 'integrating_main',
+            'base_branch' => 'qa',
+            'context' => [],
+        ])->save();
+
+        Http::fake(function ($request) {
+            if (str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/merges')) {
+                return Http::response([
+                    'message' => 'Validation Failed',
+                    'errors' => [[
+                        'resource' => 'PullRequest',
+                        'code' => 'custom',
+                        'message' => 'No commits between qa and main',
+                    ]],
+                ], 422);
+            }
+
+            return Http::response([], 200);
+        });
+
+        (new promote_ai_development_execution($execution->id))->handle(
+            app(ai_development_state_machine::class),
+            app(ai_development_notification_service::class),
+        );
+
+        $execution->refresh();
+        $this->assertSame('completed', $execution->status);
+        $this->assertNotNull($execution->finished_at);
+        $this->assertSame('already_published', data_get($execution->context, 'main_promotion_status'));
+        $this->assertSame('no_commits_between_qa_and_main', data_get($execution->context, 'main_promotion_resolution'));
+        $this->assertDatabaseHas('ai_development_events', [
+            'execution_id' => $execution->id,
+            'event' => 'completed',
+            'phase' => 'completed',
+        ]);
+        Queue::assertNotPushed(monitor_ai_development_pipeline::class);
+    }
+
+    public function test_migration_completes_blocked_promotions_with_no_commits_between_qa_and_main(): void
+    {
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'blocked',
+            'current_phase' => 'blocked',
+            'blocked_reason' => 'No fue posible promover la historia: GitHub: Validation Failed [PullRequest: custom: No commits between qa and main]',
+            'context' => ['attempt' => 'historical'],
+        ])->save();
+        $unrelated = $execution->replicate();
+        $unrelated->forceFill([
+            'status' => 'blocked',
+            'current_phase' => 'blocked',
+            'blocked_reason' => 'No fue posible promover la historia: GitHub: Validation Failed [PullRequest: custom: Another error]',
+        ])->save();
+
+        Artisan::call('migrate', [
+            '--path' => database_path('migrations/2026_09_28_000005_complete_already_published_ai_executions.php'),
+            '--realpath' => true,
+        ]);
+
+        $execution->refresh();
+        $unrelated->refresh();
+        $this->assertSame('completed', $execution->status);
+        $this->assertSame('completed', $execution->current_phase);
+        $this->assertNull($execution->blocked_reason);
+        $this->assertNotNull($execution->finished_at);
+        $this->assertSame('migration_no_commits_between_qa_and_main', data_get($execution->context, 'main_promotion_resolution'));
+        $this->assertSame('blocked', $unrelated->status);
+        $this->assertDatabaseHas('ai_development_events', [
+            'execution_id' => $execution->id,
+            'event' => 'completed',
+            'phase' => 'completed',
+        ]);
+    }
+
     public function test_periodic_jira_monitor_uses_local_status_category_alias(): void
     {
         Queue::fake();
