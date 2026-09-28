@@ -391,7 +391,7 @@ class jira_automation_service
         if (! $execution) {
             return;
         }
-        if (strcasecmp(trim((string) $issue->status), jira_automation_statuses::QA) === 0
+        if (jira_automation_statuses::isQualityReview($issue->status)
             && $execution->status === ai_development_states::WAITING_QUALITY_REVIEW
             && $execution->qa_delivered_at !== null) {
             $feedback = $this->newFeedback($issue, $execution);
@@ -404,7 +404,7 @@ class jira_automation_service
                 run_ai_development_execution::dispatch($execution->id);
             }
         }
-        if (strcasecmp(trim((string) $issue->status), jira_automation_statuses::DONE) === 0
+        if (jira_automation_statuses::isDone($issue->status)
             && $execution->status === ai_development_states::WAITING_QUALITY_REVIEW
             && $execution->qa_delivered_at !== null) {
             $execution->update(['done_detected_at' => now()]);

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Jobs\run_ai_development_execution;
+use App\Jobs\promote_ai_development_execution;
 use App\Http\Controllers\github_controller;
 use App\Mail\CustomMail;
 use App\Models\ai_agent;
@@ -335,6 +336,27 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertSame('32', $client->transitionIssue('OPS-1', 'Deployed')['id']);
         $this->assertSame('33', $client->transitionIssue('OPS-1', 'QA')['id']);
         $this->assertSame('34', $client->transitionIssue('OPS-1', 'Done')['id']);
+    }
+
+    public function test_finalizada_after_qa_queues_main_promotion(): void
+    {
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'waiting_quality_review',
+            'current_phase' => 'waiting_quality_review',
+            'qa_delivered_at' => now(),
+        ])->save();
+        $issue->update(['status' => 'Finalizada']);
+
+        app(jira_automation_service::class)->handleSyncedIssue($issue->fresh(['assignee', 'reporter', 'project', 'connection']));
+
+        $execution->refresh();
+        $this->assertSame('integrating_main', $execution->status);
+        $this->assertNotNull($execution->done_detected_at);
+        Queue::assertPushed(promote_ai_development_execution::class, 1);
     }
 
     public function test_manual_restart_resets_execution_traces_and_dispatches_again(): void

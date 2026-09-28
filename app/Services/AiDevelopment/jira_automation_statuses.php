@@ -29,6 +29,16 @@ final class jira_automation_statuses
         return in_array(self::normalize($status), ['in progress', 'en curso', 'en progreso'], true);
     }
 
+    public static function isQualityReview(?string $status): bool
+    {
+        return in_array(self::normalize($status), self::transitionAliases(self::QA), true);
+    }
+
+    public static function isDone(?string $status): bool
+    {
+        return in_array(self::normalize($status), self::transitionAliases(self::DONE), true);
+    }
+
     public static function transitionAliases(string $status): array
     {
         return match ($status) {
