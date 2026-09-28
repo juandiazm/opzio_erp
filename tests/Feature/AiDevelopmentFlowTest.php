@@ -6,6 +6,7 @@ use App\Jobs\run_ai_development_execution;
 use App\Http\Controllers\github_controller;
 use App\Mail\CustomMail;
 use App\Models\ai_agent;
+use App\Models\ai_development_event;
 use App\Models\github_connection;
 use App\Models\jira_automation_project;
 use App\Models\jira_automation_supervisor;
@@ -334,6 +335,77 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertSame('32', $client->transitionIssue('OPS-1', 'Deployed')['id']);
         $this->assertSame('33', $client->transitionIssue('OPS-1', 'QA')['id']);
         $this->assertSame('34', $client->transitionIssue('OPS-1', 'Done')['id']);
+    }
+
+    public function test_manual_restart_resets_execution_traces_and_dispatches_again(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $service = app(jira_automation_service::class);
+        $approval = $service->detectCandidate($issue);
+        $execution = $approval->execution;
+
+        $approval->update(['status' => 'approved']);
+        $execution->forceFill([
+            'status' => 'blocked',
+            'current_phase' => 'blocked',
+            'feature_branch' => 'copilot/ops-1-old',
+            'attempt' => 4,
+            'ci_attempts' => 2,
+            'main_ci_attempts' => 1,
+            'consecutive_failures' => 3,
+            'github_task_id' => 'task-old',
+            'github_task_url' => 'https://github.com/opzio/erp/agent-sessions/task-old',
+            'github_task_state' => 'failed',
+            'github_pull_request_number' => 48,
+            'qa_workflow_run_id' => 'qa-old',
+            'main_workflow_run_id' => 'main-old',
+            'last_commit_sha' => 'sha-old',
+            'error' => 'old error',
+            'blocked_reason' => 'old blocked reason',
+        ])->save();
+        ai_development_event::create([
+            'execution_id' => $execution->id,
+            'approval_id' => $approval->id,
+            'event' => 'old_trace',
+            'phase' => 'blocked',
+            'attempt' => 4,
+            'metadata' => ['old' => true],
+        ]);
+        $issue->update(['status' => 'Quality']);
+
+        Http::fake(function ($request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            if ($request->method() === 'GET' && str_ends_with($path, '/issue/OPS-1/transitions')) {
+                return Http::response(['transitions' => [['id' => '31', 'name' => 'En curso', 'to' => ['name' => 'En curso']]]]);
+            }
+            if ($request->method() === 'POST' && str_ends_with($path, '/issue/OPS-1/transitions')) {
+                return Http::response([], 204);
+            }
+
+            return Http::response([], 200);
+        });
+
+        $restarted = $service->restartExecution($execution->id);
+
+        $this->assertSame('approved', $restarted->status);
+        $this->assertSame(0, $restarted->attempt);
+        $this->assertNull($restarted->feature_branch);
+        $this->assertNull($restarted->github_task_id);
+        $this->assertNull($restarted->github_pull_request_number);
+        $this->assertNull($restarted->qa_workflow_run_id);
+        $this->assertNull($restarted->main_workflow_run_id);
+        $this->assertNull($restarted->error);
+        $this->assertSame(1, ai_development_event::query()->where('execution_id', $execution->id)->count());
+        $this->assertDatabaseHas('ai_development_events', [
+            'execution_id' => $execution->id,
+            'event' => 'manual_execution_restarted',
+            'attempt' => 0,
+        ]);
+        $this->assertSame('approved', $restarted->approval->status);
+        Queue::assertPushed(run_ai_development_execution::class, 1);
+        Http::assertSent(fn ($request): bool => $request->method() === 'POST' && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/issue/OPS-1/transitions'));
     }
 
     private function fixture(): array

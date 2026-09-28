@@ -191,7 +191,7 @@ class jira_automation_service
     public function restartExecution(int $executionId, ?int $userId = null): ai_development_execution
     {
         $execution = ai_development_execution::query()
-            ->with(['issue.connection', 'project.jiraProject', 'project.defaultAgent', 'project.githubConnection', 'approval'])
+            ->with(['issue.connection', 'project.jiraProject', 'project.defaultAgent', 'project.githubConnection', 'approval', 'agent'])
             ->findOrFail($executionId);
         $project = $execution->project;
         $issue = $execution->issue;
@@ -240,6 +240,7 @@ class jira_automation_service
                 ->delete();
 
             $execution->forceFill([
+                'approval_id' => $approval->id,
                 'agent_id' => $agent->id,
                 'repository' => $this->repository($project),
                 'status' => ai_development_states::APPROVED,

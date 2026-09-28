@@ -175,6 +175,8 @@ export async function initializeGithubModule(root) {
 		await run(button, async () => {
 			await postJson(`/admin/github/executions/${id}/restart`);
 			await load();
+			const detail = root.querySelector('[data-github-execution-detail]');
+			if (!detail.hidden && detail.dataset.executionId === String(id)) await openExecution(id);
 			document.getElementById('github-executions-tab')?.click();
 		}, root.querySelector('[data-github-connection-status]'));
 	}
@@ -183,7 +185,7 @@ export async function initializeGithubModule(root) {
 		const detail = root.querySelector('[data-github-execution-detail]');
 		const summary = root.querySelector('[data-github-execution-summary]');
 		const events = root.querySelector('[data-github-execution-events]');
-		detail.hidden = false; summary.innerHTML = '<div class="github-empty">Cargando detalle...</div>'; events.innerHTML = '';
+		detail.hidden = false; detail.dataset.executionId = String(id); summary.innerHTML = '<div class="github-empty">Cargando detalle...</div>'; events.innerHTML = '';
 		try {
 			const data = await getJson(`/admin/github/executions/${id}/data`);
 			const item = data.execution;
@@ -210,6 +212,7 @@ export async function initializeGithubModule(root) {
 	root.querySelector('[data-github-approval-filter]').addEventListener('change', (event) => { state.approvalFilter = event.target.value; renderApprovals(); });
 	root.querySelector('[data-github-execution-filter]').addEventListener('change', (event) => { state.executionFilter = event.target.value; renderExecutions(); });
 	root.querySelectorAll('[data-github-refresh]').forEach((button) => button.addEventListener('click', () => run(button, load, root.querySelector('[data-github-connection-status]'))));
+	root.querySelector('[data-github-execution-detail-restart]').addEventListener('click', (event) => restartExecution(Number(root.querySelector('[data-github-execution-detail]').dataset.executionId), event.currentTarget));
 	root.querySelector('[data-github-execution-close]').addEventListener('click', () => { root.querySelector('[data-github-execution-detail]').hidden = true; });
 	root.addEventListener('click', (event) => { const target = event.target.closest('[data-github-open-tab]'); if (!target) return; document.getElementById(target.dataset.githubOpenTab)?.click(); });
 
