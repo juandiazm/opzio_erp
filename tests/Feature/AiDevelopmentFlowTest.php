@@ -284,7 +284,7 @@ class AiDevelopmentFlowTest extends TestCase
                 && $request->data()['model'] === 'gpt-5.6-luna'
                 && $request->data()['base_ref'] === 'qa'
                 && $request->data()['head_ref'] === 'OP-48'
-                && $request->data()['create_pull_request'] === true
+                && $request->data()['create_pull_request'] === false
                 && str_contains($request->data()['prompt'], 'OPS-1');
         });
     }

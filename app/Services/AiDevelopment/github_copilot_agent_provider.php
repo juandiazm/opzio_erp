@@ -15,7 +15,6 @@ class github_copilot_agent_provider implements ai_agent_provider_interface
         string $repository,
         string $baseBranch,
         ?string $headBranch = null,
-        bool $createPullRequest = true,
     ): array {
         return (new github_client($connection))->startAgentTask(
             $owner,
@@ -23,7 +22,7 @@ class github_copilot_agent_provider implements ai_agent_provider_interface
             [
                 'prompt' => $prompt,
                 'model' => trim((string) $agent->model) ?: null,
-                'create_pull_request' => $createPullRequest,
+                'create_pull_request' => false,
                 'base_ref' => $baseBranch,
                 'head_ref' => $headBranch,
             ],

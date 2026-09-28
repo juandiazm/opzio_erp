@@ -13,6 +13,7 @@ final class ai_development_states
     public const PLANNING = 'planning';
     public const DEVELOPING = 'developing';
     public const TESTING = 'testing';
+    public const VERIFYING_INTEGRITY = 'verifying_integrity';
     public const FIXING = 'fixing';
     public const INTEGRATING_QA = 'integrating_qa';
     public const WAITING_QA_PIPELINE = 'waiting_qa_pipeline';
@@ -36,6 +37,7 @@ final class ai_development_states
             self::PLANNING,
             self::DEVELOPING,
             self::TESTING,
+            self::VERIFYING_INTEGRITY,
             self::FIXING,
             self::INTEGRATING_QA,
             self::WAITING_QA_PIPELINE,

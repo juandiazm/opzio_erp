@@ -92,59 +92,51 @@ class monitor_ai_development_agent implements ShouldQueue
     {
         $branch = collect((array) ($task['artifacts'] ?? []))->first(fn (array $artifact): bool => ($artifact['type'] ?? null) === 'branch');
         $headBranch = data_get($branch, 'data.head_ref') ?: $execution->feature_branch;
+        if (blank($headBranch)) {
+            throw new RuntimeException('Copilot cloud agent termino sin informar una branch remota.');
+        }
         $github = new github_client($execution->project->githubConnection);
-        $pullRequest = collect($github->openPullRequests(
-            $execution->project->github_owner,
-            $execution->project->github_repository,
-            $headBranch,
-            $execution->base_branch,
-        ))->first();
-        if (! is_array($pullRequest)) {
-            $pullRequest = $github->createPullRequest(
-                $execution->project->github_owner,
-                $execution->project->github_repository,
-                $execution->jira_key.' - '.($execution->issue?->summary ?: 'Implementacion automatica'),
-                $headBranch,
-                $execution->base_branch,
-                'Pull Request creado por Opzio ERP despues de completar Copilot cloud agent. El ERP controla el merge y el despliegue.',
-                false,
-            );
-        }
-        $pullNumber = (int) ($pullRequest['number'] ?? 0);
-        if ($pullNumber < 1) {
-            throw new RuntimeException('Copilot cloud agent termino sin un pull request visible para la branch '.$headBranch.'.');
-        }
 
         $execution->update([
             'feature_branch' => $headBranch ?: $execution->feature_branch,
-            'github_pull_request_number' => $pullNumber,
+            'github_pull_request_number' => null,
             'last_commit_sha' => null,
             'error' => null,
             'blocked_reason' => null,
             'context' => array_merge((array) $execution->context, [
                 'github_head_branch' => $headBranch ?: data_get($execution->context, 'github_head_branch'),
-                'github_pull_request' => $pullNumber,
-                'github_pull_request_url' => $pullRequest['html_url'] ?? null,
             ]),
         ]);
-        if ($execution->status === ai_development_states::ANALYZING) {
-            $states->transition($execution, ai_development_states::TESTING, ['github_task_state' => 'completed']);
-        } elseif ($execution->status === ai_development_states::DEVELOPING) {
-            $states->transition($execution, ai_development_states::TESTING, ['github_task_state' => 'completed']);
+        if (in_array($execution->status, [ai_development_states::ANALYZING, ai_development_states::DEVELOPING], true)) {
+            $states->transition($execution, ai_development_states::VERIFYING_INTEGRITY, ['github_task_state' => 'completed']);
         }
-        $states->event($execution->fresh(), 'tests_passed', ['source' => 'github_copilot_cloud_agent', 'task_id' => $execution->github_task_id]);
-        $states->transition($execution->fresh(), ai_development_states::INTEGRATING_QA, ['pull_request' => $pullNumber]);
+        $states->event($execution->fresh(), 'integrity_review_passed', [
+            'source' => 'github_copilot_cloud_agent',
+            'task_id' => $execution->github_task_id,
+            'programmatic_tests' => false,
+        ]);
+        $states->transition($execution->fresh(), ai_development_states::INTEGRATING_QA, ['head_branch' => $headBranch]);
 
-        $merge = $github->mergePullRequest($execution->project->github_owner, $execution->project->github_repository, $pullNumber);
+        $merge = $github->mergeBranches(
+            $execution->project->github_owner,
+            $execution->project->github_repository,
+            $execution->base_branch,
+            $headBranch,
+            $execution->jira_key.' integrate Copilot changes into '.$execution->base_branch,
+        );
         if (($merge['merged'] ?? false) !== true) {
-            throw new RuntimeException('El pull request de Copilot no pudo integrarse hacia QA.');
+            throw new RuntimeException('La branch de Copilot no pudo integrarse directamente hacia QA.');
         }
         (new jira_client($execution->issue->connection))->transitionIssue($execution->jira_key, 'Deployed');
         $execution->update([
-            'context' => array_merge((array) $execution->context, ['qa_merged' => true]),
+            'last_commit_sha' => $merge['sha'] ?? null,
+            'context' => array_merge((array) $execution->context, [
+                'qa_merged' => true,
+                'qa_merge_commit' => $merge['sha'] ?? null,
+            ]),
             'last_activity_at' => now(),
         ]);
-        $states->transition($execution->fresh(), ai_development_states::WAITING_QA_PIPELINE, ['pull_request' => $pullNumber]);
+        $states->transition($execution->fresh(), ai_development_states::WAITING_QA_PIPELINE, ['head_branch' => $headBranch]);
         monitor_ai_development_pipeline::dispatch($execution->id, 'qa')->delay(now()->addSeconds(5));
     }
 

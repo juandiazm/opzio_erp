@@ -15,7 +15,6 @@ interface ai_agent_provider_interface
         string $repository,
         string $baseBranch,
         ?string $headBranch = null,
-        bool $createPullRequest = true,
     ): array;
 
     public function status(github_connection $connection, string $owner, string $repository, string $taskId): array;

@@ -83,7 +83,6 @@ class run_ai_development_execution implements ShouldQueue
                 $project->github_owner,
                 $project->github_repository,
                 $execution->base_branch,
-                null,
             );
             $execution->update([
                 'github_task_id' => $task['id'] ?? null,
