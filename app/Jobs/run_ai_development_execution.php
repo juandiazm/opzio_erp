@@ -77,26 +77,15 @@ class run_ai_development_execution implements ShouldQueue
             $github = new github_client($project->githubConnection);
             $featureBranch = $execution->feature_branch ?: $execution->jira_key;
             $github->createBranch($project->github_owner, $project->github_repository, $featureBranch, $execution->base_branch);
-            $pullRequest = collect($github->openPullRequests(
+            $existingPullRequest = collect($github->openPullRequests(
                 $project->github_owner,
                 $project->github_repository,
                 $featureBranch,
                 $execution->base_branch,
             ))->first();
-            if (! is_array($pullRequest)) {
-                $pullRequest = $github->createPullRequest(
-                    $project->github_owner,
-                    $project->github_repository,
-                    $execution->jira_key.' - '.$execution->issue->summary,
-                    $featureBranch,
-                    $execution->base_branch,
-                    'Draft context for GitHub Copilot cloud agent. The ERP controls merge and deployment.',
-                    true,
-                );
-            }
             $execution->update([
                 'feature_branch' => $featureBranch,
-                'github_pull_request_number' => $pullRequest['number'] ?? $execution->github_pull_request_number,
+                'github_pull_request_number' => is_array($existingPullRequest) ? ($existingPullRequest['number'] ?? null) : null,
                 'context' => array_merge((array) $execution->context, ['github_head_branch' => $featureBranch]),
             ]);
             $states->event($execution->fresh(), 'github_branch_ready', ['branch' => $featureBranch, 'base_branch' => $execution->base_branch]);
@@ -108,6 +97,7 @@ class run_ai_development_execution implements ShouldQueue
                 $project->github_repository,
                 $execution->base_branch,
                 $featureBranch,
+                ! is_array($existingPullRequest),
             );
             $execution->update([
                 'github_task_id' => $task['id'] ?? null,

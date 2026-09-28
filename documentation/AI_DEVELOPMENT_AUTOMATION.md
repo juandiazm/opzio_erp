@@ -37,7 +37,7 @@ Los estados locales de Jira como `Tareas por hacer`, `En curso`, `Deploy`, `Qual
 
 El ERP no incluye un modelo de IA que pueda modificar un repositorio por si mismo. El adaptador `ai_agent_provider_interface` permite conectar Luna u otros agentes/CLI sin acoplar el flujo de negocio a un proveedor concreto. Si el comando no existe, la ejecucion queda bloqueada y se notifica a los supervisores.
 
-La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. Antes de iniciar la tarea, el ERP crea de forma idempotente la branch exacta de Jira (por ejemplo `OP-48`) desde `qa` y un Pull Request draft hacia esa branch. Copilot recibe `head_ref=OP-48`; el ERP rechaza cualquier artifact que use otra branch y resuelve el numero real del PR consultando los pull requests abiertos, no usando el ID interno del artifact.
+La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. Antes de iniciar la tarea, el ERP crea de forma idempotente la branch exacta de Jira (por ejemplo `OP-48`) desde `qa`, pero no crea un Pull Request vacio. Copilot recibe `head_ref=OP-48`, realiza sus commits y crea el PR al finalizar; si ya existe un PR con cambios, el ERP lo reutiliza. El ERP rechaza cualquier artifact que use otra branch y resuelve el numero real del PR consultando los pull requests abiertos, no usando el ID interno del artifact.
 
 ## Seguridad y reglas protegidas
 
