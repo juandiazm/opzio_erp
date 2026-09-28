@@ -157,10 +157,14 @@ class AiDevelopmentFlowTest extends TestCase
         $execution = $result['execution']->fresh(['issue', 'project.jiraProject', 'agent']);
         $prompt = app(jira_automation_prompt_builder::class)->build($execution->issue, $execution->project, $execution->agent, $execution);
         $this->assertStringStartsWith('TAREA TECNICA: [OPS-1] Implementar flujo autonomo', $prompt);
-        $this->assertStringContainsString('VALIDACIONES DE ENTORNO', $prompt);
+        $this->assertStringContainsString('OBJETIVO FUNCIONAL - PRIORIDAD MAXIMA', $prompt);
+        $this->assertStringContainsString('CRITERIOS MINIMOS DE IMPLEMENTACION', $prompt);
+        $this->assertStringContainsString('No consideres cumplido un requisito backend si solo agregas .filter(), .slice()', $prompt);
+        $this->assertStringContainsString('VALIDACION OBLIGATORIA', $prompt);
         $this->assertStringContainsString('vendor/', $prompt);
         $this->assertStringContainsString($supervisorContext, $prompt);
         $this->assertStringContainsString('<SUPERVISOR_CONTEXT>', $prompt);
+        $this->assertLessThan(strpos($prompt, 'REGLAS FIJAS DE REPOSITORIO'), strpos($prompt, 'OBJETIVO FUNCIONAL - PRIORIDAD MAXIMA'));
         $this->assertSame('OPS-1', $execution->feature_branch);
         $this->assertStringNotContainsString('Assignee:', $prompt);
         $this->assertStringNotContainsString('Reporter:', $prompt);
