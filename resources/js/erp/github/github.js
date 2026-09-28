@@ -7,6 +7,7 @@ const statusLabels = {
 };
 const eventLabels = {candidate_detected: 'Candidata detectada', approval_sent: 'Aprobacion enviada', approved: 'Aprobada', rejected: 'Rechazada', agent_started: 'Agente iniciado', analysis_started: 'Analisis iniciado', plan_created: 'Plan creado', code_changed: 'Codigo modificado', tests_started: 'Pruebas iniciadas', tests_passed: 'Pruebas aprobadas', tests_failed: 'Pruebas fallidas', qa_merge_started: 'Merge hacia QA', qa_pipeline_started: 'Pipeline QA iniciado', qa_pipeline_failed: 'Pipeline QA fallido', qa_pipeline_passed: 'Pipeline QA aprobado', quality_feedback_detected: 'Feedback QA detectado', main_merge_started: 'Merge hacia main', main_pipeline_started: 'Pipeline main iniciado', main_pipeline_failed: 'Pipeline main fallido', main_pipeline_passed: 'Pipeline main aprobado', completed: 'Completada', blocked: 'Bloqueada', execution_failed: 'Ejecucion fallida'};
 const activeStatuses = new Set(['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline']);
+const tabQueryParameter = 'tab';
 
 const labelStatus = (value) => statusLabels[value] || String(value || '-').replaceAll('_', ' ');
 const labelEvent = (value) => eventLabels[value] || String(value || '-').replaceAll('_', ' ');
@@ -23,6 +24,21 @@ function choiceMarkup(items, selected, name, description) {
 export async function initializeGithubModule(root) {
 	if (!root || root.dataset.initialized === 'true') return;
 	root.dataset.initialized = 'true';
+	const tabs = [...root.querySelectorAll('#github-module-tabs .nav-link')];
+	const updateTabUrl = (tabId) => {
+		const url = new URL(window.location.href);
+		if (tabId) url.searchParams.set(tabQueryParameter, tabId);
+		else url.searchParams.delete(tabQueryParameter);
+		window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+	};
+	const showTabFromUrl = () => {
+		const tabId = new URLSearchParams(window.location.search).get(tabQueryParameter);
+		const tab = tabs.find((item) => item.id === tabId);
+		if (tab) tab.click();
+	};
+	tabs.forEach((tab) => tab.addEventListener('click', () => updateTabUrl(tab.id)));
+	window.addEventListener('popstate', showTabFromUrl);
+	showTabFromUrl();
 	const state = {data: null, selectedProjectId: null, projectSearch: '', approvalFilter: '', executionFilter: ''};
 	const connectionForm = root.querySelector('[data-github-connection-form]');
 	const projectForm = root.querySelector('[data-github-project-form]');
