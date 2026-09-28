@@ -210,6 +210,10 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertContains('Sub-task', $types);
         $this->assertArrayNotHasKey('token', $payload['data']['github'] ?? []);
         $this->assertArrayNotHasKey('credentials', $payload['data']['github'] ?? []);
+        $this->assertSame(
+            'https://github.com/opzio/erp',
+            $payload['data']['projects'][0]['configuration']['github_repository_url'],
+        );
     }
 
     public function test_github_repository_url_uses_the_connection_host_and_api_path(): void
