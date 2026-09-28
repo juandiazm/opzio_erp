@@ -166,6 +166,20 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertNull($service->detectCandidate($issue->fresh(['assignee', 'reporter', 'project', 'connection'])));
     }
 
+    public function test_to_do_is_treated_as_pending_for_candidate_detection(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $issue->update(['status' => 'To Do']);
+
+        $approval = app(jira_automation_service::class)->detectCandidate($issue->fresh(['assignee', 'reporter', 'project', 'connection']));
+
+        $this->assertNotNull($approval);
+        $this->assertDatabaseHas('ai_development_approvals', ['jira_issue_id' => $issue->id, 'status' => 'pending']);
+        Queue::assertNothingPushed();
+    }
+
     public function test_approval_token_cannot_be_replayed(): void
     {
         Mail::fake();

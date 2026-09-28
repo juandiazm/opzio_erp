@@ -231,7 +231,7 @@ class jira_automation_service
 
     public function isCandidate(jira_issue $issue, jira_automation_project $project): bool
     {
-        if (! $project->enabled || strcasecmp(trim((string) $issue->status), jira_automation_statuses::PENDING) !== 0) {
+        if (! $project->enabled || ! jira_automation_statuses::isPending($issue->status)) {
             return false;
         }
         $typeEnabled = $project->issueTypes->contains(fn ($item): bool => $item->enabled && strcasecmp(trim((string) $item->issue_type), trim((string) $issue->issue_type)) === 0);

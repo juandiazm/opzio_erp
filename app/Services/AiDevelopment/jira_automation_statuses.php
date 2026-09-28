@@ -14,4 +14,12 @@ final class jira_automation_statuses
     {
         return [self::PENDING, self::IN_PROGRESS, self::DEPLOYED, self::QA, self::DONE];
     }
+
+    public static function isPending(?string $status): bool
+    {
+        $normalized = strtolower(trim((string) $status));
+        $normalized = str_replace(['-', '_'], ' ', $normalized);
+
+        return in_array($normalized, ['pending', 'to do', 'todo', 'por hacer', 'open', 'abierto'], true);
+    }
 }
