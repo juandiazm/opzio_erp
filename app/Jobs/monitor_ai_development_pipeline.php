@@ -118,6 +118,12 @@ class monitor_ai_development_pipeline implements ShouldQueue
         } catch (Throwable $exception) {
             $logs = 'No fue posible recuperar los logs: '.$exception->getMessage();
         }
+        if ($this->isExternalFailure($logs)) {
+            $reason = 'Fallo externo de infraestructura en CI/CD '.$this->environment.': '.mb_substr($logs, 0, 1200);
+            $states->block($execution->fresh(), $reason, ['external_failure' => true, 'workflow' => $details]);
+            $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $reason);
+            return;
+        }
         $attempts = $this->environment === 'qa' ? (int) $execution->ci_attempts + 1 : (int) $execution->main_ci_attempts + 1;
         $execution->increment($this->environment === 'qa' ? 'ci_attempts' : 'main_ci_attempts');
         $states->event($execution->fresh(), $this->environment.'_pipeline_failed', [
@@ -141,5 +147,27 @@ class monitor_ai_development_pipeline implements ShouldQueue
     private function reschedule(): void
     {
         self::dispatch($this->executionId, $this->environment)->delay(now()->addSeconds(max(5, (int) config('ai_development.pipeline.poll_delay_seconds', 60))));
+    }
+
+    private function isExternalFailure(string $logs): bool
+    {
+        $normalized = strtolower($logs);
+        foreach ([
+            'scp: stat',
+            'no such file or directory',
+            'permission denied',
+            'authentication failed',
+            'could not resolve host',
+            'runner offline',
+            'rate limit',
+            'service unavailable',
+            'connection timed out',
+        ] as $marker) {
+            if (str_contains($normalized, $marker)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -99,6 +99,17 @@ class monitor_ai_development_agent implements ShouldQueue
             $headBranch,
             $execution->base_branch,
         ))->first();
+        if (! is_array($pullRequest)) {
+            $pullRequest = $github->createPullRequest(
+                $execution->project->github_owner,
+                $execution->project->github_repository,
+                $execution->jira_key.' - '.($execution->issue?->summary ?: 'Implementacion automatica'),
+                $headBranch,
+                $execution->base_branch,
+                'Pull Request creado por Opzio ERP despues de completar Copilot cloud agent. El ERP controla el merge y el despliegue.',
+                false,
+            );
+        }
         $pullNumber = (int) ($pullRequest['number'] ?? 0);
         if ($pullNumber < 1) {
             throw new RuntimeException('Copilot cloud agent termino sin un pull request visible para la branch '.$headBranch.'.');
