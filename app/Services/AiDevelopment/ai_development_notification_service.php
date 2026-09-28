@@ -66,7 +66,7 @@ class ai_development_notification_service
 
     public function completed(ai_development_execution $execution, array $workflow): array
     {
-        $execution->loadMissing(['issue.project', 'project', 'agent']);
+        $execution->loadMissing(['issue.project', 'project.jiraProject', 'agent']);
         $recipients = $this->recipients($execution->project);
         if ($recipients->isEmpty()) {
             return ['status' => 0, 'message' => 'No hay supervisores habilitados para recibir la finalizacion.'];
