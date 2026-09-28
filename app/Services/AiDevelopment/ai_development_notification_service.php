@@ -47,21 +47,32 @@ class ai_development_notification_service
     {
         $execution->loadMissing(['issue.project', 'project', 'agent']);
         $recipients = $this->recipients($execution->project);
-        if ($recipients->isEmpty()) {
-            return ['status' => 0, 'message' => 'No hay supervisores habilitados para recibir el bloqueo.'];
+        $supervisorResponse = ['status' => 0, 'message' => 'No hay supervisores habilitados para recibir el bloqueo.'];
+        if ($recipients->isNotEmpty()) {
+            $supervisorResponse = $this->SendMail(
+                ['subject' => 'Flujo IA bloqueado: '.$execution->jira_key],
+                $recipients->all(),
+                'mail.ai_development.blocked',
+                [
+                    'execution' => $execution,
+                    'reason' => $reason,
+                    'detail_url' => url('/admin/jira?tab=ai-development&execution='.$execution->id),
+                ],
+                null,
+            );
         }
 
-        return $this->SendMail(
-            ['subject' => 'Flujo IA bloqueado: '.$execution->jira_key],
-            $recipients->all(),
-            'mail.ai_development.blocked',
-            [
-                'execution' => $execution,
-                'reason' => $reason,
-                'detail_url' => url('/admin/jira?tab=ai-development&execution='.$execution->id),
-            ],
-            null,
+        $reporterResponse = $this->reporterFlow(
+            $execution,
+            'Flujo bloqueado',
+            'La ejecucion se detuvo y requiere una revision del equipo responsable.',
+            ['Motivo' => $reason],
         );
+
+        return array_merge($supervisorResponse, [
+            'reporter_status' => $reporterResponse['status'] ?? 0,
+            'reporter_message' => $reporterResponse['message'] ?? '',
+        ]);
     }
 
     public function qaAvailable(ai_development_execution $execution): array
@@ -87,6 +98,42 @@ class ai_development_notification_service
                 'execution' => $execution,
                 'issue' => $execution->issue,
                 'reporter' => $reporter,
+                'issue_url' => $issueUrl,
+            ],
+            null,
+        );
+    }
+
+    public function reporterFlow(
+        ai_development_execution $execution,
+        string $title,
+        string $message,
+        array $details = [],
+    ): array {
+        $execution->loadMissing(['issue.connection', 'issue.project', 'issue.reporter.mapping.user', 'project', 'agent']);
+        $reporter = $execution->issue?->reporter;
+        $email = strtolower(trim((string) ($reporter?->email ?: $reporter?->mapping?->user?->email ?: '')));
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['status' => 0, 'message' => 'El reporter no tiene un correo electronico valido para notificar el estado de la ejecucion.'];
+        }
+
+        $issueKey = (string) ($execution->jira_key ?: $execution->issue?->issue_key);
+        $siteUrl = trim((string) ($execution->issue?->connection?->site_url ?? ''));
+        $issueUrl = filled($siteUrl) && filled($issueKey)
+            ? rtrim($siteUrl, '/').'/browse/'.rawurlencode($issueKey)
+            : null;
+
+        return $this->SendMail(
+            ['subject' => $title.': '.$issueKey],
+            [['address' => $email, 'name' => trim((string) ($reporter->display_name ?: $email))]],
+            'mail.ai_development.reporter',
+            [
+                'execution' => $execution,
+                'issue' => $execution->issue,
+                'reporter' => $reporter,
+                'title' => $title,
+                'message' => $message,
+                'details' => $details,
                 'issue_url' => $issueUrl,
             ],
             null,

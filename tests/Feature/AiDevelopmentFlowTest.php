@@ -20,6 +20,7 @@ use App\Models\jira_project;
 use App\Models\jira_user;
 use App\Services\AiDevelopment\jira_automation_service;
 use App\Services\AiDevelopment\ai_development_notification_service;
+use App\Services\AiDevelopment\ai_agent_provider_interface;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
 use App\Services\AiDevelopment\jira_automation_statuses;
 use App\Services\AiDevelopment\github_copilot_agent_provider;
@@ -162,6 +163,88 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertStringNotContainsString('Assignee:', $prompt);
         $this->assertStringNotContainsString('Reporter:', $prompt);
         Http::assertSent(fn ($request): bool => $request->method() === 'PUT' && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/issue/OPS-1'));
+    }
+
+    public function test_development_start_notifies_reporter_without_waiting_for_qa(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $approval->update(['status' => 'approved']);
+        $execution->forceFill(['status' => 'approved', 'current_phase' => 'approved'])->save();
+        $provider = $this->createMock(ai_agent_provider_interface::class);
+        $provider->expects($this->once())->method('start')->willReturn(['id' => 'task-reporter-1', 'state' => 'queued']);
+
+        (new run_ai_development_execution($execution->id))->handle(
+            app(\App\Services\AiDevelopment\ai_development_state_machine::class),
+            app(jira_automation_prompt_builder::class),
+            $provider,
+            app(ai_development_notification_service::class),
+        );
+
+        $this->assertDatabaseHas('ai_development_events', [
+            'execution_id' => $execution->id,
+            'event' => 'reporter_notification_sent',
+        ]);
+        Mail::assertQueued(CustomMail::class, fn (CustomMail $queued): bool => $queued->View === 'mail.ai_development.reporter');
+    }
+
+    public function test_development_job_blocks_when_attempt_limit_is_reached(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $approval->update(['status' => 'approved']);
+        $execution->forceFill([
+            'status' => 'quality_feedback',
+            'current_phase' => 'quality_feedback',
+            'attempt' => 5,
+            'consecutive_failures' => 0,
+        ])->save();
+        $provider = $this->createMock(ai_agent_provider_interface::class);
+        $provider->expects($this->never())->method('start');
+
+        (new run_ai_development_execution($execution->id))->handle(
+            app(\App\Services\AiDevelopment\ai_development_state_machine::class),
+            app(jira_automation_prompt_builder::class),
+            $provider,
+            app(ai_development_notification_service::class),
+        );
+
+        $this->assertDatabaseHas('ai_development_executions', ['id' => $execution->id, 'status' => 'blocked']);
+        $this->assertStringContainsString('limite configurable de intentos', (string) $execution->fresh()->blocked_reason);
+    }
+
+    public function test_development_job_blocks_when_consecutive_failure_limit_is_reached(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $approval->update(['status' => 'approved']);
+        $execution->forceFill([
+            'status' => 'quality_feedback',
+            'current_phase' => 'quality_feedback',
+            'attempt' => 1,
+            'consecutive_failures' => 3,
+        ])->save();
+        $provider = $this->createMock(ai_agent_provider_interface::class);
+        $provider->expects($this->never())->method('start');
+
+        (new run_ai_development_execution($execution->id))->handle(
+            app(\App\Services\AiDevelopment\ai_development_state_machine::class),
+            app(jira_automation_prompt_builder::class),
+            $provider,
+            app(ai_development_notification_service::class),
+        );
+
+        $this->assertDatabaseHas('ai_development_executions', ['id' => $execution->id, 'status' => 'blocked']);
+        $this->assertStringContainsString('fallos consecutivos', (string) $execution->fresh()->blocked_reason);
     }
 
     public function test_only_enabled_type_assignee_and_project_are_candidates(): void

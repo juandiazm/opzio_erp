@@ -41,6 +41,8 @@ Cuando una HU ya esta en `Done` o `Finalizada` y el pipeline QA ya fue aprobado,
 
 Desde `Admin > GitHub > Ejecuciones`, el boton `Reiniciar flujo` permite volver a ejecutar cualquier historia que ya tenga una ejecucion, sin importar su estado actual. La accion limpia intentos, task de Copilot, branch, PR, pipelines, errores y eventos anteriores; cambia Jira a `In Progress`, registra un unico evento de reinicio y vuelve a encolar la ejecucion.
 
+Cada fase relevante envia al reporter un correo informativo: aprobacion o rechazo, desarrollo iniciado, feedback QA, QA disponible, promocion, completado y bloqueado. Estos correos no contienen enlaces de aprobacion ni pueden cambiar el flujo; si el reporter no tiene email en Jira, se intenta el usuario ERP vinculado y, si tampoco existe, se registra el fallo sin detener la ejecucion.
+
 El ERP no ejecuta un modelo ni un CLI local. El adaptador `ai_agent_provider_interface` inicia y consulta GitHub Copilot cloud agent mediante Agent Tasks.
 
 La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. Copilot crea la branch remota; GitHub puede usar un nombre automatico como `copilot/op-48-github-url-dinamica`. Cuando el task termina, el ERP hace merge directo de esa branch hacia `qa` mediante la API de GitHub y empieza el pipeline de QA. No se requiere Pull Request para el flujo automatico.
@@ -55,6 +57,8 @@ La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. C
 - `qa.yml` y `main.yml` se rechazan si aparecen en el diff de la ejecucion.
 - Cada ejecucion queda vinculada a su task y branch remotos de GitHub; el servidor ERP no clona repositorios.
 - Los limites de intentos del agente, fallos consecutivos, minutos y tres fallos CI/CD bloquean la ejecucion y disparan correo.
+- `max_execution_attempts` y `max_consecutive_failures` se validan antes de lanzar cada nueva tarea; el contador de fallos consecutivos solo se reinicia cuando QA termina correctamente, evitando reintentos infinitos por errores repetidos.
+- Los comentarios automaticos de disponibilidad en QA no se consideran feedback; solo comentarios reales posteriores a la entrega QA pueden iniciar otra iteracion.
 - QA no autoriza produccion. Solo una transicion Jira a `Done` o `Finalizada` permite iniciar la promocion.
 
 ## Integracion externa

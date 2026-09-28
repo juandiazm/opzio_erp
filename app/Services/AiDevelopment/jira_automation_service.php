@@ -337,9 +337,12 @@ class jira_automation_service
                 'agent_id' => $agentId ?: $project->default_agent_id,
                 'context' => array_merge((array) $execution->context, ['supervisor_context' => $supervisorContext]),
             ]);
-            $this->states->transition($execution, ai_development_states::REJECTED, [
+            $execution = $this->states->transition($execution, ai_development_states::REJECTED, [
                 'story_point_estimate' => $storyPointEstimate,
                 'supervisor_context_provided' => filled($supervisorContext),
+            ]);
+            $this->notifyReporter($execution, 'Historia no aprobada', 'La historia no fue autorizada para entrar al flujo autonomo.', [
+                'Motivo' => $note ?: 'No se especifico un motivo adicional.',
             ]);
             return ['status' => 'rejected', 'approval' => $approval->fresh(), 'execution' => $execution->fresh()];
         }
@@ -375,9 +378,12 @@ class jira_automation_service
             'started_at' => now(),
             'context' => array_merge((array) $execution->context, ['supervisor_context' => $supervisorContext]),
         ]);
-        $this->states->transition($execution, ai_development_states::APPROVED, [
+        $execution = $this->states->transition($execution, ai_development_states::APPROVED, [
             'story_point_estimate' => $storyPointEstimate,
             'supervisor_context_provided' => filled($supervisorContext),
+        ]);
+        $this->notifyReporter($execution, 'Historia aprobada', 'La historia fue aprobada y comenzara su desarrollo autonomo.', [
+            'Story Points' => $storyPointEstimate,
         ]);
         run_ai_development_execution::dispatch($execution->id);
 
@@ -400,7 +406,10 @@ class jira_automation_service
                     'qa_last_feedback_at' => now(),
                     'context' => array_merge((array) $execution->context, ['last_feedback' => $feedback]),
                 ]);
-                $this->states->transition($execution, ai_development_states::QUALITY_FEEDBACK, ['feedback_count' => count($feedback)]);
+                $execution = $this->states->transition($execution, ai_development_states::QUALITY_FEEDBACK, ['feedback_count' => count($feedback)]);
+                $this->notifyReporter($execution, 'Feedback QA recibido', 'Se recibieron observaciones de QA y se iniciara una nueva iteracion de desarrollo.', [
+                    'Observaciones' => count($feedback),
+                ]);
                 run_ai_development_execution::dispatch($execution->id);
             }
         }
@@ -408,11 +417,12 @@ class jira_automation_service
             && $execution->status === ai_development_states::WAITING_QUALITY_REVIEW
             && $execution->qa_delivered_at !== null) {
             $execution->update(['done_detected_at' => now()]);
-            $this->states->transition($execution, ai_development_states::INTEGRATING_MAIN, [
+            $execution = $this->states->transition($execution, ai_development_states::INTEGRATING_MAIN, [
                 'source' => 'erp_jira_issue',
                 'jira_status' => $issue->status,
                 'jira_status_category' => $issue->status_category,
             ]);
+            $this->notifyReporter($execution, 'Publicacion iniciada', 'La historia fue marcada como finalizada en Jira y comenzo su promocion a produccion.');
             promote_ai_development_execution::dispatch($execution->id);
         }
     }
@@ -472,6 +482,15 @@ class jira_automation_service
         $this->notifications->blocked($execution, $reason);
 
         return ['status' => 'blocked', 'message' => $reason, 'approval' => $approval->fresh(), 'execution' => $execution->fresh()];
+    }
+
+    private function notifyReporter(ai_development_execution $execution, string $title, string $message, array $details = []): void
+    {
+        $notification = $this->notifications->reporterFlow($execution, $title, $message, $details);
+        $this->states->event($execution, ($notification['status'] ?? 0) === 1 ? 'reporter_notification_sent' : 'reporter_notification_failed', [
+            'title' => $title,
+            'message' => mb_substr((string) ($notification['message'] ?? ''), 0, 500),
+        ]);
     }
 
     private function hasEquivalentPendingWork(jira_issue $issue): bool

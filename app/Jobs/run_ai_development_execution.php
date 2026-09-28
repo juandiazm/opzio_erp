@@ -53,6 +53,16 @@ class run_ai_development_execution implements ShouldQueue
             if (! $project->githubConnection || blank($project->github_owner) || blank($project->github_repository)) {
                 throw new RuntimeException('El proyecto no tiene una conexion GitHub completa.');
             }
+            $attemptLimit = max(1, (int) $project->max_execution_attempts);
+            $failureLimit = max(1, (int) $project->max_consecutive_failures);
+            if ((int) $execution->attempt >= $attemptLimit) {
+                $this->blockForLoopLimit($execution, 'Se alcanzo el limite configurable de intentos de desarrollo.', $states, $notifications);
+                return;
+            }
+            if ((int) $execution->consecutive_failures >= $failureLimit) {
+                $this->blockForLoopLimit($execution, 'Se alcanzo el limite configurable de fallos consecutivos.', $states, $notifications);
+                return;
+            }
             if ($execution->started_at && $execution->started_at->diffInMinutes(now()) > (int) $project->max_execution_minutes) {
                 throw new RuntimeException('Se alcanzo el limite de minutos de la ejecucion.');
             }
@@ -62,7 +72,6 @@ class run_ai_development_execution implements ShouldQueue
             }
             $execution = $execution->fresh(['issue.connection', 'project.jiraProject', 'project.githubConnection', 'project.defaultAgent', 'agent']);
             $execution->attempt = (int) $execution->attempt + 1;
-            $execution->consecutive_failures = 0;
             $execution->last_activity_at = now();
             $execution->save();
 
@@ -96,6 +105,16 @@ class run_ai_development_execution implements ShouldQueue
                 'model' => $agent->model,
                 'prompt_hash' => hash('sha256', $prompt),
             ]);
+            $reporterNotification = $notifications->reporterFlow(
+                $execution->fresh(['issue.connection', 'issue.project', 'issue.reporter.mapping.user', 'project', 'agent']),
+                'Desarrollo iniciado',
+                'El agente autonomo comenzo a trabajar en la historia.',
+                ['Modelo' => $agent->model, 'Task GitHub' => $task['id'] ?? '-'],
+            );
+            $states->event($execution, ($reporterNotification['status'] ?? 0) === 1 ? 'reporter_notification_sent' : 'reporter_notification_failed', [
+                'title' => 'Desarrollo iniciado',
+                'message' => mb_substr((string) ($reporterNotification['message'] ?? ''), 0, 500),
+            ]);
             monitor_ai_development_agent::dispatch($execution->id)->delay(now()->addSeconds(5));
         } catch (Throwable $exception) {
             $this->handleFailure($execution, $exception, $states, $notifications);
@@ -121,13 +140,22 @@ class run_ai_development_execution implements ShouldQueue
         $attemptLimit = max(1, (int) $execution->project?->max_execution_attempts);
         $failureLimit = max(1, (int) $execution->project?->max_consecutive_failures);
         if ((int) $execution->attempt >= $attemptLimit || (int) $execution->consecutive_failures >= $failureLimit) {
-            $states->block($execution, 'Se alcanzo el limite de intentos de desarrollo: '.$message);
-            $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $execution->blocked_reason);
+            $this->blockForLoopLimit($execution, 'Se alcanzo el limite de intentos de desarrollo: '.$message, $states, $notifications);
             return;
         }
         if ($execution->status !== ai_development_states::FAILED) {
             $states->transition($execution, ai_development_states::FAILED, ['message' => $message]);
         }
         run_ai_development_execution::dispatch($execution->id)->delay(now()->addSeconds(5));
+    }
+
+    private function blockForLoopLimit(
+        ai_development_execution $execution,
+        string $reason,
+        ai_development_state_machine $states,
+        ai_development_notification_service $notifications,
+    ): void {
+        $states->block($execution, $reason);
+        $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $reason);
     }
 }

@@ -68,7 +68,7 @@ class monitor_ai_development_pipeline implements ShouldQueue
                 promote_ai_development_execution::dispatch($execution->id);
                 return;
             }
-            $this->mainSucceeded($execution, $details, $states);
+            $this->mainSucceeded($execution, $details, $states, $notifications);
         } catch (Throwable $exception) {
             $states->block($execution, 'No fue posible supervisar GitHub Actions: '.mb_substr($exception->getMessage(), 0, 1000));
             $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $execution->blocked_reason);
@@ -93,7 +93,12 @@ class monitor_ai_development_pipeline implements ShouldQueue
         } catch (Throwable $exception) {
             throw new RuntimeException('QA paso en GitHub, pero no fue posible actualizar Jira: '.$exception->getMessage(), 0, $exception);
         }
-        $execution->update(['qa_delivered_at' => now(), 'qa_workflow_run_id' => $details['id'], 'last_activity_at' => now()]);
+        $execution->update([
+            'qa_delivered_at' => now(),
+            'qa_workflow_run_id' => $details['id'],
+            'consecutive_failures' => 0,
+            'last_activity_at' => now(),
+        ]);
         $execution = $states->transition($execution, ai_development_states::WAITING_QUALITY_REVIEW, ['workflow' => $details]);
         $notification = $notifications->qaAvailable($execution);
         $states->event($execution, ($notification['status'] ?? 0) === 1 ? 'qa_reporter_notified' : 'qa_reporter_notification_failed', [
@@ -101,10 +106,25 @@ class monitor_ai_development_pipeline implements ShouldQueue
         ]);
     }
 
-    private function mainSucceeded(ai_development_execution $execution, array $details, ai_development_state_machine $states): void
+    private function mainSucceeded(
+        ai_development_execution $execution,
+        array $details,
+        ai_development_state_machine $states,
+        ai_development_notification_service $notifications,
+    ): void
     {
         $execution->update(['main_workflow_run_id' => $details['id'], 'finished_at' => now(), 'last_activity_at' => now()]);
-        $states->transition($execution, ai_development_states::COMPLETED, ['workflow' => $details]);
+        $execution = $states->transition($execution, ai_development_states::COMPLETED, ['workflow' => $details]);
+        $reporterNotification = $notifications->reporterFlow(
+            $execution,
+            'Historia completada',
+            'La implementacion supero el pipeline principal y el flujo autonomo finalizo correctamente.',
+            ['Pipeline main' => $details['id'] ?? '-'],
+        );
+        $states->event($execution, ($reporterNotification['status'] ?? 0) === 1 ? 'reporter_notification_sent' : 'reporter_notification_failed', [
+            'title' => 'Historia completada',
+            'message' => mb_substr((string) ($reporterNotification['message'] ?? ''), 0, 500),
+        ]);
         if ($execution->project?->githubConnection && filled($execution->feature_branch)) {
             try {
                 (new \App\Services\AiDevelopment\github_client($execution->project->githubConnection))->deleteBranch($execution->project->github_owner, $execution->project->github_repository, $execution->feature_branch);

@@ -49,7 +49,8 @@ class promote_ai_development_execution implements ShouldQueue
                     throw new RuntimeException('No fue posible integrar main hacia QA.');
                 }
                 $execution->update(['context' => array_merge($context, ['promotion_stage' => 'qa_sync_pipeline', 'qa_sync_pull_request' => $number])]);
-                $states->transition($execution, ai_development_states::WAITING_MAIN_PIPELINE, ['stage' => 'qa_sync', 'pull_request' => $number]);
+                $execution = $states->transition($execution, ai_development_states::WAITING_MAIN_PIPELINE, ['stage' => 'qa_sync', 'pull_request' => $number]);
+                $this->notifyReporter($execution, $states, $notifications, 'Sincronizacion de ramas en curso', 'La promocion esta preparando la rama principal para publicar la historia.', ['Pull request' => $number]);
                 monitor_ai_development_pipeline::dispatch($execution->id, 'main')->delay(now()->addSeconds(5));
                 return;
             }
@@ -64,11 +65,27 @@ class promote_ai_development_execution implements ShouldQueue
                 throw new RuntimeException('No fue posible integrar QA hacia main.');
             }
             $execution->update(['context' => array_merge($context, ['promotion_stage' => 'main_release_pipeline', 'main_pull_request' => $number])]);
-            $states->transition($execution, ai_development_states::WAITING_MAIN_PIPELINE, ['stage' => 'main_release', 'pull_request' => $number]);
+            $execution = $states->transition($execution, ai_development_states::WAITING_MAIN_PIPELINE, ['stage' => 'main_release', 'pull_request' => $number]);
+            $this->notifyReporter($execution, $states, $notifications, 'Publicacion en curso', 'La implementacion de QA se esta integrando en la rama principal.', ['Pull request' => $number]);
             monitor_ai_development_pipeline::dispatch($execution->id, 'main')->delay(now()->addSeconds(5));
         } catch (Throwable $exception) {
             $states->block($execution, 'No fue posible promover la historia: '.mb_substr($exception->getMessage(), 0, 1200));
             $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $execution->blocked_reason);
         }
+    }
+
+    private function notifyReporter(
+        ai_development_execution $execution,
+        ai_development_state_machine $states,
+        ai_development_notification_service $notifications,
+        string $title,
+        string $message,
+        array $details = [],
+    ): void {
+        $notification = $notifications->reporterFlow($execution, $title, $message, $details);
+        $states->event($execution, ($notification['status'] ?? 0) === 1 ? 'reporter_notification_sent' : 'reporter_notification_failed', [
+            'title' => $title,
+            'message' => mb_substr((string) ($notification['message'] ?? ''), 0, 500),
+        ]);
     }
 }
