@@ -277,6 +277,16 @@ class AiDevelopmentFlowTest extends TestCase
         Queue::assertNothingPushed();
     }
 
+    public function test_jira_board_column_names_are_supported_by_the_automation_flow(): void
+    {
+        $this->assertSame(['To Do', 'In Progress', 'Deploy', 'Quality', 'Done'], jira_automation_statuses::all());
+        $this->assertTrue(jira_automation_statuses::isPending('To Do'));
+        $this->assertTrue(jira_automation_statuses::isDevelopmentActive('In Progress'));
+        $this->assertTrue(jira_automation_statuses::isQualityReview('Quality'));
+        $this->assertTrue(jira_automation_statuses::isDone('Done'));
+        $this->assertContains('deploy', jira_automation_statuses::transitionAliases('Deploy'));
+    }
+
     public function test_jira_tasks_to_do_status_category_name_is_treated_as_pending(): void
     {
         Mail::fake();

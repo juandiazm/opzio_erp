@@ -37,6 +37,8 @@ php artisan jira:automation:scan --project=<automation_project_id> --issue=<JIRA
 
 Los estados locales de Jira como `Tareas por hacer`, `En curso`, `Deploy`, `Quality` y `Finalizada` se resuelven contra las etapas canónicas del flujo.
 
+La secuencia de columnas soportada es `To Do` -> `In Progress` -> `Deploy` -> `Quality` -> `Done`; se conservan aliases como `Tareas por hacer`, `En curso` y `Finalizada` para instalaciones localizadas.
+
 Cuando una HU ya esta en `Done` o `Finalizada` y el pipeline QA ya fue aprobado, una nueva sincronizacion Jira evalua la ejecucion y encola la promocion a main. Para forzar esa evaluacion sin esperar al scheduler: `php artisan jira:sync --connection=<connection_id> --days=1`.
 
 Desde `Admin > GitHub > Ejecuciones`, el boton `Reiniciar flujo` permite volver a ejecutar cualquier historia que ya tenga una ejecucion, sin importar su estado actual. La accion limpia intentos, task de Copilot, branch, PR, pipelines, errores y eventos anteriores; cambia Jira a `In Progress`, registra un unico evento de reinicio y vuelve a encolar la ejecucion.

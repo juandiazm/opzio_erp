@@ -7,14 +7,17 @@ use Illuminate\Support\Str;
 final class jira_automation_statuses
 {
     public const PENDING = 'Pending';
+    public const TO_DO = 'To Do';
     public const IN_PROGRESS = 'In Progress';
     public const DEPLOYED = 'Deployed';
+    public const DEPLOY = 'Deploy';
     public const QA = 'QA';
+    public const QUALITY = 'Quality';
     public const DONE = 'Done';
 
     public static function all(): array
     {
-        return [self::PENDING, self::IN_PROGRESS, self::DEPLOYED, self::QA, self::DONE];
+        return [self::TO_DO, self::IN_PROGRESS, self::DEPLOY, self::QUALITY, self::DONE];
     }
 
     public static function isPending(?string $status): bool
@@ -45,9 +48,10 @@ final class jira_automation_statuses
     public static function transitionAliases(string $status): array
     {
         return match ($status) {
+            self::TO_DO => ['to do', 'todo', 'pending', 'por hacer', 'tareas por hacer', 'open', 'abierto'],
             self::IN_PROGRESS => ['in progress', 'en curso', 'en progreso'],
-            self::DEPLOYED => ['deployed', 'deploy', 'desplegado', 'desplegada'],
-            self::QA => ['qa', 'quality', 'calidad', 'quality review'],
+            self::DEPLOY, self::DEPLOYED => ['deploy', 'deployed', 'desplegado', 'desplegada'],
+            self::QUALITY, self::QA => ['quality', 'qa', 'calidad', 'quality review'],
             self::DONE => [
                 'done', 'finalizada', 'finalizado', 'completada', 'completado', 'closed', 'cerrada', 'cerrado',
                 'listo', 'lista', 'listo para ejecutar', 'lista para ejecutar', 'ready', 'ready to execute',
