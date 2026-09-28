@@ -37,7 +37,10 @@ class monitor_ai_development_agent implements ShouldQueue
         $execution = ai_development_execution::query()
             ->with(['issue.connection', 'project.githubConnection', 'project.jiraProject', 'agent'])
             ->find($this->executionId);
-        if (! $execution || in_array($execution->status, [ai_development_states::COMPLETED, ai_development_states::REJECTED, ai_development_states::BLOCKED], true)) {
+        if (! $execution || in_array($execution->status, [ai_development_states::COMPLETED, ai_development_states::REJECTED], true)) {
+            return;
+        }
+        if ($execution->status === ai_development_states::BLOCKED && $execution->github_task_state !== 'completed') {
             return;
         }
         if (! $execution->github_task_id || ! $execution->project?->githubConnection) {
@@ -105,6 +108,8 @@ class monitor_ai_development_agent implements ShouldQueue
             'feature_branch' => $headBranch ?: $execution->feature_branch,
             'github_pull_request_number' => $pullNumber,
             'last_commit_sha' => null,
+            'error' => null,
+            'blocked_reason' => null,
             'context' => array_merge((array) $execution->context, [
                 'github_head_branch' => $headBranch ?: data_get($execution->context, 'github_head_branch'),
                 'github_pull_request' => $pullNumber,

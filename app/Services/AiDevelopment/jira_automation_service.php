@@ -4,6 +4,7 @@ namespace App\Services\AiDevelopment;
 
 use App\Jobs\promote_ai_development_execution;
 use App\Jobs\run_ai_development_execution;
+use App\Jobs\monitor_ai_development_agent;
 use App\Models\ai_agent;
 use App\Models\ai_development_approval;
 use App\Models\ai_development_event;
@@ -132,6 +133,15 @@ class jira_automation_service
 
         if ($approval->status === 'approved') {
             $execution = $approval->execution;
+            if (filled($execution->github_task_id) && $execution->github_task_state === 'completed') {
+                $this->states->event($execution, 'completed_task_recovery_requested', [
+                    'task_id' => $execution->github_task_id,
+                    'reason' => 'La ejecucion fue bloqueada despues de completar Copilot.',
+                ]);
+                monitor_ai_development_agent::dispatch($execution->id);
+
+                return $approval->fresh(['issue', 'project', 'execution']);
+            }
             $execution->forceFill([
                 'status' => ai_development_states::APPROVED,
                 'current_phase' => ai_development_states::APPROVED,

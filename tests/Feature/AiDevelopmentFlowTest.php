@@ -147,6 +147,8 @@ class AiDevelopmentFlowTest extends TestCase
         $execution = $result['execution']->fresh(['issue', 'project.jiraProject', 'agent']);
         $prompt = app(jira_automation_prompt_builder::class)->build($execution->issue, $execution->project, $execution->agent, $execution);
         $this->assertStringStartsWith('TAREA TECNICA: [OPS-1] Implementar flujo autonomo', $prompt);
+        $this->assertStringContainsString('VALIDACIONES DE ENTORNO', $prompt);
+        $this->assertStringContainsString('vendor/', $prompt);
         $this->assertStringContainsString($supervisorContext, $prompt);
         $this->assertStringContainsString('<SUPERVISOR_CONTEXT>', $prompt);
         $this->assertSame('OPS-1', $execution->feature_branch);
