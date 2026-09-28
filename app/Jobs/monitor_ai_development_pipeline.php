@@ -7,7 +7,6 @@ use App\Services\AiDevelopment\ai_development_notification_service;
 use App\Services\AiDevelopment\ai_development_state_machine;
 use App\Services\AiDevelopment\ai_development_states;
 use App\Services\AiDevelopment\github_workflow_service;
-use App\Services\AiDevelopment\local_git_service;
 use App\Services\Jira\jira_client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,7 +32,6 @@ class monitor_ai_development_pipeline implements ShouldQueue
         github_workflow_service $workflows,
         ai_development_state_machine $states,
         ai_development_notification_service $notifications,
-        local_git_service $git,
     ): void {
         $execution = ai_development_execution::query()->with(['project.jiraProject', 'project.githubConnection', 'issue.connection', 'issue.reporter'])->find($this->executionId);
         if (! $execution || ! $execution->project?->githubConnection) {
@@ -70,7 +68,7 @@ class monitor_ai_development_pipeline implements ShouldQueue
                 promote_ai_development_execution::dispatch($execution->id);
                 return;
             }
-            $this->mainSucceeded($execution, $details, $states, $git);
+            $this->mainSucceeded($execution, $details, $states);
         } catch (Throwable $exception) {
             $states->block($execution, 'No fue posible supervisar GitHub Actions: '.mb_substr($exception->getMessage(), 0, 1000));
             $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $execution->blocked_reason);
@@ -94,7 +92,7 @@ class monitor_ai_development_pipeline implements ShouldQueue
         $states->transition($execution, ai_development_states::WAITING_QUALITY_REVIEW, ['workflow' => $details]);
     }
 
-    private function mainSucceeded(ai_development_execution $execution, array $details, ai_development_state_machine $states, local_git_service $git): void
+    private function mainSucceeded(ai_development_execution $execution, array $details, ai_development_state_machine $states): void
     {
         $execution->update(['main_workflow_run_id' => $details['id'], 'finished_at' => now(), 'last_activity_at' => now()]);
         $states->transition($execution, ai_development_states::COMPLETED, ['workflow' => $details]);
@@ -104,11 +102,6 @@ class monitor_ai_development_pipeline implements ShouldQueue
             } catch (Throwable $exception) {
                 $states->event($execution, 'feature_branch_cleanup_failed', ['message' => mb_substr($exception->getMessage(), 0, 500)]);
             }
-        }
-        try {
-            $git->deleteWorkspace($execution);
-        } catch (Throwable $exception) {
-            $states->event($execution, 'workspace_cleanup_failed', ['message' => mb_substr($exception->getMessage(), 0, 500)]);
         }
     }
 

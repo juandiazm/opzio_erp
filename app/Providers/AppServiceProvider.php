@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Services\AiDevelopment\ai_agent_provider_interface;
-use App\Services\AiDevelopment\command_ai_agent_provider;
+use App\Services\AiDevelopment\github_copilot_agent_provider;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(ai_agent_provider_interface::class, command_ai_agent_provider::class);
+        $this->app->bind(ai_agent_provider_interface::class, github_copilot_agent_provider::class);
     }
 
     /**

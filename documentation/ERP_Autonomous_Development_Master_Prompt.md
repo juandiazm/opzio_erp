@@ -1904,8 +1904,8 @@ La interfaz de automatizacion se administra ahora desde el modulo independiente 
 - Configuracion por proyecto Jira con habilitacion, repositorio GitHub, rama base y limites de ejecucion/CI.
 - Catalogo dinamico de tipos Jira y assignees, incluido `Unassigned / Sin asignar`.
 - Supervisores globales y por proyecto con deduplicacion por correo.
-- Catalogo de agentes desacoplado mediante `ai_agent_provider_interface`; Luna se crea como agente predeterminado.
-- Luna queda asociada al modelo real `gpt-5.6-luna`; el runner recibe el modelo elegido mediante `OPZIO_AI_MODEL` y los proyectos/aprobaciones usan dropdown de agentes.
+- Catalogo de agentes desacoplado mediante `ai_agent_provider_interface`; Luna, Terra y Sol se ejecutan mediante GitHub Copilot cloud agent.
+- Luna queda asociada al modelo real `gpt-5.6-luna`; GitHub Copilot cloud agent recibe el modelo elegido mediante la API de Agent Tasks y los proyectos/aprobaciones usan dropdown de agentes.
 - Conexion GitHub singleton con credencial cifrada; cliente para repositorios, ramas, commits, checks, pull requests, merges, workflows y logs.
 - Deteccion idempotente conectada al upsert existente de `jira_sync_service`.
 - Aprobacion publica con token aleatorio almacenado como hash, expiracion, uso unico, snapshot de Jira y Story Point Estimate.
@@ -1933,9 +1933,9 @@ La suite Jira existente y las pruebas del flujo autonomo pasan en el entorno loc
 
 ### Dependencias externas pendientes de validar en entorno real
 
-- Token GitHub con permisos minimos para repositorios, pull requests, checks y Actions.
+- Token GitHub de usuario con `Agent tasks: Read and write`, `Contents: Read and write`, `Pull requests: Read and write`, `Actions: Read` y `Metadata: Read`; no se requiere una permission separada `Checks`.
 - Usuario/token Jira con permisos para actualizar Story Points, transicionar issues y comentar.
-- Comando/runner real de Luna u otro agente configurado en `AI_DEVELOPMENT_LUNA_COMMAND` o en el catalogo de agentes.
+- Copilot cloud agent habilitado en cada repositorio y token de usuario con permiso `Agent tasks: Read and write`.
 - Worker dedicado: `php artisan queue:work database --queue=ai-development --tries=1`.
 - Reglas de proteccion y nombres reales de ramas/workflows `qa.yml` y `main.yml`.
 
@@ -1945,6 +1945,6 @@ Mientras esas dependencias no existan, el ERP no inicia silenciosamente un desar
 
 La suite completa del ERP termino con `141` pruebas exitosas y `3` fallos preexistentes fuera de este cambio: `Tests\\Unit\\Outcomes\\OpenIaTraitModelTest`, `Tests\\Feature\\ExampleTest` (la raiz responde `302` para usuarios no autenticados) y `Tests\\Feature\\contracts_test`. Las pruebas Jira existentes y `AiDevelopmentFlowTest` permanecen verdes.
 
-La validacion focalizada final termino con `22` pruebas y `173` aserciones exitosas. La aprobacion publica usa URL firmada temporal, la entrega QA usa mencion ADF cuando Jira expone `account_id`, el runner limpia variables sensibles conocidas y el workspace local se elimina despues de completar produccion.
+La validacion focalizada final termino con `25` pruebas y `183` aserciones exitosas. La aprobacion publica usa URL firmada temporal, la entrega QA usa mencion ADF cuando Jira expone `account_id`, y el ERP solo inicia/pollea tareas remotas de GitHub Copilot; no ejecuta el modelo ni clona repositorios localmente.
 
 La pantalla de decision tambien permite capturar contexto e instrucciones adicionales del supervisor. Se almacenan en `supervisor_context`, se conservan incluso si la solicitud es rechazada y, cuando se aprueba, se incorporan al prompt en una seccion delimitada que no puede sobreescribir las reglas del sistema.

@@ -15,6 +15,7 @@ use App\Models\jira_project;
 use App\Models\jira_user;
 use App\Services\AiDevelopment\jira_automation_service;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
+use App\Services\AiDevelopment\github_copilot_agent_provider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -75,6 +76,7 @@ class AiDevelopmentFlowTest extends TestCase
         Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_27_000002_add_supervisor_context_to_ai_development_approvals.php'), '--realpath' => true]);
         Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_28_000002_configure_luna_agent.php'), '--realpath' => true]);
         Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_28_000003_expand_ai_agent_catalog.php'), '--realpath' => true]);
+        Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_28_000004_add_github_agent_task_fields_to_executions.php'), '--realpath' => true]);
     }
 
     public function test_candidate_detection_is_idempotent_and_rejection_does_not_dispatch(): void
@@ -198,10 +200,40 @@ class AiDevelopmentFlowTest extends TestCase
     {
         $this->assertDatabaseHas('ai_agents', [
             'name' => 'Luna',
-            'provider' => 'command',
+            'provider' => 'github_copilot',
             'model' => 'gpt-5.6-luna',
             'is_default' => 1,
         ]);
+    }
+
+    public function test_copilot_provider_starts_a_remote_github_agent_task(): void
+    {
+        [$issue, $configuration] = $this->fixture();
+        Http::fake(fn ($request) => Http::response([
+            'id' => 'task-remote-1',
+            'state' => 'queued',
+            'html_url' => 'https://github.com/opzio/erp/agent-sessions/task-remote-1',
+        ], 201));
+
+        $agent = ai_agent::where('name', 'Luna')->firstOrFail();
+        $task = app(github_copilot_agent_provider::class)->start(
+            $agent,
+            'Implementa la historia OPS-1 dentro de la rama remota.',
+            $configuration->githubConnection,
+            'opzio',
+            'erp',
+            'qa',
+        );
+
+        $this->assertSame('task-remote-1', $task['id']);
+        Http::assertSent(function ($request): bool {
+            return $request->method() === 'POST'
+                && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/agents/repos/opzio/erp/tasks')
+                && $request->data()['model'] === 'gpt-5.6-luna'
+                && $request->data()['base_ref'] === 'qa'
+                && $request->data()['create_pull_request'] === true
+                && str_contains($request->data()['prompt'], 'OPS-1');
+        });
     }
 
     private function fixture(): array

@@ -7,7 +7,7 @@ El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> G
 - `jira_automation_projects`: habilitacion por proyecto, repositorio GitHub, rama base y limites.
 - `jira_automation_issue_types` y `jira_automation_assignees`: allowlist dinamica basada en el catalogo sincronizado desde Jira; `__unassigned__` representa historias sin responsable.
 - `jira_automation_supervisors`: supervisores globales o por proyecto.
-- `ai_agents`: catalogo desacoplado. Luna queda configurada como agente `command` predeterminado con modelo real `gpt-5.6-luna`; Terra (`gpt-5.6-terra`) ofrece costo medio y Sol (`gpt-5.6-sol`) razonamiento profundo con costo alto.
+- `ai_agents`: catalogo desacoplado para GitHub Copilot cloud agent. Luna queda configurada como agente `github_copilot` predeterminado con modelo real `gpt-5.6-luna`; Terra (`gpt-5.6-terra`) ofrece costo medio y Sol (`gpt-5.6-sol`) razonamiento profundo con costo alto.
 - `ai_development_approvals`: snapshot, fingerprint, token hash, expiracion, decision y Story Point Estimate.
 - `ai_development_executions` y `ai_development_events`: maquina de estados y auditoria.
 - `github_connections`: singleton con token cifrado mediante `encrypted:array`.
@@ -15,13 +15,15 @@ El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> G
 ## Puesta en marcha
 
 1. Ejecutar `php artisan migrate`.
-2. Configurar el token GitHub desde `Admin > GitHub > Conexion`; nunca se guarda en `.env`, HTML, prompts ni logs.
-3. Configurar un comando de runner para Luna desde la pantalla o con `AI_DEVELOPMENT_LUNA_COMMAND`. El comando recibe el prompt por stdin, trabaja en el workspace aislado y recibe `OPZIO_AI_PROVIDER=command` y `OPZIO_AI_MODEL=gpt-5.6-luna`.
+2. Configurar el token GitHub desde `Admin > GitHub > Conexion`; debe ser un token de usuario con estos permisos de repositorio: `Agent tasks: Read and write`, `Contents: Read and write`, `Pull requests: Read and write`, `Actions: Read` y `Metadata: Read`. No necesitas una permission separada llamada `Checks`. Nunca se guarda en `.env`, HTML, prompts ni logs.
+3. Habilitar Copilot cloud agent en el repositorio y usar un token de usuario con permiso `Agent tasks: Read and write`. El ERP envía el prompt y el modelo a GitHub; el código se modifica en el entorno efímero de GitHub Actions, no en el servidor ERP.
 4. Configurar `AI_DEVELOPMENT_QUEUE_CONNECTION=database` y ejecutar un worker dedicado:
 
 ```text
 php artisan queue:work database --queue=ai-development --tries=1
 ```
+
+El repositorio debe tener habilitado Copilot cloud agent y el plan/organizacion debe permitir Agent Tasks. El endpoint de tareas de Copilot esta en public preview y requiere autenticacion de usuario; un GitHub App installation token no es suficiente.
 
 5. Sincronizar Jira. El detector se ejecuta despues de cada upsert y tambien mediante `jira:automation:scan --expire`. La administracion del flujo vive en el modulo GitHub; Jira conserva solamente su integracion funcional, sincronizacion y reportes.
 

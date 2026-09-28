@@ -13,7 +13,7 @@ class ai_development_state_machine
         'awaiting_approval' => ['approved', 'rejected', 'blocked'],
         'approved' => ['preparing', 'blocked'],
         'preparing' => ['analyzing', 'blocked', 'failed'],
-        'analyzing' => ['planning', 'blocked', 'failed'],
+        'analyzing' => ['planning', 'developing', 'testing', 'blocked', 'failed'],
         'planning' => ['developing', 'blocked', 'failed'],
         'developing' => ['testing', 'fixing', 'blocked', 'failed'],
         'testing' => ['integrating_qa', 'fixing', 'blocked', 'failed'],

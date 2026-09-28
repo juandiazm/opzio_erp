@@ -21,7 +21,7 @@ return new class extends Migration
         $catalog = [
             [
                 'name' => 'Luna',
-                'provider' => 'command',
+                'provider' => 'github_copilot',
                 'model' => 'gpt-5.6-luna',
                 'description' => 'Rapido y economico para cambios rutinarios.',
                 'cost_tier' => 'low',

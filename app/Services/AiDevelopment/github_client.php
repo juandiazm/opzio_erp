@@ -65,6 +65,17 @@ class github_client
         ], fn ($value): bool => $value !== null && $value !== ''));
     }
 
+    public function startAgentTask(string $owner, string $repository, array $payload): array
+    {
+        $payload = array_filter($payload, fn ($value): bool => $value !== null && $value !== '');
+        return $this->json('POST', '/agents/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/tasks', $payload);
+    }
+
+    public function agentTask(string $owner, string $repository, string $taskId): array
+    {
+        return $this->get('/agents/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/tasks/'.rawurlencode($taskId));
+    }
+
     public function commits(string $owner, string $repository, ?string $branch = null, int $perPage = 10): array
     {
         return $this->get('/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/commits', array_filter([

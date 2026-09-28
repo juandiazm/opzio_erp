@@ -85,9 +85,8 @@ class ai_development_controller extends Controller
             $data = $request->validate([
                 'id' => ['nullable', 'integer', 'exists:ai_agents,id'],
                 'name' => ['required', 'string', 'max:120'],
-                'provider' => ['required', 'string', 'max:80'],
+                'provider' => ['required', Rule::in(['github_copilot'])],
                 'model' => ['required', 'string', 'max:160'],
-                'command' => ['nullable', 'string', 'max:4000'],
                 'description' => ['nullable', 'string', 'max:255'],
                 'cost_tier' => ['required', Rule::in(['low', 'medium', 'high'])],
                 'enabled' => ['nullable', 'boolean'],
@@ -103,9 +102,6 @@ class ai_development_controller extends Controller
                 'enabled' => $request->boolean('enabled', true),
                 'is_default' => $request->boolean('is_default'),
             ];
-            if (array_key_exists('command', $data) && filled($data['command'])) {
-                $attributes['command'] = trim((string) $data['command']);
-            }
             $agent->fill($attributes)->save();
             if ($agent->is_default) {
                 ai_agent::query()->where('id', '!=', $agent->id)->update(['is_default' => false]);
@@ -316,7 +312,7 @@ class ai_development_controller extends Controller
                 'cost_label' => $this->costLabel($agent->cost_tier),
                 'enabled' => $agent->enabled,
                 'is_default' => $agent->is_default,
-                'command_configured' => filled($agent->command),
+                'execution_provider' => 'GitHub Copilot cloud agent',
             ])->values()->all(),
             'projects' => $projectPayload,
             'supervisors' => jira_automation_supervisor::query()->with('project.jiraProject')->latest('id')->get()->map(fn (jira_automation_supervisor $item): array => [
@@ -356,6 +352,10 @@ class ai_development_controller extends Controller
                 'attempt' => $item->attempt,
                 'ci_attempts' => $item->ci_attempts,
                 'main_ci_attempts' => $item->main_ci_attempts,
+                'github_task_id' => $item->github_task_id,
+                'github_task_state' => $item->github_task_state,
+                'github_task_url' => $item->github_task_url,
+                'github_pull_request_number' => $item->github_pull_request_number,
                 'started_at' => $item->started_at?->toIso8601String(),
                 'last_activity_at' => $item->last_activity_at?->toIso8601String(),
                 'error' => $item->error,
