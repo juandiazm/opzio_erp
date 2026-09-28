@@ -15,6 +15,7 @@ use App\Models\jira_automation_project;
 use App\Models\jira_automation_supervisor;
 use App\Models\jira_connection;
 use App\Models\jira_issue;
+use App\Models\jira_issue_changelog;
 use App\Models\jira_project;
 use App\Models\jira_user;
 use App\Services\AiDevelopment\jira_automation_service;
@@ -519,6 +520,45 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertSame('qa-123', $execution->qa_workflow_run_id);
         $this->assertDatabaseHas('ai_development_events', ['execution_id' => $execution->id, 'event' => 'qa_reporter_notified']);
         Mail::assertQueued(CustomMail::class, fn (CustomMail $queued): bool => $queued->View === 'mail.ai_development.qa_review');
+    }
+
+    public function test_automation_qa_comment_and_generic_changelog_do_not_restart_execution(): void
+    {
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $deliveredAt = now()->subMinute();
+        $execution->forceFill([
+            'status' => 'waiting_quality_review',
+            'current_phase' => 'waiting_quality_review',
+            'qa_delivered_at' => $deliveredAt,
+        ])->save();
+        $issue->forceFill([
+            'status' => 'Quality',
+            'comments' => [[
+                'id' => 'automation-qa-1',
+                'author' => 'ERP',
+                'created' => now()->toIso8601String(),
+                'content' => 'mention@Reporter Jira La implementacion de esta historia ya esta disponible en QA y se encuentra lista para revision.',
+            ]],
+        ])->save();
+        jira_issue_changelog::create([
+            'jira_connection_id' => $issue->jira_connection_id,
+            'jira_issue_id' => $issue->id,
+            'external_history_id' => 'history-automation-qa-1',
+            'changed_at' => now(),
+            'field' => 'status',
+            'from_value' => 'Deploy',
+            'to_value' => 'Quality',
+            'metadata' => [],
+        ]);
+
+        app(jira_automation_service::class)->handleSyncedIssue($issue->fresh(['assignee', 'reporter', 'project', 'connection']));
+
+        $execution->refresh();
+        $this->assertSame('waiting_quality_review', $execution->status);
+        Queue::assertNotPushed(run_ai_development_execution::class);
     }
 
     private function fixture(): array

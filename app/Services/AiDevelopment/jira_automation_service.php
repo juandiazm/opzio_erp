@@ -539,17 +539,19 @@ class jira_automation_service
                     return false;
                 }
             })
-            ->reject(fn (array $comment): bool => str_contains(strtolower((string) ($comment['content'] ?? '')), 'disponible para revision'))
+            ->reject(fn (array $comment): bool => $this->isAutomationQaComment($comment))
             ->values()
             ->all();
-        if ($comments !== []) {
-            return $comments;
-        }
-        $changed = \App\Models\jira_issue_changelog::query()
-            ->where('jira_issue_id', $issue->id)
-            ->where('changed_at', '>', $deliveredAt)
-            ->exists();
 
-        return $changed ? [['content' => 'Se detectaron cambios Jira posteriores a la entrega en QA.']] : [];
+        return $comments;
+    }
+
+    private function isAutomationQaComment(array $comment): bool
+    {
+        $content = Str::ascii(strtolower((string) ($comment['content'] ?? '')));
+        $content = preg_replace('/\s+/', ' ', trim($content)) ?: '';
+
+        return str_contains($content, 'la implementacion de esta historia ya esta disponible en qa')
+            || str_contains($content, 'disponible para revision');
     }
 }
