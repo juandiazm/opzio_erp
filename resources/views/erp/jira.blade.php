@@ -8,11 +8,11 @@
 @section('erp-app-content')
 <div id="jira-module" data-jira-module data-jira-endpoint="{{ url('/admin/jira') }}">
     <nav class="nav nav-tabs principal-nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="jira-dashboard-tab" data-bs-toggle="tab" data-bs-target="#jira-dashboard" type="button" role="tab" aria-controls="jira-dashboard" aria-selected="true">Dashboard</button>
-        <button class="nav-link" id="jira-reports-tab" data-bs-toggle="tab" data-bs-target="#jira-reports" type="button" role="tab" aria-controls="jira-reports" aria-selected="false">Reportes</button>
-        <button class="nav-link" id="jira-relations-tab" data-bs-toggle="tab" data-bs-target="#jira-relations" type="button" role="tab" aria-controls="jira-relations" aria-selected="false">Relaciones</button>
-        <button class="nav-link" id="jira-productivity-tab" data-bs-toggle="tab" data-bs-target="#jira-productivity" type="button" role="tab" aria-controls="jira-productivity" aria-selected="false">Productividad</button>
-        <button class="nav-link" id="jira-configuration-tab" data-bs-toggle="tab" data-bs-target="#jira-configuration" type="button" role="tab" aria-controls="jira-configuration" aria-selected="false">Configuracion</button>
+        <button class="nav-link active" id="jira-dashboard-tab" data-bs-toggle="tab" data-bs-target="#jira-dashboard" type="button" role="tab" aria-controls="jira-dashboard" aria-selected="true"><i class="fa-light fa-chart-simple" aria-hidden="true"></i><span>Dashboard</span></button>
+        <button class="nav-link" id="jira-reports-tab" data-bs-toggle="tab" data-bs-target="#jira-reports" type="button" role="tab" aria-controls="jira-reports" aria-selected="false"><i class="fa-light fa-file-chart-column" aria-hidden="true"></i><span>Reportes</span></button>
+        <button class="nav-link" id="jira-relations-tab" data-bs-toggle="tab" data-bs-target="#jira-relations" type="button" role="tab" aria-controls="jira-relations" aria-selected="false"><i class="fa-light fa-diagram-project" aria-hidden="true"></i><span>Relaciones</span></button>
+        <button class="nav-link" id="jira-productivity-tab" data-bs-toggle="tab" data-bs-target="#jira-productivity" type="button" role="tab" aria-controls="jira-productivity" aria-selected="false"><i class="fa-light fa-chart-line" aria-hidden="true"></i><span>Productividad</span></button>
+        <button class="nav-link" id="jira-configuration-tab" data-bs-toggle="tab" data-bs-target="#jira-configuration" type="button" role="tab" aria-controls="jira-configuration" aria-selected="false"><i class="fa-light fa-gear" aria-hidden="true"></i><span>Configuracion</span></button>
     </nav>
     <div class="tab-content jira-tab-content" id="jira-tab-content">
         @include('erp.jira.dashboard')

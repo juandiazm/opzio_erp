@@ -22,7 +22,7 @@
 }
 
 #jira-module .principal-nav-tabs { border-bottom-color: var(--jira-line); }
-#jira-module .principal-nav-tabs .nav-link { color: var(--jira-muted); border: 0; border-bottom: 2px solid transparent; font-weight: 650; }
+#jira-module .principal-nav-tabs .nav-link { align-items: center; color: var(--jira-muted); border: 0; border-bottom: 2px solid transparent; display: inline-flex; font-weight: 650; gap: 7px; }
 #jira-module .principal-nav-tabs .nav-link:hover,
 #jira-module .principal-nav-tabs .nav-link:focus-visible { color: var(--jira-ink); }
 #jira-module .principal-nav-tabs .nav-link.active { color: var(--jira-ink); background: transparent; border-bottom-color: var(--jira-primary); }

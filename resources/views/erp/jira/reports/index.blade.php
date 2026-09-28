@@ -133,7 +133,7 @@
 
     <div class="jira-report-pdf-viewer" data-jira-report-pdf-viewer hidden aria-hidden="true">
         <button type="button" class="jira-report-pdf-close" data-jira-report-pdf-close title="Cerrar visualizador" aria-label="Cerrar visualizador">
-            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            <i class="fa-light fa-xmark" aria-hidden="true"></i>
         </button>
         <div class="jira-report-pdf-dialog" role="dialog" aria-modal="true" aria-labelledby="jira-report-pdf-title">
             <div class="jira-report-pdf-heading">
@@ -146,29 +146,29 @@
             <div id="order-viewer" class="jira-pdf-document" tabindex="-1" aria-label="Vista previa del reporte">
                 <div id="pdf-toolbar">
                     <div class="pdf-toolbar-nav">
-                        <button id="pdf-prev-page" class="btn btn-sm" type="button" data-jira-pdf-action="previous" title="Pagina anterior" aria-label="Pagina anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                        <button id="pdf-prev-page" class="btn btn-sm" type="button" data-jira-pdf-action="previous" title="Pagina anterior" aria-label="Pagina anterior"><i class="fa-light fa-chevron-left" aria-hidden="true"></i></button>
                         <span id="pdf-page-info"><span id="pdf-page-num">1</span> / <span id="pdf-page-count">-</span></span>
-                        <button id="pdf-next-page" class="btn btn-sm" type="button" data-jira-pdf-action="next" title="Pagina siguiente" aria-label="Pagina siguiente"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+                        <button id="pdf-next-page" class="btn btn-sm" type="button" data-jira-pdf-action="next" title="Pagina siguiente" aria-label="Pagina siguiente"><i class="fa-light fa-chevron-right" aria-hidden="true"></i></button>
                     </div>
                     <div class="pdf-toolbar-actions">
-                        <button id="pdf-zoom-out" class="btn btn-sm" type="button" data-jira-pdf-action="zoom-out" title="Alejar" aria-label="Alejar"><i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i></button>
-                        <button id="pdf-zoom-in" class="btn btn-sm" type="button" data-jira-pdf-action="zoom-in" title="Acercar" aria-label="Acercar"><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></button>
+                        <button id="pdf-zoom-out" class="btn btn-sm" type="button" data-jira-pdf-action="zoom-out" title="Alejar" aria-label="Alejar"><i class="fa-light fa-magnifying-glass-minus" aria-hidden="true"></i></button>
+                        <button id="pdf-zoom-in" class="btn btn-sm" type="button" data-jira-pdf-action="zoom-in" title="Acercar" aria-label="Acercar"><i class="fa-light fa-magnifying-glass-plus" aria-hidden="true"></i></button>
                         <span class="pdf-toolbar-divider" aria-hidden="true"></span>
-                        <button id="pdf-print" class="btn btn-sm" type="button" data-jira-pdf-action="print" title="Imprimir" aria-label="Imprimir"><i class="fa-solid fa-print" aria-hidden="true"></i></button>
-                        <button id="pdf-download" class="btn btn-sm" type="button" data-jira-pdf-action="download" title="Descargar" aria-label="Descargar"><i class="fa-solid fa-download" aria-hidden="true"></i></button>
-                        <button id="pdf-share" class="btn btn-sm" type="button" data-jira-pdf-action="share" title="Compartir" aria-label="Compartir"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></button>
-                        <button id="pdf-fullscreen" class="btn btn-sm" type="button" data-jira-pdf-action="fullscreen" title="Pantalla completa" aria-label="Pantalla completa"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
-                        <button class="btn btn-sm jira-report-pdf-send-button" type="button" data-jira-report-pdf-email-toggle title="Enviar por correo"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i><span>Enviar</span></button>
+                        <button id="pdf-print" class="btn btn-sm" type="button" data-jira-pdf-action="print" title="Imprimir" aria-label="Imprimir"><i class="fa-light fa-print" aria-hidden="true"></i></button>
+                        <button id="pdf-download" class="btn btn-sm" type="button" data-jira-pdf-action="download" title="Descargar" aria-label="Descargar"><i class="fa-light fa-download" aria-hidden="true"></i></button>
+                        <button id="pdf-share" class="btn btn-sm" type="button" data-jira-pdf-action="share" title="Compartir" aria-label="Compartir"><i class="fa-light fa-share-nodes" aria-hidden="true"></i></button>
+                        <button id="pdf-fullscreen" class="btn btn-sm" type="button" data-jira-pdf-action="fullscreen" title="Pantalla completa" aria-label="Pantalla completa"><i class="fa-light fa-expand" aria-hidden="true"></i></button>
+                        <button class="btn btn-sm jira-report-pdf-send-button" type="button" data-jira-report-pdf-email-toggle title="Enviar por correo"><i class="fa-light fa-paper-plane" aria-hidden="true"></i><span>Enviar</span></button>
                     </div>
                 </div>
                 <div id="pdf-canvas-container">
-                    <div id="pdf-loading"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i></div>
+                    <div id="pdf-loading"><i class="fa-light fa-spinner fa-spin" aria-hidden="true"></i></div>
                     <canvas id="pdf-canvas"></canvas>
                 </div>
             </div>
             <form class="jira-report-pdf-email" data-jira-report-pdf-email hidden>
                 <label class="jira-field"><span>Correo destinatario</span><input type="email" name="recipients" required maxlength="2000" placeholder="correo@empresa.com"></label>
-                <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Enviar PDF</button>
+                <button class="btn btn-primary" type="submit"><i class="fa-light fa-paper-plane" aria-hidden="true"></i> Enviar PDF</button>
                 <p class="jira-status" data-jira-report-pdf-email-status role="status" aria-live="polite"></p>
             </form>
         </div>
