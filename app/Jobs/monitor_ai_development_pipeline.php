@@ -59,7 +59,7 @@ class monitor_ai_development_pipeline implements ShouldQueue
                 return;
             }
             if ($this->environment === 'qa') {
-                $this->qaSucceeded($execution, $details, $states);
+                $this->qaSucceeded($execution, $details, $states, $notifications);
                 return;
             }
             if (data_get($execution->context, 'promotion_stage') === 'qa_sync_pipeline') {
@@ -75,7 +75,12 @@ class monitor_ai_development_pipeline implements ShouldQueue
         }
     }
 
-    private function qaSucceeded(ai_development_execution $execution, array $details, ai_development_state_machine $states): void
+    private function qaSucceeded(
+        ai_development_execution $execution,
+        array $details,
+        ai_development_state_machine $states,
+        ai_development_notification_service $notifications,
+    ): void
     {
         try {
             (new jira_client($execution->issue->connection))->transitionIssue($execution->jira_key, 'QA');
@@ -89,7 +94,11 @@ class monitor_ai_development_pipeline implements ShouldQueue
             throw new RuntimeException('QA paso en GitHub, pero no fue posible actualizar Jira: '.$exception->getMessage(), 0, $exception);
         }
         $execution->update(['qa_delivered_at' => now(), 'qa_workflow_run_id' => $details['id'], 'last_activity_at' => now()]);
-        $states->transition($execution, ai_development_states::WAITING_QUALITY_REVIEW, ['workflow' => $details]);
+        $execution = $states->transition($execution, ai_development_states::WAITING_QUALITY_REVIEW, ['workflow' => $details]);
+        $notification = $notifications->qaAvailable($execution);
+        $states->event($execution, ($notification['status'] ?? 0) === 1 ? 'qa_reporter_notified' : 'qa_reporter_notification_failed', [
+            'message' => mb_substr((string) ($notification['message'] ?? ''), 0, 500),
+        ]);
     }
 
     private function mainSucceeded(ai_development_execution $execution, array $details, ai_development_state_machine $states): void

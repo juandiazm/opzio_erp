@@ -64,6 +64,35 @@ class ai_development_notification_service
         );
     }
 
+    public function qaAvailable(ai_development_execution $execution): array
+    {
+        $execution->loadMissing(['issue.connection', 'issue.project', 'issue.reporter.mapping.user', 'project', 'agent']);
+        $reporter = $execution->issue?->reporter;
+        $email = strtolower(trim((string) ($reporter?->email ?: $reporter?->mapping?->user?->email ?: '')));
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['status' => 0, 'message' => 'El reporter no tiene un correo electronico valido para notificar la revision QA.'];
+        }
+
+        $issueKey = (string) ($execution->jira_key ?: $execution->issue?->issue_key);
+        $siteUrl = trim((string) ($execution->issue?->connection?->site_url ?? ''));
+        $issueUrl = filled($siteUrl) && filled($issueKey)
+            ? rtrim($siteUrl, '/').'/browse/'.rawurlencode($issueKey)
+            : null;
+
+        return $this->SendMail(
+            ['subject' => 'Revision QA requerida: '.$issueKey],
+            [['address' => $email, 'name' => trim((string) ($reporter->display_name ?: $email))]],
+            'mail.ai_development.qa_review',
+            [
+                'execution' => $execution,
+                'issue' => $execution->issue,
+                'reporter' => $reporter,
+                'issue_url' => $issueUrl,
+            ],
+            null,
+        );
+    }
+
     public function recipients(jira_automation_project $project): Collection
     {
         $global = \App\Models\jira_automation_supervisor::query()

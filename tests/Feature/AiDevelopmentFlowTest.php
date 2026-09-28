@@ -6,6 +6,7 @@ use App\Jobs\run_ai_development_execution;
 use App\Jobs\promote_ai_development_execution;
 use App\Http\Controllers\github_controller;
 use App\Jobs\monitor_ai_development_jira_statuses;
+use App\Jobs\monitor_ai_development_pipeline;
 use App\Mail\CustomMail;
 use App\Models\ai_agent;
 use App\Models\ai_development_event;
@@ -17,6 +18,7 @@ use App\Models\jira_issue;
 use App\Models\jira_project;
 use App\Models\jira_user;
 use App\Services\AiDevelopment\jira_automation_service;
+use App\Services\AiDevelopment\ai_development_notification_service;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
 use App\Services\AiDevelopment\jira_automation_statuses;
 use App\Services\AiDevelopment\github_copilot_agent_provider;
@@ -456,6 +458,69 @@ class AiDevelopmentFlowTest extends TestCase
         Http::assertSent(fn ($request): bool => $request->method() === 'POST' && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/issue/OPS-1/transitions'));
     }
 
+    public function test_qa_notification_is_informative_and_targets_the_reporter(): void
+    {
+        Mail::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'waiting_quality_review',
+            'current_phase' => 'waiting_quality_review',
+            'feature_branch' => 'copilot/ops-1-sidebar',
+            'qa_workflow_run_id' => 'qa-123',
+        ])->save();
+
+        $result = app(ai_development_notification_service::class)->qaAvailable($execution->fresh(['issue.connection', 'issue.project', 'issue.reporter', 'agent']));
+
+        $this->assertSame(1, $result['status']);
+        Mail::assertQueued(CustomMail::class, function (CustomMail $queued): bool {
+            return $queued->View === 'mail.ai_development.qa_review'
+                && ($queued->MailData['subject'] ?? null) === 'Revision QA requerida: OPS-1'
+                && ($queued->ViewData['issue_url'] ?? null) === 'https://jira.example.test/browse/OPS-1'
+                && ! array_key_exists('approval_url', $queued->ViewData);
+        });
+    }
+
+    public function test_successful_qa_pipeline_notifies_reporter_and_waits_for_review(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'waiting_qa_pipeline',
+            'current_phase' => 'waiting_qa_pipeline',
+            'feature_branch' => 'copilot/ops-1-sidebar',
+        ])->save();
+        $issue->update(['status' => 'Deploy']);
+
+        Http::fake(function ($request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            if ($request->method() === 'GET' && str_ends_with($path, '/issue/OPS-1/transitions')) {
+                return Http::response(['transitions' => [['id' => '33', 'name' => 'Quality', 'to' => ['name' => 'Quality']]]]);
+            }
+
+            return Http::response([], 204);
+        });
+        $workflows = $this->createMock(\App\Services\AiDevelopment\github_workflow_service::class);
+        $workflows->method('latestForBranch')->willReturn(['id' => 'qa-123']);
+        $workflows->method('details')->willReturn(['id' => 'qa-123', 'status' => 'completed', 'conclusion' => 'success']);
+
+        (new monitor_ai_development_pipeline($execution->id, 'qa'))->handle(
+            $workflows,
+            app(\App\Services\AiDevelopment\ai_development_state_machine::class),
+            app(ai_development_notification_service::class),
+        );
+
+        $execution->refresh();
+        $this->assertSame('waiting_quality_review', $execution->status);
+        $this->assertSame('qa-123', $execution->qa_workflow_run_id);
+        $this->assertDatabaseHas('ai_development_events', ['execution_id' => $execution->id, 'event' => 'qa_reporter_notified']);
+        Mail::assertQueued(CustomMail::class, fn (CustomMail $queued): bool => $queued->View === 'mail.ai_development.qa_review');
+    }
+
     private function fixture(): array
     {
         $connection = jira_connection::create([
@@ -483,6 +548,7 @@ class AiDevelopmentFlowTest extends TestCase
             'jira_connection_id' => $connection->id,
             'account_id' => 'jira-user-2',
             'display_name' => 'Reporter Jira',
+            'email' => 'reporter@example.test',
             'active' => true,
         ]);
         $issue = jira_issue::create([
