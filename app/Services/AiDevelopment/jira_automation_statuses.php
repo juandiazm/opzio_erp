@@ -20,6 +20,6 @@ final class jira_automation_statuses
         $normalized = strtolower(trim((string) $status));
         $normalized = str_replace(['-', '_'], ' ', $normalized);
 
-        return in_array($normalized, ['pending', 'to do', 'todo', 'por hacer', 'open', 'abierto'], true);
+        return in_array($normalized, ['pending', 'to do', 'todo', 'por hacer', 'tareas por hacer', 'open', 'abierto'], true);
     }
 }

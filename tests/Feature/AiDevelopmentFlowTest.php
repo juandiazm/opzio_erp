@@ -180,6 +180,20 @@ class AiDevelopmentFlowTest extends TestCase
         Queue::assertNothingPushed();
     }
 
+    public function test_jira_tasks_to_do_status_category_name_is_treated_as_pending(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $issue->update(['status' => 'Tareas por hacer']);
+
+        $approval = app(jira_automation_service::class)->detectCandidate($issue->fresh(['assignee', 'reporter', 'project', 'connection']));
+
+        $this->assertNotNull($approval);
+        $this->assertDatabaseHas('ai_development_approvals', ['jira_issue_id' => $issue->id, 'status' => 'pending']);
+        Queue::assertNothingPushed();
+    }
+
     public function test_approval_token_cannot_be_replayed(): void
     {
         Mail::fake();
