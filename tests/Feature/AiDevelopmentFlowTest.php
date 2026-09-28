@@ -146,6 +146,7 @@ class AiDevelopmentFlowTest extends TestCase
         Queue::assertPushed(run_ai_development_execution::class, 1);
         $execution = $result['execution']->fresh(['issue', 'project.jiraProject', 'agent']);
         $prompt = app(jira_automation_prompt_builder::class)->build($execution->issue, $execution->project, $execution->agent, $execution);
+        $this->assertStringStartsWith('TAREA TECNICA: [OPS-1] Implementar flujo autonomo', $prompt);
         $this->assertStringContainsString($supervisorContext, $prompt);
         $this->assertStringContainsString('<SUPERVISOR_CONTEXT>', $prompt);
         $this->assertSame('OPS-1', $execution->feature_branch);
