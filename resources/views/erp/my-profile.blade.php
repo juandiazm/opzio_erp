@@ -12,7 +12,7 @@
 @section('erp-app-content')
 <nav>
     <div class="nav nav-tabs principal-nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-update-tab" data-bs-toggle="tab" data-bs-target="#nav-update" type="button" role="tab" aria-controls="nav-update" aria-selected="false">Actualizar</button>
+        <button class="nav-link active" id="nav-update-tab" data-bs-toggle="tab" data-bs-target="#nav-update" type="button" role="tab" aria-controls="nav-update" aria-selected="false"><i class="fa-light fa-user-pen" aria-hidden="true"></i> Actualizar</button>
     </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
