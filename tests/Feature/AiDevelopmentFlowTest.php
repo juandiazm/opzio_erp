@@ -212,6 +212,27 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertArrayNotHasKey('credentials', $payload['data']['github'] ?? []);
     }
 
+    public function test_github_repository_url_uses_the_connection_host_and_api_path(): void
+    {
+        $connection = github_connection::create([
+            'name' => 'GitHub Enterprise',
+            'base_url' => 'https://github.example.test/api/v3/',
+            'status' => 'active',
+            'credentials' => ['token' => 'github-secret'],
+        ]);
+
+        $this->assertSame(
+            'https://github.example.test/acme/my-repo',
+            $connection->repositoryUrl('acme', 'my-repo'),
+        );
+
+        $connection->update(['base_url' => 'https://api.github.com']);
+        $this->assertSame(
+            'https://github.com/acme/my-repo',
+            $connection->repositoryUrl('acme', 'my-repo'),
+        );
+    }
+
     public function test_luna_is_associated_with_the_real_model_name(): void
     {
         $this->assertDatabaseHas('ai_agents', [

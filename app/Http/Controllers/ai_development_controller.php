@@ -262,6 +262,10 @@ class ai_development_controller extends Controller
                     'github_connection_id' => $configuration->github_connection_id,
                     'github_owner' => $configuration->github_owner,
                     'github_repository' => $configuration->github_repository,
+                    'github_repository_url' => $configuration->githubConnection?->repositoryUrl(
+                        (string) $configuration->github_owner,
+                        (string) $configuration->github_repository,
+                    ),
                     'default_agent_id' => $configuration->default_agent_id,
                     'base_branch' => $configuration->base_branch,
                     'max_execution_attempts' => $configuration->max_execution_attempts,
@@ -275,7 +279,7 @@ class ai_development_controller extends Controller
         })->values()->all();
 
         $executionRecords = ai_development_execution::query()
-            ->with(['issue', 'project.jiraProject', 'agent'])
+            ->with(['issue', 'project.jiraProject', 'project.githubConnection', 'agent'])
             ->latest('updated_at')
             ->limit(100)
             ->get();
@@ -359,6 +363,10 @@ class ai_development_controller extends Controller
                 'github_task_state' => $item->github_task_state,
                 'github_task_url' => $item->github_task_url,
                 'github_pull_request_number' => $item->github_pull_request_number,
+                'github_repository_url' => $item->project?->githubConnection?->repositoryUrl(
+                    (string) $item->project?->github_owner,
+                    (string) $item->project?->github_repository,
+                ),
                 'started_at' => $item->started_at?->toIso8601String(),
                 'last_activity_at' => $item->last_activity_at?->toIso8601String(),
                 'error' => $item->error,

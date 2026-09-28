@@ -22,4 +22,28 @@ class github_connection extends Model
     {
         return data_get($this->credentials ?? [], $key, $default);
     }
+
+    public function repositoryUrl(string $owner, string $repository): string
+    {
+        if (trim($owner) === '' || trim($repository) === '') {
+            return '';
+        }
+
+        $baseUrl = rtrim((string) ($this->base_url ?: config('ai_development.github.base_url', 'https://api.github.com')), '/');
+        $parts = parse_url($baseUrl);
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        $path = rtrim((string) ($parts['path'] ?? ''), '/');
+
+        if ($host === 'api.github.com') {
+            $host = 'github.com';
+            $path = '';
+        } else {
+            $path = preg_replace('#/api/v\d+$#i', '', $path) ?: $path;
+        }
+
+        $scheme = $parts['scheme'] ?? 'https';
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+
+        return $scheme.'://'.$host.$port.$path.'/'.rawurlencode($owner).'/'.rawurlencode($repository);
+    }
 }

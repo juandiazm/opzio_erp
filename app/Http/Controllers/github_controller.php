@@ -20,7 +20,7 @@ class github_controller extends ai_development_controller
     {
         try {
             $record = ai_development_execution::query()
-                ->with(['issue.project', 'project.jiraProject', 'agent', 'approval.selectedAgent'])
+                ->with(['issue.project', 'project.jiraProject', 'project.githubConnection', 'agent', 'approval.selectedAgent'])
                 ->findOrFail($execution);
 
             return response()->json([
