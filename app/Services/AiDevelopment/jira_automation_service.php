@@ -15,6 +15,7 @@ use App\Models\jira_issue;
 use App\Models\jira_project;
 use App\Services\Jira\jira_client;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -35,7 +36,11 @@ class jira_automation_service
             ->where('jira_project_id', $issue->jira_project_id)
             ->where('enabled', true)
             ->first();
-        if (! $configuration || ! $this->isCandidate($issue, $configuration)) {
+        if (! $configuration) {
+            return null;
+        }
+        $reasons = $this->candidateReasons($issue, $configuration, false, false);
+        if ($reasons !== [] || (! jira_automation_statuses::isPending($issue->status) && ! jira_automation_statuses::isDevelopmentActive($issue->status))) {
             return null;
         }
 
@@ -123,6 +128,26 @@ class jira_automation_service
             ->first();
         if (! $approval || $approval->execution?->status !== ai_development_states::BLOCKED) {
             return null;
+        }
+
+        if ($approval->status === 'approved') {
+            $execution = $approval->execution;
+            $execution->forceFill([
+                'status' => ai_development_states::APPROVED,
+                'current_phase' => ai_development_states::APPROVED,
+                'error' => null,
+                'blocked_reason' => null,
+                'github_task_id' => null,
+                'github_task_url' => null,
+                'github_task_state' => null,
+                'github_pull_request_number' => null,
+                'context' => Arr::except((array) $execution->context, ['github_task', 'github_pull_request', 'github_pull_request_url', 'qa_merged']),
+                'last_activity_at' => now(),
+            ])->save();
+            $this->states->event($execution, 'approved_execution_resumed', ['approval_id' => $approval->id]);
+            run_ai_development_execution::dispatch($execution->id);
+
+            return $approval->fresh(['issue', 'project', 'execution']);
         }
 
         $token = Str::random(64);
@@ -283,13 +308,13 @@ class jira_automation_service
         return $this->candidateReasons($issue, $project, false) === [];
     }
 
-    public function candidateReasons(jira_issue $issue, jira_automation_project $project, bool $includeDuplicateWork = true): array
+    public function candidateReasons(jira_issue $issue, jira_automation_project $project, bool $includeDuplicateWork = true, bool $requirePendingState = true): array
     {
         $reasons = [];
         if (! $project->enabled) {
             $reasons[] = 'El proyecto de automatizacion esta deshabilitado.';
         }
-        if (! jira_automation_statuses::isPending($issue->status)) {
+        if ($requirePendingState && ! jira_automation_statuses::isPending($issue->status)) {
             $reasons[] = 'El estado Jira no es elegible: '.((string) $issue->status ?: 'vacio').'.';
         }
         $matchingType = $project->issueTypes->first(fn ($item): bool => strcasecmp(trim((string) $item->issue_type), trim((string) $issue->issue_type)) === 0);

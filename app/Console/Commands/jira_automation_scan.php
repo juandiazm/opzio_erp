@@ -43,7 +43,7 @@ class jira_automation_scan extends Command
                 return self::FAILURE;
             }
             if ($this->option('retry-blocked')) {
-                $reasons = $service->candidateReasons($issue, $project, false);
+                $reasons = $service->candidateReasons($issue, $project, false, false);
                 if ($reasons !== []) {
                     $this->warn($issue->issue_key.': no se puede reintentar.');
                     foreach ($reasons as $reason) {

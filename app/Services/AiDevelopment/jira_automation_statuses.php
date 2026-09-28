@@ -24,6 +24,11 @@ final class jira_automation_statuses
         return in_array($normalized, ['pending', 'to do', 'todo', 'por hacer', 'tareas por hacer', 'open', 'abierto'], true);
     }
 
+    public static function isDevelopmentActive(?string $status): bool
+    {
+        return in_array(self::normalize($status), ['in progress', 'en curso', 'en progreso'], true);
+    }
+
     public static function transitionAliases(string $status): array
     {
         return match ($status) {
