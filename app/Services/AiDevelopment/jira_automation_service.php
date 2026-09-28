@@ -288,6 +288,51 @@ class jira_automation_service
         return $execution->fresh(['issue', 'project', 'agent']);
     }
 
+    public function rejectBlockedExecution(int $executionId, ?int $userId = null, ?string $reason = null): ai_development_execution
+    {
+        $execution = ai_development_execution::query()
+            ->with(['issue.connection', 'project.jiraProject', 'approval', 'agent'])
+            ->findOrFail($executionId);
+        if ($execution->status !== ai_development_states::BLOCKED) {
+            throw new RuntimeException('Solo se pueden rechazar ejecuciones bloqueadas.');
+        }
+
+        $reason = mb_substr(trim((string) $reason), 0, 1000);
+        $reason = $reason !== '' ? $reason : 'Rechazo manual de una ejecucion bloqueada.';
+        $execution = DB::transaction(function () use ($execution, $userId, $reason): ai_development_execution {
+            if ($execution->approval) {
+                $execution->approval->forceFill([
+                    'status' => 'rejected',
+                    'decided_by_user_id' => $userId,
+                    'decided_at' => now(),
+                    'decision_note' => $reason,
+                ])->save();
+            }
+
+            $execution = $this->states->transition($execution, ai_development_states::REJECTED, [
+                'reason' => $reason,
+                'manual' => true,
+            ]);
+            $execution->forceFill([
+                'finished_at' => now(),
+                'blocked_reason' => $reason,
+                'last_activity_at' => now(),
+            ])->save();
+            $this->states->event($execution, 'manual_execution_rejected', [
+                'reason' => $reason,
+                'actor_id' => $userId,
+            ], ai_development_states::REJECTED);
+
+            return $execution->fresh(['issue', 'project', 'agent']);
+        });
+
+        $this->notifyReporter($execution, 'Historia rechazada', 'La ejecucion bloqueada fue retirada del flujo y marcada como rechazada.', [
+            'Motivo' => $reason,
+        ]);
+
+        return $execution->fresh(['issue', 'project', 'agent']);
+    }
+
     public function decideApproval(
         int $approvalId,
         string $token,

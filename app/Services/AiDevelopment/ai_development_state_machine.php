@@ -28,7 +28,7 @@ class ai_development_state_machine
         'failed' => ['preparing', 'waiting_qa_pipeline', 'blocked'],
         'rejected' => [],
         'completed' => [],
-        'blocked' => ['awaiting_approval', 'approved', 'preparing', 'developing', 'integrating_qa', 'integrating_main'],
+        'blocked' => ['awaiting_approval', 'approved', 'rejected', 'preparing', 'developing', 'integrating_qa', 'integrating_main'],
     ];
 
     public function transition(ai_development_execution $execution, string $nextState, array $metadata = []): ai_development_execution

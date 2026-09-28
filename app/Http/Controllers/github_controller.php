@@ -88,6 +88,25 @@ class github_controller extends ai_development_controller
         }
     }
 
+    public function reject_execution(Request $request, int $execution, jira_automation_service $service): JsonResponse
+    {
+        try {
+            $record = $service->rejectBlockedExecution(
+                $execution,
+                data_get(session('user'), 'id'),
+                $request->input('reason'),
+            );
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'La ejecucion bloqueada fue marcada como rechazada y retirada del flujo.',
+                'data' => ['execution_id' => $record->id, 'status' => $record->status],
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json(['status' => 0, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
     private function safeContext(array $context): array
     {
         unset($context['token'], $context['api_token'], $context['credentials'], $context['secret'], $context['authorization']);

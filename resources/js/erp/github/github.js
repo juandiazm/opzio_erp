@@ -5,7 +5,7 @@ const dateTime = (value) => value ? new Date(value).toLocaleString('es-CO', {dat
 const statusLabels = {
 	awaiting_approval: 'Esperando aprobacion', approved: 'Aprobada', rejected: 'Rechazada', preparing: 'Preparando', analyzing: 'Analizando', planning: 'Planificando', developing: 'Desarrollando', testing: 'Testeando', fixing: 'Corrigiendo', integrating_qa: 'Integrando QA', waiting_qa_pipeline: 'Esperando CI QA', waiting_quality_review: 'Esperando QA', quality_feedback: 'Feedback QA', integrating_main: 'Publicando', waiting_main_pipeline: 'Esperando CI Main', completed: 'Completada', blocked: 'Bloqueada', failed: 'Con error', candidate: 'Candidata', pending: 'Pendiente', expired: 'Expirada', active: 'Activa', disabled: 'Deshabilitada', error: 'Con error', draft: 'Borrador',
 };
-const eventLabels = {candidate_detected: 'Candidata detectada', approval_sent: 'Aprobacion enviada', approved: 'Aprobada', rejected: 'Rechazada', agent_started: 'Agente iniciado', analysis_started: 'Analisis iniciado', plan_created: 'Plan creado', code_changed: 'Codigo modificado', tests_started: 'Pruebas iniciadas', tests_passed: 'Pruebas aprobadas', tests_failed: 'Pruebas fallidas', qa_merge_started: 'Merge hacia QA', qa_pipeline_started: 'Pipeline QA iniciado', qa_pipeline_failed: 'Pipeline QA fallido', qa_pipeline_passed: 'Pipeline QA aprobado', quality_feedback_detected: 'Feedback QA detectado', main_merge_started: 'Merge hacia main', main_pipeline_started: 'Pipeline main iniciado', main_pipeline_failed: 'Pipeline main fallido', main_pipeline_passed: 'Pipeline main aprobado', reporter_notification_sent: 'Reporter notificado', reporter_notification_failed: 'No se pudo notificar al reporter', completed: 'Completada', blocked: 'Bloqueada', execution_failed: 'Ejecucion fallida'};
+const eventLabels = {candidate_detected: 'Candidata detectada', approval_sent: 'Aprobacion enviada', approved: 'Aprobada', rejected: 'Rechazada', manual_execution_rejected: 'Ejecucion rechazada manualmente', agent_started: 'Agente iniciado', analysis_started: 'Analisis iniciado', plan_created: 'Plan creado', code_changed: 'Codigo modificado', tests_started: 'Pruebas iniciadas', tests_passed: 'Pruebas aprobadas', tests_failed: 'Pruebas fallidas', qa_merge_started: 'Merge hacia QA', qa_pipeline_started: 'Pipeline QA iniciado', qa_pipeline_failed: 'Pipeline QA fallido', qa_pipeline_passed: 'Pipeline QA aprobado', quality_feedback_detected: 'Feedback QA detectado', main_merge_started: 'Merge hacia main', main_pipeline_started: 'Pipeline main iniciado', main_pipeline_failed: 'Pipeline main fallido', main_pipeline_passed: 'Pipeline main aprobado', reporter_notification_sent: 'Reporter notificado', reporter_notification_failed: 'No se pudo notificar al reporter', completed: 'Completada', blocked: 'Bloqueada', execution_failed: 'Ejecucion fallida'};
 const activeStatuses = new Set(['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline']);
 const tabQueryParameter = 'tab';
 
@@ -156,9 +156,10 @@ export async function initializeGithubModule(root) {
 	function renderExecutions() {
 		const executions = (state.data?.executions || []).filter((item) => !state.executionFilter || item.status === state.executionFilter);
 		root.querySelector('[data-github-execution-count]').textContent = `${executions.length} ejecuciones`;
-		root.querySelector('[data-github-executions]').innerHTML = executions.length ? executions.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.agent || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span></td><td>${escapeHtml(labelStatus(item.phase))}</td><td>${escapeHtml(item.branch || '-')}</td><td>${item.attempt || 0}</td><td>${item.ci_attempts || 0} / ${item.main_ci_attempts || 0}</td><td>${escapeHtml(dateTime(item.last_activity_at))}</td><td><button type="button" class="github-icon-button" data-github-execution-open="${item.id}" title="Ver detalle"><i class="fa-light fa-eye"></i></button><button type="button" class="github-icon-button" data-github-execution-restart="${item.id}" title="Reiniciar flujo"><i class="fa-light fa-rotate-left"></i></button></td></tr>`).join('') : '<tr><td colspan="10" class="github-empty">No hay ejecuciones para este filtro.</td></tr>';
+		root.querySelector('[data-github-executions]').innerHTML = executions.length ? executions.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.agent || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span></td><td>${escapeHtml(labelStatus(item.phase))}</td><td>${escapeHtml(item.branch || '-')}</td><td>${item.attempt || 0}</td><td>${item.ci_attempts || 0} / ${item.main_ci_attempts || 0}</td><td>${escapeHtml(dateTime(item.last_activity_at))}</td><td><button type="button" class="github-icon-button" data-github-execution-open="${item.id}" title="Ver detalle"><i class="fa-light fa-eye"></i></button><button type="button" class="github-icon-button" data-github-execution-restart="${item.id}" title="Reiniciar flujo"><i class="fa-light fa-rotate-left"></i></button>${item.status === 'blocked' ? `<button type="button" class="github-icon-button" data-github-execution-reject="${item.id}" title="Marcar como rechazada"><i class="fa-light fa-ban"></i></button>` : ''}</td></tr>`).join('') : '<tr><td colspan="10" class="github-empty">No hay ejecuciones para este filtro.</td></tr>';
 		root.querySelectorAll('[data-github-execution-open]').forEach((button) => button.addEventListener('click', () => openExecution(Number(button.dataset.githubExecutionOpen))));
 		root.querySelectorAll('[data-github-execution-restart]').forEach((button) => button.addEventListener('click', () => restartExecution(Number(button.dataset.githubExecutionRestart), button)));
+		root.querySelectorAll('[data-github-execution-reject]').forEach((button) => button.addEventListener('click', () => rejectExecution(Number(button.dataset.githubExecutionReject), button)));
 	}
 
 	async function restartExecution(id, button) {
@@ -183,6 +184,32 @@ export async function initializeGithubModule(root) {
 		}, root.querySelector('[data-github-connection-status]'));
 	}
 
+	async function rejectExecution(id, button) {
+		let reason = '';
+		if (typeof window.Swal?.fire === 'function') {
+			const confirmation = await window.Swal.fire({
+				title: 'Marcar ejecucion como rechazada',
+				text: 'La ejecucion bloqueada saldra del flujo y no volvera a intentarse.',
+				input: 'textarea',
+				inputLabel: 'Motivo (opcional)',
+				inputPlaceholder: 'Indica por que se rechaza la ejecucion...',
+				showCancelButton: true,
+				confirmButtonText: 'Rechazar ejecucion',
+				cancelButtonText: 'Cancelar',
+				reverseButtons: true,
+			});
+			if (!confirmation.isConfirmed) return;
+			reason = confirmation.value || '';
+		}
+		await run(button, async () => {
+			await postJson(endpointUrl(`executions/${id}/reject`), {reason});
+			await load();
+			const detail = root.querySelector('[data-github-execution-detail]');
+			detail.hidden = true;
+			document.getElementById('github-executions-tab')?.click();
+		}, root.querySelector('[data-github-connection-status]'));
+	}
+
 	async function openExecution(id) {
 		const detail = root.querySelector('[data-github-execution-detail]');
 		const summary = root.querySelector('[data-github-execution-summary]');
@@ -191,6 +218,9 @@ export async function initializeGithubModule(root) {
 		try {
 			const data = await getJson(endpointUrl(`executions/${id}/data`));
 			const item = data.execution;
+			const rejectButton = root.querySelector('[data-github-execution-detail-reject]');
+			rejectButton.hidden = item.status !== 'blocked';
+			rejectButton.dataset.executionId = String(id);
 			root.querySelector('[data-github-execution-detail-title]').textContent = `${item.jira_key} · ${item.summary || ''}`;
 			summary.innerHTML = `<div><span>Estado</span><strong>${escapeHtml(labelStatus(item.status))}</strong></div><div><span>Repositorio</span><strong>${escapeHtml(item.repository || '-')}</strong></div><div><span>Copilot task</span><strong>${escapeHtml(item.github_task_state || '-')} · ${escapeHtml(item.github_task_id || '-')}</strong></div><div><span>Pull request</span><strong>${item.github_pull_request_number ? `#${item.github_pull_request_number}` : '-'}</strong></div><div><span>Branch</span><strong>${escapeHtml(item.feature_branch || '-')}</strong></div><div><span>Intentos</span><strong>${item.attempt || 0} · CI ${item.ci_attempts || 0}/${item.main_ci_attempts || 0}</strong></div><div><span>Ultima actividad</span><strong>${escapeHtml(dateTime(item.last_activity_at))}</strong></div>${item.github_task_url ? `<div><a href="${escapeHtml(item.github_task_url)}" target="_blank" rel="noreferrer">Abrir sesion de Copilot</a></div>` : ''}${item.blocked_reason || item.error ? `<div class="github-detail-error"><span>Resultado</span><strong>${escapeHtml(item.blocked_reason || item.error)}</strong></div>` : ''}`;
 			events.innerHTML = data.events?.length ? data.events.map((event) => `<div class="github-event-item"><span class="github-event-marker"></span><div><strong>${escapeHtml(labelEvent(event.event))}</strong><small>${escapeHtml(labelStatus(event.phase))} · intento ${event.attempt || 0}</small>${Object.keys(event.metadata || {}).length ? `<code>${escapeHtml(JSON.stringify(event.metadata))}</code>` : ''}</div><time>${escapeHtml(dateTime(event.created_at))}</time></div>`).join('') : '<div class="github-empty">No hay eventos registrados.</div>';
@@ -215,6 +245,7 @@ export async function initializeGithubModule(root) {
 	root.querySelector('[data-github-execution-filter]').addEventListener('change', (event) => { state.executionFilter = event.target.value; renderExecutions(); });
 	root.querySelectorAll('[data-github-refresh]').forEach((button) => button.addEventListener('click', () => run(button, load, root.querySelector('[data-github-connection-status]'))));
 	root.querySelector('[data-github-execution-detail-restart]').addEventListener('click', (event) => restartExecution(Number(root.querySelector('[data-github-execution-detail]').dataset.executionId), event.currentTarget));
+	root.querySelector('[data-github-execution-detail-reject]').addEventListener('click', (event) => rejectExecution(Number(event.currentTarget.dataset.executionId), event.currentTarget));
 	root.querySelector('[data-github-execution-close]').addEventListener('click', () => { root.querySelector('[data-github-execution-detail]').hidden = true; });
 	root.addEventListener('click', (event) => { const target = event.target.closest('[data-github-open-tab]'); if (!target) return; document.getElementById(target.dataset.githubOpenTab)?.click(); });
 

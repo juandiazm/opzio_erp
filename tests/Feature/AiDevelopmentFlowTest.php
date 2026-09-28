@@ -542,6 +542,36 @@ class AiDevelopmentFlowTest extends TestCase
         Http::assertSent(fn ($request): bool => $request->method() === 'POST' && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/issue/OPS-1/transitions'));
     }
 
+    public function test_blocked_execution_can_be_rejected_and_removed_from_the_flow(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $service = app(jira_automation_service::class);
+        $approval = $service->detectCandidate($issue);
+        $execution = $approval->execution;
+        $approval->update(['status' => 'approved']);
+        $execution->forceFill([
+            'status' => 'blocked',
+            'current_phase' => 'blocked',
+            'blocked_reason' => 'Fallo persistente de infraestructura.',
+        ])->save();
+
+        $rejected = $service->rejectBlockedExecution($execution->id, null, 'Rechazada manualmente por el supervisor.');
+
+        $this->assertSame('rejected', $rejected->status);
+        $this->assertNotNull($rejected->finished_at);
+        $this->assertSame('rejected', $rejected->approval->status);
+        $this->assertSame('Rechazada manualmente por el supervisor.', $rejected->blocked_reason);
+        $this->assertDatabaseHas('ai_development_events', [
+            'execution_id' => $execution->id,
+            'event' => 'manual_execution_rejected',
+            'phase' => 'rejected',
+        ]);
+        Queue::assertNothingPushed();
+        Mail::assertQueued(CustomMail::class, fn (CustomMail $queued): bool => $queued->View === 'mail.ai_development.reporter');
+    }
+
     public function test_qa_notification_is_informative_and_targets_the_reporter(): void
     {
         Mail::fake();
