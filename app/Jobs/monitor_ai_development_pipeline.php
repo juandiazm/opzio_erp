@@ -125,6 +125,10 @@ class monitor_ai_development_pipeline implements ShouldQueue
             'title' => 'Historia completada',
             'message' => mb_substr((string) ($reporterNotification['message'] ?? ''), 0, 500),
         ]);
+        $completionNotification = $notifications->completed($execution->fresh(['project.jiraProject', 'issue', 'agent']), $details);
+        $states->event($execution->fresh(), ($completionNotification['status'] ?? 0) === 1 ? 'completion_notification_sent' : 'completion_notification_failed', [
+            'message' => mb_substr((string) ($completionNotification['message'] ?? ''), 0, 500),
+        ]);
         if ($execution->project?->githubConnection && filled($execution->feature_branch)) {
             try {
                 (new \App\Services\AiDevelopment\github_client($execution->project->githubConnection))->deleteBranch($execution->project->github_owner, $execution->project->github_repository, $execution->feature_branch);

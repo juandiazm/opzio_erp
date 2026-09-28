@@ -140,6 +140,28 @@ class ai_development_notification_service
         );
     }
 
+    public function completed(ai_development_execution $execution, array $workflow): array
+    {
+        $execution->loadMissing(['issue.project', 'project.jiraProject', 'agent']);
+        $recipients = $this->recipients($execution->project);
+        if ($recipients->isEmpty()) {
+            return ['status' => 0, 'message' => 'No hay supervisores habilitados para recibir la finalizacion.'];
+        }
+
+        return $this->SendMail(
+            ['subject' => 'Flujo IA finalizado en GitHub: '.$execution->jira_key],
+            $recipients->all(),
+            'mail.ai_development.completed',
+            [
+                'execution' => $execution,
+                'workflow' => $workflow,
+                'github_task_url' => $execution->github_task_url,
+                'detail_url' => url('/admin/jira?tab=ai-development&execution='.$execution->id),
+            ],
+            null,
+        );
+    }
+
     public function recipients(jira_automation_project $project): Collection
     {
         $global = \App\Models\jira_automation_supervisor::query()

@@ -1054,31 +1054,16 @@ Antes de publicar:
 
 ---
 
-# FASE 24 — Sincronizar main dentro de qa
+# FASE 24 — Preparar la promoción desde QA
 
-Antes de promover a producción:
+Cuando QA esté validado y Jira autorice la publicación:
 
 ```text
-checkout qa
-fetch
-actualizar referencias
-merge main → qa
+usar qa como origen
+preparar merge directo hacia main
 ```
 
-Objetivo:
-
-detectar antes de tocar `main` cualquier conflicto entre producción actual y el código validado en QA.
-
-Si aparecen conflictos:
-
-- resolverlos;
-- analizar cada conflicto;
-- conservar ambas funcionalidades cuando corresponda;
-- no descartar cambios de producción automáticamente;
-- ejecutar validaciones focalizadas;
-- integrar el resultado actualizado nuevamente en QA si fue necesario.
-
-Si esta sincronización genera nuevo commit en QA, debe volver a verificarse su CI/CD antes de continuar hacia main.
+No sincronizar `main` dentro de `qa` como paso intermedio ni crear Pull Requests para esta promoción.
 
 ---
 
@@ -1086,21 +1071,19 @@ Si esta sincronización genera nuevo commit en QA, debe volver a verificarse su 
 
 Cuando QA esté correctamente sincronizado con `main` y validado:
 
-Preferencia:
+realizar merge directo mediante la API de GitHub:
 
 ```text
 qa
 ↓
-Pull Request
+merge directo
 ↓
 main
 ```
 
-Si las reglas de GitHub impiden que la identidad automatizada complete el PR:
+Si las reglas de GitHub impiden el merge directo, bloquear la ejecución para intervención humana sin crear un Pull Request alternativo ni intentar vulnerar las reglas.
 
-realizar merge mediante el mecanismo permitido por GitHub/repositorio sin intentar vulnerar reglas.
-
-Registrar qué mecanismo se utilizó.
+Registrar el commit de merge y el mecanismo utilizado.
 
 ---
 
