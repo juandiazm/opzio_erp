@@ -4,6 +4,7 @@ namespace App\Services\AiDevelopment;
 
 use App\Jobs\promote_ai_development_execution;
 use App\Jobs\run_ai_development_execution;
+use App\Jobs\monitor_ai_development_agent;
 use App\Models\ai_agent;
 use App\Models\ai_development_approval;
 use App\Models\ai_development_event;
@@ -132,6 +133,15 @@ class jira_automation_service
 
         if ($approval->status === 'approved') {
             $execution = $approval->execution;
+            if (filled($execution->github_task_id) && $execution->github_task_state === 'completed') {
+                $this->states->event($execution, 'completed_task_recovery_requested', [
+                    'task_id' => $execution->github_task_id,
+                    'reason' => 'La ejecucion fue bloqueada despues de completar Copilot.',
+                ]);
+                monitor_ai_development_agent::dispatch($execution->id);
+
+                return $approval->fresh(['issue', 'project', 'execution']);
+            }
             $execution->forceFill([
                 'status' => ai_development_states::APPROVED,
                 'current_phase' => ai_development_states::APPROVED,
@@ -176,6 +186,106 @@ class jira_automation_service
         ]);
 
         return $approval->fresh(['issue', 'project', 'execution']);
+    }
+    
+    public function restartExecution(int $executionId, ?int $userId = null): ai_development_execution
+    {
+        $execution = ai_development_execution::query()
+            ->with(['issue.connection', 'project.jiraProject', 'project.defaultAgent', 'project.githubConnection', 'approval', 'agent'])
+            ->findOrFail($executionId);
+        $project = $execution->project;
+        $issue = $execution->issue;
+        $agent = $execution->agent ?: $project?->defaultAgent;
+
+        if (! $project?->enabled || ! $agent?->enabled || ! $project->githubConnection || blank($project->github_owner) || blank($project->github_repository)) {
+            throw new RuntimeException('El proyecto, agente o repositorio GitHub no esta habilitado para reiniciar la ejecucion.');
+        }
+        if (! jira_automation_statuses::isDevelopmentActive($issue->status)) {
+            (new jira_client($issue->connection))->transitionIssue($issue->issue_key, jira_automation_statuses::IN_PROGRESS);
+        }
+
+        $execution = DB::transaction(function () use ($execution, $issue, $project, $agent, $userId): ai_development_execution {
+            $approval = $execution->approval;
+            if (! $approval) {
+                $approval = ai_development_approval::create([
+                    'jira_issue_id' => $issue->id,
+                    'jira_automation_project_id' => $project->id,
+                    'source_fingerprint' => hash('sha256', 'manual-restart|'.$execution->id.'|'.now()->timestamp),
+                    'token_hash' => hash('sha256', Str::random(64)),
+                    'status' => 'approved',
+                    'snapshot' => $this->snapshot($issue, $project),
+                    'selected_agent_id' => $agent->id,
+                    'story_point_estimate' => $issue->story_points,
+                    'decided_by_user_id' => $userId,
+                    'decided_at' => now(),
+                    'expires_at' => now()->addHours(48),
+                    'decision_note' => 'Reinicio manual de ejecucion.',
+                ]);
+                $execution->approval_id = $approval->id;
+            } else {
+                $approval->forceFill([
+                    'status' => 'approved',
+                    'selected_agent_id' => $agent->id,
+                    'decided_by_user_id' => $userId,
+                    'decided_at' => now(),
+                    'decision_note' => 'Reinicio manual de ejecucion.',
+                    'blocked_reason' => null,
+                    'expires_at' => now()->addHours(48),
+                ])->save();
+            }
+
+            ai_development_event::query()
+                ->where('execution_id', $execution->id)
+                ->orWhere('approval_id', $approval->id)
+                ->delete();
+
+            $execution->forceFill([
+                'approval_id' => $approval->id,
+                'agent_id' => $agent->id,
+                'repository' => $this->repository($project),
+                'status' => ai_development_states::APPROVED,
+                'current_phase' => ai_development_states::APPROVED,
+                'feature_branch' => null,
+                'base_branch' => $project->base_branch ?: config('ai_development.default_base_branch', 'qa'),
+                'attempt' => 0,
+                'ci_attempts' => 0,
+                'main_ci_attempts' => 0,
+                'consecutive_failures' => 0,
+                'started_at' => now(),
+                'finished_at' => null,
+                'last_activity_at' => now(),
+                'qa_delivered_at' => null,
+                'qa_last_feedback_at' => null,
+                'done_detected_at' => null,
+                'last_commit_sha' => null,
+                'qa_workflow_run_id' => null,
+                'main_workflow_run_id' => null,
+                'github_task_id' => null,
+                'github_task_url' => null,
+                'github_task_state' => null,
+                'github_pull_request_number' => null,
+                'error' => null,
+                'blocked_reason' => null,
+                'context' => Arr::only((array) $execution->context, ['supervisor_context']),
+            ])->save();
+
+            ai_development_event::create([
+                'execution_id' => $execution->id,
+                'approval_id' => $approval->id,
+                'event' => 'manual_execution_restarted',
+                'phase' => ai_development_states::APPROVED,
+                'actor_type' => 'user',
+                'actor_id' => $userId,
+                'attempt' => 0,
+                'metadata' => ['reason' => 'Reinicio manual solicitado desde GitHub.'],
+            ]);
+
+            return $execution->fresh();
+        });
+
+        run_ai_development_execution::dispatch($execution->id);
+
+        return $execution->fresh(['issue', 'project', 'agent']);
     }
 
     public function decideApproval(
@@ -281,7 +391,7 @@ class jira_automation_service
         if (! $execution) {
             return;
         }
-        if (strcasecmp(trim((string) $issue->status), jira_automation_statuses::QA) === 0
+        if (jira_automation_statuses::isQualityReview($issue->status)
             && $execution->status === ai_development_states::WAITING_QUALITY_REVIEW
             && $execution->qa_delivered_at !== null) {
             $feedback = $this->newFeedback($issue, $execution);
@@ -294,11 +404,15 @@ class jira_automation_service
                 run_ai_development_execution::dispatch($execution->id);
             }
         }
-        if (strcasecmp(trim((string) $issue->status), jira_automation_statuses::DONE) === 0
+        if (jira_automation_statuses::isDone($issue->status, $issue->status_category)
             && $execution->status === ai_development_states::WAITING_QUALITY_REVIEW
             && $execution->qa_delivered_at !== null) {
             $execution->update(['done_detected_at' => now()]);
-            $this->states->transition($execution, ai_development_states::INTEGRATING_MAIN);
+            $this->states->transition($execution, ai_development_states::INTEGRATING_MAIN, [
+                'source' => 'erp_jira_issue',
+                'jira_status' => $issue->status,
+                'jira_status_category' => $issue->status_category,
+            ]);
             promote_ai_development_execution::dispatch($execution->id);
         }
     }

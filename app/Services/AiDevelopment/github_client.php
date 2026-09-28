@@ -76,6 +76,22 @@ class github_client
         ]);
     }
 
+    public function mergeBranches(string $owner, string $repository, string $base, string $head, string $commitMessage): array
+    {
+        $response = $this->request()->post('/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/merges', [
+            'base' => $base,
+            'head' => $head,
+            'commit_message' => $commitMessage,
+        ]);
+        if ($response->status() === 204) {
+            return ['merged' => true, 'already_merged' => true];
+        }
+        $this->ensureSuccessful($response);
+        $payload = $response->json();
+
+        return is_array($payload) ? ['merged' => true, ...$payload] : ['merged' => true];
+    }
+
     public function workflowRuns(string $owner, string $repository, ?string $branch = null, int $perPage = 10): array
     {
         return $this->get('/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/actions/runs', array_filter([

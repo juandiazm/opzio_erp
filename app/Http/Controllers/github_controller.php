@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ai_development_event;
 use App\Models\ai_development_execution;
+use App\Services\AiDevelopment\jira_automation_service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -66,6 +67,21 @@ class github_controller extends ai_development_controller
                         ->values()
                         ->all(),
                 ],
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json(['status' => 0, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
+    public function restart_execution(Request $request, int $execution, jira_automation_service $service): JsonResponse
+    {
+        try {
+            $record = $service->restartExecution($execution, data_get(session('user'), 'id'));
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'La ejecucion fue reiniciada y enviada nuevamente al flujo.',
+                'data' => ['execution_id' => $record->id, 'status' => $record->status],
             ]);
         } catch (Throwable $exception) {
             return response()->json(['status' => 0, 'message' => $exception->getMessage()], 422);

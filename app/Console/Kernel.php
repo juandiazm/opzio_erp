@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\monitor_ai_development_jira_statuses;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -37,9 +38,13 @@ class Kernel extends ConsoleKernel
             ->timezone('America/Bogota')
             ->withoutOverlapping(120);
         $schedule->command('jira:sync --incremental --days=1')
-            ->hourly()
+            ->everyMinute()
             ->timezone('America/Bogota')
-            ->withoutOverlapping(120);
+            ->withoutOverlapping(2);
+        $schedule->job(new monitor_ai_development_jira_statuses())
+            ->everyMinute()
+            ->timezone('America/Bogota')
+            ->withoutOverlapping(2);
         $schedule->command('jira:automation:scan --expire')
             ->everyTenMinutes()
             ->timezone('America/Bogota')

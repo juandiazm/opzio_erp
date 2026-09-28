@@ -156,15 +156,38 @@ export async function initializeGithubModule(root) {
 	function renderExecutions() {
 		const executions = (state.data?.executions || []).filter((item) => !state.executionFilter || item.status === state.executionFilter);
 		root.querySelector('[data-github-execution-count]').textContent = `${executions.length} ejecuciones`;
-		root.querySelector('[data-github-executions]').innerHTML = executions.length ? executions.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.agent || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span></td><td>${escapeHtml(labelStatus(item.phase))}</td><td>${escapeHtml(item.branch || '-')}</td><td>${item.attempt || 0}</td><td>${item.ci_attempts || 0} / ${item.main_ci_attempts || 0}</td><td>${escapeHtml(dateTime(item.last_activity_at))}</td><td><button type="button" class="github-icon-button" data-github-execution-open="${item.id}" title="Ver detalle"><i class="fa-light fa-eye"></i></button></td></tr>`).join('') : '<tr><td colspan="10" class="github-empty">No hay ejecuciones para este filtro.</td></tr>';
+		root.querySelector('[data-github-executions]').innerHTML = executions.length ? executions.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.agent || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span></td><td>${escapeHtml(labelStatus(item.phase))}</td><td>${escapeHtml(item.branch || '-')}</td><td>${item.attempt || 0}</td><td>${item.ci_attempts || 0} / ${item.main_ci_attempts || 0}</td><td>${escapeHtml(dateTime(item.last_activity_at))}</td><td><button type="button" class="github-icon-button" data-github-execution-open="${item.id}" title="Ver detalle"><i class="fa-light fa-eye"></i></button><button type="button" class="github-icon-button" data-github-execution-restart="${item.id}" title="Reiniciar flujo"><i class="fa-light fa-rotate-left"></i></button></td></tr>`).join('') : '<tr><td colspan="10" class="github-empty">No hay ejecuciones para este filtro.</td></tr>';
 		root.querySelectorAll('[data-github-execution-open]').forEach((button) => button.addEventListener('click', () => openExecution(Number(button.dataset.githubExecutionOpen))));
+		root.querySelectorAll('[data-github-execution-restart]').forEach((button) => button.addEventListener('click', () => restartExecution(Number(button.dataset.githubExecutionRestart), button)));
+	}
+
+	async function restartExecution(id, button) {
+		if (typeof window.Swal?.fire === 'function') {
+			const confirmation = await window.Swal.fire({
+				title: 'Reiniciar flujo',
+				text: 'Se limpiaran intentos, task, pipelines y trazas anteriores. Jira volvera a In Progress.',
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonText: 'Reiniciar',
+				cancelButtonText: 'Cancelar',
+				reverseButtons: true,
+			});
+			if (!confirmation.isConfirmed) return;
+		}
+		await run(button, async () => {
+			await postJson(`/admin/github/executions/${id}/restart`);
+			await load();
+			const detail = root.querySelector('[data-github-execution-detail]');
+			if (!detail.hidden && detail.dataset.executionId === String(id)) await openExecution(id);
+			document.getElementById('github-executions-tab')?.click();
+		}, root.querySelector('[data-github-connection-status]'));
 	}
 
 	async function openExecution(id) {
 		const detail = root.querySelector('[data-github-execution-detail]');
 		const summary = root.querySelector('[data-github-execution-summary]');
 		const events = root.querySelector('[data-github-execution-events]');
-		detail.hidden = false; summary.innerHTML = '<div class="github-empty">Cargando detalle...</div>'; events.innerHTML = '';
+		detail.hidden = false; detail.dataset.executionId = String(id); summary.innerHTML = '<div class="github-empty">Cargando detalle...</div>'; events.innerHTML = '';
 		try {
 			const data = await getJson(endpointUrl(`executions/${id}/data`));
 			const item = data.execution;
@@ -191,6 +214,7 @@ export async function initializeGithubModule(root) {
 	root.querySelector('[data-github-approval-filter]').addEventListener('change', (event) => { state.approvalFilter = event.target.value; renderApprovals(); });
 	root.querySelector('[data-github-execution-filter]').addEventListener('change', (event) => { state.executionFilter = event.target.value; renderExecutions(); });
 	root.querySelectorAll('[data-github-refresh]').forEach((button) => button.addEventListener('click', () => run(button, load, root.querySelector('[data-github-connection-status]'))));
+	root.querySelector('[data-github-execution-detail-restart]').addEventListener('click', (event) => restartExecution(Number(root.querySelector('[data-github-execution-detail]').dataset.executionId), event.currentTarget));
 	root.querySelector('[data-github-execution-close]').addEventListener('click', () => { root.querySelector('[data-github-execution-detail]').hidden = true; });
 	root.addEventListener('click', (event) => { const target = event.target.closest('[data-github-open-tab]'); if (!target) return; document.getElementById(target.dataset.githubOpenTab)?.click(); });
 

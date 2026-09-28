@@ -29,13 +29,30 @@ final class jira_automation_statuses
         return in_array(self::normalize($status), ['in progress', 'en curso', 'en progreso'], true);
     }
 
+    public static function isQualityReview(?string $status): bool
+    {
+        return in_array(self::normalize($status), self::transitionAliases(self::QA), true);
+    }
+
+    public static function isDone(?string $status, ?string $statusCategory = null): bool
+    {
+        $aliases = self::transitionAliases(self::DONE);
+
+        return in_array(self::normalize($status), $aliases, true)
+            || in_array(self::normalize($statusCategory), $aliases, true);
+    }
+
     public static function transitionAliases(string $status): array
     {
         return match ($status) {
             self::IN_PROGRESS => ['in progress', 'en curso', 'en progreso'],
             self::DEPLOYED => ['deployed', 'deploy', 'desplegado', 'desplegada'],
             self::QA => ['qa', 'quality', 'calidad', 'quality review'],
-            self::DONE => ['done', 'finalizada', 'finalizado', 'completada', 'completado', 'closed', 'cerrada', 'cerrado'],
+            self::DONE => [
+                'done', 'finalizada', 'finalizado', 'completada', 'completado', 'closed', 'cerrada', 'cerrado',
+                'listo', 'lista', 'listo para ejecutar', 'lista para ejecutar', 'ready', 'ready to execute',
+                'ready for execution', 'completed', 'complete', 'finished', 'resolved', 'resuelto', 'resuelta',
+            ],
             default => [self::normalize($status)],
         };
     }

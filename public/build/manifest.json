@@ -1001,7 +1001,7 @@
     "isEntry": true
   },
   "resources/js/erp/github/github.js": {
-    "file": "assets/github-CgTDAR4J.js",
+    "file": "assets/github-BYlwz69I.js",
     "name": "github",
     "src": "resources/js/erp/github/github.js",
     "isEntry": true,
@@ -1869,6 +1869,11 @@
   "resources/sass/erp/employees/employees.scss": {
     "file": "assets/employees-DcmMudSC.css",
     "src": "resources/sass/erp/employees/employees.scss",
+    "isEntry": true
+  },
+  "resources/sass/erp/github/github.scss": {
+    "file": "assets/github-CSf1wV8I.css",
+    "src": "resources/sass/erp/github/github.scss",
     "isEntry": true
   },
   "resources/sass/erp/ia_assistant/ia_assistant.scss": {

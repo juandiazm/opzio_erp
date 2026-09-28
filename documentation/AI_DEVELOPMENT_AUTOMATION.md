@@ -23,6 +23,8 @@ El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> G
 php artisan queue:work database --queue=ai-development --tries=1
 ```
 
+La sincronizacion incremental de Jira y el monitor de estados locales de las ejecuciones esperando QA se ejecutan cada minuto, igual que el polling de GitHub.
+
 El repositorio debe tener habilitado Copilot cloud agent y el plan/organizacion debe permitir Agent Tasks. El endpoint de tareas de Copilot esta en public preview y requiere autenticacion de usuario; un GitHub App installation token no es suficiente.
 
 5. Sincronizar Jira. El detector se ejecuta despues de cada upsert y tambien mediante `jira:automation:scan --expire`. La administracion del flujo vive en el modulo GitHub; Jira conserva solamente su integracion funcional, sincronizacion y reportes.
@@ -35,9 +37,13 @@ php artisan jira:automation:scan --project=<automation_project_id> --issue=<JIRA
 
 Los estados locales de Jira como `Tareas por hacer`, `En curso`, `Deploy`, `Quality` y `Finalizada` se resuelven contra las etapas canónicas del flujo.
 
-El ERP no incluye un modelo de IA que pueda modificar un repositorio por si mismo. El adaptador `ai_agent_provider_interface` permite conectar Luna u otros agentes/CLI sin acoplar el flujo de negocio a un proveedor concreto. Si el comando no existe, la ejecucion queda bloqueada y se notifica a los supervisores.
+Cuando una HU ya esta en `Done` o `Finalizada` y el pipeline QA ya fue aprobado, una nueva sincronizacion Jira evalua la ejecucion y encola la promocion a main. Para forzar esa evaluacion sin esperar al scheduler: `php artisan jira:sync --connection=<connection_id> --days=1`.
 
-La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. Copilot crea la branch remota y el Pull Request en GitHub; GitHub puede usar un nombre automatico como `copilot/op-48-github-url-dinamica`. El ERP registra esa branch real, resuelve el numero real del PR consultando los pull requests abiertos y no bloquea una ejecucion valida por el nombre automatico.
+Desde `Admin > GitHub > Ejecuciones`, el boton `Reiniciar flujo` permite volver a ejecutar cualquier historia que ya tenga una ejecucion, sin importar su estado actual. La accion limpia intentos, task de Copilot, branch, PR, pipelines, errores y eventos anteriores; cambia Jira a `In Progress`, registra un unico evento de reinicio y vuelve a encolar la ejecucion.
+
+El ERP no ejecuta un modelo ni un CLI local. El adaptador `ai_agent_provider_interface` inicia y consulta GitHub Copilot cloud agent mediante Agent Tasks.
+
+La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. Copilot crea la branch remota; GitHub puede usar un nombre automatico como `copilot/op-48-github-url-dinamica`. Cuando el task termina, el ERP hace merge directo de esa branch hacia `qa` mediante la API de GitHub y empieza el pipeline de QA. No se requiere Pull Request para el flujo automatico.
 
 ## Seguridad y reglas protegidas
 
@@ -45,15 +51,15 @@ La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. C
 - El contenido de Jira se inserta en el prompt dentro de delimitadores de datos no confiables.
 - La pantalla de decision permite agregar `supervisor_context`, que se conserva en la aprobacion y la ejecucion y llega al prompt dentro de `<SUPERVISOR_CONTEXT>`. Ese texto complementa la historia, pero no puede cambiar las reglas del sistema ni las protecciones de workflows.
 - El agente no recibe credenciales Jira/GitHub por el prompt ni por sus variables de contexto.
-- Git usa `GIT_ASKPASS` temporal y el token solo vive en el entorno del proceso Git.
+- El token solo se usa en llamadas HTTP del ERP hacia GitHub y nunca se envia al prompt del agente.
 - `qa.yml` y `main.yml` se rechazan si aparecen en el diff de la ejecucion.
-- Cada ejecucion usa un workspace y rama propios.
+- Cada ejecucion queda vinculada a su task y branch remotos de GitHub; el servidor ERP no clona repositorios.
 - Los limites de intentos del agente, fallos consecutivos, minutos y tres fallos CI/CD bloquean la ejecucion y disparan correo.
-- QA no autoriza produccion. Solo una transicion Jira a `Done` permite iniciar la promocion.
+- QA no autoriza produccion. Solo una transicion Jira a `Done` o `Finalizada` permite iniciar la promocion.
 
 ## Integracion externa
 
-El cliente GitHub cubre repositorios, ramas, commits, checks, pull requests, merge, workflows, logs y borrado de ramas. Los merge se intentan mediante Pull Request; si las politicas del repositorio impiden el merge, la ejecucion se bloquea para intervencion humana y no se evaden las protecciones.
+El cliente GitHub cubre repositorios, ramas, commits, Agent Tasks, workflows, logs y merge directo de branches. Si las politicas del repositorio impiden el merge hacia `qa`, la ejecucion se bloquea para intervencion humana y no se evaden las protecciones.
 
 El cliente Jira reutiliza la conexion existente, resuelve el campo de Story Points mediante metadata y actualiza estados/comentarios solo despues de las validaciones correspondientes.
 
