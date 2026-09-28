@@ -23,6 +23,8 @@ El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> G
 php artisan queue:work database --queue=ai-development --tries=1
 ```
 
+La sincronizacion incremental de Jira y el monitor de estados locales de las ejecuciones esperando QA se ejecutan cada minuto, igual que el polling de GitHub.
+
 El repositorio debe tener habilitado Copilot cloud agent y el plan/organizacion debe permitir Agent Tasks. El endpoint de tareas de Copilot esta en public preview y requiere autenticacion de usuario; un GitHub App installation token no es suficiente.
 
 5. Sincronizar Jira. El detector se ejecuta despues de cada upsert y tambien mediante `jira:automation:scan --expire`. La administracion del flujo vive en el modulo GitHub; Jira conserva solamente su integracion funcional, sincronizacion y reportes.

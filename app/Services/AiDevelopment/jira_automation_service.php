@@ -404,11 +404,15 @@ class jira_automation_service
                 run_ai_development_execution::dispatch($execution->id);
             }
         }
-        if (jira_automation_statuses::isDone($issue->status)
+        if (jira_automation_statuses::isDone($issue->status, $issue->status_category)
             && $execution->status === ai_development_states::WAITING_QUALITY_REVIEW
             && $execution->qa_delivered_at !== null) {
             $execution->update(['done_detected_at' => now()]);
-            $this->states->transition($execution, ai_development_states::INTEGRATING_MAIN);
+            $this->states->transition($execution, ai_development_states::INTEGRATING_MAIN, [
+                'source' => 'erp_jira_issue',
+                'jira_status' => $issue->status,
+                'jira_status_category' => $issue->status_category,
+            ]);
             promote_ai_development_execution::dispatch($execution->id);
         }
     }

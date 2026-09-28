@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Jobs\run_ai_development_execution;
 use App\Jobs\promote_ai_development_execution;
 use App\Http\Controllers\github_controller;
+use App\Jobs\monitor_ai_development_jira_statuses;
 use App\Mail\CustomMail;
 use App\Models\ai_agent;
 use App\Models\ai_development_event;
@@ -17,6 +18,7 @@ use App\Models\jira_project;
 use App\Models\jira_user;
 use App\Services\AiDevelopment\jira_automation_service;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
+use App\Services\AiDevelopment\jira_automation_statuses;
 use App\Services\AiDevelopment\github_copilot_agent_provider;
 use App\Services\Jira\jira_client;
 use Illuminate\Database\Schema\Blueprint;
@@ -352,6 +354,30 @@ class AiDevelopmentFlowTest extends TestCase
         $issue->update(['status' => 'Finalizada']);
 
         app(jira_automation_service::class)->handleSyncedIssue($issue->fresh(['assignee', 'reporter', 'project', 'connection']));
+
+        $execution->refresh();
+        $this->assertSame('integrating_main', $execution->status);
+        $this->assertNotNull($execution->done_detected_at);
+        $this->assertTrue(jira_automation_statuses::isDone('Done'));
+        $this->assertTrue(jira_automation_statuses::isDone('Finalizada'));
+        $this->assertTrue(jira_automation_statuses::isDone('Estado personalizado', 'Listo para ejecutar'));
+        Queue::assertPushed(promote_ai_development_execution::class, 1);
+    }
+
+    public function test_periodic_jira_monitor_uses_local_status_category_alias(): void
+    {
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'waiting_quality_review',
+            'current_phase' => 'waiting_quality_review',
+            'qa_delivered_at' => now(),
+        ])->save();
+        $issue->update(['status' => 'Estado personalizado', 'status_category' => 'Listo para ejecutar']);
+
+        app(monitor_ai_development_jira_statuses::class)->handle(app(jira_automation_service::class));
 
         $execution->refresh();
         $this->assertSame('integrating_main', $execution->status);
