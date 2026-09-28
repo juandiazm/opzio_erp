@@ -176,7 +176,7 @@ export async function initializeGithubModule(root) {
 			if (!confirmation.isConfirmed) return;
 		}
 		await run(button, async () => {
-			await postJson(`/admin/github/executions/${id}/restart`);
+			await postJson(endpointUrl(`executions/${id}/restart`));
 			await load();
 			const detail = root.querySelector('[data-github-execution-detail]');
 			if (!detail.hidden && detail.dataset.executionId === String(id)) await openExecution(id);
