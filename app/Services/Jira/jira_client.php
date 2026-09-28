@@ -100,6 +100,59 @@ class jira_client
         ]);
     }
 
+    public function updateIssueFields(string $issueKey, array $fields): bool
+    {
+        $response = $this->request()->put('/issue/'.rawurlencode($issueKey), ['fields' => $fields]);
+        $this->ensureSuccessful($response);
+
+        return true;
+    }
+
+    public function transitionIssue(string $issueKey, string $statusName): array
+    {
+        $transitions = $this->get('/issue/'.rawurlencode($issueKey).'/transitions');
+        $wanted = strtolower(trim($statusName));
+        $transition = collect((array) ($transitions['transitions'] ?? []))->first(function (array $item) use ($wanted): bool {
+            return strtolower(trim((string) ($item['name'] ?? ''))) === $wanted
+                || strtolower(trim((string) data_get($item, 'to.name', ''))) === $wanted;
+        });
+        if (! is_array($transition) || blank($transition['id'] ?? null)) {
+            throw new RuntimeException('Jira no ofrece una transicion disponible hacia el estado solicitado.');
+        }
+
+        $response = $this->request()->post('/issue/'.rawurlencode($issueKey).'/transitions', [
+            'transition' => ['id' => (string) $transition['id']],
+        ]);
+        $this->ensureSuccessful($response);
+
+        return $transition;
+    }
+
+    public function addComment(string $issueKey, string $comment, ?string $mentionAccountId = null): array
+    {
+        $content = [];
+        if (filled($mentionAccountId)) {
+            $content[] = ['type' => 'mention', 'attrs' => ['id' => $mentionAccountId, 'text' => '@reporter']];
+            $content[] = ['type' => 'text', 'text' => "\n\n"];
+        }
+        $content[] = ['type' => 'text', 'text' => trim($comment)];
+        $body = [
+            'body' => [
+                'type' => 'doc',
+                'version' => 1,
+                'content' => [[
+                    'type' => 'paragraph',
+                    'content' => $content,
+                ]],
+            ],
+        ];
+        $response = $this->request()->post('/issue/'.rawurlencode($issueKey).'/comment', $body);
+        $this->ensureSuccessful($response);
+        $payload = $response->json();
+
+        return is_array($payload) ? $payload : [];
+    }
+
     public function get(string $path, array $query = [], ?float $timeout = null, ?int $retries = null): array
     {
         $response = $this->request($timeout, $retries)->get($path, $query);

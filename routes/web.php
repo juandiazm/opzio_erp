@@ -44,6 +44,8 @@ use App\Http\Controllers\payment_gateway_bold_controller;
 use App\Http\Controllers\servers_dashboard_controller;
 use App\Http\Controllers\tenders_controller;
 use App\Http\Controllers\jira_controller;
+use App\Http\Controllers\ai_development_controller;
+use App\Http\Controllers\github_controller;
 //Opzio
 use App\Http\Controllers\old_opzio_controller;
 use App\Http\Controllers\client_chat_controller;
@@ -107,6 +109,12 @@ Route::get('public/contracts/{uniqueId}/signature/{token}', [public_contract_sig
 Route::post('public/contracts/{uniqueId}/signature/{token}', [public_contract_signature_controller::class, 'upload'])
     ->middleware('throttle:10,1')
     ->name('public.contract.signature.upload');
+Route::get('jira-automation/approvals/{approval}/{token}', [ai_development_controller::class, 'approval_page'])
+    ->middleware(['throttle:30,1', 'signed'])
+    ->name('ai-development.approval');
+Route::post('jira-automation/approvals/{approval}/{token}', [ai_development_controller::class, 'decide_approval'])
+    ->middleware(['throttle:10,1', 'signed'])
+    ->name('ai-development.approval.decide');
 //Admin routes
 Route::get('Admin', function () {
     return redirect('/admin');
@@ -210,6 +218,17 @@ Route::prefix('admin')->group(function () {
             Route::post('reports/{uniqueId}/regenerate', [jira_controller::class, 'regenerate_report']);
             Route::post('reports/{uniqueId}/delete', [jira_controller::class, 'delete_report']);
             Route::post('reports/{uniqueId}/restore', [jira_controller::class, 'restore_report']);
+        });
+        Route::prefix('github')->group(function () {
+            Route::get('', [github_controller::class, 'page']);
+            Route::get('data', [github_controller::class, 'data']);
+            Route::get('executions/{execution}/data', [github_controller::class, 'execution_detail']);
+            Route::post('connection/save', [github_controller::class, 'save_github']);
+            Route::post('connection/test', [github_controller::class, 'test_github']);
+            Route::post('agents/save', [github_controller::class, 'save_agent']);
+            Route::post('projects/save', [github_controller::class, 'save_project']);
+            Route::post('projects/scan', [github_controller::class, 'scan_project']);
+            Route::post('supervisors/save', [github_controller::class, 'save_supervisor']);
         });
         Route::prefix('users')->group(function () {
             Route::get('', [admin_pages_controller::class, 'users_page']);

@@ -9,9 +9,11 @@ use App\Models\jira_issue_worklog;
 use App\Models\jira_project;
 use App\Models\jira_sync_run;
 use App\Models\jira_user;
+use App\Services\AiDevelopment\jira_automation_service;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Throwable;
 
@@ -112,6 +114,7 @@ class jira_sync_service
                     [$worklogs, $history] = $this->syncIssueDetails($client, $connection, $issue, $userIds);
                     $worklogCount += $worklogs;
                     $historyCount += $history;
+                    $this->notifyAutomation($issue);
                 }
                 $startAt += count($issues);
                 $nextPageToken = $page['nextPageToken'] ?? null;
@@ -271,6 +274,7 @@ class jira_sync_service
                     $worklogCount += $worklogs;
                     $historyCount += $history;
                 }
+                $this->notifyAutomation($issue);
             }
 
             $processedUntil = max(0, $startAt) + count($issues);
@@ -591,6 +595,24 @@ class jira_sync_service
             $issue->saveQuietly();
         } catch (Throwable $exception) {
             logger()->warning('No fue posible sincronizar comentarios Jira.', ['issue' => $issue->issue_key, 'message' => jira_client::safeMessage($exception)]);
+        }
+    }
+
+    private function notifyAutomation(jira_issue $issue): void
+    {
+        static $automationTablesAvailable;
+        $automationTablesAvailable ??= Schema::hasTable('jira_automation_projects');
+        if (! $automationTablesAvailable) {
+            return;
+        }
+
+        try {
+            app(jira_automation_service::class)->handleSyncedIssue($issue->fresh(['connection', 'project', 'assignee', 'reporter']));
+        } catch (Throwable $exception) {
+            logger()->warning('No fue posible evaluar el flujo autonomo de Jira.', [
+                'issue' => $issue->issue_key,
+                'message' => mb_substr($exception->getMessage(), 0, 500),
+            ]);
         }
     }
 

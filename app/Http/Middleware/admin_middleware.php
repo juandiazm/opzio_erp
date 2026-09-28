@@ -33,7 +33,8 @@ class admin_middleware
         $hasContactsPermission = $app_permissions->firstWhere('url', 'admin/contacts/') !== null;
         $hasLicitacionesPermission = $app_permissions->firstWhere('url', 'admin/tenders/') !== null;
         $hasJiraPermission = $app_permissions->firstWhere('url', 'admin/jira/') !== null;
-        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission || !$hasContractsPermission || !$hasNotificationsPermission || !$hasContactsPermission || !$hasLicitacionesPermission || !$hasJiraPermission){
+        $hasGithubPermission = $app_permissions->firstWhere('url', 'admin/github/') !== null;
+        if(!Session::has('app_permissions') || $hasLegacyServersPermission || !$hasServersPermission || !$hasContractsPermission || !$hasNotificationsPermission || !$hasContactsPermission || !$hasLicitacionesPermission || !$hasJiraPermission || !$hasGithubPermission){
             $app_permissions = collect(user_permission::get());
             Session::put('app_permissions', $app_permissions);
             if (Session::has('user')) {

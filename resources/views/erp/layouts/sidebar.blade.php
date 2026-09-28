@@ -143,6 +143,15 @@
                 </a>
             </li>
             @endif
+            @php($github_permission = collect(session('app_permissions'))->firstWhere('url', 'admin/github/'))
+            @if($github_permission && collect(session('permissions'))->firstWhere('user_permission_id', $github_permission->id)!=null)
+            <li class="sidebar-menu-item{{ str_contains(request()->url(), '/admin/github')?' selected':'' }}">
+                <a href="/admin/github" class="sidebar-menu-item-link">
+                    <i class="fa-brands fa-github align-self-center sidebar-menu-item-icon"></i>
+                    <p class="align-self-center sidebar-menu-item-text">GitHub</p>
+                </a>
+            </li>
+            @endif
         </ul>
     </nav>
 </aside>

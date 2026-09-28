@@ -74,13 +74,14 @@ class send_pay_remaining extends Command
     {
         // Get all overdue incomes (both static and recurring)
         $incomesResponse = $this->Income_GetAllOverdueIncomes();
-        $incomes = $incomesResponse['data'];
+        $incomes = collect($incomesResponse['data'] ?? []);
         $portfolioIncomes = collect($incomesResponse['portfolio'] ?? $incomes);
+        $sendableIncomeIds = $incomes->pluck('unique_id')->flip();
         $portfolioTotalsByClient = $portfolioIncomes
             ->filter(fn ($income) => $income->client && $income->client->active == 1)
             ->groupBy(fn ($income) => $income->client->id)
             ->map(fn ($clientIncomes) => $clientIncomes->sum(fn ($income) => (float) $income->total));
-        info('command:send_pay_remaining - Total overdue incomes found: ' . count($incomes));
+        info('command:send_pay_remaining - Total overdue incomes found: ' . count($portfolioIncomes));
         
         $ia_messages = [];
         $report_message = [];
@@ -89,8 +90,8 @@ class send_pay_remaining extends Command
         // Group all incomes by client
         $groupedByClient = [];
         
-        // Process all incomes
-        foreach($incomes as $income) {
+        // Process the complete overdue portfolio; only incomes in data are eligible for today's reminder.
+        foreach($portfolioIncomes as $income) {
             $client = $income->client;
             
             // Skip if client is not active
@@ -108,12 +109,19 @@ class send_pay_remaining extends Command
                         'identification' => $client->identification,
                     ],
                     'portfolio_total' => (float) $portfolioTotalsByClient->get($client_id, 0),
+                    'portfolio_incomes' => [],
+                    'portfolio_income_ids' => [],
                     'incomes' => [],
                     'income_ids' => [], // Track unique income IDs
                     'emails' => [],
                     'phones' => [],
                     'whatsapp_recipients' => [],
                     'incomes_by_channel' => [
+                        'email' => [],
+                        'sms' => [],
+                        'whatsapp' => [],
+                    ],
+                    'notification_income_ids_by_channel' => [
                         'email' => [],
                         'sms' => [],
                         'whatsapp' => [],
@@ -138,8 +146,17 @@ class send_pay_remaining extends Command
                 'has_electronic_invoice' => !empty($income->siigo_invoice_url),
             ];
 
+            if(!in_array($income->unique_id, $groupedByClient[$client_id]['portfolio_income_ids'], true)){
+                $groupedByClient[$client_id]['portfolio_incomes'][] = $incomeData;
+                $groupedByClient[$client_id]['portfolio_income_ids'][] = $income->unique_id;
+            }
+
+            if (!$sendableIncomeIds->has($income->unique_id)) {
+                continue;
+            }
+
             // Check if this income is already added (avoid duplicates)
-            if(!in_array($income->unique_id, $groupedByClient[$client_id]['income_ids'])){
+            if(!in_array($income->unique_id, $groupedByClient[$client_id]['income_ids'], true)){
                 // Add income to client group
                 $groupedByClient[$client_id]['incomes'][] = $incomeData;
                 
@@ -148,6 +165,7 @@ class send_pay_remaining extends Command
                 info('command:send_pay_remaining - Added income: ' . $income->unique_id . ' (days overdue: ' . $income->days_overdue . ') for client: ' . $client->name);
             }else{
                 info('command:send_pay_remaining - Duplicate income skipped: ' . $income->unique_id . ' for client: ' . $client->name);
+                continue;
             }
 
             $channelsForIncome = $reminderChannel !== ''
@@ -229,6 +247,7 @@ class send_pay_remaining extends Command
         foreach($groupedByClient as $client_id => $clientData) {
             info('command:send_pay_remaining - Processing client: ' . $clientData['client']['name'] . ' with ' . count($clientData['incomes']) . ' income(s)');
             $sendAt = $this->randomSendAt();
+            $notificationChannels = [];
             $channelSummary = [];
             foreach ($clientData['incomes'] as $income) {
                 $channel = $income['reminder_channel'] ?: 'multiple';
@@ -243,15 +262,6 @@ class send_pay_remaining extends Command
                 $channelSummary[$channel]['orders']++;
                 $channelSummary[$channel]['total'] += (float) $income['total'];
             }
-            $report_clients[] = [
-                'client' => $clientData['client']['name'],
-                'identification' => $clientData['client']['identification'],
-                'total' => $clientData['portfolio_total'],
-                'channels' => array_values($channelSummary),
-                'channels_label' => implode(', ', array_column($channelSummary, 'channel_label')),
-                'orders' => count($clientData['incomes']),
-                'scheduled_for' => $sendAt->format('Y-m-d H:i:s'),
-            ];
             
             try{
                 // Generate IA message using the first service name
@@ -340,13 +350,18 @@ class send_pay_remaining extends Command
                         $attachments,
                         $sendAt
                     );
-                    info('command:send_pay_remaining - Email queued in mail_logs: ' . $mailLog->unique_id . ' for ' . $sendAt->format('Y-m-d H:i:s'));
+                    if ($mailLog) {
+                        $notificationChannels[] = 'email';
+                        $clientData['notification_income_ids_by_channel']['email'] = array_column($emailIncomes, 'unique_id');
+                        info('command:send_pay_remaining - Email queued in mail_logs: ' . $mailLog->unique_id . ' for ' . $sendAt->format('Y-m-d H:i:s'));
+                    }
                 }
             }catch(\Exception $e) {
                 info('command:send_pay_remaining email grouped: '.$e->getMessage());
             }
             
             // Send SMS for each income (keeping individual SMS as they have character limits)
+            $smsQueued = false;
             try{
                 $uniquePhones = array_unique($clientData['phones']);
                 $smsIncomes = $clientData['incomes_by_channel']['sms'];
@@ -381,11 +396,17 @@ class send_pay_remaining extends Command
                         'status' => 0,
                         'send_at' => $sendAt,
                     ]);
+                    $smsQueued = true;
                 }
             }catch(\Exception $e) {
                 info('command:send_pay_remaining sms grouped: '.$e->getMessage());
             }
+            if ($smsQueued) {
+                $notificationChannels[] = 'sms';
+                $clientData['notification_income_ids_by_channel']['sms'] = array_column($smsIncomes, 'unique_id');
+            }
 
+            $whatsappQueued = false;
             try{
                 $whatsappIncomes = $clientData['incomes_by_channel']['whatsapp'];
                 $totalAmount = array_sum(array_column($whatsappIncomes, 'total'));
@@ -417,30 +438,80 @@ class send_pay_remaining extends Command
                     );
                     if (($response['status'] ?? 0) !== 1) {
                         info('command:send_pay_remaining whatsapp: '.$response['message']);
+                    } else {
+                        $whatsappQueued = true;
                     }
                 }
             }catch(\Exception $e) {
                 info('command:send_pay_remaining whatsapp grouped: '.$e->getMessage());
             }
+            if ($whatsappQueued) {
+                $notificationChannels[] = 'whatsapp';
+                $clientData['notification_income_ids_by_channel']['whatsapp'] = array_column($whatsappIncomes, 'unique_id');
+            }
+
+            $notificationChannelLabels = array_map(
+                fn ($channel) => $this->reminderChannelLabel($channel),
+                $notificationChannels
+            );
+            $notificationScheduled = !empty($notificationChannels);
+            $report_clients[] = [
+                'client' => $clientData['client']['name'],
+                'identification' => $clientData['client']['identification'],
+                'total' => $clientData['portfolio_total'],
+                'channels' => array_values($channelSummary),
+                'channels_label' => implode(', ', array_column($channelSummary, 'channel_label')),
+                'orders' => count($clientData['portfolio_incomes']),
+                'notification_scheduled' => $notificationScheduled,
+                'notification_status' => $notificationScheduled ? 'Programada' : 'No enviada',
+                'notification_channels' => $notificationChannels,
+                'notification_channels_label' => $notificationChannelLabels
+                    ? implode(', ', $notificationChannelLabels)
+                    : 'Ninguno',
+                'scheduled_for' => $notificationScheduled ? $sendAt->format('Y-m-d H:i:s') : null,
+            ];
             
-            // Add each unique income to report (no duplicates)
-            foreach($clientData['incomes'] as $income){
+            // Add each unique overdue income to report (no duplicates)
+            foreach($clientData['portfolio_incomes'] as $income){
+                $incomeNotificationChannels = [];
+                foreach ($clientData['notification_income_ids_by_channel'] as $channel => $incomeIds) {
+                    if (in_array($income['unique_id'], $incomeIds, true)) {
+                        $incomeNotificationChannels[] = $channel;
+                    }
+                }
+                $incomeIsSendable = in_array($income['unique_id'], $clientData['income_ids'], true);
+                $incomeNotificationChannelLabels = array_map(
+                    fn ($channel) => $this->reminderChannelLabel($channel),
+                    $incomeNotificationChannels
+                );
+                $incomeNotificationScheduled = !empty($incomeNotificationChannels);
                 $report_message[] = [
                     'client' => $clientData['client']['name'],
                     'identification' => $clientData['client']['identification'],
                     'total' => $income['total'],
                     'order_id' => substr($income['unique_id'], -10),
                     'days_overdue' => $income['days_overdue'],
-                    'channel' => $income['reminder_channel'] ?: 'multiple',
-                    'channel_label' => $this->reminderChannelLabel($income['reminder_channel'] ?? null),
-                    'scheduled_for' => $sendAt->format('Y-m-d H:i:s'),
+                    'channel' => $incomeIsSendable
+                        ? ($income['reminder_channel'] ?: 'multiple')
+                        : 'none',
+                    'channel_label' => $incomeIsSendable
+                        ? ($income['reminder_channel']
+                            ? $this->reminderChannelLabel($income['reminder_channel'])
+                            : 'Varios canales')
+                        : 'Sin programación',
+                    'scheduled_for' => $incomeNotificationScheduled ? $sendAt->format('Y-m-d H:i:s') : null,
                     'siigo_invoice_url' => $income['siigo_invoice_url'] ?? null,
+                    'notification_scheduled' => $incomeNotificationScheduled,
+                    'notification_channels' => $incomeNotificationChannels,
+                    'notification_channels_label' => $incomeNotificationChannelLabels
+                        ? implode(', ', $incomeNotificationChannelLabels)
+                        : 'Ninguno',
                 ];
             }
         }
         
         //send email report to admin
-        if(count($report_message) > 0){
+        if(count($report_clients) > 0){
             $Mails = [
                 [
                     'address' => 'juandiazm@opzio.co',

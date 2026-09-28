@@ -1,0 +1,57 @@
+# Automatizacion de desarrollo desde Jira
+
+El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> GitHub -> QA -> Done -> main.
+
+## Componentes
+
+- `jira_automation_projects`: habilitacion por proyecto, repositorio GitHub, rama base y limites.
+- `jira_automation_issue_types` y `jira_automation_assignees`: allowlist dinamica basada en el catalogo sincronizado desde Jira; `__unassigned__` representa historias sin responsable.
+- `jira_automation_supervisors`: supervisores globales o por proyecto.
+- `ai_agents`: catalogo desacoplado. Luna queda configurada como agente `command` predeterminado con modelo real `gpt-5.6-luna`; Terra (`gpt-5.6-terra`) ofrece costo medio y Sol (`gpt-5.6-sol`) razonamiento profundo con costo alto.
+- `ai_development_approvals`: snapshot, fingerprint, token hash, expiracion, decision y Story Point Estimate.
+- `ai_development_executions` y `ai_development_events`: maquina de estados y auditoria.
+- `github_connections`: singleton con token cifrado mediante `encrypted:array`.
+
+## Puesta en marcha
+
+1. Ejecutar `php artisan migrate`.
+2. Configurar el token GitHub desde `Admin > GitHub > Conexion`; nunca se guarda en `.env`, HTML, prompts ni logs.
+3. Configurar un comando de runner para Luna desde la pantalla o con `AI_DEVELOPMENT_LUNA_COMMAND`. El comando recibe el prompt por stdin, trabaja en el workspace aislado y recibe `OPZIO_AI_PROVIDER=command` y `OPZIO_AI_MODEL=gpt-5.6-luna`.
+4. Configurar `AI_DEVELOPMENT_QUEUE_CONNECTION=database` y ejecutar un worker dedicado:
+
+```text
+php artisan queue:work database --queue=ai-development --tries=1
+```
+
+5. Sincronizar Jira. El detector se ejecuta despues de cada upsert y tambien mediante `jira:automation:scan --expire`. La administracion del flujo vive en el modulo GitHub; Jira conserva solamente su integracion funcional, sincronizacion y reportes.
+
+El ERP no incluye un modelo de IA que pueda modificar un repositorio por si mismo. El adaptador `ai_agent_provider_interface` permite conectar Luna u otros agentes/CLI sin acoplar el flujo de negocio a un proveedor concreto. Si el comando no existe, la ejecucion queda bloqueada y se notifica a los supervisores.
+
+## Seguridad y reglas protegidas
+
+- Los tokens de aprobacion se almacenan como SHA-256, expiran y son de uso unico.
+- El contenido de Jira se inserta en el prompt dentro de delimitadores de datos no confiables.
+- La pantalla de decision permite agregar `supervisor_context`, que se conserva en la aprobacion y la ejecucion y llega al prompt dentro de `<SUPERVISOR_CONTEXT>`. Ese texto complementa la historia, pero no puede cambiar las reglas del sistema ni las protecciones de workflows.
+- El agente no recibe credenciales Jira/GitHub por el prompt ni por sus variables de contexto.
+- Git usa `GIT_ASKPASS` temporal y el token solo vive en el entorno del proceso Git.
+- `qa.yml` y `main.yml` se rechazan si aparecen en el diff de la ejecucion.
+- Cada ejecucion usa un workspace y rama propios.
+- Los limites de intentos del agente, fallos consecutivos, minutos y tres fallos CI/CD bloquean la ejecucion y disparan correo.
+- QA no autoriza produccion. Solo una transicion Jira a `Done` permite iniciar la promocion.
+
+## Integracion externa
+
+El cliente GitHub cubre repositorios, ramas, commits, checks, pull requests, merge, workflows, logs y borrado de ramas. Los merge se intentan mediante Pull Request; si las politicas del repositorio impiden el merge, la ejecucion se bloquea para intervencion humana y no se evaden las protecciones.
+
+El cliente Jira reutiliza la conexion existente, resuelve el campo de Story Points mediante metadata y actualiza estados/comentarios solo despues de las validaciones correspondientes.
+
+## Validacion local
+
+```text
+php artisan route:list --path=admin/jira
+php artisan view:cache
+npm run build
+php artisan test tests/Feature/JiraModuleTest.php
+php artisan test tests/Feature/AiDevelopmentFlowTest.php
+php artisan schedule:list
+```

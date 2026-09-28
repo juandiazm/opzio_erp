@@ -1,4 +1,8 @@
 {
+  "_api-80n-XQe1.js": {
+    "file": "assets/api-80n-XQe1.js",
+    "name": "api"
+  },
   "_contact-tags-CcT42DoM.js": {
     "file": "assets/contact-tags-CcT42DoM.js",
     "name": "contact-tags",
@@ -17,9 +21,12 @@
     "file": "assets/cropper-Dqszr6bn.css",
     "src": "_cropper-Dqszr6bn.css"
   },
-  "_dashboard-DFQelJ_c.js": {
-    "file": "assets/dashboard-DFQelJ_c.js",
-    "name": "dashboard"
+  "_dashboard-CnlSofeF.js": {
+    "file": "assets/dashboard-CnlSofeF.js",
+    "name": "dashboard",
+    "imports": [
+      "_api-80n-XQe1.js"
+    ]
   },
   "_index-PewBSTf8.js": {
     "file": "assets/index-PewBSTf8.js",
@@ -711,7 +718,7 @@
     "isEntry": true
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-ChCbdWyE.js",
+    "file": "assets/clients-Cq3d4u5K.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
     "isEntry": true,
@@ -719,7 +726,8 @@
       "_record-url-CkW4yFAP.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
-      "_dashboard-DFQelJ_c.js"
+      "_dashboard-CnlSofeF.js",
+      "_api-80n-XQe1.js"
     ]
   },
   "resources/js/erp/clients/contacts.js": {
@@ -789,15 +797,16 @@
     "isEntry": true
   },
   "resources/js/erp/contacts/contacts.js": {
-    "file": "assets/contacts-DCi4K97e.js",
+    "file": "assets/contacts-BA-_GHdj.js",
     "name": "contacts",
     "src": "resources/js/erp/contacts/contacts.js",
     "isEntry": true,
     "imports": [
-      "_dashboard-DFQelJ_c.js",
+      "_dashboard-CnlSofeF.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
-      "_list-ClzTmGL1.js"
+      "_list-ClzTmGL1.js",
+      "_api-80n-XQe1.js"
     ]
   },
   "resources/js/erp/contracts/associations.js": {
@@ -991,6 +1000,15 @@
     "src": "resources/js/erp/employees/update.js",
     "isEntry": true
   },
+  "resources/js/erp/github/github.js": {
+    "file": "assets/github-Nf5PjV2t.js",
+    "name": "github",
+    "src": "resources/js/erp/github/github.js",
+    "isEntry": true,
+    "imports": [
+      "_api-80n-XQe1.js"
+    ]
+  },
   "resources/js/erp/ia_assistant/clients.js": {
     "file": "assets/clients-l0sNRNKZ.js",
     "name": "clients",
@@ -1155,12 +1173,13 @@
     "isEntry": true
   },
   "resources/js/erp/jira/jira.js": {
-    "file": "assets/jira-MltuR2rC.js",
+    "file": "assets/jira-FR2Xzl4T.js",
     "name": "jira",
     "src": "resources/js/erp/jira/jira.js",
     "isEntry": true,
     "imports": [
-      "_dashboard-DFQelJ_c.js",
+      "_api-80n-XQe1.js",
+      "_dashboard-CnlSofeF.js",
       "resources/js/erp/incomes/order.js",
       "_pdf.worker.min-B-tS55GQ.js"
     ]
@@ -1239,7 +1258,7 @@
     "isEntry": true
   },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-BUn_Gr66.js",
+    "file": "assets/licenses-CQNU5Blp.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
     "isEntry": true,
@@ -1248,7 +1267,8 @@
       "_list-ClzTmGL1.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
-      "_dashboard-DFQelJ_c.js"
+      "_dashboard-CnlSofeF.js",
+      "_api-80n-XQe1.js"
     ]
   },
   "resources/js/erp/licenses/list.js": {

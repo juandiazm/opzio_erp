@@ -51,9 +51,12 @@
             @php
                 $reportMessages = $Data['report_message'] ?? [];
                 $reportClients = $Data['report_clients'] ?? [];
+                $scheduledMessages = collect($reportMessages)->where('notification_scheduled', true);
+                $scheduledClients = collect($reportClients)->where('notification_scheduled', true)->count();
+                $unscheduledClients = count($reportClients) - $scheduledClients;
             @endphp
             <h1 class="email-greeting">Plan de Recordatorios de Pago</h1>
-            <p class="email-subheading">Se han programado {{ count($reportMessages) }} recordatorio{{ count($reportMessages) != 1 ? 's' : '' }} para {{ count($reportClients) }} cliente{{ count($reportClients) != 1 ? 's' : '' }}.</p>
+            <p class="email-subheading">Se revisaron {{ count($reportMessages) }} obligación{{ count($reportMessages) != 1 ? 'es' : '' }} vencida{{ count($reportMessages) != 1 ? 's' : '' }} de {{ count($reportClients) }} cliente{{ count($reportClients) != 1 ? 's' : '' }}. Se programaron notificaciones para {{ $scheduledClients }} cliente{{ $scheduledClients != 1 ? 's' : '' }}.</p>
 
             @if(count($reportClients) > 0)
             <div class="section-title">Resumen por cliente</div>
@@ -71,20 +74,30 @@
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
                     <td class="detail-label">Canales de hoy</td>
                     <td align="right" class="detail-value channel-value">
-                        @foreach($client['channels'] ?? [] as $channel)
+                        @forelse($client['channels'] ?? [] as $channel)
                         <div>{{ $channel['channel_label'] }}: {{ $channel['orders'] }} orden{{ $channel['orders'] != 1 ? 'es' : '' }} · COP ${{ number_format($channel['total'],0,',','.') }}</div>
-                        @endforeach
+                        @empty
+                        <div>Ninguno</div>
+                        @endforelse
                     </td>
                 </tr></table>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Resultado de notificación</td>
+                    <td align="right" class="detail-value">{{ $client['notification_status'] ?? 'No enviada' }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Canal(es) notificado(s)</td>
+                    <td align="right" class="detail-value channel-value">{{ $client['notification_channels_label'] ?? 'Ninguno' }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
                     <td class="detail-label">Hora programada</td>
-                    <td align="right" class="detail-value">{{ $client['scheduled_for'] }}</td>
+                    <td align="right" class="detail-value">{{ $client['scheduled_for'] ?? 'No aplica' }}</td>
                 </tr></table>
             </div>
             @endforeach
             @endif
 
-            <div class="section-title">Mensajes definidos para enviar</div>
+            <div class="section-title">Detalle de obligaciones vencidas</div>
             @foreach($reportMessages as $message)
             <div class="report-item">
                 <div class="report-item-title">Orden #{{ $message['order_id'] }}</div>
@@ -103,6 +116,14 @@
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
                     <td class="detail-label">Canal</td>
                     <td align="right" class="detail-value channel-value">{{ $message['channel_label'] ?? 'No definido' }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Resultado</td>
+                    <td align="right" class="detail-value">{{ ($message['notification_scheduled'] ?? false) ? 'Programada' : 'No enviada' }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
+                    <td class="detail-label">Canal notificado</td>
+                    <td align="right" class="detail-value channel-value">{{ $message['notification_channels_label'] ?? 'Ninguno' }}</td>
                 </tr></table>
                 @if(isset($message['scheduled_for']))
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="detail-row"><tr>
@@ -127,12 +148,20 @@
             <div class="summary-box">
                 <div class="summary-box-title">Resumen</div>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>
-                    <td class="summary-row-label">Total de órdenes</td>
+                    <td class="summary-row-label">Total de obligaciones vencidas</td>
                     <td align="right" class="summary-row-value">{{ count($reportMessages) }}</td>
                 </tr></table>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>
                     <td class="summary-row-label">Monto con recordatorio hoy</td>
-                    <td align="right" class="summary-row-value">COP ${{ number_format(array_sum(array_column($reportMessages, 'total')),0,',','.') }}</td>
+                    <td align="right" class="summary-row-value">COP ${{ number_format($scheduledMessages->sum(fn ($message) => (float) $message['total']),0,',','.') }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>
+                    <td class="summary-row-label">Clientes con notificación</td>
+                    <td align="right" class="summary-row-value">{{ $scheduledClients }}</td>
+                </tr></table>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>
+                    <td class="summary-row-label">Clientes sin notificación</td>
+                    <td align="right" class="summary-row-value">{{ $unscheduledClients }}</td>
                 </tr></table>
                 @if(count($reportClients) > 0)
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="summary-row"><tr>

@@ -955,6 +955,9 @@ class notifications_test extends TestCase
         $this->assertSame(300000.0, (float) $client['total']);
         $this->assertSame('Email, WhatsApp', $client['channels_label']);
         $this->assertSame(2, $client['orders']);
+        $this->assertTrue($client['notification_scheduled']);
+        $this->assertSame('Programada', $client['notification_status']);
+        $this->assertSame('Email, WhatsApp', $client['notification_channels_label']);
         $this->assertNotEmpty($client['scheduled_for']);
 
         $reportHtml = view('mail.pay_remaining_report', ['Data' => $command->reportViewData])->render();
@@ -964,6 +967,114 @@ class notifications_test extends TestCase
         $this->assertStringContainsString('COP $200.000', $reportHtml);
         $this->assertStringContainsString('Email', $reportHtml);
         $this->assertStringContainsString('WhatsApp', $reportHtml);
+    }
+
+    public function test_payment_reminder_report_includes_clients_without_notification(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-08-17 07:00:00', config('app.timezone')));
+        $command = new class extends send_pay_remaining {
+            public $reportViewData;
+
+            public function Income_GetAllOverdueIncomes()
+            {
+                $income = function (int $clientId, string $clientName, int $licenseId, ?string $reminderChannel = 'email') {
+                    return (object) [
+                        'unique_id' => 'INCOME-' . $clientId,
+                        'client' => (object) [
+                            'id' => $clientId,
+                            'name' => $clientName,
+                            'identification' => (string) $clientId,
+                            'active' => 1,
+                        ],
+                        'income_licenses' => collect([(object) [
+                            'license_id' => $licenseId,
+                            'license' => (object) [
+                                'service' => (object) ['name' => 'Servicio'],
+                            ],
+                        ]]),
+                        'client_name' => $clientName,
+                        'client_identification' => (string) $clientId,
+                        'timely_payment' => 1,
+                        'cutoff_date' => '2026-08-16',
+                        'total' => 100000,
+                        'payment_link' => 'https://example.test/pagar',
+                        'state' => 2,
+                        'days_overdue' => 1,
+                        'reminder_channel' => $reminderChannel,
+                        'siigo_invoice_url' => null,
+                    ];
+                };
+
+                return [
+                    'status' => 1,
+                    'data' => collect([
+                        $income(1, 'Cliente Notificado', 1),
+                        $income(2, 'Cliente Sin Contacto', 2),
+                    ]),
+                    'portfolio' => collect([
+                        $income(1, 'Cliente Notificado', 1),
+                        $income(2, 'Cliente Sin Contacto', 2),
+                        $income(3, 'Cliente Sin Cadencia', 3, null),
+                    ]),
+                ];
+            }
+
+            public function License_GetLicenseNotificationsByLicensesIds($licenseIds)
+            {
+                return [
+                    'status' => 1,
+                    'data' => $licenseIds === [1]
+                        ? [[
+                            'email' => 'cliente@example.test',
+                            'phone' => '',
+                            'channels' => ['email'],
+                        ]]
+                        : [[
+                            'email' => '',
+                            'phone' => '',
+                            'channels' => [],
+                        ]],
+                ];
+            }
+
+            public function OpenIA_MakeQuestion($message, $model = null, $options = [])
+            {
+                return ['status' => 1, 'data' => ['Mensaje']];
+            }
+
+            public function SendMail($MailData, $Mails, $View, $ViewData, $files, $unique_id = null, $mailer = null, $from = null, $replyTo = null)
+            {
+                if ($View === 'mail.pay_remaining_report') {
+                    $this->reportViewData = $ViewData;
+                }
+
+                return ['status' => 1];
+            }
+        };
+
+        try {
+            $this->assertSame(0, $command->handle());
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $clients = collect($command->reportViewData->toArray()['report_clients'])->keyBy('client');
+
+        $this->assertCount(3, $clients);
+        $this->assertTrue($clients['Cliente Notificado']['notification_scheduled']);
+        $this->assertSame('Email', $clients['Cliente Notificado']['notification_channels_label']);
+        $this->assertFalse($clients['Cliente Sin Contacto']['notification_scheduled']);
+        $this->assertSame('No enviada', $clients['Cliente Sin Contacto']['notification_status']);
+        $this->assertSame('Ninguno', $clients['Cliente Sin Contacto']['notification_channels_label']);
+        $this->assertNull($clients['Cliente Sin Contacto']['scheduled_for']);
+        $this->assertSame(1, $clients['Cliente Sin Cadencia']['orders']);
+        $this->assertFalse($clients['Cliente Sin Cadencia']['notification_scheduled']);
+        $this->assertSame('Ninguno', $clients['Cliente Sin Cadencia']['notification_channels_label']);
+
+        $reportHtml = view('mail.pay_remaining_report', ['Data' => $command->reportViewData])->render();
+        $this->assertStringContainsString('Cliente Sin Cadencia', $reportHtml);
+        $this->assertStringContainsString('No enviada', $reportHtml);
+        $this->assertStringContainsString('Clientes sin notificación', $reportHtml);
     }
 
     public function test_sms_queue_skips_future_messages_and_processes_due_messages()

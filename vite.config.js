@@ -228,6 +228,7 @@ export default defineConfig({
     'resources/js/erp/jira/configuration.js',
     'resources/js/erp/jira/dashboard.js',
     'resources/js/erp/jira/jira.js',
+    'resources/js/erp/github/github.js',
     'resources/js/erp/jira/productivity.js',
     'resources/js/erp/jira/relations.js',
     'resources/js/erp/jira/reports.js',

@@ -40,6 +40,10 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->timezone('America/Bogota')
             ->withoutOverlapping(120);
+        $schedule->command('jira:automation:scan --expire')
+            ->everyTenMinutes()
+            ->timezone('America/Bogota')
+            ->withoutOverlapping(30);
         $schedule->command('jira:process-recurrences')
             ->dailyAt('00:10')
             ->timezone('America/Bogota')

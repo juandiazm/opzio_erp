@@ -1222,3 +1222,12 @@ Todo lo demas, especialmente webhooks, edicion de Jira, Jira Data Center, integr
 - Se agregaron las vistas Blade, recursos JS/Sass, PDF y correo del módulo.
 - Se validó con lint PHP, `php artisan view:cache`, `npm run build`, rutas Jira y `JiraModuleTest`.
 - La suite completa del ERP quedó en 93 pruebas correctas y un fallo preexistente de `ExampleTest`, que espera HTTP 200 en la raíz mientras el middleware devuelve 302 para usuarios no autenticados.
+
+### Reorganizacion de automatizacion - 2026-09-28
+
+- La automatizacion de desarrollo dejo de ser una pestaña dentro de Jira.
+- Se creo el modulo administrativo independiente `admin/github` con pestañas de Resumen, Conexion, Proyectos, Agentes, Supervisores, Aprobaciones y Ejecuciones.
+- Se agrego el permiso `admin/github/`, el enlace del sidebar, rutas propias y un controlador GitHub que reutiliza la logica de orquestacion existente.
+- El resumen consume KPIs completos, actividad reciente, solicitudes de aprobacion y ejecuciones; cada ejecucion tiene detalle de eventos bajo demanda.
+- Jira conserva sincronizacion, dashboard, relaciones y reportes; ya no carga la configuracion de automatizacion.
+- Se retiraron los artefactos exclusivos de la antigua pestaña Jira y se agrego `AiDevelopmentFlowTest` para el payload del nuevo modulo.
