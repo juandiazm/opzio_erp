@@ -436,6 +436,24 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertSame('34', $client->transitionIssue('OPS-1', 'Done')['id']);
     }
 
+    public function test_jira_transition_is_idempotent_when_issue_is_already_in_quality(): void
+    {
+        [$issue] = $this->fixture();
+        Http::fake(function ($request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            if ($request->method() === 'GET' && str_ends_with($path, '/issue/OPS-1')) {
+                return Http::response(['fields' => ['status' => ['name' => 'Quality', 'statusCategory' => ['name' => 'Quality']]]]);
+            }
+
+            return Http::response([], 200);
+        });
+
+        $result = (new jira_client($issue->connection))->transitionIssue('OPS-1', 'Quality');
+
+        $this->assertTrue($result['already_applied']);
+        Http::assertNotSent(fn ($request): bool => str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/issue/OPS-1/transitions'));
+    }
+
     public function test_finalizada_after_qa_queues_main_promotion(): void
     {
         Queue::fake();

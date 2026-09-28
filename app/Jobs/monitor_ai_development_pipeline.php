@@ -83,7 +83,7 @@ class monitor_ai_development_pipeline implements ShouldQueue
     ): void
     {
         try {
-            (new jira_client($execution->issue->connection))->transitionIssue($execution->jira_key, 'QA');
+            (new jira_client($execution->issue->connection))->transitionIssue($execution->jira_key, \App\Services\AiDevelopment\jira_automation_statuses::QUALITY);
             $reporter = $execution->issue->reporter?->display_name ?: 'reporter';
             (new jira_client($execution->issue->connection))->addComment(
                 $execution->jira_key,

@@ -127,7 +127,7 @@ class monitor_ai_development_agent implements ShouldQueue
         if (($merge['merged'] ?? false) !== true) {
             throw new RuntimeException('La branch de Copilot no pudo integrarse directamente hacia QA.');
         }
-        (new jira_client($execution->issue->connection))->transitionIssue($execution->jira_key, 'Deployed');
+        (new jira_client($execution->issue->connection))->transitionIssue($execution->jira_key, \App\Services\AiDevelopment\jira_automation_statuses::DEPLOY);
         $execution->update([
             'last_commit_sha' => $merge['sha'] ?? null,
             'context' => array_merge((array) $execution->context, [

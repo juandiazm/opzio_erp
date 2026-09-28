@@ -116,8 +116,20 @@ class jira_client
 
     public function transitionIssue(string $issueKey, string $statusName): array
     {
-        $transitions = $this->get('/issue/'.rawurlencode($issueKey).'/transitions');
         $wanted = jira_automation_statuses::transitionAliases($statusName);
+        $currentIssue = $this->issue($issueKey, ['status']);
+        $currentStatus = jira_automation_statuses::normalize(data_get($currentIssue, 'fields.status.name'));
+        $currentCategory = jira_automation_statuses::normalize(data_get($currentIssue, 'fields.status.statusCategory.name'));
+        if (in_array($currentStatus, $wanted, true) || in_array($currentCategory, $wanted, true)) {
+            return [
+                'id' => null,
+                'name' => data_get($currentIssue, 'fields.status.name'),
+                'to' => ['name' => data_get($currentIssue, 'fields.status.name')],
+                'already_applied' => true,
+            ];
+        }
+
+        $transitions = $this->get('/issue/'.rawurlencode($issueKey).'/transitions');
         $transition = collect((array) ($transitions['transitions'] ?? []))->first(function (array $item) use ($wanted): bool {
             $names = [
                 jira_automation_statuses::normalize($item['name'] ?? null),
@@ -128,7 +140,17 @@ class jira_client
             return collect($names)->intersect($wanted)->isNotEmpty();
         });
         if (! is_array($transition) || blank($transition['id'] ?? null)) {
-            throw new RuntimeException('Jira no ofrece una transicion disponible hacia el estado solicitado.');
+            $available = collect((array) ($transitions['transitions'] ?? []))
+                ->map(fn (array $item): string => (string) (data_get($item, 'to.name') ?: ($item['name'] ?? '')))
+                ->filter()
+                ->unique()
+                ->implode(', ');
+            throw new RuntimeException(sprintf(
+                'Jira no ofrece una transicion de "%s" hacia "%s". Disponibles: %s.',
+                data_get($currentIssue, 'fields.status.name') ?: 'desconocido',
+                $statusName,
+                $available ?: 'ninguna',
+            ));
         }
 
         $response = $this->request()->post('/issue/'.rawurlencode($issueKey).'/transitions', [
