@@ -101,7 +101,7 @@ class monitor_ai_development_pipeline implements ShouldQueue
     {
         $execution->update(['main_workflow_run_id' => $details['id'], 'finished_at' => now(), 'last_activity_at' => now()]);
         $states->transition($execution, ai_development_states::COMPLETED, ['workflow' => $details]);
-        $notification = $notifications->completed($execution->fresh(['project', 'issue', 'agent']), $details);
+        $notification = $notifications->completed($execution->fresh(['project.jiraProject', 'issue', 'agent']), $details);
         $states->event($execution->fresh(), ($notification['status'] ?? 0) === 1 ? 'completion_notification_sent' : 'completion_notification_failed', [
             'message' => mb_substr((string) ($notification['message'] ?? ''), 0, 500),
         ]);
