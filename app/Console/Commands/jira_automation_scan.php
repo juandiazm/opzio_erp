@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\ai_development_approval;
 use App\Models\ai_development_execution;
 use App\Models\jira_automation_project;
+use App\Models\jira_issue;
 use App\Services\AiDevelopment\ai_development_state_machine;
 use App\Services\AiDevelopment\jira_automation_service;
 use Illuminate\Console\Command;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Schema;
 
 class jira_automation_scan extends Command
 {
-    protected $signature = 'jira:automation:scan {--project=} {--expire : Expira solicitudes de aprobacion vencidas}';
+    protected $signature = 'jira:automation:scan {--project=} {--issue=} {--explain : Explica por que una HU no es candidata} {--expire : Expira solicitudes de aprobacion vencidas}';
 
     protected $description = 'Detecta candidatas Jira y expira aprobaciones vencidas';
 
@@ -26,6 +27,35 @@ class jira_automation_scan extends Command
             ->where('enabled', true)
             ->when($this->option('project'), fn ($query, $id) => $query->whereKey((int) $id))
             ->get();
+        if ($this->option('issue')) {
+            $issue = jira_issue::query()
+                ->with(['assignee', 'reporter', 'project', 'connection'])
+                ->where('issue_key', (string) $this->option('issue'))
+                ->first();
+            if (! $issue) {
+                $this->error('No se encontro la HU '.$this->option('issue').' en jira_issues.');
+                return self::FAILURE;
+            }
+            $project = $projects->firstWhere('jira_project_id', $issue->jira_project_id)
+                ?: jira_automation_project::query()->with(['issueTypes', 'assignees'])->where('jira_project_id', $issue->jira_project_id)->first();
+            if (! $project) {
+                $this->error('No existe configuracion de automatizacion para el proyecto Jira '.$issue->jira_project_id.'.');
+                return self::FAILURE;
+            }
+            $reasons = $service->candidateReasons($issue, $project);
+            if ($reasons === []) {
+                $this->info($issue->issue_key.': candidata valida.');
+                if ($this->option('explain')) {
+                    $this->line('Estado: '.$issue->status.' | Tipo: '.$issue->issue_type.' | Assignee: '.($issue->assignee?->display_name ?: 'Unassigned').' ('.($issue->assignee?->account_id ?: '__unassigned__').')');
+                }
+            } else {
+                $this->warn($issue->issue_key.': no es candidata.');
+                foreach ($reasons as $reason) {
+                    $this->line('- '.$reason);
+                }
+            }
+            return self::SUCCESS;
+        }
         $detected = 0;
         foreach ($projects as $project) {
             $detected += $service->scanProject($project);

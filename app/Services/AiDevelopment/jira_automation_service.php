@@ -231,15 +231,36 @@ class jira_automation_service
 
     public function isCandidate(jira_issue $issue, jira_automation_project $project): bool
     {
-        if (! $project->enabled || ! jira_automation_statuses::isPending($issue->status)) {
-            return false;
+        return $this->candidateReasons($issue, $project, false) === [];
+    }
+
+    public function candidateReasons(jira_issue $issue, jira_automation_project $project, bool $includeDuplicateWork = true): array
+    {
+        $reasons = [];
+        if (! $project->enabled) {
+            $reasons[] = 'El proyecto de automatizacion esta deshabilitado.';
         }
-        $typeEnabled = $project->issueTypes->contains(fn ($item): bool => $item->enabled && strcasecmp(trim((string) $item->issue_type), trim((string) $issue->issue_type)) === 0);
-        if (! $typeEnabled) {
-            return false;
+        if (! jira_automation_statuses::isPending($issue->status)) {
+            $reasons[] = 'El estado Jira no es elegible: '.((string) $issue->status ?: 'vacio').'.';
+        }
+        $matchingType = $project->issueTypes->first(fn ($item): bool => strcasecmp(trim((string) $item->issue_type), trim((string) $issue->issue_type)) === 0);
+        if (! $matchingType) {
+            $reasons[] = 'El tipo de issue no esta configurado: '.((string) $issue->issue_type ?: 'vacio').'.';
+        } elseif (! $matchingType->enabled) {
+            $reasons[] = 'El tipo de issue existe pero esta deshabilitado: '.$matchingType->issue_type.'.';
         }
         $assigneeKey = $issue->assignee?->account_id ?: '__unassigned__';
-        return $project->assignees->contains(fn (jira_automation_assignee $item): bool => $item->enabled && (string) $item->assignee_key === (string) $assigneeKey);
+        $matchingAssignee = $project->assignees->first(fn (jira_automation_assignee $item): bool => (string) $item->assignee_key === (string) $assigneeKey);
+        if (! $matchingAssignee) {
+            $reasons[] = 'El assignee no esta configurado: '.($issue->assignee?->display_name ?: 'Unassigned').' (account_id '.$assigneeKey.').';
+        } elseif (! $matchingAssignee->enabled) {
+            $reasons[] = 'El assignee existe pero esta deshabilitado: '.($matchingAssignee->display_name ?: $assigneeKey).'.';
+        }
+        if ($includeDuplicateWork && $this->hasEquivalentPendingWork($issue)) {
+            $reasons[] = 'Ya existe una aprobacion pendiente o una ejecucion activa para esta HU.';
+        }
+
+        return $reasons;
     }
 
     public function scanProject(jira_automation_project $project): int
