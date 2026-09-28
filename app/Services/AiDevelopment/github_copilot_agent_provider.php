@@ -22,7 +22,7 @@ class github_copilot_agent_provider implements ai_agent_provider_interface
             [
                 'prompt' => $prompt,
                 'model' => trim((string) $agent->model) ?: null,
-                'create_pull_request' => true,
+                'create_pull_request' => $headBranch === null,
                 'base_ref' => $baseBranch,
                 'head_ref' => $headBranch,
             ],

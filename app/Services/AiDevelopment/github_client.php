@@ -188,6 +188,27 @@ class github_client
             return;
         }
         $message = trim((string) ($response->json('message') ?: $response->reason()));
+        $errors = $response->json('errors');
+        if (is_array($errors) && $errors !== []) {
+            $details = collect($errors)->map(function ($error): string {
+                if (is_string($error)) {
+                    return $error;
+                }
+                if (is_array($error)) {
+                    return collect([
+                        $error['resource'] ?? null,
+                        $error['field'] ?? null,
+                        $error['code'] ?? null,
+                        $error['message'] ?? null,
+                    ])->filter()->implode(': ');
+                }
+
+                return (string) $error;
+            })->filter()->implode('; ');
+            if ($details !== '') {
+                $message .= ' ['.$details.']';
+            }
+        }
         throw new RuntimeException('GitHub: '.mb_substr($message !== '' ? $message : 'error HTTP '.$response->status(), 0, 500));
     }
 
