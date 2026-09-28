@@ -79,14 +79,6 @@ class monitor_ai_development_agent implements ShouldQueue
                 return;
             }
 
-            $artifactBranch = collect((array) ($task['artifacts'] ?? []))
-                ->first(fn (array $artifact): bool => ($artifact['type'] ?? null) === 'branch');
-            $headBranch = data_get($artifactBranch, 'data.head_ref');
-            if (filled($headBranch) && filled($execution->feature_branch) && $headBranch !== $execution->feature_branch) {
-                $this->block($execution, 'Copilot creo la branch '.$headBranch.' en lugar de '.$execution->feature_branch.'.', $states, $notifications);
-                return;
-            }
-
             $this->completeAgentTask($execution, $task, $states);
         } catch (Throwable $exception) {
             $this->fail($execution, 'No fue posible consultar Copilot cloud agent: '.mb_substr($exception->getMessage(), 0, 1200), $states, $notifications);

@@ -7,7 +7,6 @@ use App\Services\AiDevelopment\ai_agent_provider_interface;
 use App\Services\AiDevelopment\ai_development_notification_service;
 use App\Services\AiDevelopment\ai_development_state_machine;
 use App\Services\AiDevelopment\ai_development_states;
-use App\Services\AiDevelopment\github_client;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -74,21 +73,9 @@ class run_ai_development_execution implements ShouldQueue
                 $feedback[] = ['source' => 'CI/CD', 'content' => $pipelineFeedback];
             }
             $prompt = $prompts->build($execution->issue, $project, $agent, $execution, $feedback);
-            $github = new github_client($project->githubConnection);
-            $featureBranch = $execution->feature_branch ?: $execution->jira_key;
-            $github->createBranch($project->github_owner, $project->github_repository, $featureBranch, $execution->base_branch);
-            $existingPullRequest = collect($github->openPullRequests(
-                $project->github_owner,
-                $project->github_repository,
-                $featureBranch,
-                $execution->base_branch,
-            ))->first();
             $execution->update([
-                'feature_branch' => $featureBranch,
-                'github_pull_request_number' => is_array($existingPullRequest) ? ($existingPullRequest['number'] ?? null) : null,
-                'context' => array_merge((array) $execution->context, ['github_head_branch' => $featureBranch]),
+                'context' => array_merge((array) $execution->context, ['github_requested_branch' => $execution->jira_key]),
             ]);
-            $states->event($execution->fresh(), 'github_branch_ready', ['branch' => $featureBranch, 'base_branch' => $execution->base_branch]);
             $task = $agentProvider->start(
                 $agent,
                 $prompt,
@@ -96,8 +83,7 @@ class run_ai_development_execution implements ShouldQueue
                 $project->github_owner,
                 $project->github_repository,
                 $execution->base_branch,
-                $featureBranch,
-                ! is_array($existingPullRequest),
+                null,
             );
             $execution->update([
                 'github_task_id' => $task['id'] ?? null,
