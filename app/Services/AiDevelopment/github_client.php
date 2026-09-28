@@ -30,6 +30,24 @@ class github_client
         return $this->get('/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/branches/'.rawurlencode($branch));
     }
 
+    public function createBranch(string $owner, string $repository, string $branch, string $baseBranch): array
+    {
+        $path = '/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/git/ref/heads/'.rawurlencode($branch);
+        $existing = $this->request()->get($path);
+        if ($existing->successful()) {
+            $payload = $existing->json();
+            return is_array($payload) ? $payload : [];
+        }
+        if ($existing->status() !== 404) {
+            $this->ensureSuccessful($existing);
+        }
+        $base = $this->branch($owner, $repository, $baseBranch);
+        return $this->json('POST', '/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/git/refs', [
+            'ref' => 'refs/heads/'.$branch,
+            'sha' => (string) data_get($base, 'commit.sha'),
+        ]);
+    }
+
     public function createPullRequest(string $owner, string $repository, string $title, string $head, string $base, string $body = ''): array
     {
         return $this->json('POST', '/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/pulls', [

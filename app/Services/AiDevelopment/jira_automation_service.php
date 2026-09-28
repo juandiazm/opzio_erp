@@ -383,10 +383,7 @@ class jira_automation_service
 
     private function featureBranch(jira_issue $issue): string
     {
-        $slug = Str::slug((string) $issue->summary);
-        $branch = 'ai/'.strtolower((string) $issue->issue_key).($slug !== '' ? '-'.$slug : '');
-
-        return Str::limit($branch, 240, '');
+        return trim((string) $issue->issue_key);
     }
 
     private function newFeedback(jira_issue $issue, ai_development_execution $execution): array

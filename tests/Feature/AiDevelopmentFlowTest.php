@@ -148,6 +148,9 @@ class AiDevelopmentFlowTest extends TestCase
         $prompt = app(jira_automation_prompt_builder::class)->build($execution->issue, $execution->project, $execution->agent, $execution);
         $this->assertStringContainsString($supervisorContext, $prompt);
         $this->assertStringContainsString('<SUPERVISOR_CONTEXT>', $prompt);
+        $this->assertSame('OPS-1', $execution->feature_branch);
+        $this->assertStringNotContainsString('Assignee:', $prompt);
+        $this->assertStringNotContainsString('Reporter:', $prompt);
         Http::assertSent(fn ($request): bool => $request->method() === 'PUT' && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/issue/OPS-1'));
     }
 
@@ -268,6 +271,7 @@ class AiDevelopmentFlowTest extends TestCase
             'opzio',
             'erp',
             'qa',
+            'OP-48',
         );
 
         $this->assertSame('task-remote-1', $task['id']);
@@ -276,6 +280,7 @@ class AiDevelopmentFlowTest extends TestCase
                 && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/agents/repos/opzio/erp/tasks')
                 && $request->data()['model'] === 'gpt-5.6-luna'
                 && $request->data()['base_ref'] === 'qa'
+                && $request->data()['head_ref'] === 'OP-48'
                 && $request->data()['create_pull_request'] === true
                 && str_contains($request->data()['prompt'], 'OPS-1');
         });
