@@ -30,6 +30,11 @@ class jira_client
         return $this->get('/field', [], (float) config('jira.test_timeout', 10), 0);
     }
 
+    public function issueTypes(): array
+    {
+        return $this->get('/issuetype', [], (float) config('jira.test_timeout', 10), 0);
+    }
+
     public function projects(int $startAt = 0, int $maxResults = 50): array
     {
         return $this->get('/project/search', [

@@ -15,6 +15,7 @@ use App\Models\jira_project;
 use App\Models\jira_user;
 use App\Services\AiDevelopment\github_client;
 use App\Services\AiDevelopment\jira_automation_service;
+use App\Services\Jira\jira_client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -242,9 +243,11 @@ class ai_development_controller extends Controller
         $githubConnection = github_connection::query()->latest('updated_at')->first();
         $projects = jira_project::query()->with('connection')->orderBy('name')->get();
         $configurations = jira_automation_project::query()->with(['issueTypes', 'assignees', 'defaultAgent', 'githubConnection', 'supervisors'])->get()->keyBy('jira_project_id');
-        $projectPayload = $projects->map(function (jira_project $project) use ($configurations): array {
+        $remoteIssueTypes = $this->jiraIssueTypeCatalog($projects);
+        $projectPayload = $projects->map(function (jira_project $project) use ($configurations, $remoteIssueTypes): array {
             $configuration = $configurations->get($project->id);
-            $types = jira_issue::query()->where('jira_project_id', $project->id)->whereNotNull('issue_type')->distinct()->orderBy('issue_type')->pluck('issue_type')->values();
+            $localTypes = jira_issue::query()->where('jira_project_id', $project->id)->whereNotNull('issue_type')->distinct()->orderBy('issue_type')->pluck('issue_type');
+            $types = $localTypes->merge($remoteIssueTypes[$project->id] ?? [])->filter()->unique()->sort()->values();
             $userIds = jira_issue::query()->where('jira_project_id', $project->id)->whereNotNull('assignee_jira_user_id')->distinct()->pluck('assignee_jira_user_id');
             $users = jira_user::query()->whereIn('id', $userIds)->orderBy('display_name')->get();
             return [
@@ -400,6 +403,36 @@ class ai_development_controller extends Controller
         unset($context['token'], $context['api_token'], $context['credentials'], $context['secret'], $context['authorization']);
 
         return $context;
+    }
+
+    private function jiraIssueTypeCatalog($projects): array
+    {
+        $catalog = [];
+        foreach ($projects->groupBy('jira_connection_id') as $connectionProjects) {
+            $connection = $connectionProjects->first()?->connection;
+            if (! $connection) {
+                continue;
+            }
+            try {
+                $types = (new jira_client($connection))->issueTypes();
+                $names = collect($types)
+                    ->map(fn ($type): string => trim((string) data_get($type, 'name', '')))
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->all();
+                foreach ($connectionProjects as $project) {
+                    $catalog[$project->id] = $names;
+                }
+            } catch (Throwable $exception) {
+                logger()->warning('No fue posible actualizar el catalogo de tipos Jira para GitHub.', [
+                    'jira_connection_id' => $connection->id,
+                    'message' => jira_client::safeMessage($exception),
+                ]);
+            }
+        }
+
+        return $catalog;
     }
 
     private function costLabel(?string $tier): string

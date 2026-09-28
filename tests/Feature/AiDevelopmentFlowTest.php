@@ -183,6 +183,17 @@ class AiDevelopmentFlowTest extends TestCase
     {
         [$issue] = $this->fixture();
         app(jira_automation_service::class)->detectCandidate($issue);
+        Http::fake(function ($request) {
+            return str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/rest/api/3/issuetype')
+                ? Http::response([
+                    ['id' => '1', 'name' => 'Story'],
+                    ['id' => '2', 'name' => 'Task'],
+                    ['id' => '3', 'name' => 'Bug'],
+                    ['id' => '4', 'name' => 'Epic'],
+                    ['id' => '5', 'name' => 'Sub-task'],
+                ])
+                : Http::response([], 200);
+        });
 
         $response = app(github_controller::class)->data(Request::create('/admin/github/data', 'GET'));
         $payload = $response->getData(true);
@@ -192,6 +203,11 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertArrayHasKey('approvals', $payload['data']);
         $this->assertArrayHasKey('activity', $payload['data']);
         $this->assertSame(1, $payload['data']['summary']['approvals_pending']);
+        $types = $payload['data']['projects'][0]['available_issue_types'];
+        $this->assertContains('Task', $types);
+        $this->assertContains('Bug', $types);
+        $this->assertContains('Epic', $types);
+        $this->assertContains('Sub-task', $types);
         $this->assertArrayNotHasKey('token', $payload['data']['github'] ?? []);
         $this->assertArrayNotHasKey('credentials', $payload['data']['github'] ?? []);
     }
