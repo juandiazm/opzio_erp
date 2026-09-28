@@ -118,7 +118,7 @@ class jira_automation_service
         $approval = ai_development_approval::query()
             ->with('execution')
             ->where('jira_issue_id', $issue->id)
-            ->whereIn('status', ['blocked', 'expired'])
+            ->whereIn('status', ['blocked', 'expired', 'approved'])
             ->latest('id')
             ->first();
         if (! $approval || $approval->execution?->status !== ai_development_states::BLOCKED) {

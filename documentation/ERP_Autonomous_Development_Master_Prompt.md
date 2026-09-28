@@ -1906,6 +1906,7 @@ La interfaz de automatizacion se administra ahora desde el modulo independiente 
 - Supervisores globales y por proyecto con deduplicacion por correo.
 - Catalogo de agentes desacoplado mediante `ai_agent_provider_interface`; Luna, Terra y Sol se ejecutan mediante GitHub Copilot cloud agent.
 - Luna queda asociada al modelo real `gpt-5.6-luna`; GitHub Copilot cloud agent recibe el modelo elegido mediante la API de Agent Tasks y los proyectos/aprobaciones usan dropdown de agentes.
+- Antes de iniciar Copilot, el ERP crea la branch exacta de la Jira key y un PR draft; una branch generada diferente se bloquea y nunca se integra automaticamente.
 - Conexion GitHub singleton con credencial cifrada; cliente para repositorios, ramas, commits, checks, pull requests, merges, workflows y logs.
 - Deteccion idempotente conectada al upsert existente de `jira_sync_service`.
 - Aprobacion publica con token aleatorio almacenado como hash, expiracion, uso unico, snapshot de Jira y Story Point Estimate.

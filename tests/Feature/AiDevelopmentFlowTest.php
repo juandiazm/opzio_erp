@@ -286,6 +286,30 @@ class AiDevelopmentFlowTest extends TestCase
         });
     }
 
+    public function test_copilot_task_status_falls_back_to_global_endpoint_when_repo_scope_returns_not_found(): void
+    {
+        [, $configuration] = $this->fixture();
+        Http::fake(function ($request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            if (str_ends_with($path, '/agents/repos/opzio/erp/tasks/task-fallback')) {
+                return Http::response(['message' => 'Not Found'], 404);
+            }
+            if (str_ends_with($path, '/agents/tasks/task-fallback')) {
+                return Http::response(['id' => 'task-fallback', 'state' => 'completed']);
+            }
+            return Http::response([], 200);
+        });
+
+        $task = app(github_copilot_agent_provider::class)->status(
+            $configuration->githubConnection,
+            'opzio',
+            'erp',
+            'task-fallback',
+        );
+
+        $this->assertSame('completed', $task['state']);
+    }
+
     public function test_localized_jira_transitions_are_resolved(): void
     {
         [$issue] = $this->fixture();

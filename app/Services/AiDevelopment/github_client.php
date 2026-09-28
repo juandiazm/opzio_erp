@@ -48,13 +48,14 @@ class github_client
         ]);
     }
 
-    public function createPullRequest(string $owner, string $repository, string $title, string $head, string $base, string $body = ''): array
+    public function createPullRequest(string $owner, string $repository, string $title, string $head, string $base, string $body = '', bool $draft = false): array
     {
         return $this->json('POST', '/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/pulls', [
             'title' => $title,
             'head' => $head,
             'base' => $base,
             'body' => $body,
+            'draft' => $draft,
         ]);
     }
 
@@ -91,7 +92,15 @@ class github_client
 
     public function agentTask(string $owner, string $repository, string $taskId): array
     {
-        return $this->get('/agents/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/tasks/'.rawurlencode($taskId));
+        $path = '/agents/repos/'.rawurlencode($owner).'/'.rawurlencode($repository).'/tasks/'.rawurlencode($taskId);
+        $response = $this->request()->get($path);
+        if ($response->status() === 404) {
+            return $this->get('/agents/tasks/'.rawurlencode($taskId));
+        }
+        $this->ensureSuccessful($response);
+        $payload = $response->json();
+
+        return is_array($payload) ? $payload : [];
     }
 
     public function commits(string $owner, string $repository, ?string $branch = null, int $perPage = 10): array

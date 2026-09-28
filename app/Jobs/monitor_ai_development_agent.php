@@ -79,6 +79,14 @@ class monitor_ai_development_agent implements ShouldQueue
                 return;
             }
 
+            $artifactBranch = collect((array) ($task['artifacts'] ?? []))
+                ->first(fn (array $artifact): bool => ($artifact['type'] ?? null) === 'branch');
+            $headBranch = data_get($artifactBranch, 'data.head_ref');
+            if (filled($headBranch) && filled($execution->feature_branch) && $headBranch !== $execution->feature_branch) {
+                $this->block($execution, 'Copilot creo la branch '.$headBranch.' en lugar de '.$execution->feature_branch.'.', $states, $notifications);
+                return;
+            }
+
             $this->completeAgentTask($execution, $task, $states);
         } catch (Throwable $exception) {
             $this->fail($execution, 'No fue posible consultar Copilot cloud agent: '.mb_substr($exception->getMessage(), 0, 1200), $states, $notifications);
@@ -87,12 +95,18 @@ class monitor_ai_development_agent implements ShouldQueue
 
     private function completeAgentTask(ai_development_execution $execution, array $task, ai_development_state_machine $states): void
     {
-        $pull = collect((array) ($task['artifacts'] ?? []))->first(fn (array $artifact): bool => ($artifact['type'] ?? null) === 'pull');
         $branch = collect((array) ($task['artifacts'] ?? []))->first(fn (array $artifact): bool => ($artifact['type'] ?? null) === 'branch');
-        $pullNumber = (int) data_get($pull, 'data.id', 0);
-        $headBranch = data_get($branch, 'data.head_ref') ?: data_get($pull, 'data.head_ref');
+        $headBranch = data_get($branch, 'data.head_ref') ?: $execution->feature_branch;
+        $github = new github_client($execution->project->githubConnection);
+        $pullRequest = collect($github->openPullRequests(
+            $execution->project->github_owner,
+            $execution->project->github_repository,
+            $headBranch,
+            $execution->base_branch,
+        ))->first();
+        $pullNumber = (int) ($pullRequest['number'] ?? 0);
         if ($pullNumber < 1) {
-            throw new RuntimeException('Copilot cloud agent termino sin crear el pull request esperado.');
+            throw new RuntimeException('Copilot cloud agent termino sin un pull request visible para la branch '.$headBranch.'.');
         }
 
         $execution->update([
@@ -102,6 +116,7 @@ class monitor_ai_development_agent implements ShouldQueue
             'context' => array_merge((array) $execution->context, [
                 'github_head_branch' => $headBranch ?: data_get($execution->context, 'github_head_branch'),
                 'github_pull_request' => $pullNumber,
+                'github_pull_request_url' => $pullRequest['html_url'] ?? null,
             ]),
         ]);
         if ($execution->status === ai_development_states::ANALYZING) {
@@ -112,7 +127,6 @@ class monitor_ai_development_agent implements ShouldQueue
         $states->event($execution->fresh(), 'tests_passed', ['source' => 'github_copilot_cloud_agent', 'task_id' => $execution->github_task_id]);
         $states->transition($execution->fresh(), ai_development_states::INTEGRATING_QA, ['pull_request' => $pullNumber]);
 
-        $github = new github_client($execution->project->githubConnection);
         $merge = $github->mergePullRequest($execution->project->github_owner, $execution->project->github_repository, $pullNumber);
         if (($merge['merged'] ?? false) !== true) {
             throw new RuntimeException('El pull request de Copilot no pudo integrarse hacia QA.');
