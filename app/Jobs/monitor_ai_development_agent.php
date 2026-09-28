@@ -43,6 +43,16 @@ class monitor_ai_development_agent implements ShouldQueue
         if ($execution->status === ai_development_states::BLOCKED && $execution->github_task_state !== 'completed') {
             return;
         }
+        if ($execution->github_task_state === 'completed' && in_array($execution->status, [
+            ai_development_states::INTEGRATING_QA,
+            ai_development_states::WAITING_QA_PIPELINE,
+            ai_development_states::WAITING_QUALITY_REVIEW,
+            ai_development_states::QUALITY_FEEDBACK,
+            ai_development_states::INTEGRATING_MAIN,
+            ai_development_states::WAITING_MAIN_PIPELINE,
+        ], true)) {
+            return;
+        }
         if (! $execution->github_task_id || ! $execution->project?->githubConnection) {
             return;
         }

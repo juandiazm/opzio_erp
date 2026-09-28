@@ -7,6 +7,7 @@ use App\Jobs\promote_ai_development_execution;
 use App\Http\Controllers\github_controller;
 use App\Jobs\monitor_ai_development_jira_statuses;
 use App\Jobs\monitor_ai_development_pipeline;
+use App\Jobs\monitor_ai_development_agent;
 use App\Mail\CustomMail;
 use App\Models\ai_agent;
 use App\Models\ai_development_event;
@@ -661,6 +662,33 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertSame('qa-123', $execution->qa_workflow_run_id);
         $this->assertDatabaseHas('ai_development_events', ['execution_id' => $execution->id, 'event' => 'qa_reporter_notified']);
         Mail::assertQueued(CustomMail::class, fn (CustomMail $queued): bool => $queued->View === 'mail.ai_development.qa_review');
+    }
+
+    public function test_completed_agent_monitor_does_not_reprocess_waiting_qa_pipeline(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $execution->forceFill([
+            'status' => 'waiting_qa_pipeline',
+            'current_phase' => 'waiting_qa_pipeline',
+            'github_task_id' => 'task-already-integrated',
+            'github_task_state' => 'completed',
+            'feature_branch' => 'copilot/ops-1-already-merged',
+        ])->save();
+        $provider = $this->createMock(ai_agent_provider_interface::class);
+        $provider->expects($this->never())->method('status');
+
+        (new monitor_ai_development_agent($execution->id))->handle(
+            $provider,
+            app(\App\Services\AiDevelopment\ai_development_state_machine::class),
+            app(ai_development_notification_service::class),
+        );
+
+        $this->assertSame('waiting_qa_pipeline', $execution->fresh()->status);
+        Queue::assertNothingPushed();
     }
 
     public function test_automation_qa_comment_and_generic_changelog_do_not_restart_execution(): void
