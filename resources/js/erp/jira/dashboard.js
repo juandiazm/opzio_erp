@@ -13,10 +13,11 @@ function userInitials(label) {
 	return String(label || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || '?';
 }
 
-function renderUserStoryPoints(root, users) {
+function renderUserStoryPoints(root, users, selectedUserIds = []) {
 	const list = root.querySelector('[data-jira-user-points-list]');
 	const totalElement = root.querySelector('[data-jira-user-points-total]');
 	if (!list || !totalElement) return;
+	const selectedUsers = new Set(selectedUserIds);
 
 	const items = (users || [])
 		.filter((item) => Number(item.story_points || 0) > 0)
@@ -43,7 +44,16 @@ function renderUserStoryPoints(root, users) {
 		const name = item.label || 'Sin responsable';
 		const card = document.createElement('article');
 		card.className = 'jira-user-points-card';
-		card.tabIndex = 0;
+		const jiraUserId = item.jira_user_id === null || item.jira_user_id === undefined ? '' : String(item.jira_user_id);
+		if (jiraUserId) {
+			card.dataset.jiraUserId = jiraUserId;
+			card.setAttribute('role', 'button');
+			card.setAttribute('aria-pressed', selectedUsers.size === 1 && selectedUsers.has(jiraUserId) ? 'true' : 'false');
+			card.tabIndex = 0;
+		} else {
+			card.setAttribute('aria-disabled', 'true');
+			card.tabIndex = -1;
+		}
 		card.setAttribute('aria-label', `${name}: ${number(storyPoints, 2)} Story Points, ${number(item.issues)} historias y ${number(item.estimated_hours, 2)} horas estimadas`);
 
 		const visual = document.createElement('div');
@@ -589,6 +599,14 @@ export async function initializeJiraDashboard(root) {
 		selectedLabel: 'estados seleccionados',
 		itemLabel: 'estados',
 	});
+	const userSelect = form.querySelector('[data-jira-user-native]');
+	const syncUserCards = () => {
+		const selectedUserIds = Array.from(userSelect.selectedOptions).map((option) => String(option.value));
+		root.querySelectorAll('.jira-user-points-card[data-jira-user-id]').forEach((card) => {
+			card.setAttribute('aria-pressed', selectedUserIds.length === 1 && selectedUserIds[0] === card.dataset.jiraUserId ? 'true' : 'false');
+		});
+	};
+	userSelect.addEventListener('change', syncUserCards);
 	const status = root.querySelector('[data-jira-dashboard-status]');
 	try {
 		const catalog = await (await fetch('/admin/jira/relations/data', {headers: {'Accept': 'application/json'}})).json();
@@ -645,7 +663,7 @@ export async function initializeJiraDashboard(root) {
 			}
 			if (noEpic) epicSegments.push(noEpic);
 			const users = data.users || [];
-			renderUserStoryPoints(root, users);
+			renderUserStoryPoints(root, users, Array.from(userSelect.selectedOptions).map((option) => String(option.value)));
 			renderUserHoursTable(root, users);
 			renderChart('projects', projects, [{label: 'Story Points', data: values(projects, 'story_points'), backgroundColor: JIRA_CHART_COLORS, borderColor: '#ffffff', borderWidth: 2}], 'pie');
 			renderChart('epics', epicSegments, [{label: 'Story Points', data: values(epicSegments, 'story_points'), backgroundColor: JIRA_CHART_COLORS, borderColor: '#ffffff', borderWidth: 2}], 'doughnut');
@@ -668,6 +686,34 @@ export async function initializeJiraDashboard(root) {
 			setStatus(status, error.message, 'error');
 			input.disabled = false;
 		}
+	});
+	const userPointsList = root.querySelector('[data-jira-user-points-list]');
+	const applyCardUserFilter = (userId) => {
+		const selectedUserIds = Array.from(userSelect.selectedOptions).map((option) => String(option.value));
+		const deselect = selectedUserIds.length === 1 && selectedUserIds[0] === userId;
+		if (!deselect) {
+			const projectSelect = form.querySelector('[data-jira-project-native]');
+			const epicSelect = form.querySelector('[data-jira-epic-native]');
+			const statusSelect = form.querySelector('[data-jira-status-native]');
+			[projectSelect, epicSelect, statusSelect].forEach((select) => {
+				Array.from(select.options).forEach((option) => { option.selected = false; });
+				select.dispatchEvent(new Event('change', {bubbles: true}));
+			});
+		}
+		Array.from(userSelect.options).forEach((option) => { option.selected = !deselect && String(option.value) === userId; });
+		userSelect.dispatchEvent(new Event('change', {bubbles: true}));
+		load();
+	};
+	userPointsList.addEventListener('click', (event) => {
+		const card = event.target.closest('.jira-user-points-card[data-jira-user-id]');
+		if (card && userPointsList.contains(card)) applyCardUserFilter(card.dataset.jiraUserId);
+	});
+	userPointsList.addEventListener('keydown', (event) => {
+		if (event.key !== 'Enter' && event.key !== ' ') return;
+		const card = event.target.closest('.jira-user-points-card[data-jira-user-id]');
+		if (!card || !userPointsList.contains(card)) return;
+		event.preventDefault();
+		card.click();
 	});
 	form.addEventListener('submit', (event) => { event.preventDefault(); load(); });
 	load();
