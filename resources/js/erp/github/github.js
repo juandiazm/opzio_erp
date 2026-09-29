@@ -256,8 +256,16 @@ export async function initializeGithubModule(root) {
 			execution_search: state.executionSearch,
 			execution_page: state.executionPage,
 		});
-		state.data = await getJson(`${endpointUrl('data')}?${params.toString()}`);
-		renderConnection(); renderOverview(); renderProjects(); renderProjectEditor(); renderAgents(); renderSupervisors(); renderApprovals(); renderExecutions();
+		root.querySelector('[data-github-approvals]').innerHTML = '<tr><td colspan="9" class="github-empty">Cargando aprobaciones...</td></tr>';
+		root.querySelector('[data-github-executions]').innerHTML = '<tr><td colspan="10" class="github-empty">Cargando ejecuciones...</td></tr>';
+		try {
+			state.data = await getJson(`${endpointUrl('data')}?${params.toString()}`);
+			renderConnection(); renderOverview(); renderProjects(); renderProjectEditor(); renderAgents(); renderSupervisors(); renderApprovals(); renderExecutions();
+		} catch (error) {
+			root.querySelector('[data-github-approvals]').innerHTML = `<tr><td colspan="9" class="github-empty github-empty-error">${escapeHtml(error.message)}</td></tr>`;
+			root.querySelector('[data-github-executions]').innerHTML = `<tr><td colspan="10" class="github-empty github-empty-error">${escapeHtml(error.message)}</td></tr>`;
+			setStatus(root.querySelector('[data-github-connection-status]'), error.message, 'error');
+		}
 	}
 
 	connectionForm.addEventListener('submit', (event) => { event.preventDefault(); run(connectionForm.querySelector('button[type="submit"]'), async () => { await postJson(endpointUrl('connection/save'), formObject(connectionForm)); setStatus(root.querySelector('[data-github-connection-status]'), 'Conexion guardada correctamente.', 'success'); await load(); }, root.querySelector('[data-github-connection-status]')); });
