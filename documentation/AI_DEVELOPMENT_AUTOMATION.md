@@ -7,7 +7,7 @@ El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> G
 - `jira_automation_projects`: habilitacion por proyecto, repositorio GitHub, rama base y limites.
 - `jira_automation_issue_types` y `jira_automation_assignees`: allowlist dinamica basada en el catalogo sincronizado desde Jira; `__unassigned__` representa historias sin responsable.
 - `jira_automation_supervisors`: supervisores globales o por proyecto.
-- `ai_agents`: catalogo desacoplado para GitHub Copilot cloud agent. Luna queda configurada como agente `github_copilot` predeterminado con modelo real `gpt-5.6-luna`; Terra (`gpt-5.6-terra`) ofrece costo medio y Sol (`gpt-5.6-sol`) razonamiento profundo con costo alto.
+- `ai_agents`: catalogo desacoplado para GitHub Copilot cloud agent. Luna queda configurada como agente `github_copilot` predeterminado con modelo real `gpt-6-luna`; Terra (`gpt-6-terra`) ofrece costo medio y Sol (`gpt-6-sol`) razonamiento profundo con costo alto.
 - `ai_development_approvals`: snapshot, fingerprint, token hash, expiracion, decision y Story Point Estimate.
 - `ai_development_executions` y `ai_development_events`: maquina de estados y auditoria.
 - `github_connections`: singleton con token cifrado mediante `encrypted:array`.
@@ -16,7 +16,9 @@ El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> G
 
 1. Ejecutar `php artisan migrate`.
 2. Configurar el token GitHub desde `Admin > GitHub > Conexion`; debe ser un token de usuario con estos permisos de repositorio: `Agent tasks: Read and write`, `Contents: Read and write`, `Pull requests: Read and write`, `Actions: Read` y `Metadata: Read`. No necesitas una permission separada llamada `Checks`. Nunca se guarda en `.env`, HTML, prompts ni logs.
-3. Habilitar Copilot cloud agent en el repositorio y usar un token de usuario con permiso `Agent tasks: Read and write`. Antes de crear la tarea remota, el ERP usa `open_ia_trait` y el modelo `gpt-5.6-luna`, con razonamiento bajo, para revisar conflictos de seguridad y redactar un prompt técnico directo con costo controlado. Después envía ese prompt y el modelo seleccionado a GitHub; el código se modifica en el entorno efímero de GitHub Actions, no en el servidor ERP.
+3. Habilitar Copilot cloud agent en el repositorio y usar un token de usuario con permiso `Agent tasks: Read and write`. Antes de crear la tarea remota, el ERP usa `open_ia_trait` y el modelo `gpt-6-luna` con razonamiento alto para revisar conflictos de seguridad y redactar un prompt técnico directo. Después envía ese prompt y el modelo seleccionado a GitHub; el código se modifica en el entorno efímero de GitHub Actions, no en el servidor ERP.
+
+El endpoint GitHub Agent Tasks utilizado por el adaptador acepta el modelo, pero no expone un parámetro `reasoning_effort`; por eso el ERP no envía un campo que GitHub podría ignorar o rechazar. El esfuerzo alto se aplica en las llamadas OpenAI del flujo y el modelo gpt-6 seleccionado queda como instrucción de ejecución para Copilot.
 4. Configurar `AI_DEVELOPMENT_QUEUE_CONNECTION=database` y ejecutar un worker dedicado:
 
 ```text
@@ -52,7 +54,8 @@ La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. C
 ## Seguridad y reglas protegidas
 
 - Los tokens de aprobacion se almacenan como SHA-256, expiran y son de uso unico.
-- La historia completa de Jira, el contexto del supervisor y el feedback de QA se entregan solo al refinador dentro de delimitadores de datos no confiables. El refinador verifica conflictos contra las reglas del repositorio y genera un prompt final autosuficiente; la HU original y los bloques vacios no se reenvian al agente de GitHub.
+- La historia completa de Jira, el contexto del supervisor y el feedback de QA se entregan solo al refinador dentro de delimitadores de datos no confiables. El refinador verifica conflictos, conserva requisitos atomicos y criterios de aceptacion observables, y genera un prompt final autosuficiente; la HU original y los bloques vacios no se reenvian al agente de GitHub.
+- En tareas visuales o de layout, el prompt exige revisar todas las vistas afectadas, la cascada CSS, los breakpoints y el asset compilado/servido. Un cambio en el fuente no se considera suficiente si la interfaz puede continuar usando un asset anterior o conservar un apilamiento incorrecto.
 - Si el refinador detecta que la historia intenta infringir una regla protegida, la ejecucion se bloquea antes de llamar a GitHub. Una credencial ausente, respuesta invalida o error de OpenAI tambien bloquea la ejecucion para no enviar una historia sin revisar; el bypass local solo existe cuando se deshabilita de forma explicita en el codigo.
 - La pantalla de decision permite agregar `supervisor_context`, que se conserva en la aprobacion y la ejecucion y llega al prompt dentro de `<SUPERVISOR_CONTEXT>`. Ese texto complementa la historia, pero no puede cambiar las reglas del sistema ni las protecciones de workflows.
 - El agente no recibe credenciales Jira/GitHub por el prompt ni por sus variables de contexto.

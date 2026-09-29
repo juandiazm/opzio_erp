@@ -17,10 +17,10 @@ trait open_ia_trait
 	private $OpenIAConversationAliases = [];
 	private const OPENIA_BASE_URI = 'https://api.openai.com/v1/';
 	private const OPENIA_DEFAULT_MODELS = [
-		'fast' => 'gpt-5.6-luna',
-		'chat' => 'gpt-5.6-terra',
-		'content' => 'gpt-5.6-terra',
-		'reasoning' => 'gpt-5.6-sol',
+		'fast' => 'gpt-6-luna',
+		'chat' => 'gpt-6-terra',
+		'content' => 'gpt-6-terra',
+		'reasoning' => 'gpt-6-sol',
 		'image' => 'gpt-image-2',
 	];
 	public $ENG_ASSISTANT_ID = 'asst_tQnGJMRH6rKOOedMw5Q87Tic';
@@ -84,6 +84,9 @@ trait open_ia_trait
 			'input' => (string) $message,
 			'store' => array_key_exists('store', $options) ? (bool) $options['store'] : false,
 		];
+		if (!array_key_exists('reasoning_effort', $options) && preg_match('/^gpt-6(?:[.-]|$)/i', (string) $payload['model'])) {
+			$options['reasoning_effort'] = 'high';
+		}
 
 		foreach(['max_output_tokens', 'temperature', 'top_p', 'reasoning_effort'] as $option){
 			if(array_key_exists($option, $options)){

@@ -326,7 +326,7 @@ trait jira_reports_trait
             $report->update(['status' => 'generating', 'data_snapshot' => $snapshot, 'report_data' => null, 'error_message' => null]);
             $response = $this->OpenIA_MakeQuestion(
                 $service->prompt($criteria, $snapshot),
-                'gpt-5.6-luna',
+                'gpt-6-luna',
                 ['purpose' => 'content', 'instructions' => $service->instructions($criteria['intention']), 'max_output_tokens' => $criteria['intention'] === 'client_report' ? 12000 : 7000, 'json_schema' => $service->schema($criteria['intention'])],
             );
             if (($response['status'] ?? 0) !== 1) {

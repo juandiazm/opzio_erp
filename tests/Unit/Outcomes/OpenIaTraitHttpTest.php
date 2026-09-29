@@ -17,7 +17,7 @@ class OpenIaTraitHttpTest extends TestCase
         $service = $this->makeService([
             new Response(200, [], json_encode([
                 'id' => 'resp_test_1',
-                'model' => 'gpt-5.6-luna',
+                'model' => 'gpt-6-luna',
                 'output' => [[
                     'type' => 'message',
                     'content' => [[

@@ -28,7 +28,7 @@ class JiraAutomationPromptRefinerTest extends TestCase
         $service = $this->makeService([
             new Response(200, [], json_encode([
                 'id' => 'resp_prompt_1',
-                'model' => 'gpt-5.6-luna',
+                'model' => 'gpt-6-luna',
                 'output' => [[
                     'type' => 'message',
                     'content' => [[
@@ -37,6 +37,8 @@ class JiraAutomationPromptRefinerTest extends TestCase
                             'safe' => true,
                             'conflicts' => [],
                             'prompt' => 'Implementa la historia con alcance tecnico y funcional claro.',
+                            'requirements' => ['Conserva todos los requisitos funcionales.'],
+                            'acceptance_criteria' => ['Verifica cada requisito antes de terminar.'],
                         ]),
                     ]],
                 ]],
@@ -48,11 +50,15 @@ class JiraAutomationPromptRefinerTest extends TestCase
         $this->assertStringNotContainsString($story, $result);
         $this->assertStringContainsString($rules, $result);
         $this->assertStringContainsString('Implementa la historia', $result);
+        $this->assertStringContainsString('REQUISITOS ESENCIALES PRESERVADOS:', $result);
+        $this->assertStringContainsString('CRITERIOS DE ACEPTACION OBSERVABLES:', $result);
         $payload = $this->lastPayload($service);
-        $this->assertSame('gpt-5.6-luna', $payload['model']);
-        $this->assertSame('low', $payload['reasoning']['effort']);
+        $this->assertSame('gpt-6-luna', $payload['model']);
+        $this->assertSame('high', $payload['reasoning']['effort']);
         $this->assertStringContainsString($story, $payload['input']);
         $this->assertStringContainsString($rules, $payload['input']);
+        $this->assertStringContainsString('No generalices ni suavices la solicitud', $payload['instructions']);
+        $this->assertStringContainsString('asset que la aplicacion sirve', $payload['instructions']);
         $this->assertSame('github_prompt_review', $payload['text']['format']['name']);
     }
 
@@ -72,6 +78,8 @@ class JiraAutomationPromptRefinerTest extends TestCase
                             'safe' => false,
                             'conflicts' => ['Solicita modificar main.yml.'],
                             'prompt' => '',
+                            'requirements' => [],
+                            'acceptance_criteria' => [],
                         ]),
                     ]],
                 ]],
@@ -106,7 +114,7 @@ class JiraAutomationPromptRefinerTest extends TestCase
     {
         return new ai_agent([
             'name' => 'Sol',
-            'model' => 'gpt-5.6-luna',
+            'model' => 'gpt-6-luna',
         ]);
     }
 

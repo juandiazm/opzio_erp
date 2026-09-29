@@ -90,6 +90,7 @@ class AiDevelopmentFlowTest extends TestCase
         Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_28_000002_configure_luna_agent.php'), '--realpath' => true]);
         Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_28_000003_expand_ai_agent_catalog.php'), '--realpath' => true]);
         Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_28_000004_add_github_agent_task_fields_to_executions.php'), '--realpath' => true]);
+        Artisan::call('migrate', ['--path' => database_path('migrations/2026_09_28_000006_migrate_ai_agents_to_gpt_six.php'), '--realpath' => true]);
     }
 
     public function test_candidate_detection_is_idempotent_and_rejection_does_not_dispatch(): void
@@ -387,7 +388,7 @@ class AiDevelopmentFlowTest extends TestCase
         $this->assertDatabaseHas('ai_agents', [
             'name' => 'Luna',
             'provider' => 'github_copilot',
-            'model' => 'gpt-5.6-luna',
+            'model' => 'gpt-6-luna',
             'is_default' => 1,
         ]);
     }
@@ -416,7 +417,7 @@ class AiDevelopmentFlowTest extends TestCase
         Http::assertSent(function ($request): bool {
             return $request->method() === 'POST'
                 && str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/agents/repos/opzio/erp/tasks')
-                && $request->data()['model'] === 'gpt-5.6-luna'
+                && $request->data()['model'] === 'gpt-6-luna'
                 && $request->data()['base_ref'] === 'qa'
                 && $request->data()['head_ref'] === 'OP-48'
                 && $request->data()['create_pull_request'] === false

@@ -106,6 +106,9 @@ class jira_automation_prompt_builder
             '6. Si no puedes ejecutar una validacion por limitaciones del entorno, reportala como omitida y continua con el trabajo tecnico posible.',
             '7. La validacion obligatoria es estatica: revisa diff, referencias, imports, tipos, flujo, estados vacios/error, compatibilidad y archivos protegidos. No ejecutes tests programaticos, lint, build, comandos del proyecto, migraciones ni despliegues.',
             '8. Deja el cambio implementado y una salida breve con ANALISIS, PLAN, CAMBIOS, VALIDACION ESTATICA, VALIDACIONES OMITIDAS, LIMITACIONES DE ENTORNO y BLOQUEOS FUNCIONALES.',
+            '9. Conserva literalmente las restricciones criticas de la historia: alcance, cantidad, ubicacion, alineacion, orden, estados y condiciones como "todas las vistas", "una misma fila" o "cuando el ancho lo permita". No las conviertas en recomendaciones genericas.',
+            '10. Para tareas de UI o layout, inspecciona todas las vistas y selectores afectados, la cascada CSS y el asset compilado o servido. Un cambio en una sola regla fuente no demuestra cumplimiento si un contenedor padre, breakpoint o asset anterior mantiene el resultado visual incorrecto.',
+            '11. Antes de terminar, comprueba cada criterio de aceptacion con evidencia en los archivos o en la interfaz disponible. Si no puedes comprobar el resultado visual, reportalo como validacion omitida y no lo presentes como terminado.',
         ]);
     }
 }

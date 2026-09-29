@@ -1619,7 +1619,7 @@ class notifications_test extends TestCase
 
     public function test_whatsapp_ai_fallback_recovers_an_untyped_invoice_question()
     {
-        config(['services.twilio.whatsapp.ai.fallback_model' => 'gpt-5.6-luna']);
+        config(['services.twilio.whatsapp.ai.fallback_model' => 'gpt-6-luna']);
         $client = client::create([
             'name' => 'Cliente Fallback',
             'phone' => '+573000000051',
@@ -1678,7 +1678,7 @@ class notifications_test extends TestCase
         $message = whatsapp_message::where('direction', 'inbound')->first();
         $this->assertSame(1, $response['status']);
         $this->assertTrue($response['ai']['handled']);
-        $this->assertSame('gpt-5.6-luna', $this->fakeFallbackModel);
+        $this->assertSame('gpt-6-luna', $this->fakeFallbackModel);
         $this->assertSame('invoice', $message->ai_query['topic']);
         $this->assertSame('latest', $message->ai_query['intent']);
         $this->assertSame(1, whatsapp_message::where('direction', 'outbound')->count());

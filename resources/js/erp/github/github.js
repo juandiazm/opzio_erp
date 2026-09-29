@@ -308,7 +308,7 @@ export async function initializeGithubModule(root) {
 	root.querySelector('[data-github-execution-close]').addEventListener('click', () => { root.querySelector('[data-github-execution-detail]').hidden = true; });
 	root.addEventListener('click', (event) => { const target = event.target.closest('[data-github-open-tab]'); if (!target) return; document.getElementById(target.dataset.githubOpenTab)?.click(); });
 
-	function clearAgentForm() { agentForm.reset(); agentSelector.value = ''; agentForm.querySelector('[name="enabled"]').checked = true; agentForm.querySelector('[name="provider"]').value = 'github_copilot'; agentForm.querySelector('[data-github-model]').value = 'gpt-5.6-luna'; agentForm.querySelector('[name="description"]').value = 'Rapido y economico para cambios rutinarios.'; agentForm.querySelector('[name="cost_tier"]').value = 'low'; }
+	function clearAgentForm() { agentForm.reset(); agentSelector.value = ''; agentForm.querySelector('[name="enabled"]').checked = true; agentForm.querySelector('[name="provider"]').value = 'github_copilot'; agentForm.querySelector('[data-github-model]').value = 'gpt-6-luna'; agentForm.querySelector('[name="description"]').value = 'Rapido y economico para cambios rutinarios.'; agentForm.querySelector('[name="cost_tier"]').value = 'low'; }
 
 	try { await load(); } catch (error) { setStatus(root.querySelector('[data-github-connection-status]'), error.message, 'error'); }
 }
