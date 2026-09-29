@@ -214,7 +214,9 @@
 .jira-user-points-panel .jira-panel-title > span strong { color: var(--jira-ink); font-size: 1rem; }
 .jira-user-points-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
 .jira-user-points-card { align-items: center; background: var(--jira-soft); border: 1px solid var(--jira-line); cursor: default; display: flex; flex-direction: column; min-height: 220px; overflow: hidden; padding: 16px 12px 13px; text-align: center; transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease; }
+.jira-user-points-card[role="button"] { cursor: pointer; }
 .jira-user-points-card:hover, .jira-user-points-card:focus-visible { border-color: var(--jira-primary); box-shadow: 0 8px 18px rgba(34, 2, 69, .1); outline: 0; transform: translateY(-2px); }
+.jira-user-points-card[aria-pressed="true"] { border-color: var(--jira-primary); box-shadow: 0 0 0 2px rgba(136, 95, 174, .25); }
 .jira-user-points-visual { align-items: center; display: flex; height: 112px; justify-content: center; position: relative; width: 112px; }
 .jira-user-points-avatar { align-items: center; background: #ffffff; border: 4px solid var(--jira-surface); border-radius: 50%; box-shadow: 0 2px 8px rgba(23, 23, 23, .12); color: var(--jira-primary); display: flex; font-size: 1.5rem; font-weight: 800; height: 108px; justify-content: center; overflow: hidden; position: relative; width: 108px; }
 .jira-user-points-avatar img { height: 100%; object-fit: cover; width: 100%; }
