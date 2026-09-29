@@ -72,7 +72,7 @@ class jira_metrics_service
             $userKey = (string) ($issue->assignee?->account_id ?: 'sin_responsable');
             $userName = (string) ($issue->assignee?->display_name ?: 'Sin responsable');
             $userAvatar = $this->assigneeAvatarUrl($issue->assignee);
-            $users[$userKey] ??= ['label' => $userName, 'avatar' => $userAvatar, 'story_points' => 0.0, 'issues' => 0, 'hours' => 0.0, 'estimated_hours' => 0.0, 'project_story_points' => []];
+            $users[$userKey] ??= ['jira_user_id' => $issue->assignee?->id, 'label' => $userName, 'avatar' => $userAvatar, 'story_points' => 0.0, 'issues' => 0, 'hours' => 0.0, 'estimated_hours' => 0.0, 'project_story_points' => []];
             if (blank($users[$userKey]['avatar']) && filled($userAvatar)) {
                 $users[$userKey]['avatar'] = $userAvatar;
             }
@@ -98,7 +98,7 @@ class jira_metrics_service
             $userKey = (string) ($worklog->user?->account_id ?: 'sin_autor');
             $userName = (string) ($worklog->user?->display_name ?: 'Sin autor');
             $userAvatar = $this->assigneeAvatarUrl($worklog->user);
-            $users[$userKey] ??= ['label' => $userName, 'avatar' => $userAvatar, 'story_points' => 0.0, 'issues' => 0, 'hours' => 0.0, 'estimated_hours' => 0.0, 'project_story_points' => []];
+            $users[$userKey] ??= ['jira_user_id' => $worklog->user?->id, 'label' => $userName, 'avatar' => $userAvatar, 'story_points' => 0.0, 'issues' => 0, 'hours' => 0.0, 'estimated_hours' => 0.0, 'project_story_points' => []];
             if (blank($users[$userKey]['avatar']) && filled($userAvatar)) {
                 $users[$userKey]['avatar'] = $userAvatar;
             }
