@@ -16,5 +16,7 @@ class ai_agent extends Model
         'enabled' => 'boolean',
         'is_default' => 'boolean',
         'settings' => 'array',
+        'description' => 'string',
+        'cost_tier' => 'string',
     ];
 }

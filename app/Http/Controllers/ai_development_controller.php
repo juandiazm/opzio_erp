@@ -29,7 +29,20 @@ class ai_development_controller extends Controller
 {
     public function data(Request $request): JsonResponse
     {
-        return $this->json(fn (): array => $this->dataPayload());
+        return $this->json(function () use ($request): array {
+            $filters = $request->validate([
+                'approval_status' => ['nullable', 'string', 'max:40'],
+                'approval_issue_type' => ['nullable', 'string', 'max:120'],
+                'approval_search' => ['nullable', 'string', 'max:120'],
+                'approval_page' => ['nullable', 'integer', 'min:1'],
+                'execution_status' => ['nullable', 'string', 'max:40'],
+                'execution_phase' => ['nullable', 'string', 'max:60'],
+                'execution_search' => ['nullable', 'string', 'max:120'],
+                'execution_page' => ['nullable', 'integer', 'min:1'],
+            ]);
+
+            return $this->dataPayload($filters);
+        });
     }
 
     public function save_github(Request $request): JsonResponse
@@ -238,7 +251,7 @@ class ai_development_controller extends Controller
         }
     }
 
-    private function dataPayload(): array
+    private function dataPayload(array $filters = []): array
     {
         $githubConnection = github_connection::query()->latest('updated_at')->first();
         $projects = jira_project::query()->with('connection')->orderBy('name')->get();
@@ -274,16 +287,30 @@ class ai_development_controller extends Controller
             ];
         })->values()->all();
 
-        $executionRecords = ai_development_execution::query()
+        $executionQuery = ai_development_execution::query()
             ->with(['issue', 'project.jiraProject', 'agent'])
-            ->latest('updated_at')
-            ->limit(100)
-            ->get();
-        $approvalRecords = ai_development_approval::query()
+            ->when($filters['execution_status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['execution_phase'] ?? null, fn ($query, $phase) => $query->where('current_phase', $phase))
+            ->when($filters['execution_search'] ?? null, function ($query, $search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query->where('jira_key', 'like', '%'.$search.'%')
+                        ->orWhereHas('issue', fn ($issue) => $issue->where('summary', 'like', '%'.$search.'%'));
+                });
+            })
+            ->latest('updated_at');
+        $executionRecords = $executionQuery->paginate(20, ['*'], 'execution_page', (int) ($filters['execution_page'] ?? 1));
+        $approvalQuery = ai_development_approval::query()
             ->with(['issue.project', 'project.jiraProject', 'selectedAgent', 'decider'])
-            ->latest('updated_at')
-            ->limit(100)
-            ->get();
+            ->when($filters['approval_status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['approval_issue_type'] ?? null, fn ($query, $issueType) => $query->whereHas('issue', fn ($issue) => $issue->where('issue_type', $issueType)))
+            ->when($filters['approval_search'] ?? null, function ($query, $search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query->whereHas('issue', fn ($issue) => $issue->where('issue_key', 'like', '%'.$search.'%')->orWhere('summary', 'like', '%'.$search.'%'))
+                        ->orWhereHas('project.jiraProject', fn ($project) => $project->where('project_key', 'like', '%'.$search.'%'));
+                });
+            })
+            ->latest('updated_at');
+        $approvalRecords = $approvalQuery->paginate(20, ['*'], 'approval_page', (int) ($filters['approval_page'] ?? 1));
         $activeStatuses = ['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline'];
         $summary = [
             'projects_total' => $projects->count(),
@@ -326,7 +353,7 @@ class ai_development_controller extends Controller
                 'email' => $item->email,
                 'enabled' => $item->enabled,
             ])->values()->all(),
-            'approvals' => $approvalRecords->map(fn (ai_development_approval $item): array => [
+            'approvals' => $approvalRecords->getCollection()->map(fn (ai_development_approval $item): array => [
                 'id' => $item->id,
                 'jira_key' => $item->issue?->issue_key ?: data_get($item->snapshot, 'jira_key'),
                 'summary' => $item->issue?->summary ?: data_get($item->snapshot, 'title'),
@@ -343,7 +370,12 @@ class ai_development_controller extends Controller
                 'decided_at' => $item->decided_at?->toIso8601String(),
                 'expires_at' => $item->expires_at?->toIso8601String(),
             ])->values()->all(),
-            'executions' => $executionRecords->map(fn (ai_development_execution $item): array => [
+            'approval_pagination' => [
+                'current_page' => $approvalRecords->currentPage(),
+                'last_page' => $approvalRecords->lastPage(),
+                'total' => $approvalRecords->total(),
+            ],
+            'executions' => $executionRecords->getCollection()->map(fn (ai_development_execution $item): array => [
                 'id' => $item->id,
                 'jira_key' => $item->jira_key,
                 'summary' => $item->issue?->summary,
@@ -364,6 +396,26 @@ class ai_development_controller extends Controller
                 'error' => $item->error,
                 'blocked_reason' => $item->blocked_reason,
             ])->values()->all(),
+            'execution_pagination' => [
+                'current_page' => $executionRecords->currentPage(),
+                'last_page' => $executionRecords->lastPage(),
+                'total' => $executionRecords->total(),
+            ],
+            'approval_issue_types' => ai_development_approval::query()
+                ->join('jira_issues', 'jira_issues.id', '=', 'ai_development_approvals.jira_issue_id')
+                ->whereNotNull('jira_issues.issue_type')
+                ->distinct()
+                ->orderBy('jira_issues.issue_type')
+                ->pluck('jira_issues.issue_type')
+                ->values()
+                ->all(),
+            'execution_phases' => ai_development_execution::query()
+                ->whereNotNull('current_phase')
+                ->distinct()
+                ->orderBy('current_phase')
+                ->pluck('current_phase')
+                ->values()
+                ->all(),
             'activity' => ai_development_event::query()
                 ->with('execution')
                 ->latest('created_at')

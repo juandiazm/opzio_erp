@@ -41,7 +41,7 @@ export async function initializeGithubModule(root) {
 	tabs.forEach((tab) => tab.addEventListener('click', () => updateTabUrl(tab.id)));
 	window.addEventListener('popstate', showTabFromUrl);
 	showTabFromUrl();
-	const state = {data: null, selectedProjectId: null, projectSearch: '', approvalFilter: '', executionFilter: ''};
+	const state = {data: null, selectedProjectId: null, projectSearch: '', approvalFilter: '', approvalType: '', approvalSearch: '', approvalPage: 1, executionFilter: '', executionPhase: '', executionSearch: '', executionPage: 1};
 	const connectionForm = root.querySelector('[data-github-connection-form]');
 	const projectForm = root.querySelector('[data-github-project-form]');
 	const agentForm = root.querySelector('[data-github-agent-form]');
@@ -148,18 +148,36 @@ export async function initializeGithubModule(root) {
 	}
 
 	function renderApprovals() {
-		const approvals = (state.data?.approvals || []).filter((item) => !state.approvalFilter || item.status === state.approvalFilter);
-		root.querySelector('[data-github-approval-count]').textContent = `${approvals.length} solicitudes`;
+		const approvals = state.data?.approvals || [];
+		const pagination = state.data?.approval_pagination || {current_page: 1, last_page: 1, total: approvals.length};
+		const typeSelect = root.querySelector('[data-github-approval-type]');
+		typeSelect.innerHTML = '<option value="">Todos los tipos</option>' + (state.data?.approval_issue_types || []).map((type) => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join('');
+		typeSelect.value = state.approvalType;
+		root.querySelector('[data-github-approval-count]').textContent = `${pagination.total} solicitudes`;
 		root.querySelector('[data-github-approvals]').innerHTML = approvals.length ? approvals.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.issue_type || '-')}</td><td>${escapeHtml(item.jira_status || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span>${item.decider ? `<small class="github-default-label">${escapeHtml(item.decider)}</small>` : ''}</td><td>${item.story_point_estimate ?? '-'}</td><td>${escapeHtml(item.agent || '-')}</td><td>${escapeHtml(dateTime(item.created_at))}</td><td>${escapeHtml(dateTime(item.expires_at))}</td></tr>`).join('') : '<tr><td colspan="9" class="github-empty">No hay solicitudes para este filtro.</td></tr>';
+		renderPagination(root.querySelector('[data-github-approval-pagination]'), pagination, (page) => { state.approvalPage = page; load(); });
 	}
 
 	function renderExecutions() {
-		const executions = (state.data?.executions || []).filter((item) => !state.executionFilter || item.status === state.executionFilter);
-		root.querySelector('[data-github-execution-count]').textContent = `${executions.length} ejecuciones`;
+		const executions = state.data?.executions || [];
+		const pagination = state.data?.execution_pagination || {current_page: 1, last_page: 1, total: executions.length};
+		const phaseSelect = root.querySelector('[data-github-execution-phase]');
+		phaseSelect.innerHTML = '<option value="">Todas las fases</option>' + (state.data?.execution_phases || []).map((phase) => `<option value="${escapeHtml(phase)}">${escapeHtml(labelStatus(phase))}</option>`).join('');
+		phaseSelect.value = state.executionPhase;
+		root.querySelector('[data-github-execution-count]').textContent = `${pagination.total} ejecuciones`;
 		root.querySelector('[data-github-executions]').innerHTML = executions.length ? executions.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.agent || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span></td><td>${escapeHtml(labelStatus(item.phase))}</td><td>${escapeHtml(item.branch || '-')}</td><td>${item.attempt || 0}</td><td>${item.ci_attempts || 0} / ${item.main_ci_attempts || 0}</td><td>${escapeHtml(dateTime(item.last_activity_at))}</td><td><button type="button" class="github-icon-button" data-github-execution-open="${item.id}" title="Ver detalle"><i class="fa-light fa-eye"></i></button><button type="button" class="github-icon-button" data-github-execution-restart="${item.id}" title="Reiniciar flujo"><i class="fa-light fa-rotate-left"></i></button>${item.status === 'blocked' ? `<button type="button" class="github-icon-button" data-github-execution-reject="${item.id}" title="Marcar como rechazada"><i class="fa-light fa-ban"></i></button>` : ''}</td></tr>`).join('') : '<tr><td colspan="10" class="github-empty">No hay ejecuciones para este filtro.</td></tr>';
+		renderPagination(root.querySelector('[data-github-execution-pagination]'), pagination, (page) => { state.executionPage = page; load(); });
 		root.querySelectorAll('[data-github-execution-open]').forEach((button) => button.addEventListener('click', () => openExecution(Number(button.dataset.githubExecutionOpen))));
 		root.querySelectorAll('[data-github-execution-restart]').forEach((button) => button.addEventListener('click', () => restartExecution(Number(button.dataset.githubExecutionRestart), button)));
 		root.querySelectorAll('[data-github-execution-reject]').forEach((button) => button.addEventListener('click', () => rejectExecution(Number(button.dataset.githubExecutionReject), button)));
+	}
+
+	function renderPagination(container, pagination, onPageChange) {
+		if (!container) return;
+		const current = Number(pagination.current_page || 1);
+		const last = Number(pagination.last_page || 1);
+		container.innerHTML = last > 1 ? `<button type="button" class="btn btn-secondary" ${current <= 1 ? 'disabled' : ''} data-page="${current - 1}">Anterior</button><span>Pagina ${current} de ${last}</span><button type="button" class="btn btn-secondary" ${current >= last ? 'disabled' : ''} data-page="${current + 1}">Siguiente</button>` : '';
+		container.querySelectorAll('[data-page]').forEach((button) => button.addEventListener('click', () => onPageChange(Number(button.dataset.page))));
 	}
 
 	async function restartExecution(id, button) {
@@ -228,7 +246,17 @@ export async function initializeGithubModule(root) {
 	}
 
 	async function load() {
-		state.data = await getJson(endpointUrl('data'));
+		const params = new URLSearchParams({
+			approval_status: state.approvalFilter,
+			approval_issue_type: state.approvalType,
+			approval_search: state.approvalSearch,
+			approval_page: state.approvalPage,
+			execution_status: state.executionFilter,
+			execution_phase: state.executionPhase,
+			execution_search: state.executionSearch,
+			execution_page: state.executionPage,
+		});
+		state.data = await getJson(`${endpointUrl('data')}?${params.toString()}`);
 		renderConnection(); renderOverview(); renderProjects(); renderProjectEditor(); renderAgents(); renderSupervisors(); renderApprovals(); renderExecutions();
 	}
 
@@ -241,8 +269,12 @@ export async function initializeGithubModule(root) {
 	agentSelector.addEventListener('change', () => fillAgentForm((state.data?.agents || []).find((agent) => String(agent.id) === String(agentSelector.value))));
 	supervisorForm.addEventListener('submit', (event) => { event.preventDefault(); run(supervisorForm.querySelector('button[type="submit"]'), async () => { await postJson(endpointUrl('supervisors/save'), formObject(supervisorForm)); supervisorForm.reset(); supervisorForm.querySelector('[name="enabled"]').checked = true; setStatus(root.querySelector('[data-github-supervisor-status]'), 'Supervisor guardado correctamente.', 'success'); await load(); }, root.querySelector('[data-github-supervisor-status]')); });
 	root.querySelector('[data-github-project-search]').addEventListener('input', (event) => { state.projectSearch = event.target.value; renderProjects(); });
-	root.querySelector('[data-github-approval-filter]').addEventListener('change', (event) => { state.approvalFilter = event.target.value; renderApprovals(); });
-	root.querySelector('[data-github-execution-filter]').addEventListener('change', (event) => { state.executionFilter = event.target.value; renderExecutions(); });
+	root.querySelector('[data-github-approval-filter]').addEventListener('change', (event) => { state.approvalFilter = event.target.value; state.approvalPage = 1; load(); });
+	root.querySelector('[data-github-approval-type]').addEventListener('change', (event) => { state.approvalType = event.target.value; state.approvalPage = 1; load(); });
+	root.querySelector('[data-github-approval-search]').addEventListener('input', (event) => { state.approvalSearch = event.target.value; state.approvalPage = 1; load(); });
+	root.querySelector('[data-github-execution-filter]').addEventListener('change', (event) => { state.executionFilter = event.target.value; state.executionPage = 1; load(); });
+	root.querySelector('[data-github-execution-phase]').addEventListener('change', (event) => { state.executionPhase = event.target.value; state.executionPage = 1; load(); });
+	root.querySelector('[data-github-execution-search]').addEventListener('input', (event) => { state.executionSearch = event.target.value; state.executionPage = 1; load(); });
 	root.querySelectorAll('[data-github-refresh]').forEach((button) => button.addEventListener('click', () => run(button, load, root.querySelector('[data-github-connection-status]'))));
 	root.querySelector('[data-github-execution-detail-restart]').addEventListener('click', (event) => restartExecution(Number(root.querySelector('[data-github-execution-detail]').dataset.executionId), event.currentTarget));
 	root.querySelector('[data-github-execution-detail-reject]').addEventListener('click', (event) => rejectExecution(Number(event.currentTarget.dataset.executionId), event.currentTarget));
