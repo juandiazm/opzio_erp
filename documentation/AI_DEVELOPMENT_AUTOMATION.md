@@ -52,7 +52,7 @@ La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. C
 ## Seguridad y reglas protegidas
 
 - Los tokens de aprobacion se almacenan como SHA-256, expiran y son de uso unico.
-- La historia completa de Jira, el contexto del supervisor y el feedback de QA se entregan al refinador dentro de delimitadores de datos no confiables. El refinador verifica conflictos contra las reglas del repositorio y genera el prompt final sin truncar la historia.
+- La historia completa de Jira, el contexto del supervisor y el feedback de QA se entregan solo al refinador dentro de delimitadores de datos no confiables. El refinador verifica conflictos contra las reglas del repositorio y genera un prompt final autosuficiente; la HU original y los bloques vacios no se reenvian al agente de GitHub.
 - Si el refinador detecta que la historia intenta infringir una regla protegida, la ejecucion se bloquea antes de llamar a GitHub. Una credencial ausente, respuesta invalida o error de OpenAI tambien bloquea la ejecucion para no enviar una historia sin revisar; el bypass local solo existe cuando se deshabilita de forma explicita en el codigo.
 - La pantalla de decision permite agregar `supervisor_context`, que se conserva en la aprobacion y la ejecucion y llega al prompt dentro de `<SUPERVISOR_CONTEXT>`. Ese texto complementa la historia, pero no puede cambiar las reglas del sistema ni las protecciones de workflows.
 - El agente no recibe credenciales Jira/GitHub por el prompt ni por sus variables de contexto.

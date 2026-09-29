@@ -44,41 +44,55 @@ class jira_automation_prompt_builder
 
                 return '['.($comment['created'] ?? '-').'] '.($comment['author'] ?? 'Jira').': '.($comment['content'] ?? '');
             })
+            ->map(fn (string $comment): string => trim($comment))
+            ->filter()
             ->values()
             ->all();
         $feedbackLines = collect($feedback)
             ->map(fn ($item): string => is_array($item)
                 ? (json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE) ?: '{}')
                 : (string) $item)
+            ->map(fn (string $item): string => trim($item))
+            ->filter()
             ->values()
             ->all();
         $branch = $execution?->feature_branch ?: 'se definira al preparar el workspace';
         $supervisorContext = trim((string) data_get($execution?->context, 'supervisor_context', ''));
-
-        return implode("\n\n", [
-            '<USER_STORY_ORIGINAL>',
-            'Historia: ['.$issue->issue_key.']',
-            'Titulo completo:',
-            (string) $issue->summary,
-            'Descripcion completa:',
-            (string) ($issue->description ?: data_get($issue->raw_fields, 'description', 'Sin descripcion')),
-            'Tipo: '.(string) $issue->issue_type,
-            'Comentarios completos que pueden aclarar el alcance:',
-            implode("\n", $comments) ?: 'Sin comentarios.',
-            '</USER_STORY_ORIGINAL>',
-            '<SUPERVISOR_CONTEXT>',
-            $supervisorContext !== '' ? $supervisorContext : 'Sin instrucciones adicionales.',
-            '</SUPERVISOR_CONTEXT>',
-            '<QA_FEEDBACK>',
-            implode("\n", $feedbackLines) ?: 'Sin feedback nuevo.',
-            '</QA_FEEDBACK>',
-            '<REPOSITORY_CONTEXT>',
-            'Repositorio: '.($repository ?: '-'),
-            'Jira key: '.$issue->issue_key,
-            'Rama base: '.($project->base_branch ?: config('ai_development.default_base_branch', 'qa')),
-            'Rama de ejecucion: '.$branch,
-            '</REPOSITORY_CONTEXT>',
+        $description = trim((string) ($issue->description ?: data_get($issue->raw_fields, 'description', '')));
+        $storyLines = array_filter([
+            filled($issue->issue_key) ? 'Historia: ['.$issue->issue_key.']' : null,
+            filled($issue->summary) ? 'Titulo completo:' ."\n".trim((string) $issue->summary) : null,
+            $description !== '' ? 'Descripcion completa:' ."\n".$description : null,
+            filled($issue->issue_type) ? 'Tipo: '.trim((string) $issue->issue_type) : null,
+            $comments !== [] ? 'Comentarios completos que pueden aclarar el alcance:' ."\n".implode("\n", $comments) : null,
         ]);
+        $repositoryLines = array_filter([
+            $repository !== '' ? 'Repositorio: '.$repository : null,
+            filled($issue->issue_key) ? 'Jira key: '.$issue->issue_key : null,
+            filled($project->base_branch) ? 'Rama base: '.trim((string) $project->base_branch) : null,
+            $execution?->feature_branch ? 'Rama de ejecucion: '.$execution->feature_branch : null,
+        ]);
+        $sections = array_filter([
+            $this->section('JIRA_STORY_CONTEXT', $storyLines),
+            $supervisorContext !== '' ? $this->section('SUPERVISOR_CONTEXT', [$supervisorContext]) : null,
+            $feedbackLines !== [] ? $this->section('QA_FEEDBACK', $feedbackLines) : null,
+            $this->section('REPOSITORY_CONTEXT', $repositoryLines),
+        ]);
+
+        return implode("\n\n", $sections);
+    }
+
+    private function section(string $name, array $lines): ?string
+    {
+        $lines = array_values(array_filter(array_map(
+            static fn ($line): string => trim((string) $line),
+            $lines,
+        ), static fn (string $line): bool => $line !== ''));
+        if ($lines === []) {
+            return null;
+        }
+
+        return '<'.$name.'>'."\n".implode("\n", $lines)."\n".'</'.$name.'>';
     }
 
     private function securityRules(): string

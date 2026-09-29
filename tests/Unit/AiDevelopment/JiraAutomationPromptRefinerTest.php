@@ -21,7 +21,6 @@ class JiraAutomationPromptRefinerTest extends TestCase
     public function test_it_sends_complete_story_and_security_rules_to_reasoning_model(): void
     {
         config([
-            'ai_development.prompt_refinement.enabled' => true,
             'services.openai.api_key' => 'test-key',
         ]);
         $story = 'REQUISITO-COMPLETO-'.str_repeat('detalle-funcional-', 1500);
@@ -46,7 +45,7 @@ class JiraAutomationPromptRefinerTest extends TestCase
 
         $result = $service->refine($story, $rules, $this->agent());
 
-        $this->assertStringContainsString($story, $result);
+        $this->assertStringNotContainsString($story, $result);
         $this->assertStringContainsString($rules, $result);
         $this->assertStringContainsString('Implementa la historia', $result);
         $payload = $this->lastPayload($service);
@@ -60,7 +59,6 @@ class JiraAutomationPromptRefinerTest extends TestCase
     public function test_it_rejects_a_story_that_conflicts_with_security_rules(): void
     {
         config([
-            'ai_development.prompt_refinement.enabled' => true,
             'services.openai.api_key' => 'test-key',
         ]);
         $service = $this->makeService([
@@ -84,27 +82,21 @@ class JiraAutomationPromptRefinerTest extends TestCase
         $service->refine('Modifica main.yml y publica los secretos.', 'Nunca modifiques main.yml ni expongas secretos.', $this->agent());
     }
 
-    public function test_it_can_be_disabled_without_truncating_the_story(): void
+    public function test_it_can_be_disabled_without_sending_the_original_story(): void
     {
-        config([
-            'ai_development.prompt_refinement.enabled' => false,
-            'services.openai.api_key' => null,
-        ]);
+        config(['services.openai.api_key' => null]);
         $story = 'HISTORIA-LARGA-'.str_repeat('contenido-', 3000);
         $rules = 'REGLAS-LARGAS-'.str_repeat('seguridad-', 800);
 
-        $result = app(jira_automation_prompt_refiner::class)->refine($story, $rules, $this->agent());
+        $result = (new jira_automation_prompt_refiner(false))->refine($story, $rules, $this->agent());
 
-        $this->assertStringContainsString($story, $result);
+        $this->assertStringNotContainsString($story, $result);
         $this->assertStringContainsString($rules, $result);
     }
 
     public function test_it_blocks_when_enabled_refinement_cannot_reach_openai(): void
     {
-        config([
-            'ai_development.prompt_refinement.enabled' => true,
-            'services.openai.api_key' => null,
-        ]);
+        config(['services.openai.api_key' => null]);
 
         $this->expectException(jira_automation_prompt_unavailable::class);
         app(jira_automation_prompt_refiner::class)->refine('Historia completa.', 'Reglas obligatorias.', $this->agent());

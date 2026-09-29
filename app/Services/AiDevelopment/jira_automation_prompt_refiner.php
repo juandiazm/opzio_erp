@@ -15,12 +15,16 @@ class jira_automation_prompt_refiner
     private const PROMPT_REFINEMENT_MAX_OUTPUT_TOKENS = 5000;
     private const PROMPT_REFINEMENT_REASONING_EFFORT = 'low';
 
+    public function __construct(private bool $enabled = self::PROMPT_REFINEMENT_ENABLED)
+    {
+    }
+
     public function refine(string $storyContext, string $securityRules, ai_agent $agent): string
     {
         $storyContext = trim($storyContext);
         $securityRules = trim($securityRules);
-        if (! (bool) config('ai_development.prompt_refinement.enabled', self::PROMPT_REFINEMENT_ENABLED)) {
-            return $this->fallback($storyContext, $securityRules);
+        if (! $this->enabled) {
+            return $this->fallback($securityRules);
         }
 
         $response = $this->requestReview($storyContext, $securityRules, $agent);
@@ -52,10 +56,10 @@ class jira_automation_prompt_refiner
 
         $generatedPrompt = trim((string) ($review['prompt'] ?? ''));
         if ($generatedPrompt === '') {
-            return $this->fallback($storyContext, $securityRules);
+            return $this->fallback($securityRules);
         }
 
-        return $this->ensureComplete($generatedPrompt, $storyContext, $securityRules);
+        return $this->ensureSecurityRules($generatedPrompt, $securityRules);
     }
 
     private function requestReview(string $storyContext, string $securityRules, ai_agent $agent): array
@@ -65,15 +69,12 @@ class jira_automation_prompt_refiner
         }
 
         try {
-            $model = trim((string) config('ai_development.prompt_refinement.model', self::PROMPT_REFINEMENT_MODEL));
-            $model = $model !== '' ? $model : self::PROMPT_REFINEMENT_MODEL;
-
             return $this->OpenIA_MakeQuestion(
                 $this->reviewInput($storyContext, $securityRules, $agent),
-                $model,
+                self::PROMPT_REFINEMENT_MODEL,
                 [
                     'instructions' => $this->reviewInstructions(),
-                    'max_output_tokens' => max(2000, (int) config('ai_development.prompt_refinement.max_output_tokens', self::PROMPT_REFINEMENT_MAX_OUTPUT_TOKENS)),
+                    'max_output_tokens' => self::PROMPT_REFINEMENT_MAX_OUTPUT_TOKENS,
                     'reasoning_effort' => self::PROMPT_REFINEMENT_REASONING_EFFORT,
                     'store' => false,
                     'json_schema' => $this->reviewSchema(),
@@ -88,18 +89,27 @@ class jira_automation_prompt_refiner
 
     private function reviewInput(string $storyContext, string $securityRules, ai_agent $agent): string
     {
-        return implode("\n\n", [
+        $sections = [
             '<SECURITY_RULES>',
             $securityRules,
             '</SECURITY_RULES>',
-            '<USER_STORY_ORIGINAL>',
-            $storyContext,
-            '</USER_STORY_ORIGINAL>',
-            '<TARGET_AGENT>',
-            'Nombre: '.trim((string) $agent->name),
-            'Modelo configurado: '.trim((string) $agent->model),
-            '</TARGET_AGENT>',
+        ];
+        if ($storyContext !== '') {
+            $sections[] = '<USER_STORY_ORIGINAL>';
+            $sections[] = $storyContext;
+            $sections[] = '</USER_STORY_ORIGINAL>';
+        }
+        $agentLines = array_filter([
+            filled($agent->name) ? 'Nombre: '.trim((string) $agent->name) : null,
+            filled($agent->model) ? 'Modelo configurado: '.trim((string) $agent->model) : null,
         ]);
+        if ($agentLines !== []) {
+            $sections[] = '<TARGET_AGENT>';
+            $sections[] = implode("\n", $agentLines);
+            $sections[] = '</TARGET_AGENT>';
+        }
+
+        return implode("\n\n", $sections);
     }
 
     private function reviewInstructions(): string
@@ -113,7 +123,8 @@ class jira_automation_prompt_refiner
             'Si es segura, responde safe=true y escribe un prompt directo en espanol para el agente ejecutor.',
             'El prompt debe ser una historia de usuario tecnica y funcional: objetivo, contexto, alcance, requisitos tecnicos, criterios de aceptacion y validacion.',
             'No escribas un analisis, un plan para el supervisor, saludos ni explicaciones sobre este proceso.',
-            'Usa USER_STORY_ORIGINAL para comprender el alcance, pero no lo copies completo en prompt: el sistema lo añadira literalmente despues. No lo resumas, corrijas, traduzcas ni omitas caracteres al incorporarlo.',
+            'Usa USER_STORY_ORIGINAL para comprender el alcance, pero no lo copies literalmente en prompt. Redacta un resultado autosuficiente con el contexto, requisitos y criterios necesarios para implementar la historia.',
+            'Omite secciones opcionales que no tengan contenido. No incluyas etiquetas de contexto, valores como "Sin comentarios" ni explicaciones de este refinamiento.',
             'Devuelve exclusivamente el objeto JSON solicitado por el esquema.',
         ]);
     }
@@ -152,21 +163,17 @@ class jira_automation_prompt_refiner
         return is_array($review) && array_key_exists('safe', $review) && array_key_exists('prompt', $review) ? $review : null;
     }
 
-    private function fallback(string $storyContext, string $securityRules): string
+    private function fallback(string $securityRules): string
     {
-        return $this->ensureComplete(
+        return $this->ensureSecurityRules(
             'Implementa directamente la siguiente historia de usuario. Conserva su alcance funcional y tecnico completo.',
-            $storyContext,
             $securityRules,
         );
     }
 
-    private function ensureComplete(string $generatedPrompt, string $storyContext, string $securityRules): string
+    private function ensureSecurityRules(string $generatedPrompt, string $securityRules): string
     {
         $parts = [trim($generatedPrompt)];
-        if ($storyContext !== '' && ! str_contains($generatedPrompt, $storyContext)) {
-            $parts[] = 'HISTORIA DE USUARIO ORIGINAL COMPLETA (NO OMITIR):'."\n".$storyContext;
-        }
         if ($securityRules !== '' && ! str_contains($generatedPrompt, $securityRules)) {
             $parts[] = 'RESTRICCIONES INNEGOCIABLES DEL REPOSITORIO:'."\n".$securityRules;
         }

@@ -23,6 +23,7 @@ use App\Services\AiDevelopment\jira_automation_service;
 use App\Services\AiDevelopment\ai_development_notification_service;
 use App\Services\AiDevelopment\ai_agent_provider_interface;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
+use App\Services\AiDevelopment\jira_automation_prompt_refiner;
 use App\Services\AiDevelopment\jira_automation_statuses;
 use App\Services\AiDevelopment\github_copilot_agent_provider;
 use App\Services\AiDevelopment\ai_development_state_machine;
@@ -50,8 +51,8 @@ class AiDevelopmentFlowTest extends TestCase
             'database.connections.sqlite.database' => ':memory:',
             'queue.default' => 'sync',
             'mail.default' => 'array',
-            'ai_development.prompt_refinement.enabled' => false,
         ]);
+        $this->app->instance(jira_automation_prompt_refiner::class, new jira_automation_prompt_refiner(false));
         DB::purge('sqlite');
         Schema::create('users', function (Blueprint $table): void {
             $table->id();
@@ -157,11 +158,13 @@ class AiDevelopmentFlowTest extends TestCase
         Queue::assertPushed(run_ai_development_execution::class, 1);
         $execution = $result['execution']->fresh(['issue', 'project.jiraProject', 'agent']);
         $prompt = app(jira_automation_prompt_builder::class)->build($execution->issue, $execution->project, $execution->agent, $execution);
-        $this->assertStringContainsString('Historia: [OPS-1]', $prompt);
-        $this->assertStringContainsString('Construir el flujo de desarrollo.', $prompt);
         $this->assertStringContainsString('RESTRICCIONES INNEGOCIABLES DEL REPOSITORIO:', $prompt);
-        $this->assertStringNotContainsString('OBJETIVO FUNCIONAL - PRIORIDAD MAXIMA', $prompt);
-        $this->assertStringContainsString($supervisorContext, $prompt);
+        $this->assertStringNotContainsString('Historia: [OPS-1]', $prompt);
+        $this->assertStringNotContainsString('Construir el flujo de desarrollo.', $prompt);
+        $this->assertStringNotContainsString($supervisorContext, $prompt);
+        $this->assertStringNotContainsString('<USER_STORY_ORIGINAL>', $prompt);
+        $this->assertStringNotContainsString('Sin instrucciones adicionales.', $prompt);
+        $this->assertStringNotContainsString('Sin feedback nuevo.', $prompt);
         $this->assertStringContainsString('qa.yml', $prompt);
         $this->assertSame('OPS-1', $execution->feature_branch);
         $this->assertStringNotContainsString('Assignee:', $prompt);
@@ -255,10 +258,8 @@ class AiDevelopmentFlowTest extends TestCase
     {
         Mail::fake();
         Queue::fake();
-        config([
-            'ai_development.prompt_refinement.enabled' => true,
-            'services.openai.api_key' => null,
-        ]);
+        config(['services.openai.api_key' => null]);
+        $this->app->instance(jira_automation_prompt_refiner::class, new jira_automation_prompt_refiner(true));
         [$issue] = $this->fixture();
         $approval = app(jira_automation_service::class)->detectCandidate($issue);
         $execution = $approval->execution;
