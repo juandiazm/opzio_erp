@@ -17,10 +17,12 @@ final class ai_development_states
     public const FIXING = 'fixing';
     public const INTEGRATING_QA = 'integrating_qa';
     public const WAITING_QA_PIPELINE = 'waiting_qa_pipeline';
+    public const WAITING_MANUAL_QA_PIPELINE = 'waiting_manual_qa_pipeline';
     public const WAITING_QUALITY_REVIEW = 'waiting_quality_review';
     public const QUALITY_FEEDBACK = 'quality_feedback';
     public const INTEGRATING_MAIN = 'integrating_main';
     public const WAITING_MAIN_PIPELINE = 'waiting_main_pipeline';
+    public const WAITING_MANUAL_MAIN_PIPELINE = 'waiting_manual_main_pipeline';
     public const COMPLETED = 'completed';
     public const BLOCKED = 'blocked';
     public const FAILED = 'failed';
@@ -41,10 +43,12 @@ final class ai_development_states
             self::FIXING,
             self::INTEGRATING_QA,
             self::WAITING_QA_PIPELINE,
+            self::WAITING_MANUAL_QA_PIPELINE,
             self::WAITING_QUALITY_REVIEW,
             self::QUALITY_FEEDBACK,
             self::INTEGRATING_MAIN,
             self::WAITING_MAIN_PIPELINE,
+            self::WAITING_MANUAL_MAIN_PIPELINE,
             self::COMPLETED,
             self::BLOCKED,
             self::FAILED,

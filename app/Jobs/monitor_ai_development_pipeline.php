@@ -22,7 +22,12 @@ class monitor_ai_development_pipeline implements ShouldQueue
 
     public int $tries = 1;
 
-    public function __construct(public int $executionId, public string $environment = 'qa')
+    public function __construct(
+        public int $executionId,
+        public string $environment = 'qa',
+        public ?string $workflowRunId = null,
+        public bool $manualRetry = false,
+    )
     {
         $this->onConnection(config('ai_development.queue_connection', 'database'))
             ->onQueue(config('ai_development.queue_name', 'ai-development'));
@@ -43,19 +48,26 @@ class monitor_ai_development_pipeline implements ShouldQueue
         }
 
         try {
-            $run = $workflows->latestForBranch($execution->project, $execution->environmentBranch($this->environment));
-            if (! $run || blank($run['id'])) {
-                $this->reschedule();
-                return;
+            $workflowRunId = $this->workflowRunId;
+            if (blank($workflowRunId)) {
+                $run = $workflows->latestForBranch($execution->project, $execution->environmentBranch($this->environment));
+                if (! $run || blank($run['id'])) {
+                    $this->reschedule();
+                    return;
+                }
+                $workflowRunId = (string) $run['id'];
             }
-            $details = $workflows->details($execution->project, $run['id']);
+            $details = $workflows->details($execution->project, $workflowRunId);
+            $workflowRunId = (string) ($details['id'] ?? $workflowRunId);
+            $workflowColumn = $this->environment === 'qa' ? 'qa_workflow_run_id' : 'main_workflow_run_id';
+            $execution->update([$workflowColumn => $workflowRunId]);
             if (in_array($details['status'], ['queued', 'in_progress', 'waiting', 'requested'], true)) {
-                $this->reschedule();
+                $this->reschedule($workflowRunId);
                 return;
             }
             $success = ($details['conclusion'] ?? null) === 'success';
             if (! $success) {
-                $this->pipelineFailed($execution, $details, $workflows, $states, $notifications);
+                $this->pipelineFailed($execution, $details, $workflows, $states, $notifications, $this->manualRetry);
                 return;
             }
             if ($this->environment === 'qa') {
@@ -70,7 +82,13 @@ class monitor_ai_development_pipeline implements ShouldQueue
             }
             $this->mainSucceeded($execution, $details, $states, $notifications);
         } catch (Throwable $exception) {
-            $states->block($execution, 'No fue posible supervisar GitHub Actions: '.mb_substr($exception->getMessage(), 0, 1000));
+            $reason = 'No fue posible supervisar GitHub Actions: '.$this->safeText($exception->getMessage(), 1000);
+            if ($this->manualRetry) {
+                $this->waitForManualRetry($execution->fresh(), ['id' => $this->workflowRunId], $reason, $states);
+
+                return;
+            }
+            $states->block($execution, $reason);
             $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $execution->blocked_reason);
         }
     }
@@ -97,6 +115,8 @@ class monitor_ai_development_pipeline implements ShouldQueue
             'qa_delivered_at' => now(),
             'qa_workflow_run_id' => $details['id'],
             'consecutive_failures' => 0,
+            'error' => null,
+            'blocked_reason' => null,
             'last_activity_at' => now(),
         ]);
         $execution = $states->transition($execution, ai_development_states::WAITING_QUALITY_REVIEW, ['workflow' => $details]);
@@ -113,7 +133,13 @@ class monitor_ai_development_pipeline implements ShouldQueue
         ai_development_notification_service $notifications,
     ): void
     {
-        $execution->update(['main_workflow_run_id' => $details['id'], 'finished_at' => now(), 'last_activity_at' => now()]);
+        $execution->update([
+            'main_workflow_run_id' => $details['id'],
+            'finished_at' => now(),
+            'last_activity_at' => now(),
+            'error' => null,
+            'blocked_reason' => null,
+        ]);
         $execution = $states->transition($execution, ai_development_states::COMPLETED, ['workflow' => $details]);
         $reporterNotification = $notifications->reporterFlow(
             $execution,
@@ -144,19 +170,25 @@ class monitor_ai_development_pipeline implements ShouldQueue
         github_workflow_service $workflows,
         ai_development_state_machine $states,
         ai_development_notification_service $notifications,
+        bool $manualRetry,
     ): void {
+        if ($manualRetry) {
+            $reason = 'El workflow de GitHub Actions aun no aparece como exitoso. Si ya corregiste el despliegue, vuelve a solicitar la revalidacion.';
+            $this->waitForManualRetry($execution, $details, $reason, $states);
+
+            return;
+        }
+
         $logs = '';
         try {
             $logs = $workflows->logs($execution->project, (string) $details['id']);
         } catch (Throwable $exception) {
             $logs = 'No fue posible recuperar los logs: '.$exception->getMessage();
         }
-        if ($this->isExternalFailure($logs)) {
-            $reason = 'Fallo externo de infraestructura en CI/CD '.$this->environment.': '.mb_substr($logs, 0, 1200);
-            $states->block($execution->fresh(), $reason, ['external_failure' => true, 'workflow' => $details]);
-            $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $reason);
-            return;
-        }
+        $compressedLogs = $this->isCompressedLogs($logs);
+        $logs = $compressedLogs
+            ? 'GitHub Actions entrego los logs en un archivo ZIP; consulta el workflow en GitHub.'
+            : $this->safeText($logs, (int) config('ai_development.pipeline.max_log_bytes', 12000));
         $attempts = $this->environment === 'qa' ? (int) $execution->ci_attempts + 1 : (int) $execution->main_ci_attempts + 1;
         $execution->increment($this->environment === 'qa' ? 'ci_attempts' : 'main_ci_attempts');
         $states->event($execution->fresh(), $this->environment.'_pipeline_failed', [
@@ -164,9 +196,34 @@ class monitor_ai_development_pipeline implements ShouldQueue
             'attempt' => $attempts,
             'logs' => mb_substr($logs, 0, (int) config('ai_development.pipeline.max_log_bytes', 12000)),
         ]);
+        if ($compressedLogs) {
+            $this->waitForManualRetry(
+                $execution->fresh(),
+                $details,
+                'El pipeline de GitHub Actions fallo y sus logs llegaron comprimidos. Revisa el workflow y solicita una nueva validacion cuando este corregido.',
+                $states,
+            );
+
+            return;
+        }
+        if ($this->isExternalFailure($logs)) {
+            $this->waitForManualRetry(
+                $execution->fresh(),
+                $details,
+                'Fallo externo de infraestructura en CI/CD '.$this->environment.': '.mb_substr($logs, 0, 1200),
+                $states,
+            );
+
+            return;
+        }
         if ($attempts >= max(1, (int) $execution->project->max_ci_attempts)) {
-            $states->block($execution->fresh(), 'Se alcanzo el maximo de fallos CI/CD de '.$this->environment.'.');
-            $notifications->blocked($execution->fresh(['project', 'issue', 'agent']), $execution->blocked_reason);
+            $this->waitForManualRetry(
+                $execution->fresh(),
+                $details,
+                'Se alcanzo el maximo de fallos CI/CD de '.$this->environment.'. Revisa el workflow y solicita una nueva validacion cuando este corregido.',
+                $states,
+            );
+
             return;
         }
         $execution = $execution->fresh();
@@ -177,9 +234,50 @@ class monitor_ai_development_pipeline implements ShouldQueue
         run_ai_development_execution::dispatch($execution->id);
     }
 
-    private function reschedule(): void
+    private function waitForManualRetry(
+        ai_development_execution $execution,
+        array $details,
+        string $reason,
+        ai_development_state_machine $states,
+    ): void {
+        $manualState = $this->environment === 'qa'
+            ? ai_development_states::WAITING_MANUAL_QA_PIPELINE
+            : ai_development_states::WAITING_MANUAL_MAIN_PIPELINE;
+        $execution->forceFill([
+            'error' => $this->safeText($reason, 4000),
+            'blocked_reason' => null,
+            'last_activity_at' => now(),
+        ])->save();
+        $states->transition($execution, $manualState, [
+            'workflow' => $details,
+            'manual_recheck' => $this->manualRetry,
+            'reason' => $this->safeText($reason, 1000),
+        ]);
+    }
+
+    private function reschedule(?string $workflowRunId = null): void
     {
-        self::dispatch($this->executionId, $this->environment)->delay(now()->addSeconds(max(5, (int) config('ai_development.pipeline.poll_delay_seconds', 60))));
+        self::dispatch(
+            $this->executionId,
+            $this->environment,
+            $workflowRunId ?: $this->workflowRunId,
+            $this->manualRetry,
+        )->delay(now()->addSeconds(max(5, (int) config('ai_development.pipeline.poll_delay_seconds', 60))));
+    }
+
+    private function isCompressedLogs(string $logs): bool
+    {
+        return str_starts_with($logs, "PK\x03\x04")
+            || str_starts_with($logs, "PK\x05\x06")
+            || str_starts_with($logs, "PK\x07\x08");
+    }
+
+    private function safeText(string $text, int $limit): string
+    {
+        $encoded = json_encode($text, JSON_INVALID_UTF8_SUBSTITUTE);
+        $normalized = is_string($encoded) ? json_decode($encoded, true) : null;
+
+        return mb_substr(is_string($normalized) ? $normalized : '', 0, max(0, $limit));
     }
 
     private function isExternalFailure(string $logs): bool
