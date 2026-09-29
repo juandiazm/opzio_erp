@@ -88,6 +88,21 @@ class github_controller extends ai_development_controller
         }
     }
 
+    public function revalidate_pipeline(Request $request, int $execution, jira_automation_service $service): JsonResponse
+    {
+        try {
+            $record = $service->retryPipelineValidation($execution, data_get(session('user'), 'id'));
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Se solicito revalidar el workflow existente. La ejecucion no fue reiniciada.',
+                'data' => ['execution_id' => $record->id, 'status' => $record->status],
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json(['status' => 0, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
     public function reject_execution(Request $request, int $execution, jira_automation_service $service): JsonResponse
     {
         try {

@@ -224,6 +224,7 @@ Route::prefix('admin')->group(function () {
             Route::get('data', [github_controller::class, 'data']);
             Route::get('executions/{execution}/data', [github_controller::class, 'execution_detail']);
             Route::post('executions/{execution}/restart', [github_controller::class, 'restart_execution']);
+            Route::post('executions/{execution}/pipeline/revalidate', [github_controller::class, 'revalidate_pipeline']);
             Route::post('executions/{execution}/reject', [github_controller::class, 'reject_execution']);
             Route::post('connection/save', [github_controller::class, 'save_github']);
             Route::post('connection/test', [github_controller::class, 'test_github']);

@@ -5,6 +5,7 @@ namespace App\Services\AiDevelopment;
 use App\Jobs\promote_ai_development_execution;
 use App\Jobs\run_ai_development_execution;
 use App\Jobs\monitor_ai_development_agent;
+use App\Jobs\monitor_ai_development_pipeline;
 use App\Models\ai_agent;
 use App\Models\ai_development_approval;
 use App\Models\ai_development_event;
@@ -286,6 +287,113 @@ class jira_automation_service
         run_ai_development_execution::dispatch($execution->id);
 
         return $execution->fresh(['issue', 'project', 'agent']);
+    }
+
+    public function retryPipelineValidation(int $executionId, ?int $userId = null): ai_development_execution
+    {
+        [$execution, $environment] = DB::transaction(function () use ($executionId, $userId): array {
+            $execution = ai_development_execution::query()
+                ->with('project.githubConnection')
+                ->lockForUpdate()
+                ->findOrFail($executionId);
+            $environment = $this->pipelineRecheckEnvironment($execution);
+            if (! $environment) {
+                throw new RuntimeException('La ejecucion no esta esperando una revalidacion manual de CI/CD.');
+            }
+            if (! $execution->project?->githubConnection) {
+                throw new RuntimeException('El proyecto no tiene una conexion GitHub activa para revalidar CI/CD.');
+            }
+
+            $manualState = $environment === 'qa'
+                ? ai_development_states::WAITING_MANUAL_QA_PIPELINE
+                : ai_development_states::WAITING_MANUAL_MAIN_PIPELINE;
+            if ($execution->status === ai_development_states::BLOCKED) {
+                $execution = $this->states->transition($execution, $manualState, [
+                    'manual_recovery' => true,
+                    'actor_id' => $userId,
+                ]);
+            } elseif ($execution->status !== $manualState) {
+                throw new RuntimeException('La ejecucion ya no esta disponible para revalidar CI/CD.');
+            }
+
+            $previousWorkflowRunId = $this->pipelineWorkflowRunId($execution, $environment);
+            $pipelineState = $environment === 'qa'
+                ? ai_development_states::WAITING_QA_PIPELINE
+                : ai_development_states::WAITING_MAIN_PIPELINE;
+            $execution = $this->states->transition($execution, $pipelineState, [
+                'manual_recheck' => true,
+                'environment' => $environment,
+                'previous_workflow_run_id' => $previousWorkflowRunId,
+                'actor_id' => $userId,
+            ]);
+            $execution->forceFill([
+                'error' => null,
+                'blocked_reason' => null,
+                'last_activity_at' => now(),
+            ])->save();
+            $this->states->event($execution, 'manual_pipeline_recheck_requested', [
+                'environment' => $environment,
+                'previous_workflow_run_id' => $previousWorkflowRunId,
+                'actor_id' => $userId,
+            ]);
+
+            return [$execution, $environment];
+        });
+
+        monitor_ai_development_pipeline::dispatch($execution->id, $environment, null, true)
+            ->delay(now()->addSeconds(5));
+
+        return $execution->fresh(['issue', 'project', 'agent']);
+    }
+
+    private function pipelineRecheckEnvironment(ai_development_execution $execution): ?string
+    {
+        if ($execution->status === ai_development_states::WAITING_MANUAL_QA_PIPELINE) {
+            return 'qa';
+        }
+        if ($execution->status === ai_development_states::WAITING_MANUAL_MAIN_PIPELINE) {
+            return 'main';
+        }
+        if ($execution->status !== ai_development_states::BLOCKED) {
+            return null;
+        }
+
+        $reason = strtolower((string) $execution->blocked_reason);
+        if (! str_contains($reason, 'github actions') && ! str_contains($reason, 'ci/cd')) {
+            return null;
+        }
+
+        $event = ai_development_event::query()
+            ->where('execution_id', $execution->id)
+            ->whereIn('event', [
+                'qa_pipeline_started', 'qa_pipeline_failed', 'qa_pipeline_passed',
+                'main_pipeline_started', 'main_pipeline_failed', 'main_pipeline_passed',
+            ])
+            ->latest('id')
+            ->first();
+        if ($event) {
+            return str_starts_with($event->event, 'qa_') ? 'qa' : 'main';
+        }
+
+        return str_contains($reason, 'main') ? 'main' : (str_contains($reason, 'qa') ? 'qa' : null);
+    }
+
+    private function pipelineWorkflowRunId(ai_development_execution $execution, string $environment): ?string
+    {
+        $failureEvent = ai_development_event::query()
+            ->where('execution_id', $execution->id)
+            ->where('event', $environment.'_pipeline_failed')
+            ->latest('id')
+            ->first();
+        $workflowRunId = data_get($failureEvent?->metadata, 'workflow.id');
+        if (filled($workflowRunId)) {
+            return (string) $workflowRunId;
+        }
+
+        $workflowColumn = $environment === 'qa' ? 'qa_workflow_run_id' : 'main_workflow_run_id';
+        $workflowRunId = $execution->getAttribute($workflowColumn);
+
+        return filled($workflowRunId) ? (string) $workflowRunId : null;
     }
 
     public function rejectBlockedExecution(int $executionId, ?int $userId = null, ?string $reason = null): ai_development_execution

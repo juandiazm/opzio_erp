@@ -6,11 +6,24 @@ const statusLabels = {
 	awaiting_approval: 'Esperando aprobacion', approved: 'Aprobada', rejected: 'Rechazada', preparing: 'Preparando', analyzing: 'Analizando', planning: 'Planificando', developing: 'Desarrollando', testing: 'Testeando', fixing: 'Corrigiendo', integrating_qa: 'Integrando QA', waiting_qa_pipeline: 'Esperando CI QA', waiting_quality_review: 'Esperando QA', quality_feedback: 'Feedback QA', integrating_main: 'Publicando', waiting_main_pipeline: 'Esperando CI Main', completed: 'Completada', blocked: 'Bloqueada', failed: 'Con error', candidate: 'Candidata', pending: 'Pendiente', expired: 'Expirada', active: 'Activa', disabled: 'Deshabilitada', error: 'Con error', draft: 'Borrador',
 };
 const eventLabels = {candidate_detected: 'Candidata detectada', approval_sent: 'Aprobacion enviada', approved: 'Aprobada', rejected: 'Rechazada', manual_execution_rejected: 'Ejecucion rechazada manualmente', agent_started: 'Agente iniciado', analysis_started: 'Analisis iniciado', plan_created: 'Plan creado', code_changed: 'Codigo modificado', tests_started: 'Pruebas iniciadas', tests_passed: 'Pruebas aprobadas', tests_failed: 'Pruebas fallidas', qa_merge_started: 'Merge hacia QA', qa_pipeline_started: 'Pipeline QA iniciado', qa_pipeline_failed: 'Pipeline QA fallido', qa_pipeline_passed: 'Pipeline QA aprobado', quality_feedback_detected: 'Feedback QA detectado', main_merge_started: 'Merge hacia main', main_pipeline_started: 'Pipeline main iniciado', main_pipeline_failed: 'Pipeline main fallido', main_pipeline_passed: 'Pipeline main aprobado', reporter_notification_sent: 'Reporter notificado', reporter_notification_failed: 'No se pudo notificar al reporter', completion_notification_sent: 'Notificacion de finalizacion enviada', completion_notification_failed: 'Notificacion de finalizacion fallida', completed: 'Completada', blocked: 'Bloqueada', execution_failed: 'Ejecucion fallida'};
-const activeStatuses = new Set(['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline']);
+const activeStatuses = new Set(['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_manual_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline', 'waiting_manual_main_pipeline']);
 const tabQueryParameter = 'tab';
 
 const labelStatus = (value) => statusLabels[value] || String(value || '-').replaceAll('_', ' ');
 const labelEvent = (value) => eventLabels[value] || String(value || '-').replaceAll('_', ' ');
+const manualPipelineStatuses = new Set(['waiting_manual_qa_pipeline', 'waiting_manual_main_pipeline']);
+const canRevalidatePipeline = (item) => manualPipelineStatuses.has(item.status)
+	|| (item.status === 'blocked' && ['github actions', 'ci/cd'].some((term) => (item.blocked_reason || '').toLowerCase().includes(term)));
+
+Object.assign(statusLabels, {
+	waiting_manual_qa_pipeline: 'Espera revalidacion CI QA',
+	waiting_manual_main_pipeline: 'Espera revalidacion CI Main',
+});
+Object.assign(eventLabels, {
+	qa_pipeline_manual_retry_required: 'Revalidacion manual CI QA requerida',
+	main_pipeline_manual_retry_required: 'Revalidacion manual CI Main requerida',
+	manual_pipeline_recheck_requested: 'Revalidacion manual solicitada',
+});
 
 function choiceMarkup(items, selected, name, description) {
 	const selectedSet = new Set((selected || []).map(String));
@@ -90,7 +103,7 @@ export async function initializeGithubModule(root) {
 		const items = state.data?.attention || [];
 		attention.innerHTML = items.length ? items.map((item) => {
 			const target = item.type === 'approval' ? 'github-approvals-tab' : 'github-executions-tab';
-			const icon = item.type === 'approval' ? 'shield-check' : item.type === 'blocked' ? 'triangle-exclamation' : 'user-check';
+			const icon = item.type === 'approval' ? 'shield-check' : ['blocked', 'pipeline'].includes(item.type) ? 'triangle-exclamation' : 'user-check';
 			return `<button type="button" class="github-attention-item" data-github-open-tab="${target}"><i class="fa-light fa-${icon}"></i><span><strong>${escapeHtml(item.jira_key || 'Sin HU')}</strong><small>${escapeHtml(item.project || '')} · ${escapeHtml(item.detail || '')}</small></span><i class="fa-light fa-chevron-right"></i></button>`;
 		}).join('') : '<div class="github-empty">No hay elementos que requieran atencion.</div>';
 		renderPagination(root.querySelector('[data-github-attention-pagination]'), state.data?.attention_pagination || {}, (page) => { state.attentionPage = page; load(); });
@@ -169,13 +182,21 @@ export async function initializeGithubModule(root) {
 		const executions = state.data?.executions || [];
 		const pagination = state.data?.execution_pagination || {current_page: 1, last_page: 1, total: executions.length};
 		const phaseSelect = root.querySelector('[data-github-execution-phase]');
+		const executionFilter = root.querySelector('[data-github-execution-filter]');
+		[
+			['waiting_manual_qa_pipeline', 'Espera revalidacion CI QA'],
+			['waiting_manual_main_pipeline', 'Espera revalidacion CI Main'],
+		].forEach(([value, label]) => {
+			if (![...executionFilter.options].some((option) => option.value === value)) executionFilter.add(new Option(label, value));
+		});
 		phaseSelect.innerHTML = '<option value="">Todas las fases</option>' + (state.data?.execution_phases || []).map((phase) => `<option value="${escapeHtml(phase)}">${escapeHtml(labelStatus(phase))}</option>`).join('');
 		phaseSelect.value = state.executionPhase;
 		root.querySelector('[data-github-execution-count]').textContent = `${pagination.total} ejecuciones`;
-		root.querySelector('[data-github-executions]').innerHTML = executions.length ? executions.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.agent || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span></td><td>${escapeHtml(labelStatus(item.phase))}</td><td>${escapeHtml(item.branch || '-')}</td><td>${item.attempt || 0}</td><td>${item.ci_attempts || 0} / ${item.main_ci_attempts || 0}</td><td>${escapeHtml(dateTime(item.last_activity_at))}</td><td><button type="button" class="github-icon-button" data-github-execution-open="${item.id}" title="Ver detalle"><i class="fa-light fa-eye"></i></button><button type="button" class="github-icon-button" data-github-execution-restart="${item.id}" title="Reiniciar flujo"><i class="fa-light fa-rotate-left"></i></button>${item.status === 'blocked' ? `<button type="button" class="github-icon-button" data-github-execution-reject="${item.id}" title="Marcar como rechazada"><i class="fa-light fa-ban"></i></button>` : ''}</td></tr>`).join('') : '<tr><td colspan="10" class="github-empty">No hay ejecuciones para este filtro.</td></tr>';
+		root.querySelector('[data-github-executions]').innerHTML = executions.length ? executions.map((item) => `<tr><td><strong>${escapeHtml(item.jira_key)}</strong><small>${escapeHtml(item.summary || '')}</small></td><td>${escapeHtml(item.project || '-')}</td><td>${escapeHtml(item.agent || '-')}</td><td><span class="github-status-pill github-status-${escapeHtml(item.status)}">${escapeHtml(labelStatus(item.status))}</span></td><td>${escapeHtml(labelStatus(item.phase))}</td><td>${escapeHtml(item.branch || '-')}</td><td>${item.attempt || 0}</td><td>${item.ci_attempts || 0} / ${item.main_ci_attempts || 0}</td><td>${escapeHtml(dateTime(item.last_activity_at))}</td><td><button type="button" class="github-icon-button" data-github-execution-open="${item.id}" title="Ver detalle"><i class="fa-light fa-eye"></i></button><button type="button" class="github-icon-button" data-github-execution-restart="${item.id}" title="Reiniciar flujo"><i class="fa-light fa-rotate-left"></i></button>${canRevalidatePipeline(item) ? `<button type="button" class="github-icon-button" data-github-execution-revalidate="${item.id}" title="Revalidar CI/CD"><i class="fa-light fa-arrows-rotate"></i></button>` : ''}${item.status === 'blocked' ? `<button type="button" class="github-icon-button" data-github-execution-reject="${item.id}" title="Marcar como rechazada"><i class="fa-light fa-ban"></i></button>` : ''}</td></tr>`).join('') : '<tr><td colspan="10" class="github-empty">No hay ejecuciones para este filtro.</td></tr>';
 		renderPagination(root.querySelector('[data-github-execution-pagination]'), pagination, (page) => { state.executionPage = page; load(); });
 		root.querySelectorAll('[data-github-execution-open]').forEach((button) => button.addEventListener('click', () => openExecution(Number(button.dataset.githubExecutionOpen))));
 		root.querySelectorAll('[data-github-execution-restart]').forEach((button) => button.addEventListener('click', () => restartExecution(Number(button.dataset.githubExecutionRestart), button)));
+		root.querySelectorAll('[data-github-execution-revalidate]').forEach((button) => button.addEventListener('click', () => revalidatePipeline(Number(button.dataset.githubExecutionRevalidate), button)));
 		root.querySelectorAll('[data-github-execution-reject]').forEach((button) => button.addEventListener('click', () => rejectExecution(Number(button.dataset.githubExecutionReject), button)));
 	}
 
@@ -206,6 +227,16 @@ export async function initializeGithubModule(root) {
 			const detail = root.querySelector('[data-github-execution-detail]');
 			if (!detail.hidden && detail.dataset.executionId === String(id)) await openExecution(id);
 			document.getElementById('github-executions-tab')?.click();
+		}, root.querySelector('[data-github-connection-status]'));
+	}
+
+	async function revalidatePipeline(id, button) {
+		await run(button, async () => {
+			const result = await postJson(endpointUrl(`executions/${id}/pipeline/revalidate`));
+			await load();
+			const detail = root.querySelector('[data-github-execution-detail]');
+			if (!detail.hidden && detail.dataset.executionId === String(id)) await openExecution(id);
+			setStatus(root.querySelector('[data-github-connection-status]'), result.message, 'success');
 		}, root.querySelector('[data-github-connection-status]'));
 	}
 

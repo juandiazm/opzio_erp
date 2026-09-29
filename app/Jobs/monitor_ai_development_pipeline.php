@@ -52,6 +52,12 @@ class monitor_ai_development_pipeline implements ShouldQueue
             if (blank($workflowRunId)) {
                 $run = $workflows->latestForBranch($execution->project, $execution->environmentBranch($this->environment));
                 if (! $run || blank($run['id'])) {
+                    if ($this->manualRetry) {
+                        $reason = 'No se encontro un workflow reciente en GitHub Actions. Cuando relances el despliegue, solicita otra revalidacion.';
+                        $this->waitForManualRetry($execution, [], $reason, $states);
+
+                        return;
+                    }
                     $this->reschedule();
                     return;
                 }

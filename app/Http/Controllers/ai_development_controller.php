@@ -349,14 +349,14 @@ class ai_development_controller extends Controller
         $executionAttention = DB::table('ai_development_executions')
             ->join('jira_automation_projects', 'jira_automation_projects.id', '=', 'ai_development_executions.jira_automation_project_id')
             ->join('jira_projects', 'jira_projects.id', '=', 'jira_automation_projects.jira_project_id')
-            ->whereIn('ai_development_executions.status', ['blocked', 'waiting_quality_review'])
-            ->selectRaw("CASE WHEN ai_development_executions.status = 'blocked' THEN 'blocked' ELSE 'quality' END as attention_type, ai_development_executions.id, ai_development_executions.jira_key, jira_projects.project_key as project, ai_development_executions.blocked_reason as detail, ai_development_executions.updated_at as occurred_at");
+            ->whereIn('ai_development_executions.status', ['blocked', 'waiting_quality_review', 'waiting_manual_qa_pipeline', 'waiting_manual_main_pipeline'])
+            ->selectRaw("CASE WHEN ai_development_executions.status = 'blocked' THEN 'blocked' WHEN ai_development_executions.status IN ('waiting_manual_qa_pipeline', 'waiting_manual_main_pipeline') THEN 'pipeline' ELSE 'quality' END as attention_type, ai_development_executions.id, ai_development_executions.jira_key, jira_projects.project_key as project, CASE WHEN ai_development_executions.status IN ('waiting_manual_qa_pipeline', 'waiting_manual_main_pipeline') THEN 'Requiere revalidacion manual de GitHub Actions' ELSE ai_development_executions.blocked_reason END as detail, ai_development_executions.updated_at as occurred_at");
         $attentionQuery = DB::query()->fromSub($approvalAttention->unionAll($executionAttention), 'attention')
             ->when($filters['attention_type'] ?? null, fn ($query, $type) => $query->where('attention_type', $type))
             ->when($filters['attention_search'] ?? null, fn ($query, $search) => $query->where(fn ($query) => $query->where('jira_key', 'like', '%'.$search.'%')->orWhere('project', 'like', '%'.$search.'%')))
             ->orderByDesc('occurred_at');
         $attentionRecords = $attentionQuery->paginate(8, ['*'], 'attention_page', (int) ($filters['attention_page'] ?? 1));
-        $activeStatuses = ['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline'];
+        $activeStatuses = ['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_manual_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline', 'waiting_manual_main_pipeline'];
         $summary = [
             'projects_total' => jira_project::query()->count(),
             'projects_enabled' => jira_automation_project::query()->where('enabled', true)->count(),
