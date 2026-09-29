@@ -30,7 +30,7 @@ return new class extends Migration
             ],
             [
                 'name' => 'Terra',
-                'provider' => 'command',
+                'provider' => 'github_copilot',
                 'model' => 'gpt-5.6-terra',
                 'description' => 'Equilibrio para historias de complejidad media.',
                 'cost_tier' => 'medium',
@@ -39,7 +39,7 @@ return new class extends Migration
             ],
             [
                 'name' => 'Sol',
-                'provider' => 'command',
+                'provider' => 'github_copilot',
                 'model' => 'gpt-5.6-sol',
                 'description' => 'Razonamiento profundo para cambios complejos.',
                 'cost_tier' => 'high',
