@@ -35,10 +35,22 @@ class ai_development_controller extends Controller
                 'approval_issue_type' => ['nullable', 'string', 'max:120'],
                 'approval_search' => ['nullable', 'string', 'max:120'],
                 'approval_page' => ['nullable', 'integer', 'min:1'],
+                'approval_per_page' => ['nullable', 'integer', 'in:10,20,50'],
                 'execution_status' => ['nullable', 'string', 'max:40'],
                 'execution_phase' => ['nullable', 'string', 'max:60'],
                 'execution_search' => ['nullable', 'string', 'max:120'],
                 'execution_page' => ['nullable', 'integer', 'min:1'],
+                'execution_per_page' => ['nullable', 'integer', 'in:10,20,50'],
+                'project_status' => ['nullable', 'string', 'max:20'],
+                'project_search' => ['nullable', 'string', 'max:120'],
+                'project_page' => ['nullable', 'integer', 'min:1'],
+                'project_per_page' => ['nullable', 'integer', 'in:10,20,50'],
+                'activity_event' => ['nullable', 'string', 'max:100'],
+                'activity_search' => ['nullable', 'string', 'max:120'],
+                'activity_page' => ['nullable', 'integer', 'min:1'],
+                'attention_type' => ['nullable', 'string', 'max:30'],
+                'attention_search' => ['nullable', 'string', 'max:120'],
+                'attention_page' => ['nullable', 'integer', 'min:1'],
             ]);
 
             return $this->dataPayload($filters);
@@ -254,8 +266,19 @@ class ai_development_controller extends Controller
     private function dataPayload(array $filters = []): array
     {
         $githubConnection = github_connection::query()->latest('updated_at')->first();
-        $projects = jira_project::query()->with('connection')->orderBy('name')->get();
-        $configurations = jira_automation_project::query()->with(['issueTypes', 'assignees', 'defaultAgent', 'githubConnection', 'supervisors'])->get()->keyBy('jira_project_id');
+        $projectQuery = jira_project::query()->with('connection')
+            ->when($filters['project_status'] ?? null, function ($query, $status): void {
+                if ($status === 'configured') $query->whereIn('id', jira_automation_project::query()->select('jira_project_id'));
+                if ($status === 'unconfigured') $query->whereNotIn('id', jira_automation_project::query()->select('jira_project_id'));
+                if ($status === 'enabled') $query->whereIn('id', jira_automation_project::query()->where('enabled', true)->select('jira_project_id'));
+            })
+            ->when($filters['project_search'] ?? null, function ($query, $search): void {
+                $query->where(fn ($query) => $query->where('project_key', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%'));
+            })
+            ->orderBy('name');
+        $projectsPaginator = $projectQuery->paginate((int) ($filters['project_per_page'] ?? 20), ['*'], 'project_page', (int) ($filters['project_page'] ?? 1));
+        $projects = $projectsPaginator->getCollection();
+        $configurations = jira_automation_project::query()->with(['issueTypes', 'assignees', 'defaultAgent', 'githubConnection', 'supervisors'])->whereIn('jira_project_id', $projects->pluck('id'))->get()->keyBy('jira_project_id');
         $remoteIssueTypes = $this->jiraIssueTypeCatalog($projects);
         $projectPayload = $projects->map(function (jira_project $project) use ($configurations, $remoteIssueTypes): array {
             $configuration = $configurations->get($project->id);
@@ -298,7 +321,7 @@ class ai_development_controller extends Controller
                 });
             })
             ->latest('updated_at');
-        $executionRecords = $executionQuery->paginate(20, ['*'], 'execution_page', (int) ($filters['execution_page'] ?? 1));
+        $executionRecords = $executionQuery->paginate((int) ($filters['execution_per_page'] ?? 20), ['*'], 'execution_page', (int) ($filters['execution_page'] ?? 1));
         $approvalQuery = ai_development_approval::query()
             ->with(['issue.project', 'project.jiraProject', 'selectedAgent', 'decider'])
             ->when($filters['approval_status'] ?? null, fn ($query, $status) => $query->where('status', $status))
@@ -310,11 +333,33 @@ class ai_development_controller extends Controller
                 });
             })
             ->latest('updated_at');
-        $approvalRecords = $approvalQuery->paginate(20, ['*'], 'approval_page', (int) ($filters['approval_page'] ?? 1));
+        $approvalRecords = $approvalQuery->paginate((int) ($filters['approval_per_page'] ?? 20), ['*'], 'approval_page', (int) ($filters['approval_page'] ?? 1));
+        $activityQuery = ai_development_event::query()
+            ->with('execution')
+            ->when($filters['activity_event'] ?? null, fn ($query, $event) => $query->where('event', $event))
+            ->when($filters['activity_search'] ?? null, fn ($query, $search) => $query->whereHas('execution', fn ($execution) => $execution->where('jira_key', 'like', '%'.$search.'%')))
+            ->latest('created_at');
+        $activityRecords = $activityQuery->paginate(12, ['*'], 'activity_page', (int) ($filters['activity_page'] ?? 1));
+        $approvalAttention = DB::table('ai_development_approvals')
+            ->join('jira_issues', 'jira_issues.id', '=', 'ai_development_approvals.jira_issue_id')
+            ->join('jira_automation_projects', 'jira_automation_projects.id', '=', 'ai_development_approvals.jira_automation_project_id')
+            ->join('jira_projects', 'jira_projects.id', '=', 'jira_automation_projects.jira_project_id')
+            ->where('ai_development_approvals.status', 'pending')
+            ->selectRaw("'approval' as attention_type, ai_development_approvals.id, jira_issues.issue_key as jira_key, jira_projects.project_key as project, 'Requiere decision humana' as detail, ai_development_approvals.updated_at as occurred_at");
+        $executionAttention = DB::table('ai_development_executions')
+            ->join('jira_automation_projects', 'jira_automation_projects.id', '=', 'ai_development_executions.jira_automation_project_id')
+            ->join('jira_projects', 'jira_projects.id', '=', 'jira_automation_projects.jira_project_id')
+            ->whereIn('ai_development_executions.status', ['blocked', 'waiting_quality_review'])
+            ->selectRaw("CASE WHEN ai_development_executions.status = 'blocked' THEN 'blocked' ELSE 'quality' END as attention_type, ai_development_executions.id, ai_development_executions.jira_key, jira_projects.project_key as project, ai_development_executions.blocked_reason as detail, ai_development_executions.updated_at as occurred_at");
+        $attentionQuery = DB::query()->fromSub($approvalAttention->unionAll($executionAttention), 'attention')
+            ->when($filters['attention_type'] ?? null, fn ($query, $type) => $query->where('attention_type', $type))
+            ->when($filters['attention_search'] ?? null, fn ($query, $search) => $query->where(fn ($query) => $query->where('jira_key', 'like', '%'.$search.'%')->orWhere('project', 'like', '%'.$search.'%')))
+            ->orderByDesc('occurred_at');
+        $attentionRecords = $attentionQuery->paginate(8, ['*'], 'attention_page', (int) ($filters['attention_page'] ?? 1));
         $activeStatuses = ['candidate', 'awaiting_approval', 'approved', 'preparing', 'analyzing', 'planning', 'developing', 'testing', 'fixing', 'integrating_qa', 'waiting_qa_pipeline', 'waiting_quality_review', 'quality_feedback', 'integrating_main', 'waiting_main_pipeline'];
         $summary = [
-            'projects_total' => $projects->count(),
-            'projects_enabled' => $configurations->where('enabled', true)->count(),
+            'projects_total' => jira_project::query()->count(),
+            'projects_enabled' => jira_automation_project::query()->where('enabled', true)->count(),
             'approvals_pending' => ai_development_approval::query()->where('status', 'pending')->count(),
             'executions_active' => ai_development_execution::query()->whereIn('status', $activeStatuses)->count(),
             'executions_blocked' => ai_development_execution::query()->where('status', 'blocked')->count(),
@@ -345,6 +390,11 @@ class ai_development_controller extends Controller
                 'execution_provider' => 'GitHub Copilot cloud agent',
             ])->values()->all(),
             'projects' => $projectPayload,
+            'project_pagination' => [
+                'current_page' => $projectsPaginator->currentPage(),
+                'last_page' => $projectsPaginator->lastPage(),
+                'total' => $projectsPaginator->total(),
+            ],
             'supervisors' => jira_automation_supervisor::query()->with('project.jiraProject')->latest('id')->get()->map(fn (jira_automation_supervisor $item): array => [
                 'id' => $item->id,
                 'project_id' => $item->jira_automation_project_id,
@@ -416,12 +466,7 @@ class ai_development_controller extends Controller
                 ->pluck('current_phase')
                 ->values()
                 ->all(),
-            'activity' => ai_development_event::query()
-                ->with('execution')
-                ->latest('created_at')
-                ->limit(50)
-                ->get()
-                ->map(fn (ai_development_event $event): array => [
+            'activity' => $activityRecords->getCollection()->map(fn (ai_development_event $event): array => [
                     'event' => $event->event,
                     'phase' => $event->phase,
                     'jira_key' => $event->execution?->jira_key,
@@ -431,6 +476,24 @@ class ai_development_controller extends Controller
                 ])
                 ->values()
                 ->all(),
+            'activity_pagination' => [
+                'current_page' => $activityRecords->currentPage(),
+                'last_page' => $activityRecords->lastPage(),
+                'total' => $activityRecords->total(),
+            ],
+            'attention' => $attentionRecords->getCollection()->map(fn ($item): array => [
+                'type' => $item->attention_type,
+                'jira_key' => $item->jira_key,
+                'project' => $item->project,
+                'detail' => $item->detail,
+                'occurred_at' => $item->occurred_at,
+            ])->all(),
+            'attention_pagination' => [
+                'current_page' => $attentionRecords->currentPage(),
+                'last_page' => $attentionRecords->lastPage(),
+                'total' => $attentionRecords->total(),
+            ],
+            'activity_events' => ai_development_event::query()->distinct()->orderBy('event')->pluck('event')->values()->all(),
         ];
     }
 

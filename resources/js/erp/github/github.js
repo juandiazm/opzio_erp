@@ -41,7 +41,7 @@ export async function initializeGithubModule(root) {
 	tabs.forEach((tab) => tab.addEventListener('click', () => updateTabUrl(tab.id)));
 	window.addEventListener('popstate', showTabFromUrl);
 	showTabFromUrl();
-	const state = {data: null, selectedProjectId: null, projectSearch: '', approvalFilter: '', approvalType: '', approvalSearch: '', approvalPage: 1, executionFilter: '', executionPhase: '', executionSearch: '', executionPage: 1};
+	const state = {data: null, selectedProjectId: null, projectSearch: '', projectFilter: '', projectPage: 1, activityEvent: '', activitySearch: '', activityPage: 1, attentionType: '', attentionSearch: '', attentionPage: 1, approvalFilter: '', approvalType: '', approvalSearch: '', approvalPage: 1, approvalPerPage: 20, executionFilter: '', executionPhase: '', executionSearch: '', executionPage: 1, executionPerPage: 20};
 	const connectionForm = root.querySelector('[data-github-connection-form]');
 	const projectForm = root.querySelector('[data-github-project-form]');
 	const agentForm = root.querySelector('[data-github-agent-form]');
@@ -81,21 +81,28 @@ export async function initializeGithubModule(root) {
 		[['projects', summary.projects_enabled || 0], ['approvals', summary.approvals_pending || 0], ['active', summary.executions_active || 0], ['blocked', summary.executions_blocked || 0], ['completed', summary.executions_completed || 0]].forEach(([key, value]) => { root.querySelector(`[data-github-metric="${key}"]`).textContent = Number(value).toLocaleString('es-CO'); });
 		const activity = root.querySelector('[data-github-activity]');
 		const events = state.data?.activity || [];
-		activity.innerHTML = events.length ? events.slice(0, 12).map((item) => `<div class="github-activity-item"><span class="github-activity-icon"><i class="fa-light fa-${item.event.includes('failed') || item.event === 'blocked' ? 'triangle-exclamation' : item.event === 'completed' ? 'check' : 'bolt'}"></i></span><div><strong>${escapeHtml(labelEvent(item.event))}</strong><span>${escapeHtml(item.jira_key || 'Sistema')} · ${escapeHtml(labelStatus(item.phase))}</span></div><time>${escapeHtml(dateTime(item.created_at))}</time></div>`).join('') : '<div class="github-empty">Todavia no hay actividad registrada.</div>';
+		const activityFilter = root.querySelector('[data-github-activity-filter]');
+		activityFilter.innerHTML = '<option value="">Todos los eventos</option>' + (state.data?.activity_events || []).map((event) => `<option value="${escapeHtml(event)}">${escapeHtml(labelEvent(event))}</option>`).join('');
+		activityFilter.value = state.activityEvent;
+		activity.innerHTML = events.length ? events.map((item) => `<div class="github-activity-item"><span class="github-activity-icon"><i class="fa-light fa-${item.event.includes('failed') || item.event === 'blocked' ? 'triangle-exclamation' : item.event === 'completed' ? 'check' : 'bolt'}"></i></span><div><strong>${escapeHtml(labelEvent(item.event))}</strong><span>${escapeHtml(item.jira_key || 'Sistema')} · ${escapeHtml(labelStatus(item.phase))}</span></div><time>${escapeHtml(dateTime(item.created_at))}</time></div>`).join('') : '<div class="github-empty">Todavia no hay actividad registrada.</div>';
+		renderPagination(root.querySelector('[data-github-activity-pagination]'), state.data?.activity_pagination || {}, (page) => { state.activityPage = page; load(); });
 		const attention = root.querySelector('[data-github-attention]');
-		const approvals = (state.data?.approvals || []).filter((item) => item.status === 'pending');
-		const blocked = (state.data?.executions || []).filter((item) => item.status === 'blocked');
-		const waiting = (state.data?.executions || []).filter((item) => item.status === 'waiting_quality_review');
-		const items = [...approvals.map((item) => ({icon: 'shield-check', title: `Aprobacion pendiente: ${item.jira_key}`, detail: item.project, target: 'github-approvals-tab'})), ...blocked.map((item) => ({icon: 'triangle-exclamation', title: `Ejecucion bloqueada: ${item.jira_key}`, detail: item.blocked_reason || 'Requiere intervencion', target: 'github-executions-tab'})), ...waiting.map((item) => ({icon: 'user-check', title: `Esperando QA: ${item.jira_key}`, detail: item.project, target: 'github-executions-tab'}))];
-		attention.innerHTML = items.length ? items.slice(0, 8).map((item) => `<button type="button" class="github-attention-item" data-github-open-tab="${item.target}"><i class="fa-light fa-${item.icon}"></i><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail || '')}</small></span><i class="fa-light fa-chevron-right"></i></button>`).join('') : '<div class="github-empty">No hay elementos que requieran atencion.</div>';
+		const items = state.data?.attention || [];
+		attention.innerHTML = items.length ? items.map((item) => {
+			const target = item.type === 'approval' ? 'github-approvals-tab' : 'github-executions-tab';
+			const icon = item.type === 'approval' ? 'shield-check' : item.type === 'blocked' ? 'triangle-exclamation' : 'user-check';
+			return `<button type="button" class="github-attention-item" data-github-open-tab="${target}"><i class="fa-light fa-${icon}"></i><span><strong>${escapeHtml(item.jira_key || 'Sin HU')}</strong><small>${escapeHtml(item.project || '')} · ${escapeHtml(item.detail || '')}</small></span><i class="fa-light fa-chevron-right"></i></button>`;
+		}).join('') : '<div class="github-empty">No hay elementos que requieran atencion.</div>';
+		renderPagination(root.querySelector('[data-github-attention-pagination]'), state.data?.attention_pagination || {}, (page) => { state.attentionPage = page; load(); });
 	}
 
 	function renderProjects() {
-		const projects = (state.data?.projects || []).filter((item) => `${item.project_key} ${item.name}`.toLowerCase().includes(state.projectSearch.toLowerCase()));
+		const projects = state.data?.projects || [];
 		const list = root.querySelector('[data-github-project-list]');
-		root.querySelector('[data-github-project-count]').textContent = `${projects.length} proyectos`;
+		root.querySelector('[data-github-project-count]').textContent = `${state.data?.project_pagination?.total || 0} proyectos`;
 		list.innerHTML = projects.length ? projects.map((item) => `<button type="button" class="github-project-list-item ${String(item.id) === String(state.selectedProjectId) ? 'is-selected' : ''}" data-github-project-id="${item.id}"><span class="github-project-avatar"><i class="fa-brands fa-github"></i></span><span><strong>${escapeHtml(item.project_key)} · ${escapeHtml(item.name)}</strong><small>${item.configuration?.enabled ? 'Automatizacion activa' : 'Sin activar'} · ${escapeHtml(item.configuration?.github_repository || 'Sin repositorio')}</small></span><i class="fa-light fa-chevron-right"></i></button>`).join('') : '<div class="github-empty">No hay proyectos que coincidan.</div>';
 		list.querySelectorAll('[data-github-project-id]').forEach((button) => button.addEventListener('click', () => { state.selectedProjectId = Number(button.dataset.githubProjectId); renderProjects(); renderProjectEditor(); }));
+		renderPagination(root.querySelector('[data-github-project-pagination]'), state.data?.project_pagination || {}, (page) => { state.projectPage = page; load(); });
 	}
 
 	function renderProjectEditor() {
@@ -247,14 +254,19 @@ export async function initializeGithubModule(root) {
 
 	async function load() {
 		const params = new URLSearchParams({
+			project_status: state.projectFilter, project_search: state.projectSearch, project_page: state.projectPage, project_per_page: 20,
+			activity_event: state.activityEvent, activity_search: state.activitySearch, activity_page: state.activityPage,
+			attention_type: state.attentionType, attention_search: state.attentionSearch, attention_page: state.attentionPage,
 			approval_status: state.approvalFilter,
 			approval_issue_type: state.approvalType,
 			approval_search: state.approvalSearch,
 			approval_page: state.approvalPage,
+			approval_per_page: state.approvalPerPage,
 			execution_status: state.executionFilter,
 			execution_phase: state.executionPhase,
 			execution_search: state.executionSearch,
 			execution_page: state.executionPage,
+			execution_per_page: state.executionPerPage,
 		});
 		root.querySelector('[data-github-approvals]').innerHTML = '<tr><td colspan="9" class="github-empty">Cargando aprobaciones...</td></tr>';
 		root.querySelector('[data-github-executions]').innerHTML = '<tr><td colspan="10" class="github-empty">Cargando ejecuciones...</td></tr>';
@@ -276,13 +288,20 @@ export async function initializeGithubModule(root) {
 	root.querySelector('[data-github-agent-clear]').addEventListener('click', clearAgentForm);
 	agentSelector.addEventListener('change', () => fillAgentForm((state.data?.agents || []).find((agent) => String(agent.id) === String(agentSelector.value))));
 	supervisorForm.addEventListener('submit', (event) => { event.preventDefault(); run(supervisorForm.querySelector('button[type="submit"]'), async () => { await postJson(endpointUrl('supervisors/save'), formObject(supervisorForm)); supervisorForm.reset(); supervisorForm.querySelector('[name="enabled"]').checked = true; setStatus(root.querySelector('[data-github-supervisor-status]'), 'Supervisor guardado correctamente.', 'success'); await load(); }, root.querySelector('[data-github-supervisor-status]')); });
-	root.querySelector('[data-github-project-search]').addEventListener('input', (event) => { state.projectSearch = event.target.value; renderProjects(); });
+	root.querySelector('[data-github-project-search]').addEventListener('input', (event) => { state.projectSearch = event.target.value; state.projectPage = 1; load(); });
+	root.querySelector('[data-github-project-filter]').addEventListener('change', (event) => { state.projectFilter = event.target.value; state.projectPage = 1; load(); });
+	root.querySelector('[data-github-activity-filter]').addEventListener('change', (event) => { state.activityEvent = event.target.value; state.activityPage = 1; load(); });
+	root.querySelector('[data-github-activity-search]').addEventListener('input', (event) => { state.activitySearch = event.target.value; state.activityPage = 1; load(); });
+	root.querySelector('[data-github-attention-filter]').addEventListener('change', (event) => { state.attentionType = event.target.value; state.attentionPage = 1; load(); });
+	root.querySelector('[data-github-attention-search]').addEventListener('input', (event) => { state.attentionSearch = event.target.value; state.attentionPage = 1; load(); });
 	root.querySelector('[data-github-approval-filter]').addEventListener('change', (event) => { state.approvalFilter = event.target.value; state.approvalPage = 1; load(); });
 	root.querySelector('[data-github-approval-type]').addEventListener('change', (event) => { state.approvalType = event.target.value; state.approvalPage = 1; load(); });
 	root.querySelector('[data-github-approval-search]').addEventListener('input', (event) => { state.approvalSearch = event.target.value; state.approvalPage = 1; load(); });
+	root.querySelector('[data-github-approval-size]').addEventListener('change', (event) => { state.approvalPerPage = Number(event.target.value); state.approvalPage = 1; load(); });
 	root.querySelector('[data-github-execution-filter]').addEventListener('change', (event) => { state.executionFilter = event.target.value; state.executionPage = 1; load(); });
 	root.querySelector('[data-github-execution-phase]').addEventListener('change', (event) => { state.executionPhase = event.target.value; state.executionPage = 1; load(); });
 	root.querySelector('[data-github-execution-search]').addEventListener('input', (event) => { state.executionSearch = event.target.value; state.executionPage = 1; load(); });
+	root.querySelector('[data-github-execution-size]').addEventListener('change', (event) => { state.executionPerPage = Number(event.target.value); state.executionPage = 1; load(); });
 	root.querySelectorAll('[data-github-refresh]').forEach((button) => button.addEventListener('click', () => run(button, load, root.querySelector('[data-github-connection-status]'))));
 	root.querySelector('[data-github-execution-detail-restart]').addEventListener('click', (event) => restartExecution(Number(root.querySelector('[data-github-execution-detail]').dataset.executionId), event.currentTarget));
 	root.querySelector('[data-github-execution-detail-reject]').addEventListener('click', (event) => rejectExecution(Number(event.currentTarget.dataset.executionId), event.currentTarget));
