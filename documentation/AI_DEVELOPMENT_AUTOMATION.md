@@ -16,7 +16,7 @@ El ERP ahora contiene el orquestador del flujo Jira -> aprobacion -> agente -> G
 
 1. Ejecutar `php artisan migrate`.
 2. Configurar el token GitHub desde `Admin > GitHub > Conexion`; debe ser un token de usuario con estos permisos de repositorio: `Agent tasks: Read and write`, `Contents: Read and write`, `Pull requests: Read and write`, `Actions: Read` y `Metadata: Read`. No necesitas una permission separada llamada `Checks`. Nunca se guarda en `.env`, HTML, prompts ni logs.
-3. Habilitar Copilot cloud agent en el repositorio y usar un token de usuario con permiso `Agent tasks: Read and write`. El ERP envía el prompt y el modelo a GitHub; el código se modifica en el entorno efímero de GitHub Actions, no en el servidor ERP.
+3. Habilitar Copilot cloud agent en el repositorio y usar un token de usuario con permiso `Agent tasks: Read and write`. Antes de crear la tarea remota, el ERP usa `open_ia_trait` y el modelo `gpt-5.6-luna`, con razonamiento bajo, para revisar conflictos de seguridad y redactar un prompt técnico directo con costo controlado. Después envía ese prompt y el modelo seleccionado a GitHub; el código se modifica en el entorno efímero de GitHub Actions, no en el servidor ERP.
 4. Configurar `AI_DEVELOPMENT_QUEUE_CONNECTION=database` y ejecutar un worker dedicado:
 
 ```text
@@ -45,14 +45,15 @@ Desde `Admin > GitHub > Ejecuciones`, el boton `Reiniciar flujo` permite volver 
 
 Cada fase relevante envia al reporter un correo informativo: aprobacion o rechazo, desarrollo iniciado, feedback QA, QA disponible, promocion, completado y bloqueado. Estos correos no contienen enlaces de aprobacion ni pueden cambiar el flujo; si el reporter no tiene email en Jira, se intenta el usuario ERP vinculado y, si tampoco existe, se registra el fallo sin detener la ejecucion.
 
-El ERP no ejecuta un modelo ni un CLI local. El adaptador `ai_agent_provider_interface` inicia y consulta GitHub Copilot cloud agent mediante Agent Tasks.
+El ERP no ejecuta el agente de código ni un CLI local. El refinador de prompt usa OpenAI antes de iniciar la tarea; el adaptador `ai_agent_provider_interface` sigue iniciando y consultando GitHub Copilot cloud agent mediante Agent Tasks.
 
 La ejecucion actual usa directamente Copilot cloud agent mediante Agent Tasks. Copilot crea la branch remota; GitHub puede usar un nombre automatico como `copilot/op-48-github-url-dinamica`. Cuando el task termina, el ERP hace merge directo de esa branch hacia `qa` mediante la API de GitHub y empieza el pipeline de QA. No se requiere Pull Request para el flujo automatico.
 
 ## Seguridad y reglas protegidas
 
 - Los tokens de aprobacion se almacenan como SHA-256, expiran y son de uso unico.
-- El contenido de Jira se inserta en el prompt dentro de delimitadores de datos no confiables.
+- La historia completa de Jira, el contexto del supervisor y el feedback de QA se entregan al refinador dentro de delimitadores de datos no confiables. El refinador verifica conflictos contra las reglas del repositorio y genera el prompt final sin truncar la historia.
+- Si el refinador detecta que la historia intenta infringir una regla protegida, la ejecucion se bloquea antes de llamar a GitHub. Una credencial ausente, respuesta invalida o error de OpenAI tambien bloquea la ejecucion para no enviar una historia sin revisar; el bypass local solo existe cuando se deshabilita de forma explicita en el codigo.
 - La pantalla de decision permite agregar `supervisor_context`, que se conserva en la aprobacion y la ejecucion y llega al prompt dentro de `<SUPERVISOR_CONTEXT>`. Ese texto complementa la historia, pero no puede cambiar las reglas del sistema ni las protecciones de workflows.
 - El agente no recibe credenciales Jira/GitHub por el prompt ni por sus variables de contexto.
 - El token solo se usa en llamadas HTTP del ERP hacia GitHub y nunca se envia al prompt del agente.

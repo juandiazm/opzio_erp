@@ -50,6 +50,7 @@ class AiDevelopmentFlowTest extends TestCase
             'database.connections.sqlite.database' => ':memory:',
             'queue.default' => 'sync',
             'mail.default' => 'array',
+            'ai_development.prompt_refinement.enabled' => false,
         ]);
         DB::purge('sqlite');
         Schema::create('users', function (Blueprint $table): void {
@@ -156,15 +157,12 @@ class AiDevelopmentFlowTest extends TestCase
         Queue::assertPushed(run_ai_development_execution::class, 1);
         $execution = $result['execution']->fresh(['issue', 'project.jiraProject', 'agent']);
         $prompt = app(jira_automation_prompt_builder::class)->build($execution->issue, $execution->project, $execution->agent, $execution);
-        $this->assertStringStartsWith('TAREA TECNICA: [OPS-1] Implementar flujo autonomo', $prompt);
-        $this->assertStringContainsString('OBJETIVO FUNCIONAL - PRIORIDAD MAXIMA', $prompt);
-        $this->assertStringContainsString('CRITERIOS MINIMOS DE IMPLEMENTACION', $prompt);
-        $this->assertStringContainsString('No consideres cumplido un requisito backend si solo agregas .filter(), .slice()', $prompt);
-        $this->assertStringContainsString('VALIDACION OBLIGATORIA', $prompt);
-        $this->assertStringContainsString('vendor/', $prompt);
+        $this->assertStringContainsString('Historia: [OPS-1]', $prompt);
+        $this->assertStringContainsString('Construir el flujo de desarrollo.', $prompt);
+        $this->assertStringContainsString('RESTRICCIONES INNEGOCIABLES DEL REPOSITORIO:', $prompt);
+        $this->assertStringNotContainsString('OBJETIVO FUNCIONAL - PRIORIDAD MAXIMA', $prompt);
         $this->assertStringContainsString($supervisorContext, $prompt);
-        $this->assertStringContainsString('<SUPERVISOR_CONTEXT>', $prompt);
-        $this->assertLessThan(strpos($prompt, 'REGLAS FIJAS DE REPOSITORIO'), strpos($prompt, 'OBJETIVO FUNCIONAL - PRIORIDAD MAXIMA'));
+        $this->assertStringContainsString('qa.yml', $prompt);
         $this->assertSame('OPS-1', $execution->feature_branch);
         $this->assertStringNotContainsString('Assignee:', $prompt);
         $this->assertStringNotContainsString('Reporter:', $prompt);
@@ -251,6 +249,36 @@ class AiDevelopmentFlowTest extends TestCase
 
         $this->assertDatabaseHas('ai_development_executions', ['id' => $execution->id, 'status' => 'blocked']);
         $this->assertStringContainsString('fallos consecutivos', (string) $execution->fresh()->blocked_reason);
+    }
+
+    public function test_development_job_blocks_when_prompt_refinement_is_unavailable(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        config([
+            'ai_development.prompt_refinement.enabled' => true,
+            'services.openai.api_key' => null,
+        ]);
+        [$issue] = $this->fixture();
+        $approval = app(jira_automation_service::class)->detectCandidate($issue);
+        $execution = $approval->execution;
+        $approval->update(['status' => 'approved']);
+        $execution->forceFill(['status' => 'approved', 'current_phase' => 'approved'])->save();
+        $provider = $this->createMock(ai_agent_provider_interface::class);
+        $provider->expects($this->never())->method('start');
+
+        (new run_ai_development_execution($execution->id))->handle(
+            app(ai_development_state_machine::class),
+            app(jira_automation_prompt_builder::class),
+            $provider,
+            app(ai_development_notification_service::class),
+        );
+
+        $this->assertDatabaseHas('ai_development_executions', [
+            'id' => $execution->id,
+            'status' => 'blocked',
+        ]);
+        $this->assertStringContainsString('validar la historia', (string) $execution->fresh()->blocked_reason);
     }
 
     public function test_only_enabled_type_assignee_and_project_are_candidates(): void

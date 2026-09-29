@@ -8,6 +8,8 @@ use App\Services\AiDevelopment\ai_development_notification_service;
 use App\Services\AiDevelopment\ai_development_state_machine;
 use App\Services\AiDevelopment\ai_development_states;
 use App\Services\AiDevelopment\jira_automation_prompt_builder;
+use App\Services\AiDevelopment\jira_automation_prompt_rejected;
+use App\Services\AiDevelopment\jira_automation_prompt_unavailable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -116,6 +118,8 @@ class run_ai_development_execution implements ShouldQueue
                 'message' => mb_substr((string) ($reporterNotification['message'] ?? ''), 0, 500),
             ]);
             monitor_ai_development_agent::dispatch($execution->id)->delay(now()->addSeconds(5));
+        } catch (jira_automation_prompt_rejected|jira_automation_prompt_unavailable $exception) {
+            $this->blockForLoopLimit($execution, $exception->getMessage(), $states, $notifications);
         } catch (Throwable $exception) {
             $this->handleFailure($execution, $exception, $states, $notifications);
         }
