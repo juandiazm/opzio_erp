@@ -45,7 +45,7 @@ return [
             'ai' => [
                 'enabled' => (bool) env('WHATSAPP_AI_ENABLED', true),
                 'admin_numbers' => array_values(array_filter(array_map('trim', explode(',', (string) env('WHATSAPP_AI_ADMIN_NUMBERS', ''))))),
-                'model' => env('WHATSAPP_AI_MODEL', env('OPENAI_MODEL_CHAT', 'gpt-6-terra')),
+                'model' => env('WHATSAPP_AI_MODEL', env('OPENAI_MODEL_CHAT', 'gpt-6-luna')),
                 'planner_max_output_tokens' => (int) env('WHATSAPP_AI_PLANNER_MAX_OUTPUT_TOKENS', 700),
                 'answer_max_output_tokens' => (int) env('WHATSAPP_AI_ANSWER_MAX_OUTPUT_TOKENS', 900),
                 'catalog_limit' => (int) env('WHATSAPP_AI_CATALOG_LIMIT', 100),
@@ -70,8 +70,8 @@ return [
         'retries' => (int) env('OPENAI_RETRIES', 2),
         'models' => [
             'fast' => env('OPENAI_MODEL_FAST', 'gpt-6-luna'),
-            'chat' => env('OPENAI_MODEL_CHAT', 'gpt-6-terra'),
-            'content' => env('OPENAI_MODEL_CONTENT', 'gpt-6-terra'),
+            'chat' => env('OPENAI_MODEL_CHAT', 'gpt-6-luna'),
+            'content' => env('OPENAI_MODEL_CONTENT', 'gpt-6-luna'),
             'reasoning' => env('OPENAI_MODEL_REASONING', 'gpt-6-sol'),
             'image' => env('OPENAI_IMAGE_MODEL', 'gpt-image-2'),
         ],
