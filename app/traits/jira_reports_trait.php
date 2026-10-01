@@ -349,13 +349,34 @@ trait jira_reports_trait
             ]);
             $this->Jira_EnsureReportPdf($report->fresh(['creator', 'project', 'epic']));
         } catch (Throwable $exception) {
-            $message = Str::limit(trim($exception->getMessage()), 500, '');
-            logger()->error('No fue posible generar un reporte Jira.', ['jira_report_id' => $report->id, 'message' => $message]);
-            $report->update(['status' => 'failed', 'error_message' => $message]);
-            throw ValidationException::withMessages(['report' => 'No fue posible generar el reporte Jira: '.Str::limit($message, 300, '')]);
+            $diagnostic = $this->Jira_ReportGenerationDiagnostic($exception);
+            logger()->error('No fue posible generar un reporte Jira.', [
+                'jira_report_id' => $report->id,
+                'message' => $diagnostic,
+                'exception' => $exception,
+            ]);
+            $report->update(['status' => 'failed', 'error_message' => $diagnostic]);
+            throw ValidationException::withMessages(['report' => 'No fue posible generar el reporte Jira: '.$diagnostic]);
         }
 
         return $report->fresh(['creator', 'project', 'epic', 'recurrence']);
+    }
+
+    private function Jira_ReportGenerationDiagnostic(Throwable $exception): string
+    {
+        $message = trim($exception->getMessage());
+        if (preg_match('/(?:^|\R)Error Output:\R=+\R(.*)$/s', $message, $outputMatch) !== 1) {
+            return Str::limit($message, 500, '...');
+        }
+
+        $output = trim($outputMatch[1]);
+        $lines = preg_split('/\R/', $output) ?: [];
+        $diagnostic = collect($lines)->first(fn (string $line): bool => preg_match(
+            '/^(?:Error|TypeError|ReferenceError|RangeError|SyntaxError|TimeoutError|ProtocolError):\s*/',
+            trim($line),
+        ) === 1);
+
+        return Str::limit($diagnostic ?: implode("\n", array_slice($lines, -6)), 500, '...');
     }
 
     private function Jira_ReportCriteria(jira_report $report, array $overrides = []): array

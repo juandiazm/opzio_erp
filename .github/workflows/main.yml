@@ -149,9 +149,10 @@ jobs:
         trap cleanup EXIT
         sudo chown www-data:www-data /tmp/opzio-erp-npmrc
         cd /var/www/html/opzio_erp
+        sudo tar --no-same-owner --no-same-permissions --no-overwrite-dir -xzf build.tar.gz package.json package-lock.json scripts/install_production_node_dependencies.sh
+        sudo -u www-data -H env HOME=/var/www NPM_CONFIG_USERCONFIG=/tmp/opzio-erp-npmrc bash scripts/install_production_node_dependencies.sh /var/www/html/opzio_erp
         sudo tar --no-same-owner --no-same-permissions --no-overwrite-dir -xzf build.tar.gz
         sudo rm -f bootstrap/cache/*.php
-        sudo -u www-data -H env HOME=/var/www NPM_CONFIG_USERCONFIG=/tmp/opzio-erp-npmrc bash scripts/install_production_node_dependencies.sh /var/www/html/opzio_erp
         curl -sS https://getcomposer.org/installer | php8.2
         sudo -u www-data -H env HOME=/var/www php8.2 composer.phar install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
         sudo -u www-data -H env HOME=/var/www php8.2 artisan optimize:clear

@@ -637,6 +637,24 @@ class JiraModuleTest extends TestCase
         $this->assertSame(['PO-250'], collect($metricsWithLegacyTypeFlag['issues'])->pluck('key')->all());
     }
 
+    public function test_report_generation_diagnostic_includes_the_node_root_error(): void
+    {
+        $controllerClass = \App\Http\Controllers\jira_controller::class;
+        $controller = (new \ReflectionClass($controllerClass))->newInstanceWithoutConstructor();
+        $diagnosticMethod = new \ReflectionMethod($controllerClass, 'Jira_ReportGenerationDiagnostic');
+        $exception = new \RuntimeException(implode("\n", [
+            'The command "node browser.cjs" failed.',
+            'Exit Code: 1',
+            'Error Output:',
+            '================',
+            'node:internal/modules/cjs/loader:1430',
+            'Error: Cannot find module \'puppeteer\'',
+            'Require stack:',
+        ]));
+
+        $this->assertSame("Error: Cannot find module 'puppeteer'", $diagnosticMethod->invoke($controller, $exception));
+    }
+
     public function test_report_criteria_normalizes_dashboard_filters_and_legacy_values(): void
     {
         $service = app(jira_report_service::class);
