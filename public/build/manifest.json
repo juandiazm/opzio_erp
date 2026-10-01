@@ -21,8 +21,8 @@
     "file": "assets/cropper-Dqszr6bn.css",
     "src": "_cropper-Dqszr6bn.css"
   },
-  "_dashboard-CnlSofeF.js": {
-    "file": "assets/dashboard-CnlSofeF.js",
+  "_dashboard-BXRg_WVH.js": {
+    "file": "assets/dashboard-BXRg_WVH.js",
     "name": "dashboard",
     "imports": [
       "_api-80n-XQe1.js"
@@ -718,7 +718,7 @@
     "isEntry": true
   },
   "resources/js/erp/clients/clients.js": {
-    "file": "assets/clients-Cq3d4u5K.js",
+    "file": "assets/clients-CsCrsELk.js",
     "name": "clients",
     "src": "resources/js/erp/clients/clients.js",
     "isEntry": true,
@@ -726,7 +726,7 @@
       "_record-url-CkW4yFAP.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
-      "_dashboard-CnlSofeF.js",
+      "_dashboard-BXRg_WVH.js",
       "_api-80n-XQe1.js"
     ]
   },
@@ -797,12 +797,12 @@
     "isEntry": true
   },
   "resources/js/erp/contacts/contacts.js": {
-    "file": "assets/contacts-BA-_GHdj.js",
+    "file": "assets/contacts-CO6nE19G.js",
     "name": "contacts",
     "src": "resources/js/erp/contacts/contacts.js",
     "isEntry": true,
     "imports": [
-      "_dashboard-CnlSofeF.js",
+      "_dashboard-BXRg_WVH.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
       "_list-ClzTmGL1.js",
@@ -1001,7 +1001,7 @@
     "isEntry": true
   },
   "resources/js/erp/github/github.js": {
-    "file": "assets/github-u-HCIKBq.js",
+    "file": "assets/github-Dcwpj5fr.js",
     "name": "github",
     "src": "resources/js/erp/github/github.js",
     "isEntry": true,
@@ -1173,13 +1173,13 @@
     "isEntry": true
   },
   "resources/js/erp/jira/jira.js": {
-    "file": "assets/jira-FR2Xzl4T.js",
+    "file": "assets/jira-DAwfv3w7.js",
     "name": "jira",
     "src": "resources/js/erp/jira/jira.js",
     "isEntry": true,
     "imports": [
       "_api-80n-XQe1.js",
-      "_dashboard-CnlSofeF.js",
+      "_dashboard-BXRg_WVH.js",
       "resources/js/erp/incomes/order.js",
       "_pdf.worker.min-B-tS55GQ.js"
     ]
@@ -1258,7 +1258,7 @@
     "isEntry": true
   },
   "resources/js/erp/licenses/licenses.js": {
-    "file": "assets/licenses-CQNU5Blp.js",
+    "file": "assets/licenses-BstEwV6u.js",
     "name": "licenses",
     "src": "resources/js/erp/licenses/licenses.js",
     "isEntry": true,
@@ -1267,7 +1267,7 @@
       "_list-ClzTmGL1.js",
       "_shared-7Ma7dIoB.js",
       "_contact-tags-CcT42DoM.js",
-      "_dashboard-CnlSofeF.js",
+      "_dashboard-BXRg_WVH.js",
       "_api-80n-XQe1.js"
     ]
   },
@@ -1892,7 +1892,7 @@
     "isEntry": true
   },
   "resources/sass/erp/jira/jira.scss": {
-    "file": "assets/jira-34x3FQi6.css",
+    "file": "assets/jira-DBxKOl1B.css",
     "src": "resources/sass/erp/jira/jira.scss",
     "isEntry": true
   },

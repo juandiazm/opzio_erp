@@ -440,8 +440,9 @@ TEXT;
 
     public function validateCriteria(array $data): array
     {
-        $from = Carbon::parse($data['from_date'])->startOfDay();
-        $to = Carbon::parse($data['to_date'])->startOfDay();
+        $filters = $this->normalizeMetricFilters($data);
+        $from = Carbon::parse($filters['from'])->startOfDay();
+        $to = Carbon::parse($filters['to'])->startOfDay();
         if ($from->greaterThan($to)) {
             throw ValidationException::withMessages(['to_date' => 'La fecha final debe ser igual o posterior a la inicial.']);
         }
@@ -453,22 +454,17 @@ TEXT;
             throw ValidationException::withMessages(['data_sources' => 'Selecciona al menos una fuente de datos.']);
         }
 
-        $projectIds = $this->normalizeIds($data['project_ids'] ?? ($data['jira_project_ids'] ?? ($data['jira_project_id'] ?? null)));
-        $epicIds = $this->normalizeIds($data['epic_ids'] ?? ($data['jira_epic_issue_ids'] ?? ($data['jira_epic_issue_id'] ?? null)));
-        $userIds = $this->normalizeIds($data['user_ids'] ?? ($data['jira_user_ids'] ?? null));
-        $statuses = $this->normalizeStatuses($data['statuses'] ?? ($data['jira_statuses'] ?? null));
-
         return [
             'title' => trim((string) ($data['title'] ?? '')) ?: 'Informe de resultados '.$from->format('d/m/Y').' - '.$to->format('d/m/Y'),
             'intention' => (string) $data['intention'],
-            'from_date' => $from->toDateString(),
-            'to_date' => $to->toDateString(),
-            'project_ids' => $projectIds,
-            'epic_ids' => $epicIds,
-            'user_ids' => $userIds,
-            'statuses' => $statuses,
-            'jira_project_id' => $projectIds[0] ?? null,
-            'jira_epic_issue_id' => $epicIds[0] ?? null,
+            'from_date' => $filters['from'],
+            'to_date' => $filters['to'],
+            'project_ids' => $filters['project_ids'],
+            'epic_ids' => $filters['epic_ids'],
+            'user_ids' => $filters['user_ids'],
+            'statuses' => $filters['statuses'],
+            'jira_project_id' => $filters['project_ids'][0] ?? null,
+            'jira_epic_issue_id' => $filters['epic_ids'][0] ?? null,
             'data_sources' => $sources,
             'context_prompt' => filled($data['context_prompt'] ?? null) ? trim((string) $data['context_prompt']) : null,
         ];
@@ -476,12 +472,25 @@ TEXT;
 
     private function normalizeFilterCriteria(array $criteria): array
     {
-        $criteria['project_ids'] = $this->normalizeIds($criteria['project_ids'] ?? ($criteria['jira_project_ids'] ?? ($criteria['jira_project_id'] ?? null)));
-        $criteria['epic_ids'] = $this->normalizeIds($criteria['epic_ids'] ?? ($criteria['jira_epic_issue_ids'] ?? ($criteria['jira_epic_issue_id'] ?? null)));
-        $criteria['user_ids'] = $this->normalizeIds($criteria['user_ids'] ?? ($criteria['jira_user_ids'] ?? null));
-        $criteria['statuses'] = $this->normalizeStatuses($criteria['statuses'] ?? ($criteria['jira_statuses'] ?? null));
+        $filters = $this->normalizeMetricFilters($criteria);
+        $criteria['project_ids'] = $filters['project_ids'];
+        $criteria['epic_ids'] = $filters['epic_ids'];
+        $criteria['user_ids'] = $filters['user_ids'];
+        $criteria['statuses'] = $filters['statuses'];
 
         return $criteria;
+    }
+
+    private function normalizeMetricFilters(array $criteria): array
+    {
+        return $this->metrics->normalizeFilters([
+            'from' => $criteria['from_date'] ?? ($criteria['from'] ?? null),
+            'to' => $criteria['to_date'] ?? ($criteria['to'] ?? null),
+            'project_ids' => $criteria['project_ids'] ?? ($criteria['jira_project_ids'] ?? ($criteria['jira_project_id'] ?? null)),
+            'epic_ids' => $criteria['epic_ids'] ?? ($criteria['jira_epic_issue_ids'] ?? ($criteria['jira_epic_issue_id'] ?? null)),
+            'user_ids' => $criteria['user_ids'] ?? ($criteria['jira_user_ids'] ?? null),
+            'statuses' => $criteria['statuses'] ?? ($criteria['jira_statuses'] ?? null),
+        ]);
     }
 
     private function filterLabels(array $criteria): array
@@ -526,26 +535,6 @@ TEXT;
                 ->all(),
             'statuses' => $criteria['statuses'],
         ];
-    }
-
-    private function normalizeIds(mixed $value): array
-    {
-        return collect(is_array($value) ? $value : (filled($value) ? [$value] : []))
-            ->filter(fn ($id): bool => is_numeric($id) && (int) $id > 0)
-            ->map(fn ($id): int => (int) $id)
-            ->unique()
-            ->values()
-            ->all();
-    }
-
-    private function normalizeStatuses(mixed $value): array
-    {
-        return collect(is_array($value) ? $value : (filled($value) ? [$value] : []))
-            ->map(fn ($status): string => trim((string) $status))
-            ->filter()
-            ->unique()
-            ->values()
-            ->all();
     }
 
     public function parseResponse(array $response): ?array

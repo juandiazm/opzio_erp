@@ -829,7 +829,8 @@ class JiraModuleTest extends TestCase
             'user_ids' => [$firstUser->id, $secondUser->id],
             'statuses' => ['Done', 'In Progress'],
         ]);
-        $snapshot = app(jira_report_service::class)->snapshot([
+        $reportService = app(jira_report_service::class);
+        $reportCriteria = $reportService->validateCriteria([
             'title' => 'Reporte filtrado',
             'intention' => 'executive_summary',
             'from_date' => '2026-09-01',
@@ -841,13 +842,20 @@ class JiraModuleTest extends TestCase
             'data_sources' => ['story_points', 'worklogs', 'projects', 'epics', 'users', 'statuses', 'erp_relations'],
             'context_prompt' => null,
         ]);
+        $snapshot = $reportService->snapshot($reportCriteria);
 
         $this->assertSame([$firstProject->id, $secondProject->id], $snapshot['filters']['project_ids']);
         $this->assertSame([$firstEpic->id, $secondEpic->id], $snapshot['filters']['epic_ids']);
         $this->assertSame([$firstUser->id, $secondUser->id], $snapshot['filters']['user_ids']);
         $this->assertSame(['Done', 'In Progress'], $snapshot['filters']['statuses']);
         $this->assertSame($dashboard['filters'], $snapshot['filters']);
+        $this->assertSame($dashboard['summary'], $snapshot['summary']);
+        $this->assertSame($dashboard['trace'], $snapshot['trace']);
         $this->assertSame(collect($dashboard['issues'])->pluck('key')->all(), collect($snapshot['issues'])->pluck('key')->all());
+        $this->assertSame($dashboard['projects'], $snapshot['projects']);
+        $this->assertSame($dashboard['users'], $snapshot['users']);
+        $this->assertSame($dashboard['epics'], $snapshot['epics']);
+        $this->assertSame($dashboard['daily'], $snapshot['daily']);
         $this->assertCount(2, $snapshot['issues']);
         $this->assertSame(['CRM - Clientes', 'OPS - Operacion'], collect($snapshot['report']['filters']['projects'])->pluck('label')->all());
         $this->assertSame(['OPS-E1 - Operacion comercial', 'CRM-E1 - Relacion con clientes'], collect($snapshot['report']['filters']['epics'])->pluck('label')->all());

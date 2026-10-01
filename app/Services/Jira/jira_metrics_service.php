@@ -11,21 +11,35 @@ use Illuminate\Support\Collection;
 
 class jira_metrics_service
 {
+    public function normalizeFilters(array $filters = []): array
+    {
+        return [
+            'from' => Carbon::parse($filters['from'] ?? $filters['from_date'] ?? now()->startOfMonth()->toDateString())->toDateString(),
+            'to' => Carbon::parse($filters['to'] ?? $filters['to_date'] ?? now()->toDateString())->toDateString(),
+            'project_ids' => $this->filterIds($filters['project_ids'] ?? $filters['project_id'] ?? null)->all(),
+            'epic_ids' => $this->filterIds($filters['epic_ids'] ?? $filters['epic_id'] ?? null)->all(),
+            'user_ids' => $this->filterIds($filters['user_ids'] ?? $filters['user_id'] ?? null)->all(),
+            'statuses' => collect($filters['statuses'] ?? [])
+                ->filter(fn ($status): bool => filled($status))
+                ->map(fn ($status): string => trim((string) $status))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all(),
+        ];
+    }
+
     public function dashboard(array $filters = []): array
     {
-        $from = Carbon::parse($filters['from'] ?? now()->startOfMonth()->toDateString())->startOfDay();
-        $to = Carbon::parse($filters['to'] ?? now()->toDateString())->endOfDay();
-        $statuses = collect($filters['statuses'] ?? [])
-            ->filter(fn ($status): bool => filled($status))
-            ->map(fn ($status): string => trim((string) $status))
-            ->filter()
-            ->unique()
-            ->values();
-        $projectIds = $this->filterIds($filters['project_ids'] ?? $filters['project_id'] ?? null);
-        $epicIds = $this->filterIds($filters['epic_ids'] ?? $filters['epic_id'] ?? null);
-        $userIds = $this->filterIds($filters['user_ids'] ?? $filters['user_id'] ?? null);
-        $usesExplicitStatusFilter = $statuses->isNotEmpty();
         $completedOnly = (bool) ($filters['completed_only'] ?? false);
+        $filters = $this->normalizeFilters($filters);
+        $from = Carbon::parse($filters['from'])->startOfDay();
+        $to = Carbon::parse($filters['to'])->endOfDay();
+        $statuses = collect($filters['statuses']);
+        $projectIds = collect($filters['project_ids']);
+        $epicIds = collect($filters['epic_ids']);
+        $userIds = collect($filters['user_ids']);
+        $usesExplicitStatusFilter = $statuses->isNotEmpty();
         $usesActivityScope = ! $completedOnly;
         $issueQuery = jira_issue::query()
             ->with(['project', 'assignee.mapping.user', 'assignee.mapping.employee', 'epic', 'parent'])
