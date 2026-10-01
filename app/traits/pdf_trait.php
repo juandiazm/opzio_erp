@@ -30,13 +30,10 @@ trait pdf_trait
             ->protocolTimeout(max(30, $protocolTimeout))
             ->setOption('preferCSSPageSize', true);
 
-        $puppeteerCacheDir = getenv('PUPPETEER_CACHE_DIR') ?: null;
-        if (!$puppeteerCacheDir) {
-            $defaultPuppeteerCacheDir = base_path('.runtime/puppeteer-cache');
-            if (is_dir($defaultPuppeteerCacheDir)) {
-                $puppeteerCacheDir = $defaultPuppeteerCacheDir;
-            }
-        }
+        $defaultPuppeteerCacheDir = base_path('.runtime/puppeteer-cache');
+        $puppeteerCacheDir = is_dir($defaultPuppeteerCacheDir)
+            ? $defaultPuppeteerCacheDir
+            : (getenv('PUPPETEER_CACHE_DIR') ?: null);
         if ($puppeteerCacheDir) {
             $browsershot->setNodeEnv([
                 'PUPPETEER_CACHE_DIR' => $puppeteerCacheDir,

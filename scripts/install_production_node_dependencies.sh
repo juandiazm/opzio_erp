@@ -19,6 +19,23 @@ command -v node >/dev/null 2>&1 || { echo "node is required." >&2; exit 1; }
 command -v npm >/dev/null 2>&1 || { echo "npm is required." >&2; exit 1; }
 command -v flock >/dev/null 2>&1 || { echo "flock is required." >&2; exit 1; }
 
+verify_puppeteer_installation() {
+    local modules_path="$1"
+    NODE_PATH="${modules_path}" \
+    PUPPETEER_CACHE_DIR="${puppeteer_cache_dir}" \
+    node -e '
+        const fs = require("node:fs");
+        const puppeteer = require("puppeteer");
+        const executable = puppeteer.executablePath();
+        if (!fs.existsSync(executable)) {
+            console.error(`Puppeteer Chrome is missing: ${executable}`);
+            process.exit(1);
+        }
+        fs.accessSync(executable, fs.constants.X_OK);
+        console.log(`Puppeteer and Chrome are available: ${executable}`);
+    '
+}
+
 [[ -f "${app_dir}/package.json" ]] || { echo "package.json is missing." >&2; exit 1; }
 [[ -f "${app_dir}/package-lock.json" ]] || { echo "package-lock.json is missing." >&2; exit 1; }
 
@@ -39,9 +56,7 @@ cp "${app_dir}/package.json" "${app_dir}/package-lock.json" "${release_dir}/"
 )
 
 node_modules_path="${release_dir}/node_modules"
-NODE_PATH="${node_modules_path}" \
-PUPPETEER_CACHE_DIR="${puppeteer_cache_dir}" \
-node -e 'const path = require.resolve("puppeteer"); if (!path) process.exit(1); console.log(`Puppeteer resolved at ${path}`);'
+verify_puppeteer_installation "${node_modules_path}"
 [[ -f "${node_modules_path}/puppeteer/package.json" ]] || { echo "puppeteer was not installed." >&2; exit 1; }
 
 current_link="${app_dir}/node_modules"
@@ -68,9 +83,7 @@ fi
 
 active_node_modules_path="$(readlink -f "${current_link}")"
 [[ -d "${active_node_modules_path}" ]] || { echo "The active node_modules link is invalid." >&2; exit 1; }
-NODE_PATH="${active_node_modules_path}" \
-PUPPETEER_CACHE_DIR="${puppeteer_cache_dir}" \
-node -e 'const path = require.resolve("puppeteer"); if (!path) process.exit(1); console.log(`Active Puppeteer resolved at ${path}`);'
+verify_puppeteer_installation "${active_node_modules_path}"
 [[ -f "${active_node_modules_path}/puppeteer/package.json" ]] || { echo "puppeteer is missing from the active node_modules release." >&2; exit 1; }
 
 active_release_dir="$(dirname "${active_node_modules_path}")"
