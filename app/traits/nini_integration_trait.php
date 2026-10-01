@@ -21,7 +21,7 @@ use App\Models\income_license;
  * 2. Verify/create Nini P.O.S. license for client
  * 3. Create income as paid (state=3)
  * 4. Mark payment data
- * 5. Generate Siigo electronic invoice
+ * 5. Generate Siigo electronic invoice when enabled by NINI
  * 
  * Uses existing traits: incomes_trait, clients_trait (which includes siigo_new_trait)
  */
@@ -94,8 +94,15 @@ trait nini_integration_trait
 
                 DB::commit();
 
-                // Step 4: Generate Siigo electronic invoice (outside transaction — non-critical)
-                $siigoResult = $this->NiniIntegration_GenerateSiigoInvoice($incomeData['income']);
+                // Invoice generation is independent of recording the paid recharge income.
+                if ($this->NiniIntegration_ShouldGenerateSiigoInvoice($data)) {
+                    $this->NiniIntegration_GenerateSiigoInvoice($incomeData['income']);
+                } else {
+                    info('NiniIntegration: Siigo invoice skipped by company setting', [
+                        'income_id' => $incomeData['income']->id,
+                        'nini_transaction_id' => $data['nini_transaction_id'] ?? null,
+                    ]);
+                }
 
                 $response['status'] = 1;
                 $response['message'] = 'Recarga sincronizada exitosamente';
@@ -147,6 +154,14 @@ trait nini_integration_trait
             }
         }
 
+        if (array_key_exists('generate_electronic_invoice', $data) && !is_bool($data['generate_electronic_invoice'])) {
+            return [
+                'status' => 0,
+                'message' => 'El campo generate_electronic_invoice debe ser booleano',
+                'data' => null,
+            ];
+        }
+
         if (floatval($data['total_amount']) <= 0) {
             return [
                 'status' => 0,
@@ -156,6 +171,11 @@ trait nini_integration_trait
         }
 
         return ['status' => 1, 'message' => 'OK', 'data' => null];
+    }
+
+    protected function NiniIntegration_ShouldGenerateSiigoInvoice(array $data): bool
+    {
+        return $data['generate_electronic_invoice'] ?? true;
     }
 
     /* ==================== Idempotency Check ==================== */

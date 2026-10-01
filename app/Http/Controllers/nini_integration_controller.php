@@ -50,7 +50,8 @@ class nini_integration_controller extends Controller
      *   "payment_method": string,
      *   "description": string,
      *   "transaction_created_at": string (ISO 8601),
-     *   "bonus_percentage": float
+    *   "bonus_percentage": float,
+    *   "generate_electronic_invoice": bool (optional, defaults to true)
      * }
      */
     public function syncRecharge(Request $request)
