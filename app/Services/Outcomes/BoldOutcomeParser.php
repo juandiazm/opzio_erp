@@ -135,7 +135,13 @@ class BoldOutcomeParser
     private function normalizeHeader($value): string
     {
         $value = preg_replace('/^\xEF\xBB\xBF/', '', (string) $value);
-        return mb_strtoupper(trim($value), 'UTF-8');
+        $header = mb_strtoupper(trim($value), 'UTF-8');
+
+        if (str_contains($header, 'SALDO')) {
+            return 'SALDO';
+        }
+
+        return $header;
     }
 
     private function isBlankRow(array $row): bool
