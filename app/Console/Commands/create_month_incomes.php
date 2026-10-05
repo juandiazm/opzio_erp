@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\income;
-use App\Models\income_license;
 
 use App\traits\licenses_trait;
 use App\traits\incomes_trait;
@@ -56,23 +55,28 @@ class create_month_incomes extends Command
         return 0;*/
         $now = Carbon::now();
         $today = $now->day;
+        $billingCycle = app(\App\Services\LicenseBillingCycleService::class);
         $LicensesResponse = $this->Licenses_GetLicensesToBill($now->year, $now->month);
         if($LicensesResponse['status'] == 1) {
             $Licenses = $LicensesResponse['data']['licenses'];
             $Clients = $LicensesResponse['data']['clients'];
 
-            // Only process licenses whose billing_day matches today
-            $Licenses = $Licenses->filter(function($license) use ($today) {
-                return (int)$license->billing_day === $today;
+            // Bill on the contractual day, clamped to the last day of short months.
+            $Licenses = $Licenses->filter(function($license) use ($today, $now, $billingCycle) {
+                $billingDate = $billingCycle->billingDateForMonth(
+                    $now->year,
+                    $now->month,
+                    (int) $license->billing_day
+                );
+
+                return $billingDate->day === $today;
             });
 
-            // Get license IDs that already have a non-rejected income this month
-            $startOfMonth = $now->copy()->startOfMonth();
-            $endOfMonth = $now->copy()->endOfMonth();
-            $alreadyBilledLicenseIds = income_license::whereHas('income', function($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('state', '!=', 1)
-                      ->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
-            })->pluck('license_id')->unique()->toArray();
+            $billingDate = $now->copy()->startOfDay();
+            $alreadyBilledLicenseIds = $billingCycle->issuedLicenseIdsForPeriod(
+                $Licenses->pluck('id'),
+                $billingDate
+            );
 
             // Exclude licenses already billed this month
             $Licenses = $Licenses->filter(function($license) use ($alreadyBilledLicenseIds) {
@@ -123,7 +127,7 @@ class create_month_incomes extends Command
                             2,
                             $Client['id'],
                             $Client['identification'],
-                            $Client['name'].($Client['last_name']==null?'':' '.$Client['last_name']),
+                            $Client['name'].($Client['lastname']==null?'':' '.$Client['lastname']),
                             $farthestBill['last_billing_date'],
                             $farthestBill['cutoff_date'],
                             '',
@@ -132,14 +136,23 @@ class create_month_incomes extends Command
                         if($IncomeResponse['status'] == 1){
                             //Update licenses
                             foreach ($OriginalLicenses as $BillLicense) {
-                                // Usar copy() para no mutar $now
-                                $next_billing_date = $now->copy()->addMonths($BillLicense['recurrence_months']);
-                                $last_billing_date = $now->copy();
+                                $last_billing_date = Carbon::parse($BillLicense['last_billing_date'])->startOfDay();
+                                $next_billing_date = $billingCycle->nextBillingDate(
+                                    $last_billing_date,
+                                    max(1, (int) $BillLicense['recurrence_months']),
+                                    (int) $BillLicense['billing_day']
+                                );
                                 $Res = $this->License_UpdateBillingData(
                                     $BillLicense['id']
                                     ,$next_billing_date
                                     ,$last_billing_date
                                 );
+                                if ($Res['status'] != 1) {
+                                    \Illuminate\Support\Facades\Log::error('command:create_month_incomes could not update license billing data.', [
+                                        'license_id' => $BillLicense['id'],
+                                        'message' => $Res['message'] ?? 'Unknown error',
+                                    ]);
+                                }
                             }
                             
                             // Check if client has electronic invoice enabled and income data exists
@@ -177,11 +190,22 @@ class create_month_incomes extends Command
                                 }
                             }
                         }
+                        else {
+                            \Illuminate\Support\Facades\Log::error('command:create_month_incomes could not create the income.', [
+                                'client_id' => $Client['id'],
+                                'license_ids' => collect($OriginalLicenses)->pluck('id')->all(),
+                                'message' => $IncomeResponse['message'] ?? 'Unknown error',
+                            ]);
+                        }
                     }
                 }catch(\Exception $e){
                     info('command:create_month_incomes Clients error: '.$e->getMessage());
                 }
             }
+        } else {
+            \Illuminate\Support\Facades\Log::error('command:create_month_incomes could not load due licenses.', [
+                'message' => $LicensesResponse['message'] ?? 'Unknown error',
+            ]);
         }
         
         return 0;

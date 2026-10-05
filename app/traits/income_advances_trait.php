@@ -2,11 +2,14 @@
 namespace App\traits;
 
 use App\Models\income_advance;
+use App\Models\income_license;
 use App\Models\income;
 use Carbon\Carbon;
 
 trait income_advances_trait
 {
+    use licenses_trait;
+
     // Crear un abono
     public function IncomeAdvance_Create(
         $income_id,
@@ -28,6 +31,11 @@ trait income_advances_trait
             $income = income::find($income_id);
             if (!$income) {
                 $Response['message'] = 'El ingreso no existe';
+                return $Response;
+            }
+
+            if ((int) $income->payment_state === 1) {
+                $Response['message'] = 'El ingreso ya está pagado';
                 return $Response;
             }
             
@@ -60,10 +68,19 @@ trait income_advances_trait
             
             // Verificar si se completó el pago
             $new_total_advances = $total_advances + $amount;
+            $billingSync = null;
             if ($new_total_advances >= $income->total) {
+                $income->state = 3;
                 $income->payment_state = 1;
                 $income->payment_date = $payment_date;
                 $income->save();
+
+                $billingSync = $this->License_UpdateBillingDataByIds(
+                    income_license::where('income_id', $income_id)->get()
+                );
+                if ($billingSync['status'] != 1) {
+                    info('IncomeAdvance_Create billing cycle update failed: '.$billingSync['message']);
+                }
             }
             
             $Response['status'] = 1;
@@ -71,8 +88,11 @@ trait income_advances_trait
             $Response['data'] = [
                 'advance' => $advance,
                 'total_advances' => $new_total_advances,
-                'balance_pending' => $income->total - $new_total_advances
+                'balance_pending' => $income->total - $new_total_advances,
             ];
+            if ($billingSync !== null) {
+                $Response['data']['billing_cycle_sync'] = $billingSync;
+            }
             
         } catch (\Exception $e) {
             $Response['message'] = 'Error: ' . $e->getMessage();
@@ -138,13 +158,26 @@ trait income_advances_trait
             }
             
             $income = income::find($advance->income_id);
+            if (!$income) {
+                $Response['message'] = 'El ingreso asociado al abono no existe';
+                return $Response;
+            }
+
+            if ((int) $income->payment_state === 1 && (int) $income->state === 3) {
+                $Response['message'] = 'No se pueden eliminar abonos de un ingreso ya pagado';
+                return $Response;
+            }
+
             $advance->delete();
-            
+
             // Recalcular el estado de pago del income
             $total_advances = income_advance::where('income_id', $income->id)->sum('amount');
             if ($total_advances < $income->total) {
                 $income->payment_state = 0;
                 $income->payment_date = null;
+                if ((int) $income->state === 3) {
+                    $income->state = 2;
+                }
                 $income->save();
             }
             
@@ -152,7 +185,7 @@ trait income_advances_trait
             $Response['message'] = 'Abono eliminado exitosamente';
             $Response['data'] = [
                 'total_advances' => $total_advances,
-                'balance_pending' => $income->total - $total_advances
+                'balance_pending' => $income->total - $total_advances,
             ];
             
         } catch (\Exception $e) {
@@ -185,6 +218,15 @@ trait income_advances_trait
             }
             
             $income = income::find($advance->income_id);
+            if (!$income) {
+                $Response['message'] = 'El ingreso asociado al abono no existe';
+                return $Response;
+            }
+
+            if ((int) $income->payment_state === 1 && (int) $income->state === 3) {
+                $Response['message'] = 'No se pueden modificar abonos de un ingreso ya pagado';
+                return $Response;
+            }
             
             // Si se actualiza el monto, validar
             if ($amount !== null) {
@@ -228,15 +270,27 @@ trait income_advances_trait
             
             // Recalcular el estado de pago del income
             $total_advances = income_advance::where('income_id', $income->id)->sum('amount');
+            $billingSync = null;
             if ($total_advances >= $income->total) {
+                $income->state = 3;
                 $income->payment_state = 1;
                 if (!$income->payment_date) {
                     $income->payment_date = $advance->payment_date;
                 }
                 $income->save();
+
+                $billingSync = $this->License_UpdateBillingDataByIds(
+                    income_license::where('income_id', $income->id)->get()
+                );
+                if ($billingSync['status'] != 1) {
+                    info('IncomeAdvance_Update billing cycle update failed: '.$billingSync['message']);
+                }
             } else {
                 $income->payment_state = 0;
                 $income->payment_date = null;
+                if ((int) $income->state === 3) {
+                    $income->state = 2;
+                }
                 $income->save();
             }
             
@@ -245,8 +299,11 @@ trait income_advances_trait
             $Response['data'] = [
                 'advance' => $advance,
                 'total_advances' => $total_advances,
-                'balance_pending' => $income->total - $total_advances
+                'balance_pending' => $income->total - $total_advances,
             ];
+            if ($billingSync !== null) {
+                $Response['data']['billing_cycle_sync'] = $billingSync;
+            }
             
         } catch (\Exception $e) {
             $Response['message'] = 'Error: ' . $e->getMessage();

@@ -419,6 +419,7 @@ trait incomes_trait
                 $income_license->income_id = $income->id;
                 $income_license->license_id = $item['license_id'];
                 $income_license->license_name = $item['license_name'];
+                $income_license->timely_payment = $income->timely_payment;
                 $income_license->service_id = $item['service_id'];
                 $income_license->service_name = $item['service_name'];
                 $income_license->recurrence_months = $item['recurrence_months'];

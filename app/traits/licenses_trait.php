@@ -1118,43 +1118,39 @@ trait licenses_trait
         $income_licenses
     ){
         try{
-            $licenses = license::whereIn('id', $income_licenses->pluck('license_id'))->where('type', 1)->get();
-            $license_notifications = license_notification::whereIn('license_id', $licenses->pluck('id'))->get();
-            foreach ($income_licenses as $income_license) {
-                $license = $licenses->where('id', $income_license->license_id)->first();
-                if ($license) {
-                    if ($license['last_payed_date'] == null) {
-                        $license['last_payed_date'] = Carbon::parse($income_license->timely_payment);
-                    } else {
-                        $license['last_payed_date'] = Carbon::parse($license['last_payed_date']);
-                        $income_license->timely_payment = Carbon::parse($income_license->timely_payment);
-                        //Check if last payed date is less than timely payment
-                        if ($license['last_payed_date']->lessThanOrEqualTo($income_license->timely_payment)) {
-                            $license['last_payed_date'] = $income_license->timely_payment;
-                            $license['next_billing_date'] = Carbon::parse($license['last_payed_date'])->addMonths($license['recurrence_months']);
-                        }
-                    }
-                    $license['remaining_days'] = $this->Licese_CalculateRemainingDays($license['last_payed_date'], $license['recurrence_months'], $license['next_billing_date']);
-                    $license->save();
-                    //Send update notifications
-                    $notifications = $license_notifications->where('license_id', $license->id)->values()->all();
-                    $Message = 'Hemos actualizado tu licencia '.$license->name.' Próxima fecha de facturación: '.Carbon::parse($license->next_billing_date)->format('Y-m-d');
-                    foreach ($notifications as $notification) {
-                        if ($notification->email != null && $notification->email != '') {
-                            /*$this->twilio_sms_trait->SendEmail(
-                                $notification->email
-                                , 'Notificación de pago'
-                                , 'Se ha realizado un pago de la licencia '.$license->name.' por un valor de '.$license->value.'.'
-                            );*/
-                        }
-                        if ($notification['phone'] != null && $notification['phone'] != '') {
-                            $this->TwilioSMS_SendMessage('+57', $notification['phone'], $Message);
-                        }
+            $billingCycle = app(\App\Services\LicenseBillingCycleService::class);
+            $updatedLicenses = collect();
+            $errors = [];
+
+            foreach ($income_licenses->pluck('income_id')->filter()->unique() as $incomeId) {
+                $syncResponse = $billingCycle->syncPaidIncome((int) $incomeId);
+                if ($syncResponse['status'] != 1) {
+                    $errors[] = $syncResponse['message'];
+                    continue;
+                }
+
+                $updatedLicenses = $updatedLicenses->merge($syncResponse['updated_licenses']);
+            }
+
+            $license_notifications = license_notification::whereIn('license_id', $updatedLicenses->pluck('id'))->get();
+            foreach ($updatedLicenses->unique('id') as $license) {
+                $notifications = $license_notifications->where('license_id', $license->id)->values();
+                $message = 'Hemos actualizado tu licencia '.$license->name.' Próxima fecha de facturación: '.Carbon::parse($license->next_billing_date)->format('Y-m-d');
+
+                foreach ($notifications as $notification) {
+                    if (trim((string) $notification->phone) !== '') {
+                        $this->TwilioSMS_SendMessage('+57', $notification->phone, $message);
                     }
                 }
             }
 
-            
+            if ($errors !== []) {
+                return [
+                    'status' => 0,
+                    'message' => implode(' ', $errors)
+                ];
+            }
+
             return [
                 'status' => 1,
                 'message' => 'Datos de facturación actualizados'
@@ -1193,6 +1189,7 @@ trait licenses_trait
         , $month
     ){
         try{
+            $billingCycle = app(\App\Services\LicenseBillingCycleService::class);
             $licenses = 
             license::
             where('type', 1)
@@ -1201,29 +1198,24 @@ trait licenses_trait
             ->get()
             ;
             $clients = client::whereIn('id', $licenses->pluck('client_id'))->where('active', 1)->get();
-            $licenses = $licenses->filter(function($license) use ($clients, $month, $year){
+            $licenses = $licenses->filter(function($license) use ($clients, $month, $year, $billingCycle){
                 //if client is not active
                 if($clients->where('id', $license->client_id)->count() == 0){
                     return false;
                 }
-                //
-                if($license->last_billing_date != null){
-                    //If the billing date match with de recurrence months
-                    $last_billing_date = Carbon::parse($license->last_billing_date)->startOfDay();
-                    $month_diff = $last_billing_date->diffInMonths(Carbon::parse($year.'-'.$month.'-'.$license->billing_day)->endOfDay());
-                    if($month_diff == $license->recurrence_months || $license->recurrence_months == 1){
-                        return true;
-                    }
-                }else{
-                    //Uso of case when it is a new license
-                    return true;
-                }
-                return false;
+
+                $billingDate = $billingCycle->billingDateForMonth(
+                    (int) $year,
+                    (int) $month,
+                    (int) $license->billing_day
+                );
+
+                return $billingCycle->shouldBillOnDate($license, $billingDate);
             });
             $services = service::whereIn('id', $licenses->pluck('service_id'))->get();
             $taxes = tax::whereIn('id', $services->pluck('tax_id'))->get();
             $employees = employee::whereIn('id', $licenses->pluck('employee_id'))->get();
-            $licenses = $licenses->map(function($license) use ($clients, $services, $taxes, $employees, $month, $year){
+            $licenses = $licenses->map(function($license) use ($clients, $services, $taxes, $employees, $month, $year, $billingCycle){
                 //Assoc related data to the register
                 $license->client = $clients->where('id', $license->client_id)->first();
                 $service = $services->where('id', $license->service_id)->first();
@@ -1231,10 +1223,18 @@ trait licenses_trait
                 $license->service = $service;
                 $license->employee = $employees->where('id', $license->employee_id)->first();
                 //Set billing date and next billing date
-                $license->last_billing_date = Carbon::parse($year.'-'.$month.'-'.$license->billing_day);
-                $license->next_billing_date = $license->last_billing_date->copy()->addMonths($license->recurrence_months);
+                $license->last_billing_date = $billingCycle->billingDateForMonth(
+                    (int) $year,
+                    (int) $month,
+                    (int) $license->billing_day
+                );
+                $license->next_billing_date = $billingCycle->nextBillingDate(
+                    $license->last_billing_date,
+                    max(1, (int) $license->recurrence_months),
+                    (int) $license->billing_day
+                );
                 //Set cuttoff date
-                $license->cutoff_date = $license->last_billing_date->copy()->addDays($license->days_to_expire);
+                $license->cutoff_date = $license->last_billing_date->copy()->addDays((int) $license->days_to_expire);
                 return $license;
             });
             return [

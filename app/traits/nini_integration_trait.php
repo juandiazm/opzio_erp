@@ -472,6 +472,15 @@ trait nini_integration_trait
                 $incomeLicense->save();
             }
 
+            $billingSync = app(\App\Services\LicenseBillingCycleService::class)
+                ->syncPaidIncome($income->id);
+            if ($billingSync['status'] != 1) {
+                \Illuminate\Support\Facades\Log::error('Nini integration could not synchronize license billing dates.', [
+                    'income_id' => $income->id,
+                    'message' => $billingSync['message'],
+                ]);
+            }
+
             info('NiniIntegration: Created income ID ' . $income->id . ' for client ' . $client->id . ' amount ' . $incomeTotal);
 
             $response['status'] = 1;

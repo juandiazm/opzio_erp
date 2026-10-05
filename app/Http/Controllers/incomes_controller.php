@@ -27,6 +27,19 @@ class incomes_controller extends Controller
             description_html: $request->input('description_html')
         );
         if($Response['status'] == 1){
+            $billingSync = app(\App\Services\LicenseBillingCycleService::class)
+                ->syncPaidIncome((int) $request->income_id);
+            if ($billingSync['status'] != 1) {
+                \Illuminate\Support\Facades\Log::error('Manual income payment could not synchronize license billing dates.', [
+                    'income_id' => (int) $request->income_id,
+                    'message' => $billingSync['message'],
+                ]);
+                $Response['billing_cycle_sync'] = [
+                    'status' => 0,
+                    'message' => $billingSync['message'],
+                ];
+            }
+
             return $Response;
         }
         return \Response::json($Response , 400);

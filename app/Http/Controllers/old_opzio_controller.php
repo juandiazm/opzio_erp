@@ -167,7 +167,7 @@ class old_opzio_controller extends Controller
                                     );
                                     if($incomResult['status'] == 1 && $state == 3){
                                         $income = $incomResult['data']['income'];
-                                        $this->Income_UpdateIncomePaymentData(
+                                        $paymentResponse = $this->Income_UpdateIncomePaymentData(
                                             
                                             $income['id']
                                             ,1
@@ -176,6 +176,14 @@ class old_opzio_controller extends Controller
                                             ,$income_data['bill_name']
                                             ,$income_data['bill_final_value']
                                         );
+                                        if ($paymentResponse['status'] == 1) {
+                                            $billingResponse = $this->License_UpdateBillingDataByIds(
+                                                income_license::where('income_id', $income['id'])->get()
+                                            );
+                                            if ($billingResponse['status'] != 1) {
+                                                info('Legacy income payment billing cycle update failed: '.$billingResponse['message']);
+                                            }
+                                        }
                                     }
                                     $createdIncomes[] = [
                                         'income_data' => $income_data,
