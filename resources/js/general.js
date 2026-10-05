@@ -213,7 +213,9 @@ function GetMethodFunction(URL, SuccesfullMessage, SuccessFunction, FailFunction
 			SuccessFunction(result); 1000
 		}
 	}).fail(function (jqXHR, textStatus, error) {
-    	alertWarning(jqXHR.responseJSON.message, 3000);
+		if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+			alertWarning(jqXHR.responseJSON.message, 3000);
+		}
     	if(FailFunction != null){
 			FailFunction();
 		}
@@ -231,7 +233,7 @@ function PostMethodFunctionWhitOutLoader(URL, DataSend, SuccesfullMessage, Succe
 			SuccessFunction(result);
 		}
 	}).fail(function (jqXHR, textStatus, error) {
-		if (jqXHR.responseJSON.message) {
+		if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
 			alertWarning(jqXHR.responseJSON.message, 3000);
 		}
     	if(FailFunction != null){
@@ -252,7 +254,7 @@ function PostMethodFunction(URL, DataSend, SuccesfullMessage, SuccessFunction, F
 		}
 	}).fail(function (jqXHR, textStatus, error) {
 		
-		if (jqXHR.responseJSON.message) {
+		if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
 			alertWarning(jqXHR.responseJSON.message, 3000);
 		}
     	if(FailFunction != null){
@@ -282,7 +284,7 @@ function PostMethodFunctionSync(URL, DataSend, SuccesfullMessage, SuccessFunctio
 			}
 		},
 		error: function (e) {
-			if (e.responseJSON.message) {
+			if (e.responseJSON && e.responseJSON.message) {
 				alertWarning(e.responseJSON.message, 3000);
 			}
 			if(FailFunction != null){
@@ -324,7 +326,7 @@ function PostMethodMultimediaFunction(URL, Form, SuccesfullMessage, SuccessFunct
 				}
 			},
 			error: function (e) {
-				if (e.responseJSON.message) {
+				if (e.responseJSON && e.responseJSON.message) {
 					alertWarning(e.responseJSON.message, 3000);
 				}
 				if(FailFunction != null){
@@ -359,7 +361,7 @@ function PostMethodMultimediaFunctionData(URL, data, SuccesfullMessage, SuccessF
 				}
 			},
 			error: function (e) {
-				if (e.responseJSON.message) Toastify({text:'Debes ingresaros todos los datos **'
+				if (e.responseJSON && e.responseJSON.message) Toastify({text:'Debes ingresaros todos los datos **'
 				,duration: 3000
 				, stopOnFocus: true
 				, style: {
