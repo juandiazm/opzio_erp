@@ -36,6 +36,7 @@ class dashboard_income_goals_test extends TestCase
             $table->id();
             $table->unsignedInteger('state');
             $table->decimal('total', 20, 2);
+            $table->unsignedTinyInteger('payment_state')->default(0);
             $table->date('payment_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -46,6 +47,15 @@ class dashboard_income_goals_test extends TestCase
             $table->unsignedBigInteger('income_id');
             $table->decimal('amount', 20, 2);
             $table->date('payment_date')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('income_payments', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('income_id');
+            $table->unsignedTinyInteger('payment_state')->default(0);
+            $table->decimal('total', 20, 2);
+            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
         });
 
@@ -72,7 +82,16 @@ class dashboard_income_goals_test extends TestCase
         $paidIncome = DB::table('incomes')->insertGetId([
             'state' => 3,
             'total' => 1000,
+            'payment_state' => 1,
             'payment_date' => '2026-07-10',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('income_payments')->insert([
+            'income_id' => $paidIncome,
+            'payment_state' => 1,
+            'total' => 600,
+            'payment_date' => '2026-07-10 10:00:00',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -112,6 +131,7 @@ class dashboard_income_goals_test extends TestCase
         DB::table('incomes')->insert([
             'state' => 3,
             'total' => 500,
+            'payment_state' => 1,
             'payment_date' => '2026-10-01',
             'created_at' => now(),
             'updated_at' => now(),
@@ -124,7 +144,7 @@ class dashboard_income_goals_test extends TestCase
         $this->assertSame($goal, $result['id']);
         $this->assertSame('2026-07-01', $result['comparison_start_date']);
         $this->assertSame('2026-09-30', $result['comparison_end_date']);
-        $this->assertSame(1300.0, $result['actual_amount']);
-        $this->assertSame(65.0, $result['completion_percentage']);
+        $this->assertSame(900.0, $result['actual_amount']);
+        $this->assertSame(45.0, $result['completion_percentage']);
     }
 }

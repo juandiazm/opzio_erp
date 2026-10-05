@@ -35,6 +35,7 @@ class dashboard_income_recurrence_test extends TestCase
             $table->id();
             $table->unsignedInteger('state');
             $table->decimal('total', 20, 2);
+            $table->unsignedTinyInteger('payment_state')->default(0);
             $table->date('payment_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -46,6 +47,15 @@ class dashboard_income_recurrence_test extends TestCase
             $table->unsignedBigInteger('license_id');
             $table->unsignedInteger('recurrence_months')->nullable();
             $table->decimal('total', 20, 2);
+            $table->timestamps();
+        });
+
+        Schema::create('income_payments', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('income_id');
+            $table->unsignedTinyInteger('payment_state')->default(0);
+            $table->decimal('total', 20, 2);
+            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
         });
 
@@ -84,6 +94,7 @@ class dashboard_income_recurrence_test extends TestCase
         $paidIncomeId = DB::table('incomes')->insertGetId([
             'state' => 3,
             'total' => 3600,
+            'payment_state' => 1,
             'payment_date' => '2026-02-15',
             'created_at' => now(),
             'updated_at' => now(),
@@ -114,6 +125,15 @@ class dashboard_income_recurrence_test extends TestCase
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+        ]);
+
+        DB::table('income_payments')->insert([
+            'income_id' => $paidIncomeId,
+            'payment_state' => 1,
+            'total' => 1800,
+            'payment_date' => '2026-02-15 10:00:00',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $advanceIncomeId = DB::table('incomes')->insertGetId([
@@ -149,13 +169,13 @@ class dashboard_income_recurrence_test extends TestCase
 
         $this->assertSame(1, $response['status']);
         $this->assertEquals(12000, $details[1]['projected_amount']);
-        $this->assertEquals(2000, $details[1]['paid_amount']);
+        $this->assertEquals(1200, $details[1]['paid_amount']);
         $this->assertSame(5, $details[1]['active_license_count']);
         $this->assertSame(2, $details[1]['paid_income_count']);
         $this->assertEquals(2000, $details[3]['projected_amount']);
-        $this->assertEquals(2000, $details[3]['paid_amount']);
+        $this->assertEquals(1000, $details[3]['paid_amount']);
         $this->assertSame(1, $details[3]['paid_income_count']);
         $this->assertEquals(14000, $response['data']['projected_total']);
-        $this->assertEquals(4000, $response['data']['paid_total']);
+        $this->assertEquals(2200, $response['data']['paid_total']);
     }
 }

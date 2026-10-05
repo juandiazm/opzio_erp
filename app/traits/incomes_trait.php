@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 use App\Models\income;
 use App\Models\income_advance;
+use App\Models\income_payment;
 use App\Models\income_license;
 use App\Models\client;
 use App\Models\license;
@@ -1276,6 +1277,68 @@ trait incomes_trait
         return $Response;
     }
     //STATISTICS
+    public function Income_StatisticGetPaidEntriesByDateRange($start_date, $end_date)
+    {
+        $start_date = Carbon::parse($start_date)->startOfDay()->format('Y-m-d H:i:s');
+        $end_date = Carbon::parse($end_date)->endOfDay()->format('Y-m-d H:i:s');
+        $entries = collect();
+
+        $advances = income_advance::with('income')
+            ->whereHas('income', function ($query) {
+                $query->whereNotIn('state', [1])->whereNull('deleted_at');
+            })
+            ->whereBetween('payment_date', [$start_date, $end_date])
+            ->get();
+
+        foreach ($advances as $advance) {
+            if ($advance->income) {
+                $entries->push([
+                    'income' => $advance->income,
+                    'payment_date' => Carbon::parse($advance->payment_date),
+                    'amount' => (float) $advance->amount,
+                ]);
+            }
+        }
+
+        $payments = income_payment::with('income')
+            ->where('payment_state', 1)
+            ->whereHas('income', function ($query) {
+                $query->whereNotIn('state', [1])->whereNull('deleted_at');
+            })
+            ->whereBetween('payment_date', [$start_date, $end_date])
+            ->get();
+
+        foreach ($payments as $payment) {
+            if ($payment->income) {
+                $entries->push([
+                    'income' => $payment->income,
+                    'payment_date' => Carbon::parse($payment->payment_date),
+                    'amount' => (float) $payment->total,
+                ]);
+            }
+        }
+
+        $fullyPaidIncomes = income::query()
+            ->whereIn('state', [3, 4])
+            ->where('payment_state', 1)
+            ->whereBetween('payment_date', [$start_date, $end_date])
+            ->whereDoesntHave('income_advances')
+            ->whereDoesntHave('income_payments', function ($query) {
+                $query->where('payment_state', 1);
+            })
+            ->get();
+
+        foreach ($fullyPaidIncomes as $income) {
+            $entries->push([
+                'income' => $income,
+                'payment_date' => Carbon::parse($income->payment_date),
+                'amount' => (float) $income->total,
+            ]);
+        }
+
+        return $entries;
+    }
+
     public function Income_StatisticGetIncomeValuesByMonth($date)
     {
         $date = Carbon::parse($date);
@@ -1283,53 +1346,20 @@ trait incomes_trait
         $year_average = 0;
         $difference = 0;
         try {
-            // Ingresos pagados SIN abonos: se cuenta income.total por payment_date del income
-            $current_month_incomes = income::whereIn('state', [3, 4])
-                ->whereDoesntHave('income_advances')
-                ->whereMonth('payment_date', $date->format('m'))
-                ->whereYear('payment_date', $date->format('Y'))
-                ->sum('total');
-            // Ingresos CON abonos (cualquier estado excepto rechazado): se cuentan los abonos por su payment_date
-            $current_month_advances = income_advance::whereHas('income', function ($q) {
-                $q->whereNotIn('state', [1])->whereNull('deleted_at');
-            })
-                ->whereMonth('payment_date', $date->format('m'))
-                ->whereYear('payment_date', $date->format('Y'))
-                ->sum('amount');
-            $current_month = $current_month_incomes + $current_month_advances;
-
-            // Calcular el promedio de los últimos 12 meses
+            $current_month_entries = $this->Income_StatisticGetPaidEntriesByDateRange(
+                $date->copy()->startOfMonth(),
+                $date->copy()->endOfMonth()
+            );
+            $current_month = $current_month_entries->sum('amount');
             $start_date = $date->copy()->subMonths(12)->startOfMonth();
             $end_date = $date->copy()->subMonth()->endOfMonth();
-
-            $last_12_months_incomes = income::whereIn('state', [3, 4])
-                ->whereDoesntHave('income_advances')
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->sum('total');
-            $last_12_months_advances = income_advance::whereHas('income', function ($q) {
-                $q->whereNotIn('state', [1])->whereNull('deleted_at');
-            })
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->sum('amount');
-            $last_12_months_total = $last_12_months_incomes + $last_12_months_advances;
-
-            // Contar los meses con datos en los últimos 12 meses
-            $months_with_data_incomes = income::whereIn('state', [3, 4])
-                ->whereDoesntHave('income_advances')
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->selectRaw('COUNT(DISTINCT DATE_FORMAT(payment_date, "%Y-%m")) as months_count')
-                ->first()
-                ->months_count;
-            $months_with_data_advances = income_advance::whereHas('income', function ($q) {
-                $q->whereNotIn('state', [1])->whereNull('deleted_at');
-            })
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->selectRaw('COUNT(DISTINCT DATE_FORMAT(payment_date, "%Y-%m")) as months_count')
-                ->first()
-                ->months_count;
-            $months_with_data = max($months_with_data_incomes, $months_with_data_advances);
-
-            $year_average = $months_with_data > 0 ? $last_12_months_total / $months_with_data : 0;
+            $last_12_months_entries = $this->Income_StatisticGetPaidEntriesByDateRange($start_date, $end_date);
+            $monthly_totals = $last_12_months_entries->groupBy(function ($entry) {
+                return $entry['payment_date']->format('Y-m');
+            })->map(function ($entries) {
+                return $entries->sum('amount');
+            });
+            $year_average = $monthly_totals->isNotEmpty() ? $monthly_totals->avg() : 0;
 
             $difference_porcentage = ($year_average == 0 || $current_month == 0) ? 0 : (round((($current_month / $year_average) - 1) * 100, 2));
         } catch (\Exception $e) {
@@ -1393,29 +1423,20 @@ trait incomes_trait
         try {
             $start_date = Carbon::parse($start_date)->startOfMonth();
             $end_date = Carbon::parse($end_date)->endOfMonth();
-            // Ingresos pagados SIN abonos: se cuenta income.total por payment_date del income
-            $incomesQuery = income::whereIn('state', [3, 4])
-                ->whereDoesntHave('income_advances')
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
-            // Ingresos CON abonos (cualquier estado excepto rechazado): se cuentan los abonos por su payment_date
-            $advancesQuery = income_advance::whereHas('income', function ($q) {
-                $q->whereNotIn('state', [1])->whereNull('deleted_at');
-            })
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
-            $Response['data']['incomes_count'] = $incomesQuery->count();
-            $Response['data']['incomes_total'] = round($incomesQuery->sum('total') + $advancesQuery->sum('amount'));
+            $paidEntries = $this->Income_StatisticGetPaidEntriesByDateRange($start_date, $end_date);
+            $Response['data']['incomes_count'] = $paidEntries->pluck('income.id')->unique()->count();
+            $Response['data']['incomes_total'] = round($paidEntries->sum('amount'));
             $Response['data']['incomes_total_string'] = number_format($Response['data']['incomes_total'], 0, ',', '.');
-            $incomes = $incomesQuery->get();
-            $advances = $advancesQuery->get();
+            $incomes = $paidEntries->pluck('income')->unique('id')->values();
             //get months range name
             $current_date = $start_date;
             while ($current_date <= $end_date) {
-                $month_start = $current_date->format('Y-m-d');
-                $month_end = $current_date->copy()->endOfMonth()->format('Y-m-d');
+                $month = $current_date->format('Y-m');
                 $Response['data']['month_labels'][] = strtoupper($current_date->format('M'));
-                $incomes_sum = $incomes->where('payment_date', '>=', $month_start)->where('payment_date', '<=', $month_end)->sum('total');
-                $advances_sum = $advances->where('payment_date', '>=', $month_start)->where('payment_date', '<=', $month_end)->sum('amount');
-                $Response['data']['incomes_by_month'][] = round($incomes_sum + $advances_sum);
+                $month_total = $paidEntries->filter(function ($entry) use ($month) {
+                    return $entry['payment_date']->format('Y-m') === $month;
+                })->sum('amount');
+                $Response['data']['incomes_by_month'][] = round($month_total);
                 $current_date = $current_date->addMonth();
             }
             $Response['data']['incomes'] = $incomes;
@@ -1488,36 +1509,10 @@ trait incomes_trait
                 $groups[$recurrenceMonths]['projected_cycle_amount'] += (float) $license->value;
             }
 
-            $paidLines = income_license::query()
-                ->where('recurrence_months', '>', 0)
-                ->whereHas('income', function ($query) use ($start_date, $end_date) {
-                    $query->whereIn('state', [3, 4])
-                        ->whereDoesntHave('income_advances')
-                        ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
-                })
-                ->get(['income_id', 'license_id', 'recurrence_months', 'total']);
-
-            foreach ($paidLines as $line) {
-                $recurrenceMonths = $ensureGroup($line->recurrence_months);
-                $groups[$recurrenceMonths]['paid_amount'] += (float) $line->total;
-                $groups[$recurrenceMonths]['paid_income_ids'][$line->income_id] = true;
-                $groups[$recurrenceMonths]['paid_license_ids'][$line->license_id] = true;
-            }
-
-            $advances = income_advance::query()
-                ->with(['income.income_licenses'])
-                ->whereHas('income', function ($query) {
-                    $query->whereNotIn('state', [1])->whereNull('deleted_at');
-                })
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->get();
-
-            foreach ($advances as $advance) {
-                $income = $advance->income;
-                if (!$income) {
-                    continue;
-                }
-
+            $paidEntries = $this->Income_StatisticGetPaidEntriesByDateRange($start_date, $end_date);
+            foreach ($paidEntries as $entry) {
+                $income = $entry['income'];
+                $income->loadMissing('income_licenses');
                 $incomeLines = $income->income_licenses;
                 $incomeTotal = (float) $incomeLines->sum('total');
                 if ($incomeTotal <= 0) {
@@ -1526,7 +1521,7 @@ trait incomes_trait
 
                 foreach ($incomeLines->where('recurrence_months', '>', 0) as $line) {
                     $recurrenceMonths = $ensureGroup($line->recurrence_months);
-                    $lineShare = (float) $advance->amount * ((float) $line->total / $incomeTotal);
+                    $lineShare = (float) $entry['amount'] * ((float) $line->total / $incomeTotal);
                     $groups[$recurrenceMonths]['paid_amount'] += $lineShare;
                     $groups[$recurrenceMonths]['paid_income_ids'][$income->id] = true;
                     $groups[$recurrenceMonths]['paid_license_ids'][$line->license_id] = true;
@@ -1626,29 +1621,36 @@ trait incomes_trait
         try {
             $start_date = Carbon::parse($start_date)->startOfMonth();
             $end_date = Carbon::parse($end_date)->endOfMonth();
-            $incomes = income::
-                whereIn('state', [3, 4])
-                ->whereHas('income_licenses', function ($query) {
-                    $query
-                        ->whereHas('license', function ($query) {
-                            $query
-                                ->where('type', '2')
-                            ;
-                        })
-                        ->with('license')
-                    ;
-                })
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')]);
-            $Response['data']['incomes_count'] = $incomes->count();
-            $Response['data']['incomes_total'] = round($incomes->sum('total'));
-            $incomes = $incomes->get();
-            //get months range name
+            $paidEntries = $this->Income_StatisticGetPaidEntriesByDateRange($start_date, $end_date);
+            $salesEntries = $paidEntries->map(function ($entry) {
+                $entry['income']->loadMissing('income_licenses.license');
+                $incomeLines = $entry['income']->income_licenses;
+                $incomeTotal = (float) $incomeLines->sum('total');
+                if ($incomeTotal <= 0) {
+                    return null;
+                }
+
+                $salesLinesTotal = (float) $incomeLines->filter(function ($line) {
+                    return $line->license && (string) $line->license->type === '2';
+                })->sum('total');
+                if ($salesLinesTotal <= 0) {
+                    return null;
+                }
+
+                $entry['amount'] = (float) $entry['amount'] * ($salesLinesTotal / $incomeTotal);
+                return $entry;
+            })->filter()->values();
+            $Response['data']['incomes_count'] = $salesEntries->pluck('income.id')->unique()->count();
+            $Response['data']['incomes_total'] = round($salesEntries->sum('amount'));
+            $incomes = $salesEntries->pluck('income')->unique('id')->values();
             $current_date = $start_date;
             while ($current_date <= $end_date) {
+                $month = $current_date->format('Y-m');
                 $Response['data']['month_labels'][] = strtoupper($current_date->format('M'));
-                $Response['data']['incomes_by_month'][] = round($incomes->where('payment_date', '>=', $current_date->format('Y-m-d'))->where('payment_date', '<=', $current_date->copy()->endOfMonth()->format('Y-m-d'))->sum(function ($item) {
-                    return $item->income_licenses->where('license.type', '2')->sum('total');
-                }));
+                $month_total = $salesEntries->filter(function ($entry) use ($month) {
+                    return $entry['payment_date']->format('Y-m') === $month;
+                })->sum('amount');
+                $Response['data']['incomes_by_month'][] = round($month_total);
                 $current_date = $current_date->addMonth();
             }
             $Response['data']['incomes'] = $incomes;
@@ -1677,59 +1679,23 @@ trait incomes_trait
         try {
             $start_date = Carbon::parse($start_date)->startOfMonth();
             $end_date = Carbon::parse($end_date)->endOfMonth();
-            
-            // Ingresos pagados SIN abonos: se cuenta income.total por payment_date del income
-            $total_paid_incomes = income::whereIn('state', [3, 4])
-                ->whereDoesntHave('income_advances')
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->sum('total');
-            // Ingresos CON abonos (cualquier estado excepto rechazado): se cuentan los abonos por su payment_date
-            $total_advances = income_advance::whereHas('income', function ($q) {
-                $q->whereNotIn('state', [1])->whereNull('deleted_at');
-            })
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->sum('amount');
-
-            // Obtener ingresos pagados SIN abonos agrupados por cliente
-            $paid_by_client = income::whereIn('state', [3, 4])
-                ->whereDoesntHave('income_advances')
-                ->whereBetween('payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->selectRaw('client_id, client_name, SUM(total) as total_income')
-                ->groupBy('client_id', 'client_name')
-                ->get()
-                ->keyBy('client_id');
-
-            // Obtener abonos de ingresos NO rechazados (con abonos) agrupados por cliente
-            $advances_by_client = income_advance::join('incomes', 'income_advances.income_id', '=', 'incomes.id')
-                ->whereNotIn('incomes.state', [1])
-                ->whereNull('incomes.deleted_at')
-                ->whereBetween('income_advances.payment_date', [$start_date->format('Y-m-d'), $end_date->format('Y-m-d')])
-                ->selectRaw('incomes.client_id, incomes.client_name, SUM(income_advances.amount) as total_income')
-                ->groupBy('incomes.client_id', 'incomes.client_name')
-                ->get()
-                ->keyBy('client_id');
-
-            // Fusionar ambas colecciones por cliente
-            $merged = collect();
-            foreach ($paid_by_client as $client_id => $item) {
-                $adv = $advances_by_client->get($client_id);
-                $merged->put($client_id, [
-                    'client_name' => $item->client_name,
-                    'total_income' => $item->total_income + ($adv ? $adv->total_income : 0)
-                ]);
-            }
-            foreach ($advances_by_client as $client_id => $item) {
-                if (!$merged->has($client_id)) {
-                    $merged->put($client_id, [
-                        'client_name' => $item->client_name,
-                        'total_income' => $item->total_income
-                    ]);
+            $paidEntries = $this->Income_StatisticGetPaidEntriesByDateRange($start_date, $end_date);
+            $merged = [];
+            foreach ($paidEntries as $entry) {
+                $income = $entry['income'];
+                $clientId = $income->client_id;
+                if (!isset($merged[$clientId])) {
+                    $merged[$clientId] = [
+                        'client_name' => $income->client_name,
+                        'total_income' => 0,
+                    ];
                 }
+                $merged[$clientId]['total_income'] += (float) $entry['amount'];
             }
-            $incomes = $merged->sortByDesc('total_income')->take(10)->values();
+            $incomes = collect($merged)->sortByDesc('total_income')->take(10)->values();
 
             $Response['data']['incomes_count'] = $incomes->count();
-            $Response['data']['incomes_total'] = round($total_paid_incomes + $total_advances);
+            $Response['data']['incomes_total'] = round($paidEntries->sum('amount'));
             $Response['data']['incomes_total_string'] = number_format($Response['data']['incomes_total'], 0, ',', '.');
 
             foreach ($incomes as $income) {

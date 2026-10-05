@@ -83,6 +83,9 @@ class income extends Model
     public function income_advances(){
         return $this->hasMany(income_advance::class, 'income_id');
     }
+    public function income_payments(){
+        return $this->hasMany(income_payment::class, 'income_id');
+    }
     
     // Calcular total de abonos
     public function getTotalAdvancesAttribute(){
