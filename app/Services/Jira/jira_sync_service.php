@@ -397,8 +397,12 @@ class jira_sync_service
             'story_points_field' => $settings['story_points_field'] ?? null,
             'epic_link_field' => $settings['epic_link_field'] ?? null,
         ]);
+        if (array_key_exists('attachment', $fields)) {
+            $rawFields['image_attachments'] = $this->normalizeImageAttachments($fields['attachment']);
+        }
         if (array_key_exists('description', $fields)) {
             $rawFields['description'] = $this->jiraText($fields['description']);
+            $rawFields['description_image_references'] = $this->extractImageReferences($fields['description']);
         }
         $hasCommentField = array_key_exists('comment', $fields);
         if ($hasCommentField) {
@@ -560,7 +564,7 @@ class jira_sync_service
     private function issueFields(array $settings): array
     {
         return array_values(array_filter(array_unique([
-            'summary', 'description', 'comment', 'project', 'issuetype', 'status', 'priority', 'assignee', 'reporter', 'parent',
+            'summary', 'description', 'comment', 'attachment', 'project', 'issuetype', 'status', 'priority', 'assignee', 'reporter', 'parent',
             'labels', 'components', 'created', 'updated', 'resolutiondate', 'duedate',
             'timeoriginalestimate', 'timespent', 'customfield_10020',
             $settings['story_points_field'] ?? null,
@@ -623,17 +627,80 @@ class jira_sync_service
                 return null;
             }
             $content = $this->jiraText($payload['body'] ?? null);
-            if ($content === '') {
+            $images = $this->extractImageReferences($payload['body'] ?? null);
+            if ($content === '' && $images === []) {
                 return null;
             }
 
-            return [
+            $comment = [
                 'id' => (string) ($payload['id'] ?? ''),
                 'author' => trim((string) data_get($payload, 'author.displayName', '')),
                 'created' => $payload['created'] ?? null,
                 'content' => $content,
             ];
+            if ($images !== []) {
+                $comment['images'] = $images;
+            }
+
+            return $comment;
         })->filter()->values()->all();
+    }
+
+    private function normalizeImageAttachments(mixed $attachments): array
+    {
+        return collect(is_array($attachments) ? $attachments : [])
+            ->filter(function ($attachment): bool {
+                if (! is_array($attachment)) {
+                    return false;
+                }
+                $mimeType = strtolower(trim((string) ($attachment['mimeType'] ?? '')));
+                $filename = strtolower(trim((string) ($attachment['filename'] ?? '')));
+
+                return str_starts_with($mimeType, 'image/')
+                    || preg_match('/\.(png|jpe?g|gif|webp|avif|bmp)$/i', $filename) === 1;
+            })
+            ->map(fn (array $attachment): array => [
+                'id' => is_scalar($attachment['id'] ?? null) ? (string) $attachment['id'] : '',
+                'filename' => Str::limit(trim((string) ($attachment['filename'] ?? 'imagen')), 180, ''),
+                'mime_type' => strtolower(trim((string) ($attachment['mimeType'] ?? ''))),
+                'size' => is_numeric($attachment['size'] ?? null) ? max(0, (int) $attachment['size']) : null,
+            ])
+            ->filter(fn (array $attachment): bool => $attachment['id'] !== '')
+            ->values()
+            ->all();
+    }
+
+    private function extractImageReferences(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $references = [];
+        $type = strtolower((string) ($value['type'] ?? ''));
+        if (in_array($type, ['media', 'mediainline', 'image'], true)) {
+            $attributes = is_array($value['attrs'] ?? null) ? $value['attrs'] : [];
+            $id = $attributes['id'] ?? $attributes['attachmentId'] ?? null;
+            $name = $attributes['alt'] ?? $attributes['title'] ?? null;
+            if (is_scalar($id) || is_scalar($name)) {
+                $references[] = [
+                    'id' => is_scalar($id) ? trim((string) $id) : '',
+                    'filename' => is_scalar($name) ? Str::limit(trim((string) $name), 180, '') : 'imagen incrustada',
+                    'mime_type' => strtolower(trim((string) ($attributes['mimeType'] ?? ''))),
+                ];
+            }
+        }
+
+        foreach ($value as $child) {
+            if (is_array($child)) {
+                $references = array_merge($references, $this->extractImageReferences($child));
+            }
+        }
+
+        return collect($references)
+            ->unique(fn (array $reference): string => $reference['id'].'|'.$reference['filename'])
+            ->values()
+            ->all();
     }
 
     private function jiraText(mixed $value): string
@@ -649,6 +716,10 @@ class jira_sync_service
         }
         if (isset($value['text']) && is_scalar($value['text'])) {
             return trim((string) $value['text']);
+        }
+
+        if (in_array(strtolower((string) ($value['type'] ?? '')), ['media', 'mediainline', 'image'], true)) {
+            return '';
         }
 
         $children = array_key_exists('content', $value) && is_array($value['content'])

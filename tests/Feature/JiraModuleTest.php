@@ -124,8 +124,18 @@ class JiraModuleTest extends TestCase
                             'summary' => 'Implementar sincronizacion',
                             'description' => [
                                 'type' => 'doc',
-                                'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Preparar el flujo de sincronizacion.']]]],
+                                'content' => [
+                                    ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Preparar el flujo de sincronizacion.']]],
+                                    ['type' => 'mediaSingle', 'content' => [['type' => 'media', 'attrs' => ['id' => '70001', 'type' => 'file', 'alt' => 'mockup.png']]]],
+                                ],
                             ],
+                            'attachment' => [[
+                                'id' => '70001',
+                                'filename' => 'mockup.png',
+                                'mimeType' => 'image/png',
+                                'size' => 2048,
+                                'content' => 'https://demo.atlassian.net/secure/attachment/70001/mockup.png',
+                            ]],
                             'status' => ['name' => 'Done', 'statusCategory' => ['name' => 'Done']],
                             'priority' => ['name' => 'High'],
                             'assignee' => ['accountId' => 'jira-user-1', 'displayName' => 'Ana Jira', 'active' => true],
@@ -165,7 +175,10 @@ class JiraModuleTest extends TestCase
                         'id' => '50001',
                         'author' => ['displayName' => 'Ana Jira'],
                         'created' => '2026-09-05T14:00:00.000+0000',
-                        'body' => ['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Resultado confirmado.']]]]],
+                        'body' => ['type' => 'doc', 'content' => [
+                            ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Resultado confirmado.']]],
+                            ['type' => 'mediaSingle', 'content' => [['type' => 'media', 'attrs' => ['id' => '70001', 'type' => 'file', 'alt' => 'mockup.png']]]],
+                        ]],
                     ]],
                 ]),
                 default => Http::response([], 200),
@@ -180,6 +193,9 @@ class JiraModuleTest extends TestCase
         $syncedIssue = \App\Models\jira_issue::where('issue_key', 'OPS-1')->firstOrFail();
         $this->assertSame('Preparar el flujo de sincronizacion.', $syncedIssue->description);
         $this->assertSame('Resultado confirmado.', $syncedIssue->comments[0]['content']);
+        $this->assertSame('70001', $syncedIssue->raw_fields['image_attachments'][0]['id']);
+        $this->assertSame('70001', $syncedIssue->raw_fields['description_image_references'][0]['id']);
+        $this->assertSame('70001', $syncedIssue->comments[0]['images'][0]['id']);
         $this->assertDatabaseHas('jira_issue_worklogs', ['external_id' => '30001', 'time_spent_seconds' => 7200]);
         $this->assertDatabaseHas('jira_issue_changelogs', ['external_history_id' => '40001', 'field' => 'status']);
         $this->assertSame('active', $connection->fresh()->status);

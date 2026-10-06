@@ -199,6 +199,100 @@ class AiDevelopmentFlowTest extends TestCase
         Mail::assertQueued(CustomMail::class, fn (CustomMail $queued): bool => $queued->View === 'mail.ai_development.reporter');
     }
 
+    public function test_image_context_is_analyzed_and_appended_to_the_github_prompt(): void
+    {
+        [$issue, $configuration] = $this->fixture();
+        config([
+            'services.openai.api_key' => 'test-openai-key',
+            'ai_development.image_context.enabled' => true,
+            'ai_development.image_context.max_images' => 5,
+        ]);
+        $issue->update([
+            'raw_fields' => [
+                'image_attachments' => [[
+                    'id' => '9001',
+                    'filename' => 'mockup.png',
+                    'mime_type' => 'image/png',
+                    'size' => 68,
+                ]],
+                'description_image_references' => [[
+                    'id' => '9001',
+                    'filename' => 'mockup.png',
+                ]],
+            ],
+            'comments' => [[
+                'created' => '2026-09-05T14:00:00+00:00',
+                'images' => [['id' => '9001', 'filename' => 'mockup.png']],
+            ]],
+        ]);
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ3sAAAAASUVORK5CYII=', true);
+        $requests = [];
+        Http::fake(function ($request) use (&$requests, $png) {
+            $requests[] = $request;
+            if (str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/attachment/content/9001')) {
+                return Http::response($png, 200, ['Content-Type' => 'image/png', 'Content-Length' => (string) strlen($png)]);
+            }
+            if (str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/responses')) {
+                return Http::response([
+                    'output' => [[
+                        'type' => 'message',
+                        'content' => [[
+                            'type' => 'output_text',
+                            'text' => json_encode([
+                                'visual_summary' => 'Formulario compacto con un boton principal azul.',
+                                'visible_text' => ['Guardar'],
+                                'visual_details' => ['El boton esta alineado a la derecha.'],
+                            ]),
+                        ]],
+                    ]],
+                ]);
+            }
+
+            return Http::response([], 200);
+        });
+
+        $prompt = app(jira_automation_prompt_builder::class)->build(
+            $issue->fresh(['connection']),
+            $configuration,
+            ai_agent::where('name', 'Luna')->firstOrFail(),
+        );
+
+        $this->assertCount(1, array_filter($requests, fn ($request): bool => str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/attachment/content/9001')));
+        $this->assertStringContainsString('<JIRA_IMAGE_CONTEXT_UNTRUSTED>', $prompt);
+        $this->assertStringContainsString('mockup.png', $prompt);
+        $this->assertStringContainsString('Formulario compacto', $prompt);
+        $this->assertStringContainsString('Guardar', $prompt);
+        $this->assertStringContainsString('origen: adjunto, descripcion, comentario 2026-09-05T14:00:00+00:00', $prompt);
+        $this->assertCount(1, array_filter($requests, fn ($request): bool => str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/responses')));
+        $visionRequest = collect($requests)->first(fn ($request): bool => str_ends_with(parse_url($request->url(), PHP_URL_PATH), '/responses'));
+        $this->assertSame('gpt-6-luna', $visionRequest->data()['model']);
+        $this->assertStringStartsWith('data:image/png;base64,', $visionRequest->data()['input'][0]['content'][1]['image_url']);
+    }
+
+    public function test_failed_image_download_is_reported_without_blocking_prompt_creation(): void
+    {
+        [$issue, $configuration] = $this->fixture();
+        config(['services.openai.api_key' => 'test-openai-key']);
+        $issue->update([
+            'raw_fields' => ['image_attachments' => [[
+                'id' => '9002',
+                'filename' => 'missing.png',
+                'mime_type' => 'image/png',
+                'size' => 128,
+            ]]],
+        ]);
+        Http::fake(fn () => Http::response(['message' => 'Not Found'], 404));
+
+        $prompt = app(jira_automation_prompt_builder::class)->build(
+            $issue->fresh(['connection']),
+            $configuration,
+            ai_agent::where('name', 'Luna')->firstOrFail(),
+        );
+
+        $this->assertStringContainsString('<JIRA_IMAGE_CONTEXT_UNTRUSTED>', $prompt);
+        $this->assertStringContainsString('No se pudo analizar la imagen "missing.png" (fallo de descarga).', $prompt);
+    }
+
     public function test_development_job_blocks_when_attempt_limit_is_reached(): void
     {
         Mail::fake();

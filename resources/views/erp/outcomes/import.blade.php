@@ -26,8 +26,8 @@
                 </div>
                 <div id="import-paste-field" hidden>
                     <label class="form-label" for="import-paste-text">Datos copiados de Bold</label>
-                    <textarea id="import-paste-text" class="form-control" rows="9" placeholder="Copia la tabla completa, incluyendo la fila de encabezados, y pégala aquí." aria-describedby="import-paste-help"></textarea>
-                    <small id="import-paste-help" class="form-text">Pega las columnas tal como aparecen en Bold. Se importarán los montos negativos y los movimientos identificados como gastos; los abonos e ingresos se omiten. Las demás columnas se conservan como detalle.</small>
+                    <textarea id="import-paste-text" class="form-control" rows="9" placeholder="Copia el listado de movimientos de Bold y pégalo aquí." aria-describedby="import-paste-help"></textarea>
+                    <small id="import-paste-help" class="form-text">Se admiten los bloques de movimientos de Bold y tablas copiadas. Se incluyen compras, comisiones, impuestos, pagos y transferencias enviadas; se omiten abonos, transferencias recibidas y reembolsos.</small>
                 </div>
             </div>
             <div id="import-btns-container">

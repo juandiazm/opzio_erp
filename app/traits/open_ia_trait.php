@@ -21,6 +21,7 @@ trait open_ia_trait
 		'chat' => 'gpt-6-terra',
 		'content' => 'gpt-6-terra',
 		'reasoning' => 'gpt-6-sol',
+		'vision' => 'gpt-6-luna',
 		'image' => 'gpt-image-2',
 	];
 	public $ENG_ASSISTANT_ID = 'asst_tQnGJMRH6rKOOedMw5Q87Tic';

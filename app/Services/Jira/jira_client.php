@@ -81,6 +81,60 @@ class jira_client
         ]);
     }
 
+    public function attachmentContent(string $attachmentId, int $maxBytes): string
+    {
+        if (! ctype_digit($attachmentId)) {
+            throw new RuntimeException('El identificador del adjunto Jira no es valido.');
+        }
+
+        $response = $this->request(retries: 0)
+            ->withOptions(['allow_redirects' => false])
+            ->get('/attachment/content/'.rawurlencode($attachmentId));
+
+        if ($response->redirect()) {
+            $location = trim((string) $response->header('Location'));
+            $target = parse_url($location);
+            $site = parse_url((string) $this->connection->site_url);
+            $target = is_array($target) ? $target : [];
+            $site = is_array($site) ? $site : [];
+            $targetHost = strtolower((string) ($target['host'] ?? ''));
+            $siteHost = strtolower((string) ($site['host'] ?? ''));
+            $sameSite = ($target['scheme'] ?? '') === 'https'
+                && $targetHost !== ''
+                && $targetHost === $siteHost
+                && (int) ($target['port'] ?? 443) === (int) ($site['port'] ?? 443)
+                && ! isset($target['user'])
+                && ! isset($target['pass']);
+            $atlassianMedia = ($target['scheme'] ?? '') === 'https'
+                && $targetHost === 'api.media.atlassian.com'
+                && (int) ($target['port'] ?? 443) === 443
+                && ! isset($target['user'])
+                && ! isset($target['pass']);
+            if (! $sameSite && ! $atlassianMedia) {
+                throw new RuntimeException('Jira redirigio el adjunto a un origen no permitido.');
+            }
+
+            $download = $sameSite
+                ? $this->request(retries: 0)->withOptions(['allow_redirects' => false])->get($location)
+                : Http::timeout($this->requestTimeout ?? (float) config('services.jira.timeout', config('jira.timeout', 30)))
+                    ->withOptions(['allow_redirects' => false])
+                    ->get($location);
+            if ($download->redirect()) {
+                throw new RuntimeException('Jira devolvio una redireccion adicional al descargar el adjunto.');
+            }
+            $response = $download;
+        }
+
+        $this->ensureSuccessful($response);
+        $contentLength = (int) $response->header('Content-Length', 0);
+        $content = $response->body();
+        if (($contentLength > $maxBytes) || strlen($content) > $maxBytes) {
+            throw new RuntimeException('El adjunto Jira excede el limite de bytes permitido.');
+        }
+
+        return $content;
+    }
+
     public function worklogs(string $issueKey, int $startAt = 0, int $maxResults = 100): array
     {
         return $this->get('/issue/'.rawurlencode($issueKey).'/worklog', [

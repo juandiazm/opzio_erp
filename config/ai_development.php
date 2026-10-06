@@ -9,6 +9,12 @@ return [
     'default_max_consecutive_failures' => (int) env('AI_DEVELOPMENT_MAX_CONSECUTIVE_FAILURES', 3),
     'queue_connection' => env('AI_DEVELOPMENT_QUEUE_CONNECTION', 'database'),
     'queue_name' => env('AI_DEVELOPMENT_QUEUE_NAME', 'ai-development'),
+    'image_context' => [
+        'enabled' => (bool) env('AI_DEVELOPMENT_IMAGE_CONTEXT_ENABLED', true),
+        'max_images' => (int) env('AI_DEVELOPMENT_IMAGE_MAX_IMAGES', 5),
+        'max_image_bytes' => (int) env('AI_DEVELOPMENT_IMAGE_MAX_IMAGE_BYTES', 5242880),
+        'max_total_bytes' => (int) env('AI_DEVELOPMENT_IMAGE_MAX_TOTAL_BYTES', 15728640),
+    ],
     'github' => [
         'base_url' => env('GITHUB_API_BASE_URL', 'https://api.github.com'),
         'timeout' => (float) env('GITHUB_TIMEOUT', 30),

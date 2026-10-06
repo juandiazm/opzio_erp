@@ -61,4 +61,56 @@ class BoldPasteParserTest extends TestCase
             unlink($path);
         }
     }
+
+    public function test_it_parses_bold_transaction_cards_and_skips_non_expenses(): void
+    {
+        $content = implode("\n", [
+            '30 de septiembre',
+            '',
+            'Bold',
+            'Transferencia enviada',
+            'Bre-B',
+            'Beneficiario de prueba',
+            '-$500.000,00',
+            '30/09/2026 - 12:38:01',
+            '',
+            'Bold',
+            'Transferencia recibida',
+            'Bolsillos',
+            'Cuenta de prueba',
+            '$500.000,00',
+            '30/09/2026 - 12:37:37',
+            '',
+            'Bold',
+            'Abono enviado',
+            'Bolsillos',
+            '-$38.394,00',
+            '29/09/2026 - 08:19:02',
+            '',
+            'Bold',
+            'Compra',
+            'Tarjeta débito',
+            'Comercio de prueba',
+            '-$164.700,00',
+            '29/09/2026 - 11:06:26',
+            '',
+            'Bold',
+            'Compra reembolsada',
+            'Tarjeta débito',
+            'Comercio de prueba',
+            '-$12.000,00',
+            '29/09/2026 - 10:00:00',
+        ]);
+
+        $result = (new BoldPasteParser())->parse($content);
+
+        $this->assertCount(5, $result['rows']);
+        $this->assertSame([], $result['errors']);
+        $this->assertSame('-500000.00', $result['rows'][0]['amount']);
+        $this->assertSame('500000.00', $result['rows'][1]['amount']);
+        $this->assertSame('38394.00', $result['rows'][2]['amount']);
+        $this->assertSame('-164700.00', $result['rows'][3]['amount']);
+        $this->assertSame('12000.00', $result['rows'][4]['amount']);
+        $this->assertStringContainsString('Tarjeta débito | Comercio de prueba', $result['rows'][3]['description']);
+    }
 }

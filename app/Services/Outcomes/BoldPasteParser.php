@@ -77,6 +77,10 @@ class BoldPasteParser
         }
 
         $lines = preg_split('/\r\n|\n|\r/', $content);
+        if ($this->isTransactionBlockFormat($lines)) {
+            return $this->parseTransactionBlocks($lines);
+        }
+
         $firstLine = '';
         foreach ($lines as $line) {
             if (trim($line) !== '') {
@@ -157,6 +161,119 @@ class BoldPasteParser
                 ];
             }
         }
+
+        return [
+            'rows' => $rows,
+            'errors' => $errors,
+        ];
+    }
+
+    private function isTransactionBlockFormat(array $lines): bool
+    {
+        foreach ($lines as $index => $line) {
+            if (trim($line) !== 'Bold') {
+                continue;
+            }
+
+            for ($next = $index + 1; $next < count($lines); $next++) {
+                $value = trim($lines[$next]);
+                if ($value === '') {
+                    continue;
+                }
+
+                if ($this->isExpenseMovement($value) || $this->isExplicitNonExpenseMovement($value)) {
+                    return true;
+                }
+                break;
+            }
+        }
+
+        return false;
+    }
+
+    private function parseTransactionBlocks(array $lines): array
+    {
+        $rows = [];
+        $errors = [];
+        $block = null;
+        $blockStartLine = 0;
+
+        $finishBlock = function () use (&$block, &$rows, &$errors, &$blockStartLine): void {
+            if ($block === null) {
+                return;
+            }
+
+            try {
+                if (count($block) < 4) {
+                    throw new InvalidArgumentException('El movimiento no contiene todos sus datos.');
+                }
+
+                $type = trim($block[0]);
+                $movementType = $this->normalizeHeader($type);
+                $isNonExpense = $this->isExplicitNonExpenseMovement($type);
+                if (!$isNonExpense && !$this->isExpenseMovement($type)) {
+                    throw new InvalidArgumentException("Tipo de movimiento no reconocido: '{$type}'.");
+                }
+
+                $amount = $this->parseMoney($block[count($block) - 2]);
+                if ($amount === null) {
+                    throw new InvalidArgumentException('El valor del movimiento no es válido.');
+                }
+
+                $timestamp = trim($block[count($block) - 1]);
+                $date = $this->parseDate($timestamp);
+                if ($isNonExpense) {
+                    $amount = ltrim($amount, '-');
+                } elseif ((float) $amount > 0) {
+                    $amount = '-' . ltrim($amount, '-');
+                }
+
+                $details = array_map('trim', array_slice($block, 1, -2));
+                $details = array_values(array_filter($details, fn (string $detail): bool => $detail !== ''));
+                $description = mb_substr(implode(' | ', array_merge([$type], $details, ['Hora: ' . $timestamp])), 0, 2000, 'UTF-8');
+                $identifier = 'PASTE-' . substr(hash('sha256', json_encode([
+                    $timestamp,
+                    $amount,
+                    $description,
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)), 0, 24);
+
+                $rows[] = [
+                    'line' => $blockStartLine,
+                    'date' => $date,
+                    'identifier' => $identifier,
+                    'description' => $description,
+                    'amount' => $amount,
+                    'balance' => null,
+                ];
+            } catch (\Throwable $exception) {
+                $errors[] = [
+                    'line' => $blockStartLine,
+                    'message' => $exception->getMessage(),
+                ];
+            }
+
+            $block = null;
+        };
+
+        foreach ($lines as $index => $line) {
+            $value = trim($line);
+            if ($value === 'Bold') {
+                $finishBlock();
+                $block = [];
+                $blockStartLine = $index + 1;
+                continue;
+            }
+
+            if ($block === null || $value === '' || preg_match('/^\d{1,2} de \p{L}+$/u', $value)) {
+                continue;
+            }
+
+            $block[] = $value;
+            if (preg_match('/^\d{2}\/\d{2}\/\d{4}\s+-\s+\d{2}:\d{2}:\d{2}$/', $value)) {
+                $finishBlock();
+            }
+        }
+        $finishBlock();
 
         return [
             'rows' => $rows,
@@ -268,7 +385,7 @@ class BoldPasteParser
     private function isExplicitNonExpenseMovement(string $movementType): bool
     {
         $type = $this->normalizeHeader($movementType);
-        foreach (['ABONO', 'INGRESO', 'CREDITO', 'VENTA', 'REEMBOLSO', 'DEVOLUCION', 'RECIBIDO', 'RECIBIDA', 'ANULACION', 'REVERSO', 'REVERSA'] as $marker) {
+        foreach (['ABONO', 'INGRESO', 'CREDITO', 'VENTA', 'REEMBOLS', 'DEVOLUCION', 'RECIBIDO', 'RECIBIDA', 'ANULACION', 'REVERSO', 'REVERSA'] as $marker) {
             if (str_contains($type, $marker)) {
                 return true;
             }
@@ -280,7 +397,7 @@ class BoldPasteParser
     private function isExpenseMovement(string $movementType): bool
     {
         $type = $this->normalizeHeader($movementType);
-        foreach (['GASTO', 'EGRESO', 'COMPRA', 'CARGO', 'DEBITO', 'COMISION', 'RETIRO', 'PAGO', 'TARIFA', 'SUSCRIPCION'] as $marker) {
+        foreach (['GASTO', 'EGRESO', 'COMPRA', 'CARGO', 'DEBITO', 'COMISION', 'RETIRO', 'PAGO', 'TARIFA', 'SUSCRIPCION', 'COBRO', 'IMPUESTO', 'TRANSFERENCIAENVIADA'] as $marker) {
             if (str_contains($type, $marker)) {
                 return true;
             }
@@ -295,7 +412,7 @@ class BoldPasteParser
             throw new InvalidArgumentException('La fecha está vacía.');
         }
 
-        foreach (['!d/m/Y', '!d/m/Y H:i:s', '!d/m/Y H:i', '!Y-m-d', '!Y-m-d H:i:s', '!Y-m-d H:i', '!d-m-Y', '!d-m-Y H:i:s', '!d-m-Y H:i'] as $format) {
+        foreach (['!d/m/Y', '!d/m/Y H:i:s', '!d/m/Y - H:i:s', '!d/m/Y H:i', '!Y-m-d', '!Y-m-d H:i:s', '!Y-m-d H:i', '!d-m-Y', '!d-m-Y H:i:s', '!d-m-Y H:i'] as $format) {
             try {
                 $date = Carbon::createFromFormat($format, $value);
                 $dateErrors = Carbon::getLastErrors();
