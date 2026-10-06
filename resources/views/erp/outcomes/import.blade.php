@@ -13,14 +13,21 @@
             </div>
             <div class="outcome-import-fields">
                 <div>
-                    <label class="form-label" for="import-source">Fuente</label>
-                    <select id="import-source" name="source" class="form-select" required>
-                        <option value="bold">Bold</option>
+                    <label class="form-label" for="import-format">Formato de importación</label>
+                    <select id="import-format" name="import-format" class="form-select" required>
+                        <option value="csv">Bold (CSV)</option>
+                        <option value="paste">Bold (copiar - pegar)</option>
                     </select>
                 </div>
-                <div>
+                <input type="hidden" name="source" value="bold">
+                <div id="import-file-field">
                     <label class="form-label" for="import-file-input">Archivo CSV</label>
                     <input type="file" id="import-file-input" name="import-file" accept=".csv,text/csv" class="form-control" required>
+                </div>
+                <div id="import-paste-field" hidden>
+                    <label class="form-label" for="import-paste-text">Datos copiados de Bold</label>
+                    <textarea id="import-paste-text" class="form-control" rows="9" placeholder="Copia la tabla completa, incluyendo la fila de encabezados, y pégala aquí." aria-describedby="import-paste-help"></textarea>
+                    <small id="import-paste-help" class="form-text">Pega las columnas tal como aparecen en Bold. Se importarán los montos negativos y los movimientos identificados como gastos; los abonos e ingresos se omiten. Las demás columnas se conservan como detalle.</small>
                 </div>
             </div>
             <div id="import-btns-container">

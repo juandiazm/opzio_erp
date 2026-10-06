@@ -6,8 +6,8 @@ use App\Services\Outcomes\OutcomeImportService;
 
 class outcomes_import
 {
-    public function import(string $path, string $source, int $userId): array
+    public function import(string $path, string $source, int $userId, string $format = 'csv'): array
     {
-        return app(OutcomeImportService::class)->import($path, $source, $userId);
+        return app(OutcomeImportService::class)->import($path, $source, $userId, $format);
     }
 }

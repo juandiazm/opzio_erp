@@ -186,7 +186,7 @@ trait outcomes_trait
     }
 
     //IMPORT
-    public function Outcome_ImportOutcomes($file, $source = 'bold', $userId = null){
+    public function Outcome_ImportOutcomes($file, $source = 'bold', $userId = null, $format = 'csv'){
         $Response = [
             'status' => 0,
             'message' => 'Error al importar los datos'
@@ -209,7 +209,7 @@ trait outcomes_trait
             }
             $path = $file->getRealPath() ?: $file->getPathname();
             $outcomes_import = new outcomes_import();
-            $Response = $outcomes_import->import($path, $source, (int) $userId);
+            $Response = $outcomes_import->import($path, $source, (int) $userId, $format);
         }catch(\Exception $e){
             $Response['message'] = 'Error al importar: '.$e->getMessage();
             info('Outcome_ImportOutcomes error: '.$e->getMessage());

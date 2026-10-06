@@ -63,6 +63,7 @@ $(document).on('click', '#create-outcome-button', createOutcome);
 $(document).on('click', '#update-outcome-button', updateOutcome);
 $(document).on('click', '#import-btn-container', massImport.openMassImportModal);
 $(document).on('click', '#import-cancel-btn, #import-cancel-action', massImport.closeMassImportModal);
+$(document).on('change', '#import-format', massImport.updateImportFormat);
 $(document).on('click', '#import-confirm-btn', massImport.confirmMassImport);
 $(document).on('click', '#import-form-container', function(event){
     if(event.target === this) massImport.closeMassImportModal();

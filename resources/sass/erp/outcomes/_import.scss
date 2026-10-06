@@ -42,7 +42,7 @@
 }
 
 #import-form {
-    width: min(100%, 440px);
+    width: min(100%, 560px);
 }
 
 .outcome-import-modal {
@@ -85,6 +85,16 @@
 .outcome-import-fields {
     display: grid;
     gap: 16px;
+
+    textarea {
+        resize: vertical;
+        font-family: monospace;
+    }
+
+    small {
+        display: block;
+        margin-top: 6px;
+    }
 }
 
 #import-btns-container {

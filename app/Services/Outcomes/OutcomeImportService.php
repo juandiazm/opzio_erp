@@ -11,11 +11,12 @@ class OutcomeImportService
 {
     public function __construct(
         private BoldOutcomeParser $parser,
+        private BoldPasteParser $pasteParser,
         private OutcomeClassifier $classifier
     ) {
     }
 
-    public function import(string $path, string $source, int $userId): array
+    public function import(string $path, string $source, int $userId, string $format = 'csv'): array
     {
         if ($source !== 'bold') {
             return [
@@ -25,7 +26,20 @@ class OutcomeImportService
         }
 
         try {
-            $parsed = $this->parser->parse($path);
+            if ($format === 'paste') {
+                $content = file_get_contents($path);
+                if ($content === false) {
+                    throw new \InvalidArgumentException('No se pudieron leer los datos pegados.');
+                }
+                $parsed = $this->pasteParser->parse($content);
+            } elseif ($format === 'csv') {
+                $parsed = $this->parser->parse($path);
+            } else {
+                return [
+                    'status' => 0,
+                    'message' => 'El formato de importación no está disponible.',
+                ];
+            }
         } catch (\Throwable $exception) {
             return [
                 'status' => 0,

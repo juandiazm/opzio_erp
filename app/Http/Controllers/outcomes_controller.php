@@ -171,6 +171,7 @@ class outcomes_controller extends Controller
     public function import_outcomes(Request $request){
         $request->validate([
             'source' => 'required|in:bold',
+            'import-format' => 'required|in:csv,paste',
             'import-file' => 'required|file|max:20480',
         ]);
 
@@ -200,7 +201,8 @@ class outcomes_controller extends Controller
         $Response = $this->Outcome_ImportOutcomes(
             $request->file('import-file'),
             $request->input('source'),
-            (int) $userId
+            (int) $userId,
+            $request->input('import-format')
         );
         if($Response['status'] == 1){
             return $Response;
