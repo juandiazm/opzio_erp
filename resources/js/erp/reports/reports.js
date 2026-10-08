@@ -3,6 +3,14 @@ import * as charts from './charts.js';
 import * as zoom from './zoom.js';
 import * as reportExport from './export.js';
 
+const dateRangePickerScript = document.createElement('script');
+dateRangePickerScript.src = 'https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js';
+const dateRangePickerLoaded = new Promise((resolve, reject) => {
+    dateRangePickerScript.onload = resolve;
+    dateRangePickerScript.onerror = () => reject(new Error('Failed to load the date range picker.'));
+});
+document.head.append(dateRangePickerScript);
+
 $('.report-item-date-input').on('apply.daterangepicker', function(ev, picker){
     charts.setDataOnReportItem($(this).attr('id'), picker.startDate.format('YYYY-MM-DD'), picker.endDate.format('YYYY-MM-DD'));
     charts.refreshCheckedGraphs(picker.startDate, picker.endDate, $(this).attr('id'));
@@ -23,7 +31,7 @@ $('#zoom-in-export-report-excel-icon').on('click', function(){
     reportExport.exportReport(sheets, this);
 });
 
-$(document).ready(function(){
+dateRangePickerLoaded.then(() => $(document).ready(function(){
     let startDate = moment().subtract(3, 'month');
     let endDate = moment();
     $('.report-item-date-input').daterangepicker({showDropdowns: true, startDate: startDate, endDate: endDate, maxDate: endDate});
@@ -36,4 +44,4 @@ $(document).ready(function(){
     charts.setDataOnReportItem('date-range-input-licenses', startDate, endDate);
     charts.setDataOnReportItem('date-range-input-incomes', startDate, endDate);
     charts.setDataOnReportItem('date-range-input-outcomes', startDate, endDate);
-});
+}));
