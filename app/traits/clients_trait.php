@@ -566,7 +566,7 @@ trait clients_trait
             }
             $documents = $documents->get();
             foreach($documents as $document){
-                $document->document_url = Storage::disk('client_document')->url($document->document_private_name);
+                $document->document_url = url('/storage/client_documents/'.rawurlencode($document->document_private_name));
             }
             return [
                 'status' => 1,
