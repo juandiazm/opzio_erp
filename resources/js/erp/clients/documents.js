@@ -79,7 +79,7 @@ function showClientDocuments(response){
     $.each(response.data,function(index,value){
         appendContent += '<tr id="'+value.id+'">';
             appendContent += '<td class="text-left"><input type="text" name="" class="client-document-input-name align-self-end input-value" placeholder="Nombre..." value="'+value.document_public_name+'"></td>';
-            appendContent += '<td class="text-left"><a href="'+value.document_url+'" target="_blank" class="client-document-input-link">'+value.document_private_name+'</a></td>';
+            appendContent += '<td class="text-left"><a href="'+value.document_url+'" target="_blank" rel="noopener noreferrer" class="client-document-input-link">'+value.document_private_name+'</a></td>';
             appendContent += '<td class="text-center action-cell">';
                 appendContent += '<i class="fa-solid fa-pen-to-square update-client-file-btn"></i>';
                 appendContent += '<i class="fa-solid fa-trash-can delete-client-file-btn"></i>';
