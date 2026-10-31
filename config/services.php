@@ -1,5 +1,11 @@
 <?php
 
+$isProduction = PHP_OS_FAMILY !== 'Windows' && env('APP_ENV', 'production') === 'production';
+$puppeteerHome = getenv(PHP_OS_FAMILY === 'Windows' ? 'USERPROFILE' : 'HOME');
+$localPuppeteerCache = $puppeteerHome
+    ? rtrim($puppeteerHome, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'.cache'.DIRECTORY_SEPARATOR.'puppeteer'
+    : storage_path('app/runtime/browsershot/puppeteer-cache');
+
 return [
 
     /*
@@ -129,8 +135,16 @@ return [
             'PDF_CHROME_PATH',
             PHP_OS_FAMILY === 'Windows' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : null
         ),
-        'node_binary' => env('PDF_NODE_BINARY', 'node'),
-        'node_module_path' => env('PDF_NODE_MODULE_PATH', base_path('node_modules')),
+        'node_binary' => env('PDF_NODE_BINARY', PHP_OS_FAMILY === 'Windows' ? 'node' : '/usr/bin/node'),
+        'node_module_path' => env(
+            'BROWSERSHOT_NODE_MODULES',
+            $isProduction ? '/opt/opzio/browsershot/node_modules' : env('PDF_NODE_MODULE_PATH', base_path('node_modules'))
+        ),
+        'puppeteer_cache_dir' => env(
+            'BROWSERSHOT_PUPPETEER_CACHE',
+            $isProduction ? '/opt/opzio/browsershot/cache' : env('PUPPETEER_CACHE_DIR', $localPuppeteerCache)
+        ),
+        'no_sandbox' => filter_var(env('BROWSERSHOT_NO_SANDBOX', $isProduction), FILTER_VALIDATE_BOOLEAN),
     ],
 
 ];

@@ -1,6 +1,6 @@
 <?php 
 namespace App\traits;
-use Spatie\Browsershot\Browsershot;
+use App\Services\Pdf\BrowsershotFactory;
 trait pdf_trait
 {
     public function PDF_GenerarPDF($view, $Data, $orientation = 'portrait')
@@ -13,13 +13,7 @@ trait pdf_trait
         $processTimeout = (int) config('services.pdf.'.($isJiraReport ? 'jira_timeout' : 'timeout'), $isJiraReport ? 300 : 180);
         $protocolTimeout = (int) config('services.pdf.'.($isJiraReport ? 'jira_protocol_timeout' : 'protocol_timeout'), $isJiraReport ? 300 : 180);
 
-        $browsershot = Browsershot::html($html)
-            ->setNodeBinary(config('services.pdf.node_binary', 'node'))
-            ->setNodeModulePath(config('services.pdf.node_module_path', base_path('node_modules')))
-            ->addChromiumArguments([
-                'no-sandbox',
-                'disable-setuid-sandbox',
-            ])
+        $browsershot = app(BrowsershotFactory::class)->fromHtml($html)
             ->format('A4')
             ->landscape(strtolower($orientation) === 'landscape')
             ->showBackground()
@@ -29,56 +23,6 @@ trait pdf_trait
             ->timeout(max(30, $processTimeout))
             ->protocolTimeout(max(30, $protocolTimeout))
             ->setOption('preferCSSPageSize', true);
-
-        $runtimeDir = storage_path('app/runtime/browsershot');
-        $runtimeDirectories = [
-            $runtimeDir,
-            $runtimeDir.'/home',
-            $runtimeDir.'/config',
-            $runtimeDir.'/cache',
-            $runtimeDir.'/data',
-        ];
-
-        foreach ($runtimeDirectories as $directory) {
-            if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
-                throw new \RuntimeException('Unable to create PDF runtime directory: '.$directory);
-            }
-
-            if (!is_writable($directory)) {
-                throw new \RuntimeException('PDF runtime directory is not writable: '.$directory);
-            }
-        }
-
-        $defaultPuppeteerCacheDir = base_path('.runtime/puppeteer-cache');
-        $configuredPuppeteerCacheDir = getenv('PUPPETEER_CACHE_DIR') ?: null;
-        $puppeteerCacheDir = is_dir($defaultPuppeteerCacheDir) && is_writable($defaultPuppeteerCacheDir)
-            ? $defaultPuppeteerCacheDir
-            : $runtimeDir.'/puppeteer-cache';
-
-        if ($configuredPuppeteerCacheDir && is_dir($configuredPuppeteerCacheDir) && is_writable($configuredPuppeteerCacheDir)) {
-            $puppeteerCacheDir = $configuredPuppeteerCacheDir;
-        }
-
-        if (!is_dir($puppeteerCacheDir) && !mkdir($puppeteerCacheDir, 0775, true) && !is_dir($puppeteerCacheDir)) {
-            throw new \RuntimeException('Unable to create Puppeteer cache directory: '.$puppeteerCacheDir);
-        }
-
-        if (!is_writable($puppeteerCacheDir)) {
-            throw new \RuntimeException('Puppeteer cache directory is not writable: '.$puppeteerCacheDir);
-        }
-
-        $browsershot->setNodeEnv([
-            'HOME' => $runtimeDir.'/home',
-            'XDG_CONFIG_HOME' => $runtimeDir.'/config',
-            'XDG_CACHE_HOME' => $runtimeDir.'/cache',
-            'XDG_DATA_HOME' => $runtimeDir.'/data',
-            'PUPPETEER_CACHE_DIR' => $puppeteerCacheDir,
-        ]);
-
-        $chromePath = config('services.pdf.chrome_path');
-        if ($chromePath) {
-            $browsershot->setChromePath($chromePath);
-        }
 
         if ($view === 'pdf.contract') {
             $browsershot
