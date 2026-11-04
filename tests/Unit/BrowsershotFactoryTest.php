@@ -30,6 +30,7 @@ class BrowsershotFactoryTest extends TestCase
             $this->assertSame($modulesPath, $this->propertyValue($browsershot, 'nodeModulePath'));
             $this->assertSame('node-test', $this->propertyValue($browsershot, 'nodeBinary'));
             $this->assertSame(storage_path('app/runtime/browsershot/tmp'), $this->propertyValue($browsershot, 'tempPath'));
+            $this->assertSame('load', $this->propertyValue($browsershot, 'additionalOptions')['waitUntil']);
             $this->assertSame($cachePath, $this->propertyValue($browsershot, 'nodeEnvVars')['PUPPETEER_CACHE_DIR']);
             $this->assertSame(storage_path('app/runtime/browsershot/home'), $this->propertyValue($browsershot, 'nodeEnvVars')['HOME']);
             $this->assertSame(storage_path('app/runtime/browsershot/config'), $this->propertyValue($browsershot, 'nodeEnvVars')['XDG_CONFIG_HOME']);

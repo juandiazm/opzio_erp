@@ -17,7 +17,6 @@ trait pdf_trait
             ->format('A4')
             ->landscape(strtolower($orientation) === 'landscape')
             ->showBackground()
-            ->waitUntilNetworkIdle()
             ->newHeadless()
             ->writeOptionsToFile()
             ->timeout(max(30, $processTimeout))

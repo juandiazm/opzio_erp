@@ -60,7 +60,8 @@ class BrowsershotFactory
             ->setNodeBinary(config('services.pdf.node_binary'))
             ->setNodeModulePath($nodeModulePath)
             ->setCustomTempPath($runtimeDir.'/tmp')
-            ->setNodeEnv($runtimeEnvironment);
+            ->setNodeEnv($runtimeEnvironment)
+            ->setOption('waitUntil', 'load');
 
         $chromePath = config('services.pdf.chrome_path');
         if ($chromePath) {
