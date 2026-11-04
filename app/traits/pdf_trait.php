@@ -73,7 +73,7 @@ trait pdf_trait
 
     private function PDF_EnterpriseHeaderHtml($identifier, $date)
     {
-        $logo = $this->PDF_AssetDataUri(public_path('images/opzio-logo-wide-purple-transparent.png'));
+        $logo = $this->PDF_AssetDataUri(public_path('images/opzio-logo-pdf.png'));
         $logo = $logo ? htmlspecialchars($logo, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : null;
         $identifier = htmlspecialchars((string) $identifier, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $date = htmlspecialchars((string) $date, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -117,7 +117,7 @@ trait pdf_trait
     {
         $report = is_array($Data['report'] ?? null) ? $Data['report'] : [];
         $project = is_array($report['project'] ?? null) ? $report['project'] : [];
-        $logo = $this->PDF_AssetDataUri(public_path('images/opzio-logo-wide-purple-transparent.png'));
+        $logo = $this->PDF_AssetDataUri(public_path('images/opzio-logo-pdf.png'));
         $logo = $logo ? htmlspecialchars($logo, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : null;
         $projectName = htmlspecialchars((string) ($project['display_name'] ?? $project['name'] ?? 'Proyecto'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $period = htmlspecialchars((string) ($report['period']['label'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

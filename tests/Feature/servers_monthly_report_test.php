@@ -179,6 +179,28 @@ class servers_monthly_report_test extends TestCase
         $this->assertStringNotContainsString('/var/www/report-project', $pdfHtml);
     }
 
+    public function test_monthly_report_pdf_header_embeds_the_optimized_logo()
+    {
+        $command = app(\App\Console\Commands\send_servers_monthly_report::class);
+        $headerMethod = new \ReflectionMethod($command, 'PDF_ServersMonthlyHeaderHtml');
+        $headerMethod->setAccessible(true);
+
+        $header = $headerMethod->invoke($command, [
+            'report' => [
+                'project' => ['display_name' => 'Proyecto de prueba'],
+                'period' => ['label' => 'Octubre 2026'],
+            ],
+        ]);
+        $logoPath = public_path('images/opzio-logo-pdf.png');
+        $dimensions = getimagesize($logoPath);
+
+        $this->assertIsArray($dimensions);
+        $this->assertSame(472, $dimensions[0]);
+        $this->assertSame(221, $dimensions[1]);
+        $this->assertStringContainsString('data:image/png;base64,', $header);
+        $this->assertLessThan(30000, strlen($header));
+    }
+
     public function test_monthly_report_dry_run_is_idempotent_safe_and_targets_active_projects()
     {
         $exitCode = Artisan::call('servers:send-monthly-report', [

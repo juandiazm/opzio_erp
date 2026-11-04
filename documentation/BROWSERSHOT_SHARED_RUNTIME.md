@@ -8,4 +8,6 @@ The factory checks that Puppeteer is readable, that the configured browser cache
 
 The ERP production and QA deployment workflows run `php artisan browsershot:smoke-test` as the detected PHP-FPM pool user after deployment. The command generates a PDF and fails the deployment unless the output begins with a PDF signature. They also restart Laravel queue workers after deployment so long-lived workers load the deployed code.
 
+PDF headers embed the 472×221 `public/images/opzio-logo-pdf.png` asset instead of the 6057×2838 source logo. This preserves the existing print dimensions while avoiding repeatedly decoding a 17-megapixel image for each report.
+
 CRM does not use Browsershot: its PDF generation uses Dompdf, which does not require Node.js, Puppeteer, Chrome, or a project `node_modules` directory. Its existing quotation PDF test exercises that path.

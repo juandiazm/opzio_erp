@@ -3,7 +3,7 @@
 The production VM receives two different kinds of changes:
 
 1. **System changes through authenticated Remote SSH:** NGINX JSON logs, PHP-FPM local status, read-only permissions, the `opzio-observer` user, systemd unit, token file and release installer.
-2. **Application/agent code through CI/CD:** Laravel deploy remains in the existing `ridder_erp` workflow; the Go agent has its own workflow and uploads only a compiled Linux binary to a release directory.
+2. **Application/agent code through CI/CD:** Laravel deploys through `.github/workflows/qa.yml` for QA and `.github/workflows/main.yml` for production; the Go agent has its own workflow and uploads only a compiled Linux binary to a release directory.
 
 Do not upload the Go source tree to the VM. Do not run Go on production. Do not place the ERP token or observer token in either repository.
 
