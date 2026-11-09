@@ -13,6 +13,8 @@ export const incomeState = {
     editingGoalId: null,
     currentIncome: null,
     incomeId: null,
+    sortBy: 'created_at',
+    sortDirection: 'desc',
     incomeStatesTotals: {
         '-1': {total: 0, text: 'Todas', class: 'state-1'},
         '0': {total: 0, text: 'Pendiente', class: 'state-0'},

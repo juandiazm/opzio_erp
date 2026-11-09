@@ -245,20 +245,88 @@ trait incomes_trait
         $state = null
         ,
         $with_trashed = false
+        ,
+        $due_status = 'all'
+        ,
+        $sort_by = 'created_at'
+        ,
+        $sort_direction = 'desc'
+        ,
+        $states = null
     ) {
         try {
-            $incomes = income::with('client')->orderBy('created_at', 'desc');
+            $sortableColumns = [
+                'client_name' => 'client_name',
+                'cutoff_date' => 'cutoff_date',
+                'aging' => 'cutoff_date',
+                'total' => 'total',
+                'bill_name' => 'bill_name',
+                'payment_date' => 'payment_date',
+                'created_at' => 'created_at',
+                'state' => 'state',
+            ];
+            $sortBy = is_string($sort_by) && isset($sortableColumns[$sort_by])
+                ? $sort_by
+                : 'created_at';
+            $sortColumn = $sortableColumns[$sortBy];
+            $sortDirection = is_string($sort_direction) && strtolower($sort_direction) === 'asc'
+                ? 'asc'
+                : 'desc';
+
+            $incomes = income::with('client');
+            if ($sortBy === 'aging') {
+                $paidDirection = $sortDirection === 'asc' ? 'ASC' : 'DESC';
+                $incomes = $incomes->orderByRaw(
+                    'CASE WHEN state = 3 OR payment_state = 1 THEN 1 ELSE 0 END ' . $paidDirection
+                );
+            }
+            $incomes = $incomes
+                ->orderBy($sortColumn, $sortDirection)
+                ->orderBy('id', 'desc');
             if ($with_trashed) {
                 $incomes = $incomes->withTrashed();
             }
-            if ($state != null && $state != '' && $state != '-1')
+            if (is_array($states)) {
+                $validStates = [0, 1, 2, 3, 4];
+                $selectedStates = [];
+                foreach ($states as $selectedState) {
+                    if (is_int($selectedState) && in_array($selectedState, $validStates, true)) {
+                        $selectedStates[] = $selectedState;
+                    } elseif (is_string($selectedState) && in_array($selectedState, ['0', '1', '2', '3', '4'], true)) {
+                        $selectedStates[] = (int) $selectedState;
+                    }
+                }
+                $selectedStates = array_values(array_unique($selectedStates));
+                if ($selectedStates !== [] && count($selectedStates) < count($validStates)) {
+                    $incomes = $incomes->whereIn('state', $selectedStates);
+                }
+            } elseif ($state != null && $state != '' && $state != '-1') {
                 $incomes = $incomes->where('state', $state);
+            }
+            if ($due_status === 'overdue' || $due_status === 'due_soon') {
+                $today = Carbon::today();
+                $incomes = $incomes
+                    ->whereIn('state', [2, 4])
+                    ->where('payment_state', '!=', 1)
+                    ->whereNull('deleted_at');
+
+                if ($due_status === 'overdue') {
+                    $incomes = $incomes->where('cutoff_date', '<', $today->toDateString());
+                } else {
+                    $incomes = $incomes->whereBetween('cutoff_date', [
+                        $today->toDateString(),
+                        $today->copy()->addDays(7)->toDateString(),
+                    ]);
+                }
+            }
             if ($search != null && $search != '') {
                 $incomes = $incomes->where(function ($query) use ($search) {
                     $query->where('unique_id', 'like', '%' . $search . '%')
                         ->orWhere('client_identification', 'like', '%' . $search . '%')
                         ->orWhere('client_name', 'like', '%' . $search . '%')
                         ->orWhere('total', 'like', '%' . $search . '%')
+                        ->orWhere('bill_name', 'like', '%' . $search . '%')
+                        ->orWhere('payment_reference', 'like', '%' . $search . '%')
                     ;
                 });
             }

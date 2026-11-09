@@ -38,12 +38,26 @@ function changeTab(){
 
 $(document).on('click', '#nav-tab .nav-link', changeTab);
 $(document).on('change', '#db-pagination-per-page', list.changePageSize);
+$(document).on('click', '.income-sort-button', function(){ list.toggleIncomeSort($(this).attr('data-sort-by')); });
+$(document).on('click', '#income-state-filter-select-all', function(){
+    $('.income-state-filter').prop('checked', true);
+    list.updateStateFilterSummary();
+    incomeState.pagination.page = 1;
+    list.getIncomesPage();
+});
 $(document).on('click', '#db-pagination .page-item-number', list.changePage);
 $(document).on('click', '#db-page-item-back', list.selectBackPage);
 $(document).on('click', '#db-page-item-next', list.selectNextPage);
 $(document).on('click', '.list-update-btn', function(){ list.goToUpdateTab(this); });
 $(document).on('change', '#search-list-input', function(){ incomeState.pagination.page = 1; list.getIncomesPage(); });
-$(document).on('change', '#state-list-input', function(){ incomeState.pagination.page = 1; list.getIncomesPage(); });
+$(document).on('change', '.income-state-filter', function(){
+    const stateOptions = $('.income-state-filter');
+    if(stateOptions.filter(':checked').length === 0) stateOptions.prop('checked', true);
+    list.updateStateFilterSummary();
+    incomeState.pagination.page = 1;
+    list.getIncomesPage();
+});
+$(document).on('change', '#due-status-list-input', function(){ incomeState.pagination.page = 1; list.getIncomesPage(); });
 $(document).on('click', '.list-delete-btn', function(){ list.deleteIncome($(this).parent().parent().attr('income-id')); });
 $(document).on('click', '.list-view-order', function(){ if(list.setCurrentIncomeFromRow(this)) order.showIncomeOrder(); });
 $(document).on('click', '.list-update-traceability', function(){ if(list.setCurrentIncomeFromRow(this)) goToIncomesTraceability('id%'+incomeState.currentIncome.id); });

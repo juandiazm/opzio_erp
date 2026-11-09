@@ -26,6 +26,71 @@ function renderSiigoAction(income, client){
     return '<a href="javascript:void(0)" onclick="window.createSiigoInvoice('+income.id+')" title="Crear factura electrónica"><i class="fa-solid fa-file-circle-plus text-success"></i></a>';
 }
 
+function renderIncomeAging(income){
+    const state = Number(income.state);
+    if(state === 3 || Number(income.payment_state) === 1){
+        return '<span class="income-aging income-aging-paid">Pagado</span>';
+    }
+    if(income.deleted_at || ![2, 4].includes(state)){
+        return '<span class="text-muted">—</span>';
+    }
+
+    const daysOverdue = Number(income.days_overdue) || 0;
+    if(daysOverdue > 0){
+        const dayLabel = daysOverdue === 1 ? 'día' : 'días';
+        return '<span class="income-aging income-aging-overdue" title="En mora '+daysOverdue+' '+dayLabel+'">-'+daysOverdue+'</span>';
+    }
+
+    const daysUntilCutoff = Number(income.days_until_cutoff) || 0;
+    const title = daysUntilCutoff === 0
+        ? 'Vence hoy'
+        : 'Faltan '+daysUntilCutoff+' '+(daysUntilCutoff === 1 ? 'día' : 'días');
+    return '<span class="income-aging income-aging-upcoming" title="'+title+'">'+daysUntilCutoff+'</span>';
+}
+
+export function updateSortHeaders(){
+    $('#income-list-table-header th[data-sort-key]').each(function(){
+        const header = $(this);
+        const isActive = header.attr('data-sort-key') === incomeState.sortBy;
+        const direction = incomeState.sortDirection === 'asc' ? 'asc' : 'desc';
+        const label = header.attr('data-sort-label');
+        const icon = header.find('.income-sort-indicator');
+
+        header.attr('aria-sort', isActive ? (direction === 'asc' ? 'ascending' : 'descending') : 'none');
+        icon.removeClass('fa-sort fa-sort-up fa-sort-down').addClass(
+            isActive ? (direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'
+        );
+        header.find('.income-sort-button').attr(
+            'aria-label',
+            'Ordenar por '+label+(isActive ? ' ('+(direction === 'asc' ? 'ascendente' : 'descendente')+')' : '')
+        );
+    });
+}
+
+export function updateStateFilterSummary(){
+    const options = $('.income-state-filter');
+    const selected = options.filter(':checked');
+    let summary = 'Todos los estados';
+
+    if(selected.length === 1){
+        summary = selected.first().closest('.income-state-filter-option').find('.erp-status-label').text().trim();
+    }else if(selected.length > 1 && selected.length < options.length){
+        summary = selected.length+' estados seleccionados';
+    }
+
+    $('#income-state-filter-summary').text(summary);
+    $('#income-state-filter-toggle').attr('aria-label', 'Filtrar por estado: '+summary);
+}
+
+function updateIncomeStateFilterTotals(){
+    $('#income-state-filter-total-all').text('$'+incomeState.incomeStatesTotals['-1'].total.toLocaleString('es-CO'));
+    ['0', '1', '2', '3', '4'].forEach(function(state){
+        $('#income-state-filter-total-'+state).text(
+            '$'+incomeState.incomeStatesTotals[state].total.toLocaleString('es-CO')
+        );
+    });
+}
+
 export function showPagination(){
     let paginationContainer = $('#db-pagination');
     paginationContainer.empty();
@@ -59,9 +124,28 @@ export function changePage(){ let selectedPage = $(this).attr('title'); if(selec
 export function selectBackPage(){ if(incomeState.pagination.page > 1){ incomeState.pagination.page = parseInt(incomeState.pagination.page) - 1; getIncomesPage(); } }
 export function selectNextPage(){ if(incomeState.pagination.page < incomeState.pagination.totalPages){ incomeState.pagination.page = parseInt(incomeState.pagination.page) + 1; getIncomesPage(); } }
 
+export function toggleIncomeSort(sortBy){
+    if(incomeState.sortBy === sortBy){
+        incomeState.sortDirection = incomeState.sortDirection === 'asc' ? 'desc' : 'asc';
+    }else{
+        incomeState.sortBy = sortBy;
+        incomeState.sortDirection = 'asc';
+    }
+    incomeState.pagination.page = 1;
+    updateSortHeaders();
+    getIncomesPage();
+}
+
 export function getIncomesPage(){
     if(incomeState.incomeId != null && incomeState.incomeId != '' && incomeState.incomeId != 0) $('#search-list-input').val(incomeState.incomeId);
-    PostMethodFunction('/admin/incomes/get-page', {pagination: incomeState.pagination, search: $('#search-list-input').val(), state: $('#state-list-input').val()}, null, showIncomesPage, null);
+    PostMethodFunction('/admin/incomes/get-page', {
+        pagination: incomeState.pagination,
+        search: $('#search-list-input').val(),
+        states: $('.income-state-filter:checked').map(function(){ return this.value; }).get(),
+        due_status: $('#due-status-list-input').val(),
+        sort_by: incomeState.sortBy,
+        sort_direction: incomeState.sortDirection,
+    }, null, showIncomesPage, null);
 }
 
 export function setCurrentIncomeFromRow(row){
@@ -87,15 +171,18 @@ export function showIncomesPage(response){
     };
     incomeState.pagination = response.pagination;
     incomeState.incomes = response.data;
+    updateSortHeaders();
     let appendedContent = '';
     $.each(incomeState.incomes, function(index, value){
         value.total = Math.round(value.total);
         const associatedClient = value.client || null;
         appendedContent += '<tr income-id='+value.id+' class="income-row-info'+(value.state != 1 ? '' : ' deleted')+'">';
         appendedContent += '<td class="columns-identity text-start erp-identity-cell" title="'+value.unique_id+'"><div class="erp-identity">'+renderEntityAvatar(associatedClient, 'clients')+'<div class="erp-identity-copy"><p class="erp-identity-name" title="'+value.client_name+'">'+value.client_name+'</p><span class="erp-identity-meta"><button type="button" class="erp-copy-id copy-action" data-clipboard-text="'+value.unique_id+'" title="Copiar ID" aria-label="Copiar ID"><i class="fa-regular fa-copy"></i></button><span>'+value.unique_id.substr(value.unique_id.length - 5)+'</span></span></div></div></td>';
-        appendedContent += '<td class="columns-cycle text-center"><div class="erp-meta-stack"><span>Pago O.: '+value.timely_payment+'</span><small>Corte: '+value.cutoff_date+'</small></div></td>';
+        appendedContent += '<td class="columns-cycle text-center"><div class="erp-meta-stack"><span>Pago oportuno: '+value.timely_payment+'</span><small>Corte: '+value.cutoff_date+'</small></div></td>';
         appendedContent += '<td class="columns-total text-end" title="'+value.total+'"><p>$'+value.total.toLocaleString('es-CO')+'</p></td>';
         appendedContent += '<td class="columns-bill text-center"><div class="erp-meta-stack erp-bill-meta"><span>'+(value.bill_name == null ? '-' : value.bill_name)+'</span><span>'+renderSiigoAction(value, associatedClient)+'</span></div></td>';
+        appendedContent += '<td class="columns-payment-date text-center"><p>'+(value.payment_date || '—')+'</p></td>';
+        appendedContent += '<td class="columns-aging text-center">'+renderIncomeAging(value)+'</td>';
         appendedContent += '<td class="columns-created-at text-center"><p>'+value.created_at_string+'</p></td>';
         appendedContent += '<td class="columns-state text-center">'+renderIncomeState(value)+'</td><td class="columns-actions text-end action-cell">';
         const paymentLinkAvailable = value.payment_state != 1 && value.state != 1;
@@ -112,14 +199,8 @@ export function showIncomesPage(response){
     });
     $('#income-list-table #income-list-table-body').empty().append(appendedContent);
     showPagination();
-    let selectedState = $('#state-list-input').val();
-    $('#state-list-input').empty();
-    $('#state-list-input').append('<option value="-1" '+(selectedState == '-1' ? 'selected' : '')+'>Todos ($'+incomeState.incomeStatesTotals['-1'].total.toLocaleString('es-CO')+')</option>');
-    $('#state-list-input').append('<option value="0" '+(selectedState == 0 ? 'selected' : '')+'>Cotizaciones ($'+incomeState.incomeStatesTotals[0].total.toLocaleString('es-CO')+')</option>');
-    $('#state-list-input').append('<option value="1" '+(selectedState == 1 ? 'selected' : '')+'>Rechazadas ($'+incomeState.incomeStatesTotals[1].total.toLocaleString('es-CO')+')</option>');
-    $('#state-list-input').append('<option value="2" '+(selectedState == 2 ? 'selected' : '')+'>Aprobadas ($'+incomeState.incomeStatesTotals[2].total.toLocaleString('es-CO')+')</option>');
-    $('#state-list-input').append('<option value="3" '+(selectedState == 3 ? 'selected' : '')+'>Pagadas ($'+incomeState.incomeStatesTotals[3].total.toLocaleString('es-CO')+')</option>');
-    $('#state-list-input').append('<option value="4" '+(selectedState == 4 ? 'selected' : '')+'>Facturadas ($'+incomeState.incomeStatesTotals[4].total.toLocaleString('es-CO')+')</option>');
+    updateIncomeStateFilterTotals();
+    updateStateFilterSummary();
     if(incomeState.incomeId != null && incomeState.incomeId != '' && incomeState.incomeId != 0){
         if(incomeState.incomes.length > 0){ incomeState.currentIncome = incomeState.incomes[0]; if(incomeState.currentIncome != null){ setUpdateRecordId(incomeState.currentIncome.unique_id || incomeState.currentIncome.id); incomeState.tabsView['nav-update-tab'] = false; $('#nav-update-tab').removeClass('d-none').tab('show'); $('#nav-update-tab').trigger('click'); } }
         incomeState.incomeId = null;

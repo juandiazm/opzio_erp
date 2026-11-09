@@ -12,7 +12,7 @@ use \Carbon\Carbon;
 class income extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $appends = ['state_text', 'created_at_string', 'payment_link', 'total_string', 'doc_url', 'bill_final_value_string','payment_state_text', 'cutoff_date_string', 'days_overdue', 'total_advances', 'balance_pending'];
+    protected $appends = ['state_text', 'created_at_string', 'payment_link', 'total_string', 'doc_url', 'bill_final_value_string','payment_state_text', 'cutoff_date_string', 'days_overdue', 'days_until_cutoff', 'total_advances', 'balance_pending'];
     protected $casts = [
         'quotation_totalize' => 'boolean',
     ];
@@ -71,6 +71,20 @@ class income extends Model
             return (int) $cutoffDate->diffInDays($today);
         }
         
+        return 0;
+    }
+    public function getDaysUntilCutoffAttribute(){
+        if (!$this->cutoff_date) {
+            return 0;
+        }
+
+        $cutoffDate = Carbon::parse($this->cutoff_date)->startOfDay();
+        $today = Carbon::today();
+
+        if ($cutoffDate->greaterThanOrEqualTo($today)) {
+            return (int) $today->diffInDays($cutoffDate);
+        }
+
         return 0;
     }
     /*relationships*/

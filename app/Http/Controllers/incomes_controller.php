@@ -82,11 +82,19 @@ class incomes_controller extends Controller
 
     //Get incomes page
     public function get_page(Request $request){
+        $validatedFilters = $request->validate([
+            'states' => ['sometimes', 'array'],
+            'states.*' => ['integer', 'in:0,1,2,3,4'],
+        ]);
         $Response = $this->Income_GetPage(
             $request->pagination,
             $request->search,
             $request->state,
-            true
+            true,
+            $request->input('due_status', 'all'),
+            $request->input('sort_by', 'created_at'),
+            $request->input('sort_direction', 'desc'),
+            $validatedFilters['states'] ?? null
         );
         if($Response['status'] == 1){
             return $Response;
