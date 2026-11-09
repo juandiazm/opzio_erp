@@ -13,6 +13,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 use Tests\TestCase;
@@ -1210,5 +1211,34 @@ class JiraModuleTest extends TestCase
         $this->assertFalse($result['has_more']);
         $this->assertStringContainsString('created >= "1970-01-01 00:00', (string) $capturedJql);
         $this->assertStringContainsString('ORDER BY created ASC', (string) $capturedJql);
+    }
+
+    public function test_sync_command_logs_failure_context_for_scheduler_diagnostics(): void
+    {
+        $connection = jira_connection::create([
+            'name' => 'Jira con error',
+            'site_url' => 'https://demo.atlassian.net',
+            'provider' => 'jira_cloud',
+            'status' => 'active',
+            'credentials' => ['email' => 'robot@example.test', 'api_token' => 'secret-token'],
+        ]);
+        $service = \Mockery::mock(jira_sync_service::class);
+        $service->shouldReceive('sync')
+            ->once()
+            ->andThrow(new \RuntimeException('Jira devolvio HTTP 503.'));
+        $this->app->instance(jira_sync_service::class, $service);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->withArgs(function (string $message, array $context) use ($connection): bool {
+                return $message === 'Jira sync command failed.'
+                    && $context['connection_id'] === $connection->id
+                    && $context['exception'] === \RuntimeException::class
+                    && $context['message'] === 'Jira devolvio HTTP 503.';
+            });
+
+        $exitCode = Artisan::call('jira:sync', ['--incremental' => true, '--days' => 1]);
+
+        $this->assertSame(1, $exitCode);
     }
 }

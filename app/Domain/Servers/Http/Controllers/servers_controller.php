@@ -11,6 +11,7 @@ use App\Domain\Servers\Models\servers_project;
 use App\Domain\Servers\Models\servers_project_sample;
 use App\Domain\Servers\Models\servers_storage_sample;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -118,15 +119,7 @@ class servers_controller extends Controller
         $existingBatch = servers_ingest_batch::where('batch_id', $validated['batch_id'])->first();
 
         if ($existingBatch) {
-            if ($existingBatch->payload_hash !== $payloadHash || $existingBatch->agent_id !== $agent->agent_id) {
-                return response()->json(['message' => 'Batch id was already used with another payload.'], 409);
-            }
-
-            return response()->json([
-                'accepted' => true,
-                'duplicate' => true,
-                'batch_id' => $validated['batch_id'],
-            ], 202);
+            return $this->duplicateBatchResponse($existingBatch, $validated['batch_id'], $agent->agent_id, $payloadHash);
         }
 
         $projectReferences = collect($payload['projects'] ?? [])
@@ -153,132 +146,154 @@ class servers_controller extends Controller
             ], 422);
         }
 
-        DB::transaction(function () use ($agent, $payload, $validated, $payloadHash, $projects) {
-            servers_ingest_batch::create([
-                'batch_id' => $validated['batch_id'],
-                'agent_id' => $agent->agent_id,
-                'captured_at' => $validated['captured_at'],
-                'payload_hash' => $payloadHash,
-                'accepted_at' => now(),
-            ]);
-
-            if (! empty($payload['host'])) {
-                $host = $payload['host'];
-                servers_host_sample::create([
-                    'host_id' => $agent->host_id,
+        try {
+            DB::transaction(function () use ($agent, $payload, $validated, $payloadHash, $projects) {
+                servers_ingest_batch::create([
+                    'batch_id' => $validated['batch_id'],
                     'agent_id' => $agent->agent_id,
-                    'sampled_at' => $host['sampled_at'] ?? $validated['captured_at'],
-                    'cpu_percent' => $host['cpu_percent'] ?? null,
-                    'load1' => $host['load1'] ?? null,
-                    'load5' => $host['load5'] ?? null,
-                    'load15' => $host['load15'] ?? null,
-                    'memory_total_bytes' => $host['memory_total_bytes'] ?? null,
-                    'memory_available_bytes' => $host['memory_available_bytes'] ?? null,
-                    'swap_total_bytes' => $host['swap_total_bytes'] ?? null,
-                    'swap_free_bytes' => $host['swap_free_bytes'] ?? null,
-                    'network_rx_bytes' => $host['network_rx_bytes'] ?? null,
-                    'network_tx_bytes' => $host['network_tx_bytes'] ?? null,
-                    'disk_total_bytes' => $host['disk_total_bytes'] ?? null,
-                    'disk_free_bytes' => $host['disk_free_bytes'] ?? null,
-                    'disk_used_bytes' => $host['disk_used_bytes'] ?? null,
-                    'disk_used_percent' => $host['disk_used_percent'] ?? null,
-                    'metadata' => $host['metadata'] ?? null,
+                    'captured_at' => $validated['captured_at'],
+                    'payload_hash' => $payloadHash,
+                    'accepted_at' => now(),
                 ]);
+
+                if (! empty($payload['host'])) {
+                    $host = $payload['host'];
+                    servers_host_sample::create([
+                        'host_id' => $agent->host_id,
+                        'agent_id' => $agent->agent_id,
+                        'sampled_at' => $host['sampled_at'] ?? $validated['captured_at'],
+                        'cpu_percent' => $host['cpu_percent'] ?? null,
+                        'load1' => $host['load1'] ?? null,
+                        'load5' => $host['load5'] ?? null,
+                        'load15' => $host['load15'] ?? null,
+                        'memory_total_bytes' => $host['memory_total_bytes'] ?? null,
+                        'memory_available_bytes' => $host['memory_available_bytes'] ?? null,
+                        'swap_total_bytes' => $host['swap_total_bytes'] ?? null,
+                        'swap_free_bytes' => $host['swap_free_bytes'] ?? null,
+                        'network_rx_bytes' => $host['network_rx_bytes'] ?? null,
+                        'network_tx_bytes' => $host['network_tx_bytes'] ?? null,
+                        'disk_total_bytes' => $host['disk_total_bytes'] ?? null,
+                        'disk_free_bytes' => $host['disk_free_bytes'] ?? null,
+                        'disk_used_bytes' => $host['disk_used_bytes'] ?? null,
+                        'disk_used_percent' => $host['disk_used_percent'] ?? null,
+                        'metadata' => $host['metadata'] ?? null,
+                    ]);
+                }
+
+                foreach ($payload['projects'] ?? [] as $sample) {
+                    $project = $projects->get($sample['key']);
+                    servers_project_sample::create([
+                        'project_id' => $project->id,
+                        'agent_id' => $agent->agent_id,
+                        'sampled_at' => $sample['sampled_at'] ?? $validated['captured_at'],
+                        'attribution_mode' => $sample['attribution_mode'] ?? $project->attribution_mode,
+                        'cpu_percent' => $sample['cpu_percent'] ?? null,
+                        'memory_rss_bytes' => $sample['memory_rss_bytes'] ?? null,
+                        'memory_pss_bytes' => $sample['memory_pss_bytes'] ?? null,
+                        'process_count' => $sample['process_count'] ?? null,
+                        'fpm_active_processes' => $sample['fpm_active_processes'] ?? null,
+                        'fpm_idle_processes' => $sample['fpm_idle_processes'] ?? null,
+                        'fpm_listen_queue' => $sample['fpm_listen_queue'] ?? null,
+                        'fpm_max_listen_queue' => $sample['fpm_max_listen_queue'] ?? null,
+                        'fpm_max_children_reached' => $sample['fpm_max_children_reached'] ?? null,
+                        'fpm_slow_requests' => $sample['fpm_slow_requests'] ?? null,
+                        'storage_total_bytes' => $sample['storage_total_bytes'] ?? null,
+                        'storage_files' => $sample['storage_files'] ?? null,
+                        'storage_directories' => $sample['storage_directories'] ?? null,
+                        'storage_scan_duration_ms' => $sample['storage_scan_duration_ms'] ?? null,
+                        'metadata' => $sample['metadata'] ?? null,
+                    ]);
+                }
+
+                foreach ($payload['http_buckets'] ?? [] as $bucket) {
+                    $project = $projects->get($bucket['project_key']);
+                    servers_http_bucket::create([
+                        'project_id' => $project->id,
+                        'agent_id' => $agent->agent_id,
+                        'bucket_start' => $bucket['bucket_start'],
+                        'bucket_seconds' => $bucket['bucket_seconds'] ?? 60,
+                        'requests_total' => $bucket['requests_total'] ?? 0,
+                        'status_2xx' => $bucket['status_2xx'] ?? 0,
+                        'status_3xx' => $bucket['status_3xx'] ?? 0,
+                        'status_4xx' => $bucket['status_4xx'] ?? 0,
+                        'status_5xx' => $bucket['status_5xx'] ?? 0,
+                        'status_499' => $bucket['status_499'] ?? 0,
+                        'status_500' => $bucket['status_500'] ?? 0,
+                        'status_502' => $bucket['status_502'] ?? 0,
+                        'status_503' => $bucket['status_503'] ?? 0,
+                        'status_504' => $bucket['status_504'] ?? 0,
+                        'request_bytes' => $bucket['request_bytes'] ?? 0,
+                        'response_bytes' => $bucket['response_bytes'] ?? 0,
+                        'latency_count' => $bucket['latency_count'] ?? 0,
+                        'latency_sum_ms' => $bucket['latency_sum_ms'] ?? 0,
+                        'p50_ms' => $bucket['p50_ms'] ?? null,
+                        'p95_ms' => $bucket['p95_ms'] ?? null,
+                        'p99_ms' => $bucket['p99_ms'] ?? null,
+                        'metadata' => $bucket['metadata'] ?? null,
+                    ]);
+                }
+
+                foreach ($payload['storage'] ?? [] as $storage) {
+                    $project = $projects->get($storage['project_key']);
+                    servers_storage_sample::create([
+                        'project_id' => $project->id,
+                        'agent_id' => $agent->agent_id,
+                        'sampled_at' => $storage['sampled_at'] ?? $validated['captured_at'],
+                        'total_bytes' => $storage['total_bytes'] ?? null,
+                        'files' => $storage['files'] ?? null,
+                        'directories' => $storage['directories'] ?? null,
+                        'scan_duration_ms' => $storage['scan_duration_ms'] ?? null,
+                        'breakdown' => $storage['breakdown'] ?? null,
+                        'metadata' => $storage['metadata'] ?? null,
+                    ]);
+                }
+
+                foreach ($payload['events'] ?? [] as $event) {
+                    $project = ! empty($event['project_key']) ? $projects->get($event['project_key']) : null;
+                    servers_event::create([
+                        'host_id' => $agent->host_id,
+                        'project_id' => $project ? $project->id : null,
+                        'agent_id' => $agent->agent_id,
+                        'event_type' => $event['event_type'],
+                        'severity' => $event['severity'] ?? 'info',
+                        'occurred_at' => $event['occurred_at'] ?? $validated['captured_at'],
+                        'message' => $event['message'] ?? null,
+                        'context' => $event['context'] ?? null,
+                    ]);
+                }
+
+                $agent->last_seen_at = now();
+                if (array_key_exists('config_version', $validated)) {
+                    $agent->config_version = $validated['config_version'];
+                }
+                $agent->save();
+            });
+        } catch (UniqueConstraintViolationException $exception) {
+            $existingBatch = servers_ingest_batch::where('batch_id', $validated['batch_id'])->first();
+            if (! $existingBatch) {
+                throw $exception;
             }
 
-            foreach ($payload['projects'] ?? [] as $sample) {
-                $project = $projects->get($sample['key']);
-                servers_project_sample::create([
-                    'project_id' => $project->id,
-                    'agent_id' => $agent->agent_id,
-                    'sampled_at' => $sample['sampled_at'] ?? $validated['captured_at'],
-                    'attribution_mode' => $sample['attribution_mode'] ?? $project->attribution_mode,
-                    'cpu_percent' => $sample['cpu_percent'] ?? null,
-                    'memory_rss_bytes' => $sample['memory_rss_bytes'] ?? null,
-                    'memory_pss_bytes' => $sample['memory_pss_bytes'] ?? null,
-                    'process_count' => $sample['process_count'] ?? null,
-                    'fpm_active_processes' => $sample['fpm_active_processes'] ?? null,
-                    'fpm_idle_processes' => $sample['fpm_idle_processes'] ?? null,
-                    'fpm_listen_queue' => $sample['fpm_listen_queue'] ?? null,
-                    'fpm_max_listen_queue' => $sample['fpm_max_listen_queue'] ?? null,
-                    'fpm_max_children_reached' => $sample['fpm_max_children_reached'] ?? null,
-                    'fpm_slow_requests' => $sample['fpm_slow_requests'] ?? null,
-                    'storage_total_bytes' => $sample['storage_total_bytes'] ?? null,
-                    'storage_files' => $sample['storage_files'] ?? null,
-                    'storage_directories' => $sample['storage_directories'] ?? null,
-                    'storage_scan_duration_ms' => $sample['storage_scan_duration_ms'] ?? null,
-                    'metadata' => $sample['metadata'] ?? null,
-                ]);
-            }
-
-            foreach ($payload['http_buckets'] ?? [] as $bucket) {
-                $project = $projects->get($bucket['project_key']);
-                servers_http_bucket::create([
-                    'project_id' => $project->id,
-                    'agent_id' => $agent->agent_id,
-                    'bucket_start' => $bucket['bucket_start'],
-                    'bucket_seconds' => $bucket['bucket_seconds'] ?? 60,
-                    'requests_total' => $bucket['requests_total'] ?? 0,
-                    'status_2xx' => $bucket['status_2xx'] ?? 0,
-                    'status_3xx' => $bucket['status_3xx'] ?? 0,
-                    'status_4xx' => $bucket['status_4xx'] ?? 0,
-                    'status_5xx' => $bucket['status_5xx'] ?? 0,
-                    'status_499' => $bucket['status_499'] ?? 0,
-                    'status_500' => $bucket['status_500'] ?? 0,
-                    'status_502' => $bucket['status_502'] ?? 0,
-                    'status_503' => $bucket['status_503'] ?? 0,
-                    'status_504' => $bucket['status_504'] ?? 0,
-                    'request_bytes' => $bucket['request_bytes'] ?? 0,
-                    'response_bytes' => $bucket['response_bytes'] ?? 0,
-                    'latency_count' => $bucket['latency_count'] ?? 0,
-                    'latency_sum_ms' => $bucket['latency_sum_ms'] ?? 0,
-                    'p50_ms' => $bucket['p50_ms'] ?? null,
-                    'p95_ms' => $bucket['p95_ms'] ?? null,
-                    'p99_ms' => $bucket['p99_ms'] ?? null,
-                    'metadata' => $bucket['metadata'] ?? null,
-                ]);
-            }
-
-            foreach ($payload['storage'] ?? [] as $storage) {
-                $project = $projects->get($storage['project_key']);
-                servers_storage_sample::create([
-                    'project_id' => $project->id,
-                    'agent_id' => $agent->agent_id,
-                    'sampled_at' => $storage['sampled_at'] ?? $validated['captured_at'],
-                    'total_bytes' => $storage['total_bytes'] ?? null,
-                    'files' => $storage['files'] ?? null,
-                    'directories' => $storage['directories'] ?? null,
-                    'scan_duration_ms' => $storage['scan_duration_ms'] ?? null,
-                    'breakdown' => $storage['breakdown'] ?? null,
-                    'metadata' => $storage['metadata'] ?? null,
-                ]);
-            }
-
-            foreach ($payload['events'] ?? [] as $event) {
-                $project = ! empty($event['project_key']) ? $projects->get($event['project_key']) : null;
-                servers_event::create([
-                    'host_id' => $agent->host_id,
-                    'project_id' => $project ? $project->id : null,
-                    'agent_id' => $agent->agent_id,
-                    'event_type' => $event['event_type'],
-                    'severity' => $event['severity'] ?? 'info',
-                    'occurred_at' => $event['occurred_at'] ?? $validated['captured_at'],
-                    'message' => $event['message'] ?? null,
-                    'context' => $event['context'] ?? null,
-                ]);
-            }
-
-            $agent->last_seen_at = now();
-            if (array_key_exists('config_version', $validated)) {
-                $agent->config_version = $validated['config_version'];
-            }
-            $agent->save();
-        });
+            return $this->duplicateBatchResponse($existingBatch, $validated['batch_id'], $agent->agent_id, $payloadHash);
+        }
 
         return response()->json([
             'accepted' => true,
             'duplicate' => false,
             'batch_id' => $validated['batch_id'],
+        ], 202);
+    }
+
+    private function duplicateBatchResponse(servers_ingest_batch $batch, string $batchId, string $agentId, string $payloadHash)
+    {
+        if ($batch->payload_hash !== $payloadHash || $batch->agent_id !== $agentId) {
+            return response()->json(['message' => 'Batch id was already used with another payload.'], 409);
+        }
+
+        return response()->json([
+            'accepted' => true,
+            'duplicate' => true,
+            'batch_id' => $batchId,
         ], 202);
     }
 

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Servers\Models\servers_agent;
 use App\Domain\Servers\Models\servers_host;
+use App\Domain\Servers\Models\servers_ingest_batch;
 use App\Domain\Servers\Models\servers_project;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -191,6 +192,64 @@ class servers_api_test extends TestCase
         $this->assertSame(1, DB::table('servers_host_samples')->count());
         $this->assertSame(1, DB::table('servers_project_samples')->count());
         $this->assertSame(1, DB::table('servers_http_buckets')->count());
+    }
+
+    public function test_ingest_handles_a_batch_created_after_the_duplicate_check()
+    {
+        $payload = [
+            'agent_id' => 'test-agent',
+            'batch_id' => 'batch-race',
+            'captured_at' => '2026-08-14T14:00:15Z',
+            'projects' => [['key' => 'test-project']],
+        ];
+        $inserted = false;
+
+        servers_project::retrieved(function () use (&$inserted, $payload): void {
+            if ($inserted) {
+                return;
+            }
+
+            $inserted = true;
+            servers_ingest_batch::create([
+                'batch_id' => $payload['batch_id'],
+                'agent_id' => $payload['agent_id'],
+                'captured_at' => $payload['captured_at'],
+                'payload_hash' => hash('sha256', request()->getContent()),
+                'accepted_at' => now(),
+            ]);
+        });
+
+        $this->withHeaders($this->observerHeaders())
+            ->postJson('/api/internal/servers/v1/ingest', $payload)
+            ->assertStatus(202)
+            ->assertJsonPath('duplicate', true);
+
+        $this->assertSame(1, DB::table('servers_ingest_batches')->count());
+        $this->assertSame(0, DB::table('servers_project_samples')->count());
+    }
+
+    public function test_ingest_rejects_reuse_of_a_batch_id_with_a_different_payload()
+    {
+        $payload = [
+            'agent_id' => 'test-agent',
+            'batch_id' => 'batch-conflict',
+            'captured_at' => '2026-08-14T14:00:15Z',
+            'projects' => [['key' => 'test-project']],
+        ];
+
+        $this->withHeaders($this->observerHeaders())
+            ->postJson('/api/internal/servers/v1/ingest', $payload)
+            ->assertStatus(202)
+            ->assertJsonPath('duplicate', false);
+
+        $payload['captured_at'] = '2026-08-14T14:01:15Z';
+
+        $this->withHeaders($this->observerHeaders())
+            ->postJson('/api/internal/servers/v1/ingest', $payload)
+            ->assertStatus(409)
+            ->assertJsonPath('message', 'Batch id was already used with another payload.');
+
+        $this->assertSame(1, DB::table('servers_ingest_batches')->count());
     }
 
     public function test_ingest_rejects_projects_outside_the_active_registry()

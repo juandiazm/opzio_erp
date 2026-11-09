@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\jira_connection;
+use App\Services\Jira\jira_client;
 use App\Services\Jira\jira_sync_service;
 use Illuminate\Console\Command;
 use Throwable;
@@ -38,7 +39,14 @@ class jira_sync extends Command
             );
             $this->info($connection->name.': '.$result['message']);
         } catch (Throwable $exception) {
-            $this->error($connection->name.': '.$exception->getMessage());
+            $message = jira_client::safeMessage($exception);
+            logger()->error('Jira sync command failed.', [
+                'connection_id' => $connection->id,
+                'connection_name' => $connection->name,
+                'exception' => $exception::class,
+                'message' => $message,
+            ]);
+            $this->error($connection->name.': '.$message);
             return self::FAILURE;
         }
 
