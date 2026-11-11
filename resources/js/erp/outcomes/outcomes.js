@@ -4,7 +4,16 @@ import * as massImport from './import.js';
 import * as shared from './shared.js';
 import { createOutcome } from './create.js';
 import { updateOutcome, showCurrentOutcome } from './update.js';
+import { exportOutcomes } from './export.js';
 import { getUpdateRecordId, setUpdateRecordId } from '../layouts/record-url.js';
+
+function setOutcomeActionsExpanded(expanded){
+    $('#outcome-actions-container')
+        .toggleClass('is-expanded', expanded)
+        .toggleClass('is-collapsed', !expanded);
+    $('#outcome-actions-toggle').attr('aria-expanded', expanded ? 'true' : 'false');
+    $('#outcome-actions-menu').attr('aria-hidden', expanded ? 'false' : 'true');
+}
 
 function loadOutcomeFromUrl(){
     const recordId = outcomeState.urlRecordId;
@@ -58,10 +67,36 @@ $(document).ready(function(){
     shared.getOutcomeFormData(finishCatalogLoading, finishCatalogLoading);
 });
 $(document).on('click', '#nav-tab .nav-link', changeTab);
+$(document).on('mouseenter', '#outcome-actions-container', function(){ setOutcomeActionsExpanded(true); });
+$(document).on('focusin', '#outcome-actions-container', function(event){
+    if(event.target.id !== 'outcome-actions-toggle' || !this.classList.contains('is-collapsed')){
+        setOutcomeActionsExpanded(true);
+    }
+});
+$(document).on('mouseleave', '#outcome-actions-container', function(){
+    if(!this.contains(document.activeElement)) setOutcomeActionsExpanded(false);
+});
+$(document).on('focusout', '#outcome-actions-container', function(){
+    const container = this;
+    window.setTimeout(function(){
+        if(!container.contains(document.activeElement) && !container.matches(':hover')) setOutcomeActionsExpanded(false);
+    }, 0);
+});
+$(document).on('click', '#outcome-actions-toggle', function(){ setOutcomeActionsExpanded(true); });
+$(document).on('click', function(event){
+    if(!$(event.target).closest('#outcome-actions-container').length) setOutcomeActionsExpanded(false);
+});
+$(document).on('keydown', '#outcome-actions-container', function(event){
+    if(event.key === 'Escape'){
+        setOutcomeActionsExpanded(false);
+        $('#outcome-actions-toggle').trigger('focus');
+    }
+});
 $(document).on('click', '#toggle-outcome-filters', list.toggleFilters);
 $(document).on('click', '#create-outcome-button', createOutcome);
 $(document).on('click', '#update-outcome-button', updateOutcome);
 $(document).on('click', '#import-btn-container', massImport.openMassImportModal);
+$(document).on('click', '#export-outcomes-btn', exportOutcomes);
 $(document).on('click', '#import-cancel-btn, #import-cancel-action', massImport.closeMassImportModal);
 $(document).on('change', '#import-format', massImport.updateImportFormat);
 $(document).on('click', '#import-confirm-btn', massImport.confirmMassImport);

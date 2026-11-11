@@ -1,6 +1,18 @@
-<button type="button" id="import-btn-container" title="Importar egresos" aria-label="Importar egresos">
-    <i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i>
-</button>
+<div id="outcome-actions-container" class="outcome-actions-container">
+    <div id="outcome-actions-menu" class="outcome-actions-menu" role="group" aria-label="Funciones de egresos" aria-hidden="true">
+        <button type="button" id="import-btn-container" class="outcome-action-button" title="Importar egresos" aria-label="Importar egresos">
+            <i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i>
+            <span>Importar egresos</span>
+        </button>
+        <button type="button" id="export-outcomes-btn" class="outcome-action-button" title="Exportar todos los egresos que coinciden con los filtros" aria-label="Exportar egresos filtrados">
+            <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+            <span>Exportar egresos</span>
+        </button>
+    </div>
+    <button type="button" id="outcome-actions-toggle" class="outcome-actions-toggle" title="Mostrar funciones de egresos" aria-label="Mostrar funciones de egresos" aria-controls="outcome-actions-menu" aria-expanded="false">
+        <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
+    </button>
+</div>
 <div id="import-form-container" aria-hidden="true">
     <form id="import-form" enctype="multipart/form-data">
         @csrf

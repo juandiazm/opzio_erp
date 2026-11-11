@@ -107,11 +107,24 @@ export function showPagination(){
     paginationContainer.append(appendedContent);
 }
 
-export function getOutcomesPage(onLoaded, recordId = null){
-    let dataSend = {page: outcomeState.pagination.page, size: outcomeState.pagination.size, search: String($('#search-list-input').val() || '').trim(), from: $('#date-from').val() || null, to: $('#date-to').val() || null};
+export function getOutcomeFilters(){
+    const dataSend = {
+        search: String($('#search-list-input').val() || '').trim(),
+        from: $('#date-from').val() || '',
+        to: $('#date-to').val() || '',
+    };
     filterDefinitions.forEach(function(definition){
-        dataSend[definition.field] = $(definition.selector).val() || null;
+        dataSend[definition.field] = $(definition.selector).val() || '';
     });
+    return dataSend;
+}
+
+export function getOutcomesPage(onLoaded, recordId = null){
+    const dataSend = {
+        page: outcomeState.pagination.page,
+        size: outcomeState.pagination.size,
+        ...getOutcomeFilters(),
+    };
     PostMethodFunction('/admin/outcomes/get', dataSend, null, function(response){ showOutcomesPage(response, onLoaded, recordId); }, null);
 }
 

@@ -493,6 +493,7 @@ Route::prefix('admin')->group(function () {
             Route::post('update-association', [outcomes_controller::class, 'update_outcome_association']);
             Route::post('import', [outcomes_controller::class, 'import_outcomes']);
             Route::post('get', [outcomes_controller::class, 'get_outcomes']);
+            Route::get('export', [outcomes_controller::class, 'export_outcomes']);
             Route::post('delete', [outcomes_controller::class, 'delete_outcome']);
             Route::post('recover', [outcomes_controller::class, 'recover_outcome']);
         });

@@ -2,12 +2,17 @@
 
 namespace Tests\Unit\Outcomes;
 
+use App\Exportable\outcomes_export;
 use App\Models\outcome;
 use App\Models\outcome_type;
 use App\Models\user;
 use App\traits\outcomes_trait;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Excel as ExcelFormat;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Tests\TestCase;
 
 class OutcomeListTest extends TestCase
@@ -63,6 +68,64 @@ class OutcomeListTest extends TestCase
             'provider_id' => 'none',
         ]));
         $this->assertSame(2, $unassignedProvider['pagination']['total']);
+    }
+
+    public function test_filtered_export_query_includes_all_matches_and_summarizes_deleted_outcomes_separately(): void
+    {
+        $manager = new class {
+            use outcomes_trait;
+        };
+
+        $firstType = outcome_type::create(['name' => 'Servicios para exportar']);
+        $secondType = outcome_type::create(['name' => 'Otro tipo para exportar']);
+        $testUser = user::forceCreate([
+            'unique_id' => uniqid('user-', true),
+            'name' => 'Usuario',
+            'lastname' => 'Exportación',
+            'username' => uniqid('export-', true),
+            'email' => uniqid('export-', true).'@example.test',
+            'identification' => uniqid('export-id-', true),
+            'password' => 'password',
+        ]);
+
+        $activeOutcome = $this->createOutcome($testUser->id, $firstType->id, 10.25, 'Servicio contable');
+        $deletedOutcome = $this->createOutcome($testUser->id, $firstType->id, 20.25, 'Servicio contable eliminado');
+        $deletedOutcome->delete();
+        $this->createOutcome($testUser->id, $secondType->id, 99.99, 'Servicio excluido por tipo');
+
+        $query = $manager->Outcome_BuildFilteredOutcomesQuery(new Request([
+            'page' => 1,
+            'size' => 1,
+            'from' => '2026-08-18',
+            'to' => '2026-08-18',
+            'search' => 'Servicio',
+            'outcome_type_id' => $firstType->id,
+        ]));
+
+        $this->assertEqualsCanonicalizing(
+            [$activeOutcome->id, $deletedOutcome->id],
+            $query->pluck('id')->all()
+        );
+
+        $export = new outcomes_export($query);
+        $sheets = $export->sheets();
+        $this->assertSame(['Resumen', 'Detalle'], array_map(function ($sheet) {
+            return $sheet->title();
+        }, $sheets));
+
+        $summaryRows = $sheets[0]->collection()->all();
+        $this->assertContains(['Servicios para exportar', 'Vigente', 1, 10.25], $summaryRows);
+        $this->assertContains(['Servicios para exportar', 'Eliminado', 1, 20.25], $summaryRows);
+        $this->assertContains(['TOTAL VIGENTE', 'Vigente', 1, 10.25], $summaryRows);
+        $this->assertContains(['TOTAL ELIMINADO', 'Eliminado', 1, 20.25], $summaryRows);
+        $this->assertContains(['TOTAL GENERAL (incluye eliminados)', 'Todos', 2, 30.5], $summaryRows);
+
+        $formulaCell = (new Spreadsheet())->getActiveSheet()->getCell('A1');
+        $sheets[1]->bindValue($formulaCell, '=1+1');
+        $this->assertSame(DataType::TYPE_STRING, $formulaCell->getDataType());
+
+        $xlsx = Excel::raw($export, ExcelFormat::XLSX);
+        $this->assertStringStartsWith('PK', $xlsx);
     }
 
     public function test_form_catalogs_include_types_and_association_updates_are_scoped(): void

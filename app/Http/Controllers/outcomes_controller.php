@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Session;
 
+use App\Exportable\outcomes_export;
 use App\traits\outcomes_trait;
+use Maatwebsite\Excel\Facades\Excel;
 
 class outcomes_controller extends Controller
 {
@@ -136,6 +138,47 @@ class outcomes_controller extends Controller
             return response()->json($Response);
         }
         return response()->json($Response, 400);
+    }
+
+    public function export_outcomes(Request $request)
+    {
+        $associationFilter = function ($attribute, $value, $fail) {
+            if ($value === null) {
+                return;
+            }
+
+            if (!is_scalar($value)) {
+                $fail('El filtro seleccionado no es válido.');
+                return;
+            }
+
+            if (in_array((string) $value, ['none', 'null'], true)) {
+                return;
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
+                $fail('El filtro seleccionado no es válido.');
+            }
+        };
+
+        $request->validate([
+            'from' => ['nullable', 'date_format:Y-m-d'],
+            'to' => ['nullable', 'date_format:Y-m-d'],
+            'search' => ['nullable', 'string'],
+            'outcome_type_id' => ['nullable', $associationFilter],
+            'provider_id' => ['nullable', $associationFilter],
+            'employee_id' => ['nullable', $associationFilter],
+            'department_id' => ['nullable', $associationFilter],
+            'user_id' => ['nullable', $associationFilter],
+            'client_id' => ['nullable', $associationFilter],
+        ]);
+
+        $query = $this->Outcome_BuildFilteredOutcomesQuery($request);
+
+        return Excel::download(
+            new outcomes_export($query),
+            'egresos_'.now()->format('Ymd_His').'.xlsx'
+        );
     }
     
     public function delete_outcome(Request $request)

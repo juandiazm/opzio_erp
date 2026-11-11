@@ -2,6 +2,8 @@
 namespace App\traits;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Session;
 use App\Imports\outcomes_import;
 use Illuminate\Support\Facades\Storage;
@@ -449,9 +451,6 @@ trait outcomes_trait
     {
         $page   = max(1, (int) $request->input('page', 1));
         $size   = max(1, (int) $request->input('size', 5));
-        $from   = $request->input('from');
-        $to     = $request->input('to');
-        $search = $request->input('search');
 
         $Response = [
             'status'     => 0,
@@ -462,49 +461,7 @@ trait outcomes_trait
         ];
 
         try {
-            $query = outcome::query()->withTrashed()->with(['provider', 'employee', 'department', 'user', 'client', 'outcomeType']);
-
-            // filtro de fechas
-            if ($from) {
-                $query->where('date', '>=', Carbon::parse($from)->startOfDay());
-            }
-            if ($to) {
-                $query->where('date', '<=', Carbon::parse($to)->endOfDay());
-            }
-
-            $associationFilters = [
-                'outcome_type_id' => 'outcome_type_id',
-                'provider_id' => 'provider_id',
-                'employee_id' => 'employee_id',
-                'department_id' => 'department_id',
-                'user_id' => 'user_id',
-                'client_id' => 'client_id',
-            ];
-            foreach ($associationFilters as $input => $column) {
-                $filterValue = $request->input($input);
-                if ($filterValue === 'none' || $filterValue === 'null') {
-                    $query->whereNull($column);
-                    continue;
-                }
-                if (!is_scalar($filterValue)) {
-                    continue;
-                }
-
-                $filterId = filter_var($filterValue, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-                if ($filterId !== false) {
-                    $query->where($column, $filterId);
-                }
-            }
-
-            // filtro de búsqueda en name o description
-            if ($search) {
-                $query->where(function($q) use($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('unique_id', 'like', "%{$search}%")
-                    ->orWhere('amount', 'like', "%{$search}%");
-                });
-            }
+            $query = $this->Outcome_BuildFilteredOutcomesQuery($request);
 
             // conteo y paginado
             $total = (clone $query)->count();
@@ -536,6 +493,56 @@ trait outcomes_trait
         }
 
         return $Response;
+    }
+
+    public function Outcome_BuildFilteredOutcomesQuery(Request $request): Builder
+    {
+        $query = outcome::query()
+            ->withTrashed()
+            ->with(['provider', 'employee', 'department', 'user', 'client', 'outcomeType']);
+
+        if ($request->input('from')) {
+            $query->where('outcomes.date', '>=', Carbon::parse($request->input('from'))->startOfDay());
+        }
+        if ($request->input('to')) {
+            $query->where('outcomes.date', '<=', Carbon::parse($request->input('to'))->endOfDay());
+        }
+
+        $associationFilters = [
+            'outcome_type_id' => 'outcomes.outcome_type_id',
+            'provider_id' => 'outcomes.provider_id',
+            'employee_id' => 'outcomes.employee_id',
+            'department_id' => 'outcomes.department_id',
+            'user_id' => 'outcomes.user_id',
+            'client_id' => 'outcomes.client_id',
+        ];
+        foreach ($associationFilters as $input => $column) {
+            $filterValue = $request->input($input);
+            if ($filterValue === 'none' || $filterValue === 'null') {
+                $query->whereNull($column);
+                continue;
+            }
+            if (!is_scalar($filterValue)) {
+                continue;
+            }
+
+            $filterId = filter_var($filterValue, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($filterId !== false) {
+                $query->where($column, $filterId);
+            }
+        }
+
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function($q) use($search) {
+                $q->where('outcomes.name', 'like', "%{$search}%")
+                ->orWhere('outcomes.description', 'like', "%{$search}%")
+                ->orWhere('outcomes.unique_id', 'like', "%{$search}%")
+                ->orWhere('outcomes.amount', 'like', "%{$search}%");
+            });
+        }
+
+        return $query;
     }
 
     public function Outcome_DeleteOutcome(int $id)
