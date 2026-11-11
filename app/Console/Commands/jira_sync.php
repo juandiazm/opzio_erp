@@ -10,6 +10,8 @@ use Throwable;
 
 class jira_sync extends Command
 {
+    private const ERROR_RETRY_BACKOFF_MINUTES = 5;
+
     protected $signature = 'jira:sync {--connection=} {--days=1} {--full} {--incremental}';
 
     protected $description = 'Sincroniza proyectos, issues, worklogs e historial de Jira';
@@ -21,12 +23,23 @@ class jira_sync extends Command
             return self::INVALID;
         }
 
-        $connection = jira_connection::query()
-            ->where('status', 'active')
-            ->when($this->option('connection') !== null, fn ($query) => $query->whereKey((int) $this->option('connection')))
-            ->first();
+        $connectionQuery = jira_connection::query()
+            ->whereIn('status', ['active', 'error'])
+            ->when($this->option('connection') === null, function ($query): void {
+                $query->where(function ($query): void {
+                    $query->where('status', 'active')
+                        ->orWhere(function ($query): void {
+                            $query->where('status', 'error')
+                                ->whereDoesntHave('syncRuns', fn ($runs) => $runs
+                                    ->where('status', 'failed')
+                                    ->where('finished_at', '>=', now()->subMinutes(self::ERROR_RETRY_BACKOFF_MINUTES)));
+                        });
+                });
+            })
+            ->when($this->option('connection') !== null, fn ($query) => $query->whereKey((int) $this->option('connection')));
+        $connection = $connectionQuery->first();
         if ($connection === null) {
-            $this->warn('No hay conexiones Jira para sincronizar.');
+            $this->warn('No hay conexiones Jira elegibles para sincronizar.');
             return self::SUCCESS;
         }
 
@@ -40,11 +53,14 @@ class jira_sync extends Command
             $this->info($connection->name.': '.$result['message']);
         } catch (Throwable $exception) {
             $message = jira_client::safeMessage($exception);
+            $cause = $exception->getPrevious();
             logger()->error('Jira sync command failed.', [
                 'connection_id' => $connection->id,
                 'connection_name' => $connection->name,
                 'exception' => $exception::class,
                 'message' => $message,
+                'cause_exception' => $cause !== null ? $cause::class : null,
+                'cause_message' => $cause !== null ? jira_client::safeDiagnosticMessage($cause, $connection) : null,
             ]);
             $this->error($connection->name.': '.$message);
             return self::FAILURE;

@@ -1225,7 +1225,13 @@ class JiraModuleTest extends TestCase
         $service = \Mockery::mock(jira_sync_service::class);
         $service->shouldReceive('sync')
             ->once()
-            ->andThrow(new \RuntimeException('Jira devolvio HTTP 503.'));
+            ->andThrow(new \RuntimeException(
+                'No fue posible conectar con Jira. Verifica la URL, la red y el timeout.',
+                0,
+                new \Illuminate\Http\Client\ConnectionException(
+                    'cURL error 28: Operation timed out for https://demo.atlassian.net/rest/api/3/field?api_token=secret-token',
+                ),
+            ));
         $this->app->instance(jira_sync_service::class, $service);
 
         Log::shouldReceive('error')
@@ -1234,11 +1240,96 @@ class JiraModuleTest extends TestCase
                 return $message === 'Jira sync command failed.'
                     && $context['connection_id'] === $connection->id
                     && $context['exception'] === \RuntimeException::class
-                    && $context['message'] === 'Jira devolvio HTTP 503.';
+                    && $context['message'] === 'No fue posible conectar con Jira. Verifica la URL, la red y el timeout.'
+                    && $context['cause_exception'] === \Illuminate\Http\Client\ConnectionException::class
+                    && str_contains($context['cause_message'], 'cURL error 28')
+                    && ! str_contains($context['cause_message'], 'secret-token')
+                    && ! str_contains($context['cause_message'], 'demo.atlassian.net');
             });
 
         $exitCode = Artisan::call('jira:sync', ['--incremental' => true, '--days' => 1]);
 
         $this->assertSame(1, $exitCode);
+    }
+
+    public function test_sync_command_retries_failed_connection_after_backoff(): void
+    {
+        $connection = jira_connection::create([
+            'name' => 'Jira recuperable',
+            'site_url' => 'https://demo.atlassian.net',
+            'provider' => 'jira_cloud',
+            'status' => 'error',
+            'credentials' => ['email' => 'robot@example.test', 'api_token' => 'secret-token'],
+            'last_error' => 'No fue posible conectar con Jira.',
+        ]);
+        $failedAt = now()->subMinutes(6);
+        $connection->syncRuns()->create([
+            'mode' => 'incremental',
+            'status' => 'failed',
+            'started_at' => $failedAt,
+            'finished_at' => $failedAt,
+            'error_message' => 'No fue posible conectar con Jira.',
+        ]);
+
+        Http::fake(function ($request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            return match (true) {
+                str_ends_with($path, '/field') => Http::response([]),
+                str_ends_with($path, '/project/search') => Http::response(['isLast' => true, 'values' => []]),
+                str_ends_with($path, '/search/jql') => Http::response(['isLast' => true, 'total' => 0, 'issues' => []]),
+                default => Http::response([], 200),
+            };
+        });
+
+        $exitCode = Artisan::call('jira:sync', ['--incremental' => true, '--days' => 1]);
+
+        $this->assertSame(0, $exitCode);
+        $this->assertSame('active', $connection->fresh()->status);
+        $this->assertNull($connection->fresh()->last_error);
+        $this->assertSame(1, $connection->syncRuns()->where('status', 'succeeded')->count());
+    }
+
+    public function test_sync_command_defers_recent_errors_but_allows_explicit_retry(): void
+    {
+        $connection = jira_connection::create([
+            'name' => 'Jira con fallo reciente',
+            'site_url' => 'https://demo.atlassian.net',
+            'provider' => 'jira_cloud',
+            'status' => 'error',
+            'credentials' => ['email' => 'robot@example.test', 'api_token' => 'secret-token'],
+            'last_error' => 'No fue posible conectar con Jira.',
+        ]);
+        $failedAt = now()->subMinute();
+        $connection->syncRuns()->create([
+            'mode' => 'incremental',
+            'status' => 'failed',
+            'started_at' => $failedAt,
+            'finished_at' => $failedAt,
+            'error_message' => 'No fue posible conectar con Jira.',
+        ]);
+        Http::fake();
+
+        $scheduledExitCode = Artisan::call('jira:sync', ['--incremental' => true, '--days' => 1]);
+
+        $this->assertSame(0, $scheduledExitCode);
+        Http::assertNothingSent();
+
+        $service = \Mockery::mock(jira_sync_service::class);
+        $service->shouldReceive('sync')
+            ->once()
+            ->withArgs(fn ($actualConnection, int $days, bool $full, bool $incremental): bool => $actualConnection->is($connection)
+                && $days === 1
+                && ! $full
+                && $incremental)
+            ->andReturn(['message' => 'Sincronizacion de prueba.']);
+        $this->app->instance(jira_sync_service::class, $service);
+
+        $manualExitCode = Artisan::call('jira:sync', [
+            '--connection' => $connection->id,
+            '--incremental' => true,
+            '--days' => 1,
+        ]);
+
+        $this->assertSame(0, $manualExitCode);
     }
 }

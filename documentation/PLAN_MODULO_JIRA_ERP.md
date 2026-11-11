@@ -486,7 +486,7 @@ La primera entrega debe incluir el comando:
 php artisan jira:sync {--connection=} {--days=1} {--incremental|--full}
 ```
 
-La interfaz puede invocar la misma capa de servicio para una sincronizacion manual. El modo `--incremental` consulta issues con `updated` desde `last_sync_at` de la ejecución anterior, con dos minutos de solapamiento para no perder cambios en el límite; `--full` consulta por `created` desde la última historia almacenada. El upsert hace que el solapamiento sea seguro y evita duplicados. El scheduler ejecuta `jira:sync --incremental --days=1` cada hora.
+La interfaz puede invocar la misma capa de servicio para una sincronizacion manual. El modo `--incremental` consulta issues con `updated` desde `last_sync_at` de la ejecución anterior, con dos minutos de solapamiento para no perder cambios en el límite; `--full` consulta por `created` desde la última historia almacenada. El upsert hace que el solapamiento sea seguro y evita duplicados. El scheduler evalua `jira:sync --incremental --days=1` cada minuto. Si una ejecucion falla y la conexion queda en `error`, se reintenta automaticamente cinco minutos despues del ultimo fallo; `draft` y `disabled` no se sincronizan. Una ejecucion explicita con `--connection=<id>` permite forzar un reintento antes de ese plazo.
 
 Punto importante: `config/queue.php` del ERP tiene por defecto `QUEUE_CONNECTION=sync`. Por ello, crear un Job no vuelve asynchrono el proceso en el entorno actual. Para sincronizaciones largas o reportes IA de gran volumen se debe decidir entre:
 

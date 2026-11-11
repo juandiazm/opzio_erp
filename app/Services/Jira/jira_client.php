@@ -316,4 +316,18 @@ class jira_client
 
         return $message !== '' ? mb_substr($message, 0, 500) : 'No fue posible completar la operacion con Jira.';
     }
+
+    public static function safeDiagnosticMessage(Throwable $exception, jira_connection $connection): string
+    {
+        $message = trim($exception->getMessage());
+        $message = preg_replace('/https?:\/\/[^\s]+/i', '[URL]', $message) ?? $message;
+        foreach (['email', 'api_token'] as $key) {
+            $credential = trim((string) $connection->credential($key));
+            if ($credential !== '') {
+                $message = str_replace($credential, '[REDACTED]', $message);
+            }
+        }
+
+        return $message !== '' ? mb_substr($message, 0, 500) : $exception::class;
+    }
 }
